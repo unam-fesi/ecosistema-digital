@@ -11,7 +11,7 @@ const ADMIN_EMAIL = 'admin@ecosistemadigital.unam.mx';
  */
 async function checkAuth() {
   try {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await supabaseClient.auth.getSession();
     return session;
   } catch (error) {
     console.error('Error verificando autenticación:', error);
@@ -27,7 +27,7 @@ async function checkAuth() {
  */
 async function loginAdmin(email, password) {
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
       email,
       password
     });
@@ -49,7 +49,7 @@ async function loginAdmin(email, password) {
  */
 async function logoutAdmin() {
   try {
-    await supabase.auth.signOut();
+    await supabaseClient.auth.signOut();
     window.location.href = 'index.html';
   } catch (error) {
     console.error('Error en logout:', error);
