@@ -367,6 +367,7 @@ body { font-family:'Inter',system-ui,-apple-system,sans-serif; color:#1E293B; ba
   border-color:var(--gold); font-weight:700; position:relative; }
 .calendar-day.reserved::after { content:'•'; position:absolute; bottom:2px; right:4px;
   color:var(--gold); font-weight:900; }
+.calendar-day.today { border:2px solid var(--gold); font-weight:700; color:var(--navy); }
 .calendar-day.selected { background:var(--gold); color:var(--navy); border-color:var(--gold); }
 .calendar-day:hover:not(.other-month) { border-color:var(--gold); background:rgba(196,162,78,0.06); }
 
@@ -991,8 +992,21 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
           <div class="form-group"><label class="form-label">Tipo de usuario <span class="req">*</span></label><select class="input" required><option value="">Seleccionar...</option><option>Estudiante</option><option>Profesor</option><option>Investigador</option><option>Área académica</option><option>Grupo de trabajo</option><option>Otro</option></select></div>
           <div class="form-group"><label class="form-label">Servicio solicitado <span class="req">*</span></label><select class="input" required><option value="">Seleccionar...</option><option>Inteligencia Artificial</option><option>Realidad Virtual</option><option>Realidad Aumentada</option><option>Uso de Bases de Datos</option><option>Telemedicina</option></select></div>
           <div class="form-group"><label class="form-label">Modalidad <span class="req">*</span></label><select class="input" id="modalidadSol" onchange="toggleGroup('grupalSol',this.value==='Grupal')" required><option value="">Seleccionar...</option><option>Individual</option><option>Grupal</option></select></div>
-          <div class="form-group"><label class="form-label">Fecha deseada</label><input class="input" type="date"></div>
         </div>
+        <div class="form-group"><label class="form-label">Fecha deseada</label></div>
+        <div class="calendar-widget" style="margin-bottom:24px;background:#f9fafb;border:1px solid #E8ECF1">
+          <div class="calendar-header">
+            <h4>📅 Selecciona fecha</h4>
+            <div class="calendar-nav">
+              <button type="button" class="calendar-nav-btn" onclick="prevCalendarMonth('servicios')">← Anterior</button>
+              <span style="padding:6px 12px;font-weight:600;color:var(--navy);min-width:120px;text-align:center" id="calendarTitle_servicios">Marzo 2026</span>
+              <button type="button" class="calendar-nav-btn" onclick="nextCalendarMonth('servicios')">Siguiente →</button>
+            </div>
+          </div>
+          <div class="calendar-grid" id="calendarGrid_servicios"></div>
+          <p style="font-size:12px;color:#94A3B8;margin-top:12px;text-align:center">• = Solicitud existente | Selecciona una fecha disponible</p>
+        </div>
+        <input type="hidden" id="serviciosDateInput" name="servicios_fecha" value="">
         <div class="group-box" id="grupalSol" style="display:none">
           <div class="group-box-title">⬢ Información del grupo</div>
           <div class="form-grid">
@@ -1098,10 +1112,21 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
           <div class="form-group"><label class="form-label">Carrera o área</label><input class="input" placeholder="Ej. Médico Cirujano"></div>
           <div class="form-group"><label class="form-label">Tipo de asesoría <span class="req">*</span></label><select class="input" required><option value="">Seleccionar...</option><option>Orientación general</option><option>Asesoría especializada</option><option>Acompañamiento remoto</option><option>Consulta interdisciplinaria</option><option>Segunda opinión académica</option></select></div>
           <div class="form-group"><label class="form-label">Motivo <span class="req">*</span></label><textarea class="input" rows="3" placeholder="Describa el motivo..." required></textarea></div>
-          <div class="form-grid" style="gap:0 16px">
-            <div class="form-group"><label class="form-label">Modalidad <span class="req">*</span></label><select class="input" required><option value="">Seleccionar...</option><option>Individual</option><option>Grupal</option></select></div>
-            <div class="form-group"><label class="form-label">Fecha estimada</label><input class="input" type="date"></div>
+          <div class="form-group"><label class="form-label">Modalidad <span class="req">*</span></label><select class="input" required><option value="">Seleccionar...</option><option>Individual</option><option>Grupal</option></select></div>
+          <div class="form-group"><label class="form-label">Fecha estimada</label></div>
+          <div class="calendar-widget" style="margin-bottom:24px;background:#f9fafb;border:1px solid #E8ECF1">
+            <div class="calendar-header">
+              <h4>📅 Selecciona fecha</h4>
+              <div class="calendar-nav">
+                <button type="button" class="calendar-nav-btn" onclick="prevCalendarMonth('telemedicina')">← Anterior</button>
+                <span style="padding:6px 12px;font-weight:600;color:var(--navy);min-width:120px;text-align:center" id="calendarTitle_telemedicina">Marzo 2026</span>
+                <button type="button" class="calendar-nav-btn" onclick="nextCalendarMonth('telemedicina')">Siguiente →</button>
+              </div>
+            </div>
+            <div class="calendar-grid" id="calendarGrid_telemedicina"></div>
+            <p style="font-size:12px;color:#94A3B8;margin-top:12px;text-align:center">• = Asesoría programada | Selecciona una fecha disponible</p>
           </div>
+          <input type="hidden" id="telemedicinaDateInput" name="telemedicina_fecha" value="">
           <div class="form-group"><label class="form-label">Comentarios</label><textarea class="input" rows="2" placeholder="Información adicional..."></textarea></div>
           <button type="submit" class="btn btn-gold btn-full" style="padding:15px">Solicitar asesoría</button>
         </form>
@@ -2194,29 +2219,46 @@ function loadNotifications(){
     }catch(e){console.log('Notificaciones: ',e.message);}
   })();
 }
-/* ─── CALENDAR FUNCTIONS ─── */
-let currentCalendarDate=new Date();
-let reservedDates=[];
-async function loadReservedDates(){
+/* ─── CALENDAR FUNCTIONS (REFACTORED & REUSABLE) ─── */
+const calendarState={
+  espacios:{date:new Date(),reservedDates:[]},
+  servicios:{date:new Date(),reservedDates:[]},
+  telemedicina:{date:new Date(),reservedDates:[]}
+};
+
+async function loadReservedDatesForCalendar(type,table,dateField){
   if(!window.supabaseClient)return;
   try{
-    const{data,error}=await supabaseClient.from('solicitudes_espacios').select('fecha');
+    const{data,error}=await supabaseClient.from(table).select(dateField);
     if(error)throw error;
-    reservedDates=data?data.map(d=>d.fecha):[];
-  }catch(e){console.log('Calendar error:',e.message);}
+    calendarState[type].reservedDates=data?data.map(d=>d[dateField]):[];
+  }catch(e){console.log('Calendar error for '+type+':',e.message);}
 }
-function renderCalendar(){
-  const year=currentCalendarDate.getFullYear();
-  const month=currentCalendarDate.getMonth();
+
+function renderCalendarForType(type){
+  const state=calendarState[type];
+  const year=state.date.getFullYear();
+  const month=state.date.getMonth();
   const today=new Date();
   const firstDay=new Date(year,month,1);
-  const lastDay=new Date(year,month+1,0);
   const startDate=new Date(firstDay);
   startDate.setDate(startDate.getDate()-firstDay.getDay());
 
-  document.getElementById('calendarTitle').textContent=new Intl.DateTimeFormat('es-ES',{month:'long',year:'numeric'}).format(firstDay);
+  // Handle both 'espacios' (no suffix) and other types (with suffix)
+  let titleId='calendarTitle';
+  let gridId='calendarGrid';
+  if(type!=='espacios'){
+    titleId='calendarTitle_'+type;
+    gridId='calendarGrid_'+type;
+  }
 
-  const grid=document.getElementById('calendarGrid');
+  const titleEl=document.getElementById(titleId);
+  if(titleEl){
+    titleEl.textContent=new Intl.DateTimeFormat('es-ES',{month:'long',year:'numeric'}).format(firstDay);
+  }
+
+  const grid=document.getElementById(gridId);
+  if(!grid)return;
   grid.innerHTML='';
 
   // Day headers
@@ -2234,46 +2276,80 @@ function renderCalendar(){
     const dayDiv=document.createElement('div');
     dayDiv.className='calendar-day';
     const dateStr=current.toISOString().split('T')[0];
+    const isPastDate=current<today&&current.toDateString()!==today.toDateString();
 
     if(current.getMonth()!==month)dayDiv.classList.add('other-month');
-    if(reservedDates.includes(dateStr))dayDiv.classList.add('reserved');
+    if(state.reservedDates.includes(dateStr))dayDiv.classList.add('reserved');
     if(current.toDateString()===today.toDateString())dayDiv.classList.add('today');
+    if(isPastDate)dayDiv.classList.add('other-month');
 
     dayDiv.textContent=current.getDate();
-    dayDiv.onclick=()=>selectCalendarDate(dateStr);
+    if(!isPastDate){
+      dayDiv.onclick=()=>selectCalendarDate(type,dateStr);
+    }else{
+      dayDiv.style.cursor='not-allowed';
+    }
     grid.appendChild(dayDiv);
     current.setDate(current.getDate()+1);
   }
 }
-function prevCalendarMonth(){
-  currentCalendarDate.setMonth(currentCalendarDate.getMonth()-1);
-  renderCalendar();
-}
-function nextCalendarMonth(){
-  currentCalendarDate.setMonth(currentCalendarDate.getMonth()+1);
-  renderCalendar();
-}
-function selectCalendarDate(dateStr){
-  const reserved=reservedDates.includes(dateStr);
-  if(reserved){
-    showToast('Esta fecha ya tiene reserva');
-    return;
-  }
-  // Set the hidden date input for the espacio form
-  const dateInput=document.getElementById('espacioDateInput');
-  if(dateInput)dateInput.value=dateStr;
-  document.querySelectorAll('.calendar-day').forEach(d=>d.classList.remove('selected'));
-  event.target.classList.add('selected');
-  showToast('Fecha seleccionada: '+dateStr);
+
+function prevCalendarMonth(type){
+  calendarState[type].date.setMonth(calendarState[type].date.getMonth()-1);
+  renderCalendarForType(type);
 }
 
-function initCalendar(){
-  if(!window.supabaseClient){
-    setTimeout(initCalendar,200);
+function nextCalendarMonth(type){
+  calendarState[type].date.setMonth(calendarState[type].date.getMonth()+1);
+  renderCalendarForType(type);
+}
+
+function selectCalendarDate(type,dateStr){
+  const state=calendarState[type];
+  const reserved=state.reservedDates.includes(dateStr);
+  if(reserved){
+    showToast('Esta fecha ya tiene una solicitud registrada');
     return;
   }
-  loadReservedDates();
-  renderCalendar();
+
+  // Set the hidden date input for the corresponding form
+  const inputMap={
+    'espacios':'espacioDateInput',
+    'servicios':'serviciosDateInput',
+    'telemedicina':'telemedicinaDateInput'
+  };
+  const dateInput=document.getElementById(inputMap[type]);
+  if(dateInput)dateInput.value=dateStr;
+
+  // Update selected state only for this calendar
+  let gridId='calendarGrid';
+  if(type!=='espacios'){
+    gridId='calendarGrid_'+type;
+  }
+  const grid=document.getElementById(gridId);
+  if(grid){
+    grid.querySelectorAll('.calendar-day').forEach(d=>d.classList.remove('selected'));
+    event.target.classList.add('selected');
+  }
+  showToast('Fecha seleccionada: '+new Date(dateStr).toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'}));
+}
+
+function initCalendars(){
+  if(!window.supabaseClient){
+    setTimeout(initCalendars,200);
+    return;
+  }
+  // Load reserved dates for all calendar types
+  loadReservedDatesForCalendar('espacios','solicitudes_espacios','fecha');
+  loadReservedDatesForCalendar('servicios','solicitudes_servicios','fecha_deseada');
+  loadReservedDatesForCalendar('telemedicina','solicitudes_asesoria','fecha_estimada');
+
+  // Render all calendars
+  setTimeout(()=>{
+    renderCalendarForType('espacios');
+    renderCalendarForType('servicios');
+    renderCalendarForType('telemedicina');
+  },100);
 }
 
 function initSupabaseFeatures(){
@@ -2287,7 +2363,7 @@ function initSupabaseFeatures(){
   loadBadges();
   loadPremios();
   loadLeaderboard();
-  initCalendar();
+  initCalendars();
 }
 // Wait for DOM to be ready and for deferred scripts to load
 if(document.readyState==='loading'){
