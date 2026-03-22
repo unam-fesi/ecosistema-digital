@@ -8,7 +8,16 @@ let allServicios = [];
 let allEspacios = [];
 let allAsesoria = [];
 let allContactos = [];
+let allCursos = [];
+let allInscripciones = [];
+let allNotificaciones = [];
+let allProyectos = [];
+let allBadges = [];
+let allBadgesUsuarios = [];
+let allPremios = [];
 let currentTab = 'servicios';
+let currentCursoSelected = null;
+let currentProyectoSelected = null;
 let charts = {};
 
 /**
@@ -154,6 +163,167 @@ async function fetchContactos() {
 }
 
 /**
+ * Obtiene todos los cursos
+ * @returns {Promise<Array>}
+ */
+async function fetchCursos() {
+  try {
+    const { data, error } = await supabaseClient
+      .from('cursos')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    allCursos = data || [];
+    return allCursos;
+  } catch (error) {
+    console.error('Error fetching cursos:', error);
+    return [];
+  }
+}
+
+/**
+ * Obtiene inscripciones a cursos
+ * @returns {Promise<Array>}
+ */
+async function fetchInscripciones() {
+  try {
+    const { data, error } = await supabaseClient
+      .from('inscripciones')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    allInscripciones = data || [];
+    return allInscripciones;
+  } catch (error) {
+    console.error('Error fetching inscripciones:', error);
+    return [];
+  }
+}
+
+/**
+ * Obtiene todas las notificaciones
+ * @returns {Promise<Array>}
+ */
+async function fetchNotificaciones() {
+  try {
+    const { data, error } = await supabaseClient
+      .from('notificaciones')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    allNotificaciones = data || [];
+    return allNotificaciones;
+  } catch (error) {
+    console.error('Error fetching notificaciones:', error);
+    return [];
+  }
+}
+
+/**
+ * Obtiene proyectos comunitarios
+ * @returns {Promise<Array>}
+ */
+async function fetchProyectos() {
+  try {
+    const { data, error } = await supabaseClient
+      .from('proyectos_comunidad')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    allProyectos = data || [];
+    return allProyectos;
+  } catch (error) {
+    console.error('Error fetching proyectos:', error);
+    return [];
+  }
+}
+
+/**
+ * Obtiene comentarios de un proyecto
+ * @param {string} proyectoId - ID del proyecto
+ * @returns {Promise<Array>}
+ */
+async function fetchComentarios(proyectoId) {
+  try {
+    const { data, error } = await supabaseClient
+      .from('comentarios_comunidad')
+      .select('*')
+      .eq('proyecto_id', proyectoId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching comentarios:', error);
+    return [];
+  }
+}
+
+/**
+ * Obtiene todos los badges disponibles
+ * @returns {Promise<Array>}
+ */
+async function fetchBadges() {
+  try {
+    const { data, error } = await supabaseClient
+      .from('badges')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    allBadges = data || [];
+    return allBadges;
+  } catch (error) {
+    console.error('Error fetching badges:', error);
+    return [];
+  }
+}
+
+/**
+ * Obtiene badges otorgados a usuarios
+ * @returns {Promise<Array>}
+ */
+async function fetchBadgesUsuarios() {
+  try {
+    const { data, error } = await supabaseClient
+      .from('badges_usuarios')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    allBadgesUsuarios = data || [];
+    return allBadgesUsuarios;
+  } catch (error) {
+    console.error('Error fetching badges_usuarios:', error);
+    return [];
+  }
+}
+
+/**
+ * Obtiene todos los premios
+ * @returns {Promise<Array>}
+ */
+async function fetchPremios() {
+  try {
+    const { data, error } = await supabaseClient
+      .from('premios')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    allPremios = data || [];
+    return allPremios;
+  } catch (error) {
+    console.error('Error fetching premios:', error);
+    return [];
+  }
+}
+
+/**
  * Obtiene seguimientos de una solicitud
  * @param {string} tipo - Tipo de solicitud
  * @param {string} id - ID de la solicitud
@@ -276,6 +446,335 @@ async function addSeguimiento(tipo, id, nota) {
   }
 }
 
+// ============= FUNCIONES CRUD PARA CURSOS =============
+
+/**
+ * Crea un nuevo curso
+ */
+async function saveCurso() {
+  const titulo = document.getElementById('cursoTitulo')?.value.trim();
+  const instructor = document.getElementById('cursoInstructor')?.value.trim();
+  const categoria = document.getElementById('cursoCategoria')?.value.trim();
+  const fechaInicio = document.getElementById('cursoFechaInicio')?.value;
+  const fechaFin = document.getElementById('cursoFechaFin')?.value;
+  const cupo = document.getElementById('cursoCupo')?.value;
+  const modalidad = document.getElementById('cursoModalidad')?.value;
+
+  if (!titulo || !instructor || !categoria || !fechaInicio || !fechaFin || !cupo || !modalidad) {
+    alert('Por favor completa todos los campos');
+    return;
+  }
+
+  try {
+    const { error } = await supabaseClient
+      .from('cursos')
+      .insert([{
+        titulo,
+        instructor,
+        categoria,
+        fecha_inicio: fechaInicio,
+        fecha_fin: fechaFin,
+        cupo: parseInt(cupo),
+        modalidad,
+        activo: true
+      }]);
+
+    if (error) throw error;
+
+    console.log('Curso creado exitosamente');
+    hideAddCursoForm();
+    await loadAllData();
+  } catch (error) {
+    console.error('Error saving curso:', error);
+    alert('Error al crear el curso');
+  }
+}
+
+/**
+ * Alterna el estado activo de un curso
+ */
+async function toggleCursoActivo(id, activo) {
+  try {
+    const { error } = await supabaseClient
+      .from('cursos')
+      .update({ activo })
+      .eq('id', id);
+
+    if (error) throw error;
+    await loadAllData();
+  } catch (error) {
+    console.error('Error toggling curso activo:', error);
+    alert('Error al actualizar el estado del curso');
+  }
+}
+
+// ============= FUNCIONES CRUD PARA NOTIFICACIONES =============
+
+/**
+ * Crea una nueva notificación
+ */
+async function saveNotificacion() {
+  const titulo = document.getElementById('notifTitulo')?.value.trim();
+  const mensaje = document.getElementById('notifMensaje')?.value.trim();
+  const tipo = document.getElementById('notifTipo')?.value;
+  const icono = document.getElementById('notifIcono')?.value.trim();
+  const fechaInicio = document.getElementById('notifFechaInicio')?.value;
+  const fechaFin = document.getElementById('notifFechaFin')?.value;
+  const enlaceUrl = document.getElementById('notifEnlace')?.value.trim();
+
+  if (!titulo || !mensaje || !tipo || !fechaInicio || !fechaFin) {
+    alert('Por favor completa los campos obligatorios');
+    return;
+  }
+
+  try {
+    const { error } = await supabaseClient
+      .from('notificaciones')
+      .insert([{
+        titulo,
+        mensaje,
+        tipo,
+        icono: icono || '🔔',
+        fecha_inicio: fechaInicio,
+        fecha_fin: fechaFin,
+        enlace_url: enlaceUrl || null,
+        activa: true
+      }]);
+
+    if (error) throw error;
+
+    console.log('Notificación creada exitosamente');
+    hideAddNotificacionForm();
+    await loadAllData();
+  } catch (error) {
+    console.error('Error saving notificacion:', error);
+    alert('Error al crear la notificación');
+  }
+}
+
+/**
+ * Alterna el estado de una notificación
+ */
+async function toggleNotificacion(id, activa) {
+  try {
+    const { error } = await supabaseClient
+      .from('notificaciones')
+      .update({ activa })
+      .eq('id', id);
+
+    if (error) throw error;
+    await loadAllData();
+  } catch (error) {
+    console.error('Error toggling notificacion:', error);
+    alert('Error al actualizar la notificación');
+  }
+}
+
+/**
+ * Elimina una notificación
+ */
+async function deleteNotificacion(id) {
+  if (!confirm('¿Estás seguro de que deseas eliminar esta notificación?')) return;
+
+  try {
+    const { error } = await supabaseClient
+      .from('notificaciones')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    await loadAllData();
+  } catch (error) {
+    console.error('Error deleting notificacion:', error);
+    alert('Error al eliminar la notificación');
+  }
+}
+
+// ============= FUNCIONES CRUD PARA COMUNIDAD =============
+
+/**
+ * Alterna el estado de un proyecto
+ */
+async function toggleProyecto(id, activo) {
+  try {
+    const { error } = await supabaseClient
+      .from('proyectos_comunidad')
+      .update({ activo })
+      .eq('id', id);
+
+    if (error) throw error;
+    await loadAllData();
+  } catch (error) {
+    console.error('Error toggling proyecto:', error);
+    alert('Error al actualizar el proyecto');
+  }
+}
+
+// ============= FUNCIONES CRUD PARA BADGES =============
+
+/**
+ * Crea un nuevo badge
+ */
+async function saveBadge() {
+  const nombre = document.getElementById('badgeNombre')?.value.trim();
+  const descripcion = document.getElementById('badgeDescripcion')?.value.trim();
+  const icono = document.getElementById('badgeIcono')?.value.trim();
+
+  if (!nombre || !descripcion || !icono) {
+    alert('Por favor completa todos los campos');
+    return;
+  }
+
+  try {
+    const { error } = await supabaseClient
+      .from('badges')
+      .insert([{
+        nombre,
+        descripcion,
+        icono
+      }]);
+
+    if (error) throw error;
+
+    console.log('Badge creado exitosamente');
+    hideAddBadgeForm();
+    await loadAllData();
+  } catch (error) {
+    console.error('Error saving badge:', error);
+    alert('Error al crear el badge');
+  }
+}
+
+/**
+ * Otorga un badge a un usuario
+ */
+async function saveAwardBadge() {
+  const badgeId = document.getElementById('awardBadgeSelect')?.value;
+  const nombre = document.getElementById('awardNombre')?.value.trim();
+  const correo = document.getElementById('awardCorreo')?.value.trim();
+
+  if (!badgeId || !nombre || !correo) {
+    alert('Por favor completa todos los campos');
+    return;
+  }
+
+  try {
+    const { error } = await supabaseClient
+      .from('badges_usuarios')
+      .insert([{
+        badge_id: badgeId,
+        nombre_usuario: nombre,
+        correo_usuario: correo
+      }]);
+
+    if (error) throw error;
+
+    console.log('Badge otorgado exitosamente');
+    hideAwardBadgeForm();
+    await loadAllData();
+  } catch (error) {
+    console.error('Error awarding badge:', error);
+    alert('Error al otorgar el badge');
+  }
+}
+
+/**
+ * Elimina un badge
+ */
+async function deleteBadge(id) {
+  if (!confirm('¿Estás seguro de que deseas eliminar este badge?')) return;
+
+  try {
+    const { error } = await supabaseClient
+      .from('badges')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    await loadAllData();
+  } catch (error) {
+    console.error('Error deleting badge:', error);
+    alert('Error al eliminar el badge');
+  }
+}
+
+/**
+ * Quita un badge otorgado a un usuario
+ */
+async function deleteAwardBadge(id) {
+  if (!confirm('¿Estás seguro de que deseas quitar este badge?')) return;
+
+  try {
+    const { error } = await supabaseClient
+      .from('badges_usuarios')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    await loadAllData();
+  } catch (error) {
+    console.error('Error deleting award badge:', error);
+    alert('Error al quitar el badge');
+  }
+}
+
+// ============= FUNCIONES CRUD PARA PREMIOS =============
+
+/**
+ * Crea un nuevo premio
+ */
+async function savePremio() {
+  const nombre = document.getElementById('premioNombre')?.value.trim();
+  const categoria = document.getElementById('premioCategoria')?.value.trim();
+  const stock = document.getElementById('premioStock')?.value;
+  const valor = document.getElementById('premioValor')?.value.trim();
+
+  if (!nombre || !categoria || !stock || !valor) {
+    alert('Por favor completa todos los campos');
+    return;
+  }
+
+  try {
+    const { error } = await supabaseClient
+      .from('premios')
+      .insert([{
+        nombre,
+        categoria,
+        stock: parseInt(stock),
+        valor
+      }]);
+
+    if (error) throw error;
+
+    console.log('Premio creado exitosamente');
+    hideAddPremioForm();
+    await loadAllData();
+  } catch (error) {
+    console.error('Error saving premio:', error);
+    alert('Error al crear el premio');
+  }
+}
+
+/**
+ * Elimina un premio
+ */
+async function deletePremio(id) {
+  if (!confirm('¿Estás seguro de que deseas eliminar este premio?')) return;
+
+  try {
+    const { error } = await supabaseClient
+      .from('premios')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    await loadAllData();
+  } catch (error) {
+    console.error('Error deleting premio:', error);
+    alert('Error al eliminar el premio');
+  }
+}
+
 // ============= FUNCIONES DE RENDERIZADO DE TABLAS =============
 
 /**
@@ -384,6 +883,226 @@ function renderTableContactos() {
     `;
     tableBody.appendChild(row);
   });
+}
+
+/**
+ * Renderiza la tabla de cursos
+ */
+function renderTableCursos() {
+  const tableBody = document.getElementById('bodyCursos');
+  if (!tableBody) return;
+
+  tableBody.innerHTML = '';
+
+  if (allCursos.length === 0) {
+    tableBody.innerHTML = '<tr><td colspan="9" class="empty-state"><p>No hay cursos.</p></td></tr>';
+    return;
+  }
+
+  allCursos.forEach(item => {
+    const row = document.createElement('tr');
+    const inscrito = allInscripciones.filter(i => i.curso_id === item.id).length;
+    row.innerHTML = `
+      <td>${escapeHTML(item.id)}</td>
+      <td>${escapeHTML(item.titulo || 'N/A')}</td>
+      <td>${escapeHTML(item.instructor || 'N/A')}</td>
+      <td>${escapeHTML(item.categoria || 'N/A')}</td>
+      <td>${formatDate(item.fecha_inicio)} - ${formatDate(item.fecha_fin)}</td>
+      <td>${inscrito}/${item.cupo || 0}</td>
+      <td>${escapeHTML(item.modalidad || 'N/A')}</td>
+      <td>
+        <input type="checkbox" ${item.activo ? 'checked' : ''}
+               onchange="toggleCursoActivo('${escapeHTML(item.id)}', this.checked)">
+      </td>
+      <td>
+        <button class="btn-small" onclick="selectCursoForInscripciones('${escapeHTML(item.id)}')">Ver Inscritos</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+/**
+ * Renderiza la tabla de notificaciones
+ */
+function renderTableNotificaciones() {
+  const tableBody = document.getElementById('bodyNotificaciones');
+  if (!tableBody) return;
+
+  tableBody.innerHTML = '';
+
+  if (allNotificaciones.length === 0) {
+    tableBody.innerHTML = '<tr><td colspan="7" class="empty-state"><p>No hay notificaciones.</p></td></tr>';
+    return;
+  }
+
+  allNotificaciones.forEach(item => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${escapeHTML(item.id)}</td>
+      <td>${escapeHTML(item.titulo || 'N/A')}</td>
+      <td><span class="badge" style="background-color: ${getBadgeColor(item.tipo)}">${escapeHTML(item.tipo || 'N/A')}</span></td>
+      <td>
+        <input type="checkbox" ${item.activa ? 'checked' : ''}
+               onchange="toggleNotificacion('${escapeHTML(item.id)}', this.checked)">
+      </td>
+      <td>${formatDate(item.fecha_inicio)}</td>
+      <td>${formatDate(item.fecha_fin)}</td>
+      <td>
+        <button class="btn-small" onclick="deleteNotificacion('${escapeHTML(item.id)}')">Eliminar</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+/**
+ * Renderiza la tabla de comunidad
+ */
+function renderTableComunidad() {
+  const tableBody = document.getElementById('bodyComunidad');
+  if (!tableBody) return;
+
+  tableBody.innerHTML = '';
+
+  if (allProyectos.length === 0) {
+    tableBody.innerHTML = '<tr><td colspan="8" class="empty-state"><p>No hay proyectos.</p></td></tr>';
+    return;
+  }
+
+  allProyectos.forEach(item => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${escapeHTML(item.id)}</td>
+      <td>${escapeHTML(item.titulo || 'N/A')}</td>
+      <td>${escapeHTML(item.autor || 'N/A')}</td>
+      <td>${escapeHTML(item.carrera || 'N/A')}</td>
+      <td>${escapeHTML(item.categoria || 'N/A')}</td>
+      <td>${item.likes || 0}</td>
+      <td>
+        <input type="checkbox" ${item.activo ? 'checked' : ''}
+               onchange="toggleProyecto('${escapeHTML(item.id)}', this.checked)">
+      </td>
+      <td>
+        <button class="btn-small" onclick="selectProyectoForComentarios('${escapeHTML(item.id)}')">Ver Comentarios</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+/**
+ * Renderiza la tabla de badges
+ */
+function renderTableBadges() {
+  const tableBody = document.getElementById('bodyBadges');
+  if (!tableBody) return;
+
+  tableBody.innerHTML = '';
+
+  if (allBadges.length === 0) {
+    tableBody.innerHTML = '<tr><td colspan="4" class="empty-state"><p>No hay badges.</p></td></tr>';
+    return;
+  }
+
+  allBadges.forEach(item => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td style="font-size: 24px;">${escapeHTML(item.icono || '🏅')}</td>
+      <td>${escapeHTML(item.nombre || 'N/A')}</td>
+      <td>${escapeHTML(item.descripcion || 'N/A')}</td>
+      <td>
+        <button class="btn-small" onclick="deleteBadge('${escapeHTML(item.id)}')">Eliminar</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+
+  // Actualizar select para otorgar badges
+  const awardSelect = document.getElementById('awardBadgeSelect');
+  if (awardSelect) {
+    const currentValue = awardSelect.value;
+    awardSelect.innerHTML = '<option value="">Seleccionar badge</option>';
+    allBadges.forEach(badge => {
+      const option = document.createElement('option');
+      option.value = badge.id;
+      option.textContent = `${badge.icono || '🏅'} ${badge.nombre}`;
+      awardSelect.appendChild(option);
+    });
+    awardSelect.value = currentValue;
+  }
+}
+
+/**
+ * Renderiza la tabla de badges otorgados
+ */
+function renderTableBadgesUsuarios() {
+  const tableBody = document.getElementById('bodyBadgesUsuarios');
+  if (!tableBody) return;
+
+  tableBody.innerHTML = '';
+
+  if (allBadgesUsuarios.length === 0) {
+    tableBody.innerHTML = '<tr><td colspan="4" class="empty-state"><p>No hay badges otorgados.</p></td></tr>';
+    return;
+  }
+
+  allBadgesUsuarios.forEach(item => {
+    const badge = allBadges.find(b => b.id === item.badge_id);
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${escapeHTML(item.nombre_usuario || 'N/A')}</td>
+      <td style="font-size: 20px;">${escapeHTML(badge?.icono || '🏅')} ${escapeHTML(badge?.nombre || 'N/A')}</td>
+      <td>${formatDate(item.created_at)}</td>
+      <td>
+        <button class="btn-small" onclick="deleteAwardBadge('${escapeHTML(item.id)}')">Quitar</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+/**
+ * Renderiza la tabla de premios
+ */
+function renderTablePremios() {
+  const tableBody = document.getElementById('bodyPremios');
+  if (!tableBody) return;
+
+  tableBody.innerHTML = '';
+
+  if (allPremios.length === 0) {
+    tableBody.innerHTML = '<tr><td colspan="6" class="empty-state"><p>No hay premios.</p></td></tr>';
+    return;
+  }
+
+  allPremios.forEach((item, index) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${escapeHTML(item.nombre || 'N/A')}</td>
+      <td>${escapeHTML(item.categoria || 'N/A')}</td>
+      <td>${item.stock || 0}</td>
+      <td>${escapeHTML(item.valor || 'N/A')}</td>
+      <td>
+        <button class="btn-small" onclick="deletePremio('${escapeHTML(item.id)}')">Eliminar</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+/**
+ * Obtiene color de badge según tipo
+ */
+function getBadgeColor(tipo) {
+  const colors = {
+    'info': '#2196F3',
+    'alerta': '#FF9800',
+    'evento': '#4CAF50',
+    'logro': '#9C27B0'
+  };
+  return colors[tipo] || '#666';
 }
 
 // ============= FUNCIONES DE MODAL =============
@@ -956,7 +1675,14 @@ async function loadAllData() {
       fetchSolicitudesServicios(),
       fetchSolicitudesEspacios(),
       fetchSolicitudesAsesoria(),
-      fetchContactos()
+      fetchContactos(),
+      fetchCursos(),
+      fetchInscripciones(),
+      fetchNotificaciones(),
+      fetchProyectos(),
+      fetchBadges(),
+      fetchBadgesUsuarios(),
+      fetchPremios()
     ]);
 
     // Actualizar interfaz
@@ -965,6 +1691,14 @@ async function loadAllData() {
     renderTableEspacios();
     renderTableAsesoria();
     renderTableContactos();
+    renderTableCursos();
+    renderTableNotificaciones();
+    renderTableComunidad();
+    renderTableBadges();
+    renderTableBadgesUsuarios();
+    renderTablePremios();
+    updateBadgesStats();
+    updateCursoStats();
     renderChartServicios();
     renderChartEstados();
     renderChartTendencia();
@@ -1241,11 +1975,14 @@ Asegúrate de que tu respuesta sea práctica, accionable y esté fundamentada en
  * @param {string} responseText - Raw response text from the API
  */
 function displaySentimentResults(responseText) {
-  // Parse the response into sections
-  const summaryMatch = responseText.match(/## RESUMEN GENERAL\n([\s\S]*?)(?=## LO QUE HACEMOS BIEN|$)/);
-  const strengthsMatch = responseText.match(/## LO QUE HACEMOS BIEN\n([\s\S]*?)(?=## ÁREAS DE MEJORA|$)/);
-  const improvementsMatch = responseText.match(/## ÁREAS DE MEJORA\n([\s\S]*?)(?=## ACCIONES RECOMENDADAS|$)/);
-  const actionsMatch = responseText.match(/## ACCIONES RECOMENDADAS\n([\s\S]*?)$/);
+  // Normalize: strip **, normalize newlines, trim
+  let txt = responseText.replace(/\*\*/g, '').replace(/\r\n/g, '\n');
+
+  // Parse sections with flexible regex (##, ###, or plain headers)
+  const summaryMatch = txt.match(/#{1,3}\s*RESUMEN GENERAL\s*\n([\s\S]*?)(?=#{1,3}\s*LO QUE HACEMOS BIEN|$)/i);
+  const strengthsMatch = txt.match(/#{1,3}\s*LO QUE HACEMOS BIEN\s*\n([\s\S]*?)(?=#{1,3}\s*[ÁA]REAS DE MEJORA|$)/i);
+  const improvementsMatch = txt.match(/#{1,3}\s*[ÁA]REAS DE MEJORA\s*\n([\s\S]*?)(?=#{1,3}\s*ACCIONES RECOMENDADAS|$)/i);
+  const actionsMatch = txt.match(/#{1,3}\s*ACCIONES RECOMENDADAS\s*\n([\s\S]*?)$/i);
 
   // Function to convert markdown-like formatting to HTML
   function formatContent(text) {
@@ -1292,4 +2029,231 @@ function displaySentimentResults(responseText) {
   document.getElementById('sentimentStrengths').innerHTML = formatContent(strengthsText);
   document.getElementById('sentimentImprovements').innerHTML = formatContent(improvementsText);
   document.getElementById('sentimentActions').innerHTML = formatContent(actionsText);
+}
+
+// ============= HELPER FUNCTIONS PARA MOSTRAR/OCULTAR FORMULARIOS =============
+
+/**
+ * Muestra el formulario para agregar curso
+ */
+function showAddCursoForm() {
+  const form = document.getElementById('addCursoForm');
+  if (form) form.style.display = 'block';
+}
+
+/**
+ * Oculta el formulario para agregar curso
+ */
+function hideAddCursoForm() {
+  const form = document.getElementById('addCursoForm');
+  if (form) {
+    form.style.display = 'none';
+    document.getElementById('cursoTitulo').value = '';
+    document.getElementById('cursoInstructor').value = '';
+    document.getElementById('cursoCategoria').value = '';
+    document.getElementById('cursoFechaInicio').value = '';
+    document.getElementById('cursoFechaFin').value = '';
+    document.getElementById('cursoCupo').value = '';
+    document.getElementById('cursoModalidad').value = '';
+  }
+}
+
+/**
+ * Muestra el formulario para agregar notificación
+ */
+function showAddNotificacionForm() {
+  const form = document.getElementById('addNotificacionForm');
+  if (form) form.style.display = 'block';
+}
+
+/**
+ * Oculta el formulario para agregar notificación
+ */
+function hideAddNotificacionForm() {
+  const form = document.getElementById('addNotificacionForm');
+  if (form) {
+    form.style.display = 'none';
+    document.getElementById('notifTitulo').value = '';
+    document.getElementById('notifMensaje').value = '';
+    document.getElementById('notifTipo').value = '';
+    document.getElementById('notifIcono').value = '';
+    document.getElementById('notifFechaInicio').value = '';
+    document.getElementById('notifFechaFin').value = '';
+    document.getElementById('notifEnlace').value = '';
+  }
+}
+
+/**
+ * Muestra el formulario para agregar badge
+ */
+function showAddBadgeForm() {
+  const form = document.getElementById('addBadgeForm');
+  if (form) form.style.display = 'block';
+}
+
+/**
+ * Oculta el formulario para agregar badge
+ */
+function hideAddBadgeForm() {
+  const form = document.getElementById('addBadgeForm');
+  if (form) {
+    form.style.display = 'none';
+    document.getElementById('badgeNombre').value = '';
+    document.getElementById('badgeDescripcion').value = '';
+    document.getElementById('badgeIcono').value = '';
+  }
+}
+
+/**
+ * Muestra el formulario para otorgar badge
+ */
+function showAwardBadgeForm() {
+  const form = document.getElementById('awardBadgeForm');
+  if (form) form.style.display = 'block';
+}
+
+/**
+ * Oculta el formulario para otorgar badge
+ */
+function hideAwardBadgeForm() {
+  const form = document.getElementById('awardBadgeForm');
+  if (form) {
+    form.style.display = 'none';
+    document.getElementById('awardBadgeSelect').value = '';
+    document.getElementById('awardNombre').value = '';
+    document.getElementById('awardCorreo').value = '';
+  }
+}
+
+/**
+ * Muestra el formulario para agregar premio
+ */
+function showAddPremioForm() {
+  const form = document.getElementById('addPremioForm');
+  if (form) form.style.display = 'block';
+}
+
+/**
+ * Oculta el formulario para agregar premio
+ */
+function hideAddPremioForm() {
+  const form = document.getElementById('addPremioForm');
+  if (form) {
+    form.style.display = 'none';
+    document.getElementById('premioNombre').value = '';
+    document.getElementById('premioCategoria').value = '';
+    document.getElementById('premioStock').value = '';
+    document.getElementById('premioValor').value = '';
+  }
+}
+
+/**
+ * Actualiza las estadísticas de badges
+ */
+function updateBadgesStats() {
+  const totalAwarded = allBadgesUsuarios.length;
+  const badgeCounts = {};
+
+  allBadgesUsuarios.forEach(item => {
+    badgeCounts[item.badge_id] = (badgeCounts[item.badge_id] || 0) + 1;
+  });
+
+  const mostPopular = Object.entries(badgeCounts).reduce((a, b) => a[1] > b[1] ? a : b, ['', 0]);
+  const mostPopularBadge = allBadges.find(b => b.id === mostPopular[0]);
+
+  const userCounts = {};
+  allBadgesUsuarios.forEach(item => {
+    userCounts[item.nombre_usuario] = (userCounts[item.nombre_usuario] || 0) + 1;
+  });
+
+  const topUserEntry = Object.entries(userCounts).reduce((a, b) => a[1] > b[1] ? a : b, ['', 0]);
+
+  document.getElementById('totalBadgesAwarded').textContent = totalAwarded;
+  document.getElementById('mostPopularBadge').textContent = mostPopularBadge ?
+    `${mostPopularBadge.icono} ${mostPopularBadge.nombre}` : 'N/A';
+  document.getElementById('topUser').textContent = topUserEntry[0] || 'N/A';
+}
+
+/**
+ * Actualiza las estadísticas de cursos
+ */
+function updateCursoStats() {
+  const totalCursos = allCursos.length;
+  const totalInscritos = allInscripciones.length;
+  const cursosActivos = allCursos.filter(c => c.activo).length;
+
+  document.getElementById('totalCursos').textContent = totalCursos;
+  document.getElementById('totalInscritos').textContent = totalInscritos;
+  document.getElementById('cursosActivos').textContent = cursosActivos;
+}
+
+/**
+ * Selecciona un curso para mostrar sus inscripciones
+ */
+function selectCursoForInscripciones(cursoId) {
+  currentCursoSelected = cursoId;
+  const tableBody = document.getElementById('bodyInscripciones');
+  if (!tableBody) return;
+
+  tableBody.innerHTML = '';
+  const inscripcionesCurso = allInscripciones.filter(i => i.curso_id === cursoId);
+
+  if (inscripcionesCurso.length === 0) {
+    tableBody.innerHTML = '<tr><td colspan="7" class="empty-state"><p>No hay inscripciones para este curso.</p></td></tr>';
+    return;
+  }
+
+  inscripcionesCurso.forEach((item, index) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${escapeHTML(item.nombre_estudiante || 'N/A')}</td>
+      <td>${escapeHTML(item.correo_estudiante || 'N/A')}</td>
+      <td>${escapeHTML(item.carrera || 'N/A')}</td>
+      <td>${formatDate(item.created_at)}</td>
+      <td><span class="badge" style="background-color: ${item.estado === 'activo' ? '#4CAF50' : '#FF9800'}">${escapeHTML(item.estado || 'N/A')}</span></td>
+      <td>
+        <button class="btn-small" onclick="alert('Funcionalidad de edición para inscritos en desarrollo')">Editar</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
+}
+
+/**
+ * Selecciona un proyecto para mostrar sus comentarios
+ */
+function selectProyectoForComentarios(proyectoId) {
+  currentProyectoSelected = proyectoId;
+  loadProyectoComentarios(proyectoId);
+}
+
+/**
+ * Carga y renderiza comentarios de un proyecto
+ */
+async function loadProyectoComentarios(proyectoId) {
+  const tableBody = document.getElementById('bodyComentarios');
+  if (!tableBody) return;
+
+  tableBody.innerHTML = '';
+  const comentarios = await fetchComentarios(proyectoId);
+
+  if (comentarios.length === 0) {
+    tableBody.innerHTML = '<tr><td colspan="5" class="empty-state"><p>No hay comentarios para este proyecto.</p></td></tr>';
+    return;
+  }
+
+  comentarios.forEach((item, index) => {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${escapeHTML(item.usuario || 'N/A')}</td>
+      <td>${escapeHTML(item.comentario || 'N/A')}</td>
+      <td>${formatDate(item.created_at)}</td>
+      <td>
+        <button class="btn-small" onclick="alert('Funcionalidad de edición para comentarios en desarrollo')">Acciones</button>
+      </td>
+    `;
+    tableBody.appendChild(row);
+  });
 }
