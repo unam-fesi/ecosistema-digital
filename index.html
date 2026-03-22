@@ -1,1 +1,1344 @@
-<!-- Ecosistema Digital — FES Iztacala, UNAM -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecosistema Digital — FES Iztacala, UNAM</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0C2340;
+  --navy-light: #163A64;
+  --navy-mid: #1a4a7a;
+  --gold: #C4A24E;
+  --gold-light: #D4B86A;
+  --gold-glow: rgba(196,162,78,0.25);
+  --cream: #FAF8F4;
+  --radius: 20px;
+  --radius-sm: 12px;
+  --shadow-soft: 0 8px 32px rgba(12,35,64,0.08);
+  --shadow-hover: 0 24px 80px rgba(12,35,64,0.18);
+  --glow-gold: 0 0 40px rgba(196,162,78,0.3), 0 0 80px rgba(196,162,78,0.1);
+}
+* { box-sizing:border-box; margin:0; padding:0; }
+html { scroll-behavior:smooth; }
+body { font-family:'Inter',system-ui,-apple-system,sans-serif; color:#1E293B; background:#fff; overflow-x:hidden; }
+.serif { font-family:'Playfair Display',Georgia,serif; }
+
+/* ─── CURSOR GLOW ─── */
+.cursor-glow {
+  position:fixed; pointer-events:none; z-index:9999;
+  width:400px; height:400px; border-radius:50%;
+  background:radial-gradient(circle, rgba(196,162,78,0.06) 0%, transparent 65%);
+  transform:translate(-50%,-50%);
+  transition:opacity 0.3s;
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes float    { 0%,100%{transform:translateY(0) rotate(0deg)} 33%{transform:translateY(-14px) rotate(1deg)} 66%{transform:translateY(-7px) rotate(-1deg)} }
+@keyframes floatSlow{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+@keyframes glow     { 0%,100%{filter:drop-shadow(0 0 12px var(--gold-glow))} 50%{filter:drop-shadow(0 0 40px rgba(196,162,78,0.6))} }
+@keyframes fadeUp   { from{opacity:0;transform:translateY(50px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeDown { from{opacity:0;transform:translateY(-30px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeLeft { from{opacity:0;transform:translateX(60px)} to{opacity:1;transform:translateX(0)} }
+@keyframes fadeRight{ from{opacity:0;transform:translateX(-60px)} to{opacity:1;transform:translateX(0)} }
+@keyframes scaleUp  { from{opacity:0;transform:scale(0.85)} to{opacity:1;transform:scale(1)} }
+@keyframes fadeIn   { from{opacity:0} to{opacity:1} }
+@keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+@keyframes particleRise  { 0%{transform:translateY(0) scale(1);opacity:0} 20%{opacity:0.9} 100%{transform:translateY(-140px) scale(0);opacity:0} }
+@keyframes orbit    { from{transform:rotate(0deg) translateX(120px) rotate(0deg)} to{transform:rotate(360deg) translateX(120px) rotate(-360deg)} }
+@keyframes orbitRev { from{transform:rotate(0deg) translateX(80px) rotate(0deg)} to{transform:rotate(-360deg) translateX(80px) rotate(360deg)} }
+@keyframes pulse    { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
+@keyframes shimmer  { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+@keyframes rotateIn { from{opacity:0;transform:perspective(600px) rotateX(30deg) translateY(30px)} to{opacity:1;transform:perspective(600px) rotateX(0deg) translateY(0)} }
+@keyframes blob     { 0%,100%{border-radius:60% 40% 30% 70%/60% 30% 70% 40%} 50%{border-radius:30% 60% 70% 40%/50% 60% 30% 60%} }
+@keyframes counterUp{ from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* Reveal classes */
+.reveal               { opacity:0; transform:translateY(50px);     transition:opacity 0.9s cubic-bezier(.22,1,.36,1), transform 0.9s cubic-bezier(.22,1,.36,1); }
+.reveal.from-left     { transform:translateX(60px); }
+.reveal.from-right    { transform:translateX(-60px); }
+.reveal.scale         { transform:scale(0.88); }
+.reveal.rotate        { transform:perspective(600px) rotateX(25deg) translateY(20px); }
+.reveal.visible       { opacity:1; transform:none; }
+.reveal.d1  { transition-delay:0.1s } .reveal.d2  { transition-delay:0.2s }
+.reveal.d3  { transition-delay:0.3s } .reveal.d4  { transition-delay:0.4s }
+.reveal.d5  { transition-delay:0.5s } .reveal.d6  { transition-delay:0.6s }
+
+/* ─── SCROLL PROGRESS ─── */
+.scroll-progress { position:fixed; top:0; left:0; height:3px; z-index:1001; width:0;
+  background:linear-gradient(90deg, #C4A24E, #D4B86A, #C4A24E);
+  background-size:200% 100%; animation:shimmer 2s linear infinite;
+  box-shadow:0 0 12px rgba(196,162,78,0.6);
+}
+
+/* ─── NAVBAR ─── */
+.navbar {
+  position:fixed; top:0; left:0; right:0; z-index:1000;
+  background:rgba(12,35,64,0.5); backdrop-filter:blur(24px) saturate(200%);
+  -webkit-backdrop-filter:blur(24px) saturate(200%);
+  border-bottom:1px solid rgba(196,162,78,0.08);
+  transition:all 0.5s cubic-bezier(.4,0,.2,1); padding:14px 0;
+}
+.navbar.scrolled {
+  background:rgba(8,22,44,0.96); padding:9px 0;
+  border-bottom:1px solid rgba(196,162,78,0.18);
+  box-shadow:0 4px 40px rgba(0,0,0,0.2);
+}
+.nav-inner { max-width:1280px; margin:0 auto; padding:0 32px; display:flex; align-items:center; justify-content:space-between; }
+.nav-brand { display:flex; align-items:center; gap:12px; text-decoration:none; }
+.nav-logo-mini { width:36px; height:36px; border:1.5px solid var(--gold); border-radius:10px;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(196,162,78,0.1); transition:all 0.3s; }
+.nav-brand:hover .nav-logo-mini { box-shadow:var(--glow-gold); background:rgba(196,162,78,0.18); }
+.nav-logo-mini span { color:var(--gold); font-weight:700; font-size:14px; }
+.nav-name { color:#fff; font-size:14px; font-weight:600; }
+.nav-links { display:flex; gap:2px; }
+.nav-links a { padding:8px 16px; border-radius:10px; font-size:13px; font-weight:500; text-decoration:none;
+  color:rgba(255,255,255,0.65); transition:all 0.3s; position:relative; }
+.nav-links a:hover { color:#fff; background:rgba(255,255,255,0.07); }
+.nav-links a.active { color:var(--gold); background:rgba(196,162,78,0.1); }
+.nav-links a.active::after { content:''; position:absolute; bottom:3px; left:50%; transform:translateX(-50%);
+  width:16px; height:2px; background:var(--gold); border-radius:2px;
+  box-shadow:0 0 8px rgba(196,162,78,0.6); }
+.hamburger { display:none; background:none; border:1px solid rgba(255,255,255,0.15); border-radius:10px; cursor:pointer; padding:8px 10px; }
+.hamburger:hover { border-color:var(--gold); }
+.hamburger svg { display:block; }
+.mobile-menu { display:none; background:rgba(8,22,44,0.98); backdrop-filter:blur(20px); padding:8px 24px 20px; }
+.mobile-menu.open { display:block; animation:fadeIn 0.3s ease; }
+.mobile-menu a { display:block; padding:14px 16px; font-size:15px; font-weight:500; text-decoration:none;
+  color:rgba(255,255,255,0.75); border-radius:10px; margin:2px 0; transition:all 0.2s; }
+.mobile-menu a:hover { background:rgba(196,162,78,0.1); color:var(--gold); padding-left:22px; }
+@media(max-width:1024px){ .nav-links{display:none!important} .hamburger{display:block!important} .nav-name-full{display:none} }
+@media(min-width:1025px){ .nav-name-short{display:none} }
+
+/* ─── BUTTONS ─── */
+.btn { display:inline-flex; align-items:center; gap:8px; font-family:'Inter',sans-serif; font-weight:600;
+  font-size:15px; border:none; border-radius:var(--radius-sm); cursor:pointer;
+  transition:all 0.3s cubic-bezier(.4,0,.2,1); text-decoration:none; position:relative; overflow:hidden; }
+.btn::after { content:''; position:absolute; inset:0; background:rgba(255,255,255,0.15);
+  transform:translateX(-100%) skewX(-15deg); transition:transform 0.4s; }
+.btn:hover::after { transform:translateX(150%) skewX(-15deg); }
+.btn-gold { background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:var(--navy); padding:14px 32px; }
+.btn-gold:hover { transform:translateY(-3px); box-shadow:0 12px 40px rgba(196,162,78,0.5); }
+.btn-glass { background:rgba(255,255,255,0.09); color:#fff; padding:14px 32px;
+  border:1px solid rgba(255,255,255,0.18); backdrop-filter:blur(12px); }
+.btn-glass:hover { background:rgba(255,255,255,0.16); border-color:rgba(196,162,78,0.5); transform:translateY(-3px); }
+.btn-outline-gold { background:transparent; color:var(--gold); padding:12px 28px; border:1.5px solid var(--gold); }
+.btn-outline-gold:hover { background:rgba(196,162,78,0.1); transform:translateY(-2px);
+  box-shadow:0 0 20px rgba(196,162,78,0.2); }
+.btn-sm { padding:10px 20px; font-size:13px; border-radius:8px; }
+.btn-full { width:100%; justify-content:center; }
+@media(max-width:600px) { .hero-buttons .btn { width:100%; justify-content:center; font-size:14px; padding:14px 20px; } }
+
+/* ─── HERO ─── */
+.hero {
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  position:relative; overflow:hidden; text-align:center; padding:130px 24px 90px;
+  background:linear-gradient(135deg,#050D18 0%,#0C2340 30%,#163A64 55%,#1a4a7a 75%,#0C2340 100%);
+  background-size:400% 400%; animation:gradientShift 14s ease infinite;
+}
+/* Aurora blobs */
+.hero-blob { position:absolute; border-radius:50%; filter:blur(80px); pointer-events:none; opacity:0.18; }
+.hero-blob-1 { width:600px; height:600px; background:radial-gradient(circle,#C4A24E,transparent 70%); top:-100px; right:-100px; animation:floatSlow 8s ease-in-out infinite; }
+.hero-blob-2 { width:500px; height:500px; background:radial-gradient(circle,#163A64,transparent 70%); bottom:-100px; left:-100px; animation:floatSlow 10s ease-in-out infinite reverse; }
+.hero-blob-3 { width:300px; height:300px; background:radial-gradient(circle,rgba(196,162,78,0.4),transparent 70%); top:40%; left:10%; animation:floatSlow 6s ease-in-out infinite; opacity:0.08; }
+/* Grid overlay */
+.hero-grid { position:absolute; inset:0; pointer-events:none; opacity:0.035;
+  background-image:linear-gradient(rgba(196,162,78,1) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(196,162,78,1) 1px,transparent 1px);
+  background-size:60px 60px; }
+.hero-radial { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:900px; height:900px;
+  background:radial-gradient(circle,rgba(196,162,78,0.07) 0%,transparent 60%); pointer-events:none; }
+.hero-particles { position:absolute; inset:0; pointer-events:none; }
+.particle { position:absolute; border-radius:50%; opacity:0; animation:particleRise 4s ease-in-out infinite; }
+
+/* Floating orbs */
+.hero-orb { position:absolute; border-radius:50%; border:1px solid rgba(196,162,78,0.25);
+  pointer-events:none; animation:blob 8s ease-in-out infinite; }
+.hero-orb-1 { width:80px; height:80px; top:20%; left:8%; animation-duration:9s; }
+.hero-orb-2 { width:50px; height:50px; top:60%; right:12%; animation-duration:7s; animation-delay:2s; }
+.hero-orb-3 { width:120px; height:120px; bottom:20%; left:20%; animation-duration:11s; animation-delay:4s; opacity:0.4; }
+
+.hero-content { position:relative; z-index:2; max-width:900px; }
+.hero-logo-wrap { display:inline-block; animation:float 6s ease-in-out infinite, glow 5s ease-in-out infinite; margin-bottom:40px; }
+.hero-badge { display:inline-flex; align-items:center; gap:8px; background:rgba(196,162,78,0.12);
+  border:1px solid rgba(196,162,78,0.25); border-radius:30px; padding:8px 20px;
+  font-size:12px; font-weight:600; color:rgba(255,255,255,0.85); letter-spacing:1.5px;
+  text-transform:uppercase; margin-bottom:28px; backdrop-filter:blur(8px);
+  animation:fadeDown 0.8s ease both 0.1s; }
+.hero-badge .pulse-dot { width:7px; height:7px; background:#4ade80; border-radius:50%;
+  box-shadow:0 0 8px #4ade80; animation:pulse 2s ease-in-out infinite; }
+.hero h1 { font-size:clamp(34px,6.5vw,64px); color:#fff; font-weight:700; line-height:1.12;
+  margin-bottom:18px; animation:fadeUp 0.9s ease both 0.3s; }
+.hero h1 .gold { color:var(--gold); text-shadow:0 0 40px rgba(196,162,78,0.4); }
+.hero .tagline { font-size:clamp(15px,2.2vw,21px); color:rgba(255,255,255,0.72);
+  margin-bottom:10px; animation:fadeUp 0.9s ease both 0.5s; }
+.hero .desc { font-size:clamp(13px,1.6vw,16px); color:rgba(255,255,255,0.42);
+  max-width:620px; margin:0 auto 48px; line-height:1.85; animation:fadeUp 0.9s ease both 0.65s; }
+.hero-buttons { display:flex; flex-wrap:wrap; gap:14px; justify-content:center; animation:fadeUp 0.9s ease both 0.8s; }
+/* Scroll hint */
+.scroll-hint { position:absolute; bottom:36px; left:50%; transform:translateX(-50%); z-index:2;
+  display:flex; flex-direction:column; align-items:center; gap:8px; opacity:0.5;
+  animation:fadeIn 1s ease both 1.5s; }
+.scroll-hint span { font-size:11px; color:rgba(255,255,255,0.6); letter-spacing:2px; text-transform:uppercase; }
+.scroll-wheel { width:22px; height:36px; border:1.5px solid rgba(255,255,255,0.3); border-radius:12px;
+  display:flex; align-items:flex-start; justify-content:center; padding:5px; }
+.scroll-wheel::after { content:''; width:4px; height:8px; background:var(--gold); border-radius:2px;
+  animation:float 1.5s ease-in-out infinite; }
+
+/* ─── SECTIONS ─── */
+.section { padding:110px 24px; position:relative; }
+.section-cream { background:var(--cream); }
+.section-white { background:#fff; }
+.section-gradient { background:linear-gradient(180deg,var(--navy) 0%,#06101E 100%); position:relative; overflow:hidden; }
+.section-gradient::before { content:''; position:absolute; top:-200px; right:-200px; width:700px; height:700px;
+  background:radial-gradient(circle,rgba(196,162,78,0.06) 0%,transparent 65%); pointer-events:none; }
+.section-gradient::after { content:''; position:absolute; bottom:-200px; left:-200px; width:600px; height:600px;
+  background:radial-gradient(circle,rgba(22,58,100,0.6) 0%,transparent 65%); pointer-events:none; }
+.container { max-width:1200px; margin:0 auto; }
+.container-sm { max-width:820px; margin:0 auto; }
+.container-md { max-width:1000px; margin:0 auto; }
+
+/* ─── SECTION DIVIDERS ─── */
+.section-wave { overflow:hidden; line-height:0; }
+.section-wave svg { display:block; }
+
+/* ─── SECTION HEADERS ─── */
+.sec-header { text-align:center; margin-bottom:60px; }
+.sec-tag { display:inline-flex; align-items:center; gap:8px; font-size:11px; font-weight:700;
+  letter-spacing:2.5px; text-transform:uppercase; color:var(--gold); margin-bottom:18px;
+  background:rgba(196,162,78,0.08); padding:7px 18px; border-radius:20px;
+  border:1px solid rgba(196,162,78,0.15); }
+.sec-tag .dot { width:6px; height:6px; background:var(--gold); border-radius:50%;
+  box-shadow:0 0 6px var(--gold); animation:pulse 2s ease-in-out infinite; }
+.sec-header h2 { font-size:clamp(28px,4vw,46px); font-weight:700; color:var(--navy);
+  line-height:1.2; margin-bottom:18px; }
+.sec-header.light h2 { color:#fff; }
+.sec-header p { font-size:16px; color:#64748B; max-width:600px; margin:0 auto; line-height:1.8; }
+.sec-header.light p { color:rgba(255,255,255,0.55); }
+
+/* ─── FLOATING CARDS (3D tilt) ─── */
+.card { background:#fff; border:1px solid #E8ECF1; border-radius:var(--radius);
+  padding:28px; transition:all 0.5s cubic-bezier(.22,1,.36,1);
+  position:relative; overflow:hidden; transform-style:preserve-3d; }
+.card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg,var(--gold),var(--gold-light),var(--gold));
+  background-size:200% 100%; transform:scaleX(0); transform-origin:left;
+  transition:transform 0.5s; }
+.card:hover { transform:translateY(-10px) perspective(600px) rotateX(2deg);
+  box-shadow:var(--shadow-hover); border-color:rgba(196,162,78,0.25); }
+.card:hover::before { transform:scaleX(1); animation:shimmer 1.5s linear infinite; }
+
+/* Glass card */
+.card-glass { background:rgba(255,255,255,0.06); backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,0.1); border-radius:var(--radius); padding:28px;
+  transition:all 0.5s cubic-bezier(.22,1,.36,1); position:relative; overflow:hidden; }
+.card-glass::after { content:''; position:absolute; inset:0; opacity:0;
+  background:linear-gradient(135deg,rgba(196,162,78,0.08),transparent);
+  transition:opacity 0.4s; }
+.card-glass:hover { transform:translateY(-8px); border-color:rgba(196,162,78,0.25);
+  box-shadow:0 30px 80px rgba(0,0,0,0.25); }
+.card-glass:hover::after { opacity:1; }
+
+.card-dark { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08);
+  border-radius:var(--radius); padding:28px; transition:all 0.5s cubic-bezier(.22,1,.36,1);
+  backdrop-filter:blur(10px); position:relative; overflow:hidden; }
+.card-dark::before { content:''; position:absolute; inset:0; opacity:0;
+  background:linear-gradient(135deg,rgba(196,162,78,0.06),rgba(196,162,78,0.02));
+  transition:opacity 0.4s; }
+.card-dark:hover { transform:translateY(-8px); background:rgba(255,255,255,0.07);
+  border-color:rgba(196,162,78,0.2); box-shadow:0 30px 80px rgba(0,0,0,0.3); }
+.card-dark:hover::before { opacity:1; }
+
+.card-grid { display:grid; gap:22px; }
+.card-grid-2 { grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); }
+.card-grid-3 { grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
+.card-grid-4 { grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
+
+/* ─── ACCORDION ─── */
+.accordion { display:flex; flex-direction:column; gap:14px; }
+.accordion-item { background:#fff; border:1px solid #E8ECF1; border-radius:var(--radius);
+  overflow:hidden; transition:all 0.4s; }
+.accordion-item:hover { border-color:rgba(196,162,78,0.3); box-shadow:0 4px 20px rgba(12,35,64,0.06); }
+.accordion-item.open { border-color:var(--gold); box-shadow:0 12px 40px rgba(196,162,78,0.1); }
+.accordion-trigger { width:100%; padding:24px 28px; background:none; border:none;
+  display:flex; align-items:center; gap:16px; cursor:pointer; font-family:'Inter',sans-serif;
+  text-align:left; transition:all 0.3s; }
+.accordion-trigger:hover { background:rgba(196,162,78,0.02); }
+.accordion-icon-wrap { width:54px; height:54px; border-radius:14px; display:flex;
+  align-items:center; justify-content:center; flex-shrink:0; font-size:28px;
+  transition:transform 0.4s; }
+.accordion-item.open .accordion-icon-wrap { transform:scale(1.05); }
+.accordion-trigger-text { flex:1; }
+.accordion-trigger-text h3 { font-size:18px; font-weight:700; color:var(--navy); margin-bottom:4px; }
+.accordion-trigger-text p { font-size:13px; color:#94A3B8; }
+.accordion-chevron { width:34px; height:34px; border-radius:8px; background:#F1F5F9;
+  display:flex; align-items:center; justify-content:center; transition:all 0.4s; flex-shrink:0; }
+.accordion-item.open .accordion-chevron { background:var(--gold); transform:rotate(180deg);
+  box-shadow:0 4px 16px rgba(196,162,78,0.3); }
+.accordion-item.open .accordion-chevron svg path { stroke:#fff; }
+.accordion-body { max-height:0; overflow:hidden; transition:max-height 0.55s cubic-bezier(.4,0,.2,1), padding 0.3s; padding:0 28px; }
+.accordion-item.open .accordion-body { max-height:800px; padding:0 28px 28px; }
+.accordion-body-inner { padding-top:8px; border-top:1px solid #F1F5F9; }
+.accordion-body-inner p { font-size:14px; color:#64748B; line-height:1.85; margin-bottom:16px; }
+.acc-tags { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.acc-tag { font-size:12px; padding:6px 14px; border-radius:8px; background:rgba(12,35,64,0.04);
+  color:var(--navy); font-weight:500; transition:all 0.2s; }
+.acc-tag:hover { background:rgba(196,162,78,0.1); color:var(--navy); }
+
+/* ─── CARRERAS ─── */
+.carreras-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:16px; }
+.carrera-card { background:#fff; border:1px solid #E8ECF1; border-radius:16px;
+  padding:28px 16px; text-align:center; cursor:default;
+  transition:all 0.5s cubic-bezier(.22,1,.36,1); position:relative; overflow:hidden; }
+.carrera-card::before { content:''; position:absolute; inset:0; opacity:0;
+  background:radial-gradient(circle at 50% 100%, var(--carrera-color,var(--gold)) 0%,transparent 60%);
+  transition:opacity 0.4s; }
+.carrera-card::after { content:''; position:absolute; bottom:0; left:0; right:0; height:3px;
+  background:var(--carrera-color,var(--gold)); transform:scaleX(0); transition:transform 0.4s; }
+.carrera-card:hover { transform:translateY(-8px) scale(1.02); box-shadow:var(--shadow-hover); }
+.carrera-card:hover::before { opacity:0.05; }
+.carrera-card:hover::after { transform:scaleX(1); }
+.carrera-emoji { font-size:34px; margin-bottom:12px; display:block; transition:transform 0.3s; }
+.carrera-card:hover .carrera-emoji { transform:scale(1.2) translateY(-3px); }
+.carrera-name { font-size:13px; font-weight:600; color:var(--navy); line-height:1.4; }
+
+/* ─── TABS ─── */
+.tabs-nav { display:flex; gap:4px; flex-wrap:wrap; margin-bottom:32px; padding:5px;
+  background:#F1F5F9; border-radius:14px; }
+.tab-btn { padding:12px 24px; border:none; background:transparent; border-radius:10px;
+  font-family:'Inter',sans-serif; font-size:14px; font-weight:500; color:#64748B;
+  cursor:pointer; transition:all 0.3s; flex:1; min-width:120px; text-align:center; }
+.tab-btn.active { background:#fff; color:var(--navy); font-weight:600;
+  box-shadow:0 2px 12px rgba(0,0,0,0.08); }
+.tab-btn:hover:not(.active) { color:var(--navy); background:rgba(255,255,255,0.5); }
+.tab-content { display:none; animation:fadeUp 0.5s ease; }
+.tab-content.active { display:block; }
+
+/* ─── FORMS ─── */
+.form-card { background:#fff; border:1px solid #E8ECF1; border-radius:var(--radius);
+  padding:44px; box-shadow:var(--shadow-soft); transition:box-shadow 0.4s; }
+.form-card:hover { box-shadow:0 20px 60px rgba(12,35,64,0.1); }
+.form-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:0 24px; }
+.form-group { margin-bottom:22px; }
+.form-label { display:block; font-size:13px; font-weight:600; color:#334155; margin-bottom:8px; }
+.form-label .req { color:#EF4444; }
+.input { width:100%; padding:13px 16px; border:1.5px solid #E2E8F0; border-radius:var(--radius-sm);
+  font-size:14px; font-family:'Inter',sans-serif; color:#1E293B;
+  transition:all 0.3s; background:#FAFBFC; }
+.input:focus { outline:none; border-color:var(--gold); box-shadow:0 0 0 4px rgba(196,162,78,0.12);
+  background:#fff; transform:translateY(-1px); }
+.input::placeholder { color:#94A3B8; }
+textarea.input { resize:vertical; min-height:110px; }
+select.input { appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat; background-position:right 16px center; padding-right:40px; }
+.group-box { background:rgba(196,162,78,0.04); border:1px solid rgba(196,162,78,0.15);
+  border-radius:var(--radius); padding:24px; margin-bottom:22px; animation:fadeIn 0.4s ease; }
+.group-box-title { font-size:14px; font-weight:700; color:var(--navy); margin-bottom:16px;
+  display:flex; align-items:center; gap:8px; }
+
+/* ─── NOTICE ─── */
+.notice { display:flex; align-items:center; gap:16px;
+  background:linear-gradient(135deg,rgba(196,162,78,0.07),rgba(196,162,78,0.02));
+  border:1px solid rgba(196,162,78,0.18); border-radius:var(--radius);
+  padding:20px 26px; margin-bottom:36px; }
+.notice-icon { width:42px; height:42px; border-radius:10px; background:rgba(196,162,78,0.12);
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.notice p { font-size:14px; color:#475569; line-height:1.65; }
+
+/* ─── COUNTERS ─── */
+.counter-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:24px; margin-bottom:64px; }
+.counter-card { text-align:center; padding:36px 20px; border-radius:var(--radius);
+  background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.09);
+  backdrop-filter:blur(10px); transition:all 0.4s; position:relative; overflow:hidden; }
+.counter-card::before { content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg,transparent,var(--gold),transparent);
+  transform:scaleX(0); transition:transform 0.4s; }
+.counter-card:hover { transform:translateY(-6px); border-color:rgba(196,162,78,0.2);
+  background:rgba(255,255,255,0.08); }
+.counter-card:hover::before { transform:scaleX(1); }
+.counter-num { font-size:46px; font-weight:700; color:var(--gold); margin-bottom:10px;
+  font-family:'Playfair Display',Georgia,serif;
+  text-shadow:0 0 30px rgba(196,162,78,0.4); }
+.counter-label { font-size:13px; color:rgba(255,255,255,0.55); font-weight:500; }
+
+/* ─── GALLERY ─── */
+.gallery-item { border-radius:var(--radius); overflow:hidden; position:relative;
+  height:210px; cursor:default; transition:all 0.5s cubic-bezier(.22,1,.36,1); }
+.gallery-item:hover { transform:translateY(-10px) scale(1.02);
+  box-shadow:0 24px 80px rgba(0,0,0,0.25); }
+.gallery-bg { position:absolute; inset:0; opacity:0.85; transition:opacity 0.4s; }
+.gallery-item:hover .gallery-bg { opacity:1; }
+.gallery-content { position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center; padding:20px; }
+.gallery-content .emoji { font-size:48px; margin-bottom:16px; transition:transform 0.4s cubic-bezier(.22,1,.36,1); }
+.gallery-item:hover .emoji { transform:scale(1.2) translateY(-5px); }
+.gallery-content p { font-size:15px; font-weight:700; color:#fff; text-align:center;
+  text-shadow:0 2px 10px rgba(0,0,0,0.35); }
+/* Shine overlay */
+.gallery-item::after { content:''; position:absolute; inset:0; opacity:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.15) 0%,transparent 50%);
+  transition:opacity 0.4s; }
+.gallery-item:hover::after { opacity:1; }
+
+/* ─── CONTACT ─── */
+.contact-card { display:flex; gap:18px; align-items:flex-start; padding:22px;
+  border-radius:var(--radius); transition:all 0.3s; }
+.contact-card:hover { background:rgba(196,162,78,0.05); transform:translateX(4px); }
+.contact-icon { width:50px; height:50px; border-radius:14px;
+  background:linear-gradient(135deg,rgba(12,35,64,0.07),rgba(12,35,64,0.02));
+  display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  transition:all 0.3s; }
+.contact-card:hover .contact-icon { background:rgba(196,162,78,0.1); transform:scale(1.05); }
+.contact-label { font-size:13px; font-weight:600; color:var(--navy); margin-bottom:4px; }
+.contact-value { font-size:14px; color:#64748B; line-height:1.5; }
+
+/* ─── TELEMEDICINA ─── */
+.tele-benefit { display:flex; gap:16px; align-items:flex-start; padding:18px;
+  border-radius:var(--radius-sm); transition:all 0.3s; }
+.tele-benefit:hover { background:rgba(196,162,78,0.05); transform:translateX(4px); }
+.tele-icon { width:46px; height:46px; border-radius:12px;
+  background:linear-gradient(135deg,rgba(196,162,78,0.12),rgba(196,162,78,0.04));
+  display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:22px;
+  transition:transform 0.3s; }
+.tele-benefit:hover .tele-icon { transform:scale(1.1) rotate(-3deg); }
+
+/* ─── FLOATING SHAPES BG ─── */
+.floating-shapes { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+.shape { position:absolute; border-radius:50%; opacity:0.04; }
+.shape-1 { width:300px; height:300px; background:var(--gold); top:10%; left:5%; animation:floatSlow 12s ease-in-out infinite; }
+.shape-2 { width:200px; height:200px; background:var(--navy-light); top:50%; right:8%; animation:floatSlow 9s ease-in-out infinite reverse; }
+.shape-3 { width:150px; height:150px; background:var(--gold-light); bottom:15%; left:30%; animation:floatSlow 7s ease-in-out infinite; opacity:0.06; }
+
+/* ─── FOOTER ─── */
+footer { background:linear-gradient(180deg,var(--navy) 0%,#040A14 100%);
+  padding:70px 24px 36px; border-top:2px solid var(--gold);
+  position:relative; overflow:hidden; }
+footer::before { content:''; position:absolute; top:-200px; left:50%; transform:translateX(-50%);
+  width:800px; height:400px;
+  background:radial-gradient(ellipse,rgba(196,162,78,0.04) 0%,transparent 70%);
+  pointer-events:none; }
+.footer-inner { max-width:1200px; margin:0 auto; position:relative; z-index:1; }
+.footer-grid { display:grid; grid-template-columns:2fr 1fr 1fr; gap:44px; margin-bottom:44px; }
+@media(max-width:768px) { .footer-grid{grid-template-columns:1fr; gap:32px} }
+.footer-brand p { font-size:13px; color:rgba(255,255,255,0.38); line-height:1.8; }
+.footer-title { font-size:11px; font-weight:700; color:var(--gold); letter-spacing:2px;
+  text-transform:uppercase; margin-bottom:18px; }
+.footer-link { display:block; font-size:13px; color:rgba(255,255,255,0.45);
+  text-decoration:none; padding:5px 0; transition:all 0.25s; }
+.footer-link:hover { color:var(--gold); padding-left:8px; }
+.footer-info { font-size:13px; color:rgba(255,255,255,0.38); margin:0 0 8px; }
+.footer-bottom { border-top:1px solid rgba(255,255,255,0.06); padding-top:28px; text-align:center; }
+.footer-bottom p { font-size:12px; color:rgba(255,255,255,0.22); line-height:1.8; }
+
+/* ─── PROYECTO MODAL ─── */
+@keyframes modalIn     { from{opacity:0;transform:scale(0.7) translateY(40px)} to{opacity:1;transform:scale(1) translateY(0)} }
+@keyframes leafFall    { 0%{transform:translate(0,0) rotate(0deg);opacity:0} 10%{opacity:1} 100%{transform:translate(var(--lx),120px) rotate(var(--lr));opacity:0} }
+@keyframes leafFloat   { 0%,100%{transform:translateY(0) rotate(0deg)} 50%{transform:translateY(-10px) rotate(5deg)} }
+@keyframes ringPulse   { 0%{transform:translate(-50%,-50%) scale(0.9);opacity:0.7} 100%{transform:translate(-50%,-50%) scale(1.8);opacity:0} }
+@keyframes treeSway    { 0%,100%{transform:rotate(-1.5deg) translateY(0)} 50%{transform:rotate(1.5deg) translateY(-3px)} }
+@keyframes shimmerGold { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+@keyframes countUp475  { from{opacity:0;transform:scale(0.5) rotate(-10deg)} to{opacity:1;transform:scale(1) rotate(0deg)} }
+@keyframes starSpin    { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+.proyecto-overlay {
+  position:fixed; inset:0; z-index:10000;
+  background:rgba(2,8,20,0.85); backdrop-filter:blur(8px);
+  display:flex; align-items:center; justify-content:center;
+  padding:20px; opacity:0; pointer-events:none;
+  transition:opacity 0.4s cubic-bezier(.4,0,.2,1);
+}
+.proyecto-overlay.active { opacity:1; pointer-events:all; }
+
+.proyecto-card {
+  position:relative; width:100%; max-width:480px;
+  border-radius:28px; overflow:hidden;
+  animation:modalIn 0.6s cubic-bezier(.22,1,.36,1) both;
+  box-shadow:0 40px 120px rgba(0,0,0,0.6), 0 0 80px rgba(196,162,78,0.15);
+}
+.proyecto-card-bg {
+  position:absolute; inset:0;
+  background:linear-gradient(160deg, #0a1f3a 0%, #0d3320 35%, #1a4a1a 60%, #0C2340 100%);
+}
+.proyecto-card-noise {
+  position:absolute; inset:0; opacity:0.04;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* Ring pulses behind tree */
+.proyecto-ring { position:absolute; width:220px; height:220px; border-radius:50%;
+  border:1px solid rgba(196,162,78,0.2); top:38%; left:50%;
+  transform:translate(-50%,-50%); }
+.proyecto-ring-1 { animation:ringPulse 2.8s ease-out infinite; }
+.proyecto-ring-2 { animation:ringPulse 2.8s ease-out 0.9s infinite; }
+.proyecto-ring-3 { animation:ringPulse 2.8s ease-out 1.8s infinite; }
+
+.proyecto-leaves { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+.leaf { position:absolute; font-size:16px; top:-20px; animation:leafFall linear infinite; }
+
+.proyecto-inner { position:relative; z-index:2; padding:40px 36px 36px; text-align:center; }
+
+/* 475 badge */
+.badge-475 {
+  display:inline-block;
+  font-size:72px; font-weight:900; line-height:1;
+  font-family:'Playfair Display',Georgia,serif;
+  background:linear-gradient(135deg, #f4d03f, #C4A24E, #f0e68c, #C4A24E, #f4d03f);
+  background-size:300% 100%;
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-clip:text;
+  animation:shimmerGold 3s linear infinite, countUp475 0.8s cubic-bezier(.22,1,.36,1) both 0.3s;
+  text-shadow:none; filter:drop-shadow(0 0 20px rgba(196,162,78,0.4));
+}
+.aniversario-label {
+  font-size:13px; font-weight:700; letter-spacing:4px; color:rgba(196,162,78,0.75);
+  text-transform:uppercase; margin-top:4px; margin-bottom:28px;
+}
+
+/* Tree SVG */
+.tree-wrap { position:relative; display:inline-block; margin-bottom:20px; }
+.tree-svg { animation:treeSway 4s ease-in-out infinite; transform-origin:bottom center;
+  filter:drop-shadow(0 8px 24px rgba(0,80,0,0.5)); }
+.tree-glow { position:absolute; bottom:-8px; left:50%; transform:translateX(-50%);
+  width:80px; height:16px; background:radial-gradient(ellipse,rgba(100,200,80,0.35),transparent);
+  border-radius:50%; }
+
+.proyecto-title {
+  font-size:22px; font-weight:800; color:#fff; line-height:1.3; margin-bottom:8px;
+  font-family:'Playfair Display',Georgia,serif;
+  text-shadow:0 2px 20px rgba(0,0,0,0.4);
+}
+.proyecto-subtitle { font-size:13px; color:rgba(255,255,255,0.5); margin-bottom:30px; line-height:1.6; }
+
+.btn-proyecto {
+  display:inline-flex; align-items:center; gap:10px;
+  background:linear-gradient(135deg,#2d6a2d,#1a4a1a);
+  color:#fff; font-weight:700; font-size:15px; padding:14px 36px;
+  border-radius:50px; text-decoration:none; border:none; cursor:pointer;
+  transition:all 0.35s cubic-bezier(.22,1,.36,1); font-family:'Inter',sans-serif;
+  box-shadow:0 8px 30px rgba(0,80,0,0.4);
+  position:relative; overflow:hidden;
+}
+.btn-proyecto::before { content:''; position:absolute; inset:0; opacity:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);
+  transition:opacity 0.3s; }
+.btn-proyecto:hover { transform:translateY(-3px) scale(1.04);
+  box-shadow:0 16px 48px rgba(0,120,0,0.5), 0 0 30px rgba(100,200,80,0.2); }
+.btn-proyecto:hover::before { opacity:1; }
+
+/* Stars */
+.star-field { position:absolute; inset:0; pointer-events:none; }
+.star { position:absolute; border-radius:50%; background:#fff; }
+
+/* Close btn */
+.proyecto-close {
+  position:absolute; top:18px; right:18px; z-index:10;
+  width:36px; height:36px; border-radius:50%; background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.12); cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition:all 0.3s; color:rgba(255,255,255,0.6); font-size:18px;
+}
+.proyecto-close:hover { background:rgba(255,255,255,0.16); color:#fff; transform:rotate(90deg); }
+
+/* Btn new projects in hero */
+.btn-new-projects {
+  display:inline-flex; align-items:center; gap:9px;
+  background:rgba(255,255,255,0.09); color:#fff; font-family:'Inter',sans-serif;
+  font-weight:600; font-size:15px; padding:14px 28px;
+  border:1px solid rgba(255,255,255,0.18); border-radius:var(--radius-sm);
+  cursor:pointer; backdrop-filter:blur(12px);
+  transition:all 0.35s cubic-bezier(.22,1,.36,1);
+  position:relative; overflow:hidden;
+}
+.btn-new-projects::after { content:''; position:absolute; inset:0;
+  background:rgba(255,255,255,0.15); transform:translateX(-100%) skewX(-15deg);
+  transition:transform 0.4s; }
+.btn-new-projects:hover::after { transform:translateX(150%) skewX(-15deg); }
+.btn-new-projects:hover { transform:translateY(-3px);
+  background:rgba(255,255,255,0.16); border-color:rgba(196,162,78,0.5);
+  box-shadow:0 12px 36px rgba(0,0,0,0.2), 0 0 20px rgba(196,162,78,0.12); }
+.btn-new-projects .new-badge {
+  background:linear-gradient(135deg,#f4d03f,#C4A24E);
+  color:#000; font-size:10px; font-weight:800; padding:2px 7px;
+  border-radius:6px; letter-spacing:0.5px; text-transform:uppercase;
+  box-shadow:0 2px 8px rgba(196,162,78,0.4);
+}
+
+/* ─── TOAST ─── */
+#toast { position:fixed; bottom:40px; left:50%; transform:translateX(-50%) translateY(120px);
+  background:rgba(8,22,44,0.96); backdrop-filter:blur(20px);
+  color:#fff; padding:18px 36px; border-radius:16px; font-size:14px; font-weight:500;
+  z-index:9999; box-shadow:0 16px 50px rgba(0,0,0,0.3);
+  transition:transform 0.5s cubic-bezier(.22,1,.36,1);
+  display:flex; align-items:center; gap:12px;
+  border:1px solid rgba(196,162,78,0.25); }
+
+/* ─── PARALLAX HERO TEXT ─── */
+.parallax-layer { will-change:transform; }
+
+/* ─── SECTION SEPARATOR ─── */
+.sep { width:60px; height:3px; background:linear-gradient(90deg,var(--gold),var(--gold-light));
+  border-radius:2px; margin:0 auto 20px; }
+
+@media(max-width:768px) {
+  .section { padding:80px 24px; }
+  .hero { padding:120px 20px 100px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Cursor glow -->
+<div class="cursor-glow" id="cursorGlow"></div>
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- NAVBAR -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <a href="#inicio" class="nav-brand">
+      <div class="nav-logo-mini"><span>ED</span></div>
+      <span class="nav-name nav-name-full">Ecosistema Digital</span>
+      <span class="nav-name nav-name-short">ED — FES Iztacala</span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="#inicio" class="active" data-section="inicio">Inicio</a>
+      <a href="#quienes" data-section="quienes">Quiénes somos</a>
+      <a href="#servicios" data-section="servicios">Servicios</a>
+      <a href="#solicitud" data-section="solicitud">Solicitud</a>
+      <a href="#espacio" data-section="espacio">Espacio</a>
+      <a href="#telemedicina" data-section="telemedicina">Telemedicina</a>
+      <a href="#contacto" data-section="contacto">Contacto</a>
+    </div>
+    <button class="hamburger" id="hamburgerBtn">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+        <line x1="3" y1="7" x2="21" y2="7"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="17" x2="21" y2="17"/>
+      </svg>
+    </button>
+  </div>
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#inicio">Inicio</a><a href="#quienes">Quiénes somos</a>
+    <a href="#servicios">Servicios</a><a href="#solicitud">Solicitud de servicios</a>
+    <a href="#espacio">Uso del espacio</a><a href="#telemedicina">Telemedicina</a>
+    <a href="#contacto">Contacto</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="inicio">
+  <div class="hero-blob hero-blob-1"></div>
+  <div class="hero-blob hero-blob-2"></div>
+  <div class="hero-blob hero-blob-3"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-radial parallax-layer" id="heroRadial"></div>
+  <div class="hero-particles" id="heroParticles"></div>
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-orb hero-orb-3"></div>
+
+  <div class="hero-content parallax-layer" id="heroContent">
+    <div class="hero-logo-wrap">
+      <img src="assets/logo-ecosistema-digital.png" alt="Ecosistema Digital" style="height:90px;width:auto;filter:drop-shadow(0 0 24px rgba(196,162,78,0.4))" onerror="this.parentElement.innerHTML='<div style=\'width:90px;height:90px;border:2px solid var(--gold);border-radius:20px;display:flex;align-items:center;justify-content:center;background:rgba(196,162,78,0.1)\'><span style=\'color:var(--gold);font-size:32px;font-weight:700\'>ED</span></div>'">
+    </div>
+    <div class="hero-badge">
+      <span class="pulse-dot"></span>
+      FES Iztacala · UNAM
+    </div>
+    <h1 class="serif">Ecosistema <span class="gold">Digital</span></h1>
+    <p class="tagline">Facultad de Estudios Superiores Iztacala, UNAM</p>
+    <p class="desc">Integración académica y tecnológica para desarrollar proyectos, servicios, innovación y análisis que transforman la formación universitaria.</p>
+    <div class="hero-buttons">
+      <a href="#servicios" class="btn btn-gold">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Nuestros servicios
+      </a>
+      <button class="btn-new-projects" onclick="openProyecto()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Nuevos proyectos
+        <span class="new-badge">nuevo</span>
+      </button>
+      <a href="#solicitud" class="btn btn-glass">
+        Solicitar servicio
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+
+
+  <div class="scroll-hint">
+    <div class="scroll-wheel"></div>
+    <span>Scroll</span>
+  </div>
+</section>
+
+<!-- QUIÉNES SOMOS -->
+<section class="section section-cream" id="quienes" style="position:relative;overflow:hidden">
+  <div class="floating-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="sec-header reveal">
+      <div class="sec-tag"><span class="dot"></span> Quiénes somos</div>
+      <div class="sep"></div>
+      <h2 class="serif">Sobre el Ecosistema Digital</h2>
+      <p>Una iniciativa interdisciplinaria que articula saberes y capacidades para el desarrollo tecnológico universitario.</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="reveal d1">
+      <div class="tabs-nav">
+        <button class="tab-btn active" onclick="switchTab('about','desc',this)">Descripción</button>
+        <button class="tab-btn" onclick="switchTab('about','mission',this)">Misión y Visión</button>
+        <button class="tab-btn" onclick="switchTab('about','objetivos',this)">Objetivos</button>
+        <button class="tab-btn" onclick="switchTab('about','carreras',this)">Carreras participantes</button>
+      </div>
+
+      <div id="about-desc" class="tab-content active">
+        <div style="max-width:800px;margin:0 auto">
+          <p style="font-size:16px;color:#475569;line-height:1.95;margin-bottom:18px">
+            El <strong style="color:var(--navy)">Ecosistema Digital</strong> es un espacio de integración académica y tecnológica de la Facultad de Estudios Superiores Iztacala, UNAM. Surge como respuesta a la necesidad de articular los saberes y capacidades de las carreras que conforman la Facultad, con el fin de desarrollar proyectos, servicios, acompañamiento, innovación, simulación, análisis de información y apoyo en procesos vinculados con la salud.
+          </p>
+          <p style="font-size:16px;color:#475569;line-height:1.95">
+            Este ecosistema representa la convergencia entre la formación universitaria y las tecnologías emergentes, abriendo oportunidades de colaboración, investigación, docencia y extensión que benefician a estudiantes, profesores, investigadores y a la comunidad en general.
+          </p>
+        </div>
+      </div>
+
+      <div id="about-mission" class="tab-content">
+        <div class="card-grid card-grid-2">
+          <div class="card">
+            <h3 class="serif" style="font-size:24px;color:var(--navy);margin-bottom:16px">Misión</h3>
+            <p style="font-size:15px;color:#64748B;line-height:1.85">Promover la integración de tecnologías digitales en los procesos de formación, investigación y atención, fomentando la colaboración interdisciplinaria entre las carreras de la FES Iztacala para generar soluciones innovadoras al servicio de la comunidad universitaria y la sociedad.</p>
+          </div>
+          <div class="card">
+            <h3 class="serif" style="font-size:24px;color:var(--navy);margin-bottom:16px">Visión</h3>
+            <p style="font-size:15px;color:#64748B;line-height:1.85">Consolidarse como un referente nacional en la integración de tecnologías digitales para la formación universitaria, impulsando la innovación educativa y el desarrollo de soluciones con impacto social a través de la colaboración interdisciplinaria.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="about-objetivos" class="tab-content">
+        <div class="card-grid card-grid-2" id="objGrid"></div>
+      </div>
+
+      <div id="about-carreras" class="tab-content">
+        <div class="carreras-grid" id="carrerasGrid"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICIOS -->
+<section class="section section-white" id="servicios">
+  <div class="container-md">
+    <div class="sec-header reveal">
+      <div class="sec-tag"><span class="dot"></span> Nuestros servicios</div>
+      <div class="sep"></div>
+      <h2 class="serif">Servicios del ecosistema</h2>
+      <p>Soluciones tecnológicas para fortalecer la formación, la investigación y la atención.</p>
+    </div>
+    <div class="accordion reveal d1" id="serviciosAccordion"></div>
+  </div>
+</section>
+
+<!-- SOLICITUD -->
+<section class="section section-cream" id="solicitud">
+  <div class="container-sm">
+    <div class="sec-header reveal">
+      <div class="sec-tag"><span class="dot"></span> Solicitar servicio</div>
+      <div class="sep"></div>
+      <h2 class="serif">Solicitud de servicios</h2>
+      <p>Complete el formulario y nos pondremos en contacto a la brevedad.</p>
+    </div>
+    <div class="form-card reveal d1">
+      <form onsubmit="event.preventDefault();showToast('Solicitud enviada exitosamente')">
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Nombre completo <span class="req">*</span></label><input class="input" placeholder="Nombre y apellidos" required></div>
+          <div class="form-group"><label class="form-label">Correo electrónico <span class="req">*</span></label><input class="input" type="email" placeholder="correo@ejemplo.com" required></div>
+          <div class="form-group"><label class="form-label">Teléfono</label><input class="input" type="tel" placeholder="55 1234 5678"></div>
+          <div class="form-group"><label class="form-label">Carrera, área o dependencia</label><input class="input" placeholder="Ej. Psicología"></div>
+          <div class="form-group"><label class="form-label">Tipo de usuario <span class="req">*</span></label><select class="input" required><option value="">Seleccionar...</option><option>Estudiante</option><option>Profesor</option><option>Investigador</option><option>Área académica</option><option>Grupo de trabajo</option><option>Otro</option></select></div>
+          <div class="form-group"><label class="form-label">Servicio solicitado <span class="req">*</span></label><select class="input" required><option value="">Seleccionar...</option><option>Inteligencia Artificial</option><option>Realidad Virtual</option><option>Realidad Aumentada</option><option>Uso de Bases de Datos</option><option>Telemedicina</option></select></div>
+          <div class="form-group"><label class="form-label">Modalidad <span class="req">*</span></label><select class="input" id="modalidadSol" onchange="toggleGroup('grupalSol',this.value==='Grupal')" required><option value="">Seleccionar...</option><option>Individual</option><option>Grupal</option></select></div>
+          <div class="form-group"><label class="form-label">Fecha deseada</label><input class="input" type="date"></div>
+        </div>
+        <div class="group-box" id="grupalSol" style="display:none">
+          <div class="group-box-title">⬢ Información del grupo</div>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">Número de participantes</label><input class="input" type="number" placeholder="Ej. 15"></div>
+            <div class="form-group"><label class="form-label">Nombre del grupo</label><input class="input" placeholder="Ej. Grupo 2401"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Objetivo de la actividad</label><textarea class="input" rows="3" placeholder="Describa brevemente el objetivo..."></textarea></div>
+        </div>
+        <div class="form-group"><label class="form-label">Descripción de la necesidad <span class="req">*</span></label><textarea class="input" required placeholder="Describa detalladamente el servicio que requiere..."></textarea></div>
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Horario deseado</label><input class="input" placeholder="Ej. 10:00 a 12:00"></div>
+          <div class="form-group"><label class="form-label">Requerimientos adicionales</label><input class="input" placeholder="Software, equipos..."></div>
+        </div>
+        <div style="text-align:right;margin-top:8px"><button type="submit" class="btn btn-gold" style="padding:14px 52px">Enviar solicitud</button></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- USO DEL ESPACIO -->
+<section class="section section-white" id="espacio">
+  <div class="container-sm">
+    <div class="sec-header reveal">
+      <div class="sec-tag"><span class="dot"></span> Reservar espacio</div>
+      <div class="sep"></div>
+      <h2 class="serif">Solicitud de uso del espacio</h2>
+      <p>Reserve el espacio físico del Ecosistema Digital.</p>
+    </div>
+    <div class="notice reveal">
+      <div class="notice-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
+      <p>La disponibilidad del espacio estará sujeta a revisión y confirmación por parte de la coordinación del Ecosistema Digital.</p>
+    </div>
+    <div class="form-card reveal d1">
+      <form onsubmit="event.preventDefault();showToast('Solicitud de espacio registrada')">
+        <div class="form-grid">
+          <div class="form-group"><label class="form-label">Nombre <span class="req">*</span></label><input class="input" placeholder="Nombre completo" required></div>
+          <div class="form-group"><label class="form-label">Correo <span class="req">*</span></label><input class="input" type="email" placeholder="correo@ejemplo.com" required></div>
+          <div class="form-group"><label class="form-label">Teléfono</label><input class="input" type="tel" placeholder="55 1234 5678"></div>
+          <div class="form-group"><label class="form-label">Carrera o dependencia</label><input class="input" placeholder="Ej. Enfermería"></div>
+          <div class="form-group"><label class="form-label">Tipo de solicitud <span class="req">*</span></label><select class="input" required><option value="">Seleccionar...</option><option>Individual</option><option>Grupal</option></select></div>
+          <div class="form-group"><label class="form-label">Número de asistentes</label><input class="input" type="number" placeholder="Ej. 20"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Motivo <span class="req">*</span></label><input class="input" placeholder="Ej. Práctica de simulación clínica" required></div>
+        <div class="form-group"><label class="form-label">Actividad a realizar</label><textarea class="input" rows="3" placeholder="Describa la actividad..."></textarea></div>
+        <div class="form-group"><label class="form-label">Tecnología requerida</label><select class="input"><option value="">Seleccionar...</option><option>Inteligencia Artificial</option><option>Realidad Virtual</option><option>Realidad Aumentada</option><option>Bases de Datos</option><option>Telemedicina</option><option>Otro</option><option>Ninguno</option></select></div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0 20px">
+          <div class="form-group"><label class="form-label">Fecha <span class="req">*</span></label><input class="input" type="date" required></div>
+          <div class="form-group"><label class="form-label">Hora inicio <span class="req">*</span></label><input class="input" type="time" required></div>
+          <div class="form-group"><label class="form-label">Hora término <span class="req">*</span></label><input class="input" type="time" required></div>
+        </div>
+        <div class="form-group"><label class="form-label">Observaciones</label><textarea class="input" rows="3" placeholder="Información adicional..."></textarea></div>
+        <div style="text-align:right;margin-top:8px"><button type="submit" class="btn btn-gold" style="padding:14px 52px">Solicitar espacio</button></div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- TELEMEDICINA -->
+<section class="section" id="telemedicina" style="background:linear-gradient(180deg,#FAF8F4 0%,#fff 100%);position:relative;overflow:hidden">
+  <div class="floating-shapes"><div class="shape shape-2" style="opacity:0.03"></div></div>
+  <div class="container" style="position:relative;z-index:1">
+    <div class="sec-header reveal">
+      <div class="sec-tag"><span class="dot"></span> Salud digital</div>
+      <div class="sep"></div>
+      <h2 class="serif">Telemedicina</h2>
+      <p>Orientación, acompañamiento y asesoría remota en procesos vinculados con salud digital.</p>
+    </div>
+    <div class="card-grid card-grid-2" style="align-items:start">
+      <div class="reveal from-right d1">
+        <h3 class="serif" style="font-size:24px;color:var(--navy);margin-bottom:18px">Acerca del servicio</h3>
+        <p style="font-size:15px;color:#64748B;line-height:1.95;margin-bottom:30px">El servicio de telemedicina ofrece un canal de comunicación profesional para brindar orientación, asesoría y acompañamiento en procesos relacionados con la salud, facilitando la interacción remota entre profesionales, estudiantes e interesados.</p>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <div class="tele-benefit"><div class="tele-icon">❤️</div><div><p style="font-weight:600;color:var(--navy);font-size:14px;margin-bottom:3px">Enfoque humano</p><p style="font-size:13px;color:#64748B;line-height:1.6">Orientación con cercanía y profesionalismo.</p></div></div>
+          <div class="tele-benefit"><div class="tele-icon">🌍</div><div><p style="font-weight:600;color:var(--navy);font-size:14px;margin-bottom:3px">Sin barreras</p><p style="font-size:13px;color:#64748B;line-height:1.6">Asesoría que trasciende limitaciones geográficas.</p></div></div>
+          <div class="tele-benefit"><div class="tele-icon">🛡️</div><div><p style="font-weight:600;color:var(--navy);font-size:14px;margin-bottom:3px">Respaldo institucional</p><p style="font-size:13px;color:#64748B;line-height:1.6">Experiencia de la FES Iztacala.</p></div></div>
+          <div class="tele-benefit"><div class="tele-icon">👥</div><div><p style="font-weight:600;color:var(--navy);font-size:14px;margin-bottom:3px">Atención flexible</p><p style="font-size:13px;color:#64748B;line-height:1.6">Modalidad individual o grupal.</p></div></div>
+        </div>
+        <div style="margin-top:26px;display:flex;flex-wrap:wrap;gap:8px">
+          <span class="acc-tag">Orientación general</span><span class="acc-tag">Asesoría especializada</span>
+          <span class="acc-tag">Acompañamiento remoto</span><span class="acc-tag">Consulta interdisciplinaria</span>
+        </div>
+      </div>
+      <div class="form-card reveal from-left d2" style="position:sticky;top:110px">
+        <h3 style="font-size:19px;font-weight:700;color:var(--navy);margin-bottom:26px;text-align:center">Solicitar asesoría</h3>
+        <form onsubmit="event.preventDefault();showToast('Solicitud de asesoría registrada')">
+          <div class="form-group"><label class="form-label">Nombre <span class="req">*</span></label><input class="input" placeholder="Nombre y apellidos" required></div>
+          <div class="form-group"><label class="form-label">Correo <span class="req">*</span></label><input class="input" type="email" placeholder="correo@ejemplo.com" required></div>
+          <div class="form-group"><label class="form-label">Teléfono</label><input class="input" type="tel" placeholder="55 1234 5678"></div>
+          <div class="form-group"><label class="form-label">Carrera o área</label><input class="input" placeholder="Ej. Médico Cirujano"></div>
+          <div class="form-group"><label class="form-label">Tipo de asesoría <span class="req">*</span></label><select class="input" required><option value="">Seleccionar...</option><option>Orientación general</option><option>Asesoría especializada</option><option>Acompañamiento remoto</option><option>Consulta interdisciplinaria</option><option>Segunda opinión académica</option></select></div>
+          <div class="form-group"><label class="form-label">Motivo <span class="req">*</span></label><textarea class="input" rows="3" placeholder="Describa el motivo..." required></textarea></div>
+          <div class="form-grid" style="gap:0 16px">
+            <div class="form-group"><label class="form-label">Modalidad <span class="req">*</span></label><select class="input" required><option value="">Seleccionar...</option><option>Individual</option><option>Grupal</option></select></div>
+            <div class="form-group"><label class="form-label">Fecha estimada</label><input class="input" type="date"></div>
+          </div>
+          <div class="form-group"><label class="form-label">Comentarios</label><textarea class="input" rows="2" placeholder="Información adicional..."></textarea></div>
+          <button type="submit" class="btn btn-gold btn-full" style="padding:15px">Solicitar asesoría</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IMPACTO -->
+<section class="section section-gradient">
+  <div class="container" style="position:relative;z-index:2">
+    <div class="sec-header light reveal">
+      <div class="sec-tag"><span class="dot"></span> Impacto</div>
+      <div class="sep"></div>
+      <h2 class="serif">Impacto y beneficios</h2>
+      <p>Un ecosistema que transforma la interacción con la tecnología y el conocimiento.</p>
+    </div>
+    <div class="counter-grid reveal d1" id="counterGrid"></div>
+    <div class="card-grid card-grid-3 reveal d2" id="impactoGrid"></div>
+  </div>
+</section>
+
+<!-- GALERÍA -->
+<section class="section section-cream">
+  <div class="container">
+    <div class="sec-header reveal">
+      <div class="sec-tag"><span class="dot"></span> Tecnología</div>
+      <div class="sep"></div>
+      <h2 class="serif">Entorno tecnológico</h2>
+      <p>Las áreas de innovación que convergen en nuestro ecosistema digital.</p>
+    </div>
+    <div class="card-grid card-grid-4 reveal d1" id="galeriaGrid"></div>
+  </div>
+</section>
+
+<!-- CONTACTO -->
+<section class="section section-white" id="contacto">
+  <div class="container-md">
+    <div class="sec-header reveal">
+      <div class="sec-tag"><span class="dot"></span> Contáctenos</div>
+      <div class="sep"></div>
+      <h2 class="serif">Contacto</h2>
+      <p>Estamos a su disposición para resolver cualquier duda.</p>
+    </div>
+    <div class="card-grid card-grid-2" style="align-items:start">
+      <div class="reveal from-right d1">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div class="contact-card">
+            <div class="contact-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 4l10 8 10-8"/></svg></div>
+            <div><p class="contact-label">Correo electrónico</p><p class="contact-value">ecosistemadigital@iztacala.unam.mx</p></div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="1.5"><path d="M22 16.9v3a2 2 0 01-2.2 2A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1.9.4 1.8.7 2.6a2 2 0 01-.4 2.1L8 9.7a16 16 0 006.3 6.3l1.3-1.3a2 2 0 012.1-.4c.8.3 1.7.5 2.6.7a2 2 0 011.7 2z"/></svg></div>
+            <div><p class="contact-label">Teléfono</p><p class="contact-value">55 5623 1100 ext. 0000</p></div>
+          </div>
+          <div class="contact-card">
+            <div class="contact-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="1.5"><path d="M12 2C8.1 2 5 5.1 5 9c0 5.2 7 13 7 13s7-7.8 7-13c0-3.9-3.1-7-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg></div>
+            <div><p class="contact-label">Ubicación</p><p class="contact-value">FES Iztacala, UNAM. Av. de los Barrios No. 1, Los Reyes Iztacala, Tlalnepantla, Estado de México.</p></div>
+          </div>
+        </div>
+        <div style="margin-top:26px;padding:26px;background:#F8FAFC;border-radius:var(--radius);border:1px solid #E8ECF1">
+          <p style="font-size:14px;font-weight:600;color:var(--navy);margin:0 0 8px">🕐 Horario de atención</p>
+          <p style="font-size:14px;color:#64748B;margin:0;line-height:1.65">Lunes a viernes de 9:00 a 17:00 horas.</p>
+        </div>
+      </div>
+      <div class="form-card reveal from-left d2">
+        <form onsubmit="event.preventDefault();showToast('Mensaje enviado')">
+          <div class="form-group"><label class="form-label">Nombre <span class="req">*</span></label><input class="input" placeholder="Su nombre" required></div>
+          <div class="form-group"><label class="form-label">Correo <span class="req">*</span></label><input class="input" type="email" placeholder="correo@ejemplo.com" required></div>
+          <div class="form-group"><label class="form-label">Asunto</label><input class="input" placeholder="Motivo de su mensaje"></div>
+          <div class="form-group"><label class="form-label">Mensaje <span class="req">*</span></label><textarea class="input" rows="5" placeholder="Escriba su mensaje..." required></textarea></div>
+          <button type="submit" class="btn btn-gold btn-full" style="padding:15px">Enviar mensaje</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+          <div style="width:42px;height:42px;border-radius:12px;border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;background:rgba(196,162,78,0.1)"><span style="color:var(--gold);font-weight:700;font-size:16px">ED</span></div>
+          <span style="color:#fff;font-size:17px;font-weight:700">Ecosistema Digital</span>
+        </div>
+        <p>Iniciativa interdisciplinaria de la Facultad de Estudios Superiores Iztacala, UNAM. Participan: Médico Cirujano, Enfermería, Cirujano Dentista, Psicología, Psicología SUAyED, Optometría, Ecología, Biología y la División de Investigación y Posgrado.</p>
+      </div>
+      <div>
+        <p class="footer-title">Navegación</p>
+        <a href="#inicio" class="footer-link">Inicio</a>
+        <a href="#quienes" class="footer-link">Quiénes somos</a>
+        <a href="#servicios" class="footer-link">Servicios</a>
+        <a href="#solicitud" class="footer-link">Solicitud</a>
+        <a href="#espacio" class="footer-link">Uso del espacio</a>
+        <a href="#telemedicina" class="footer-link">Telemedicina</a>
+        <a href="#contacto" class="footer-link">Contacto</a>
+      </div>
+      <div>
+        <p class="footer-title">Contacto</p>
+        <p class="footer-info">ecosistemadigital@iztacala.unam.mx</p>
+        <p class="footer-info">55 5623 1100</p>
+        <p class="footer-info">FES Iztacala, UNAM</p>
+        <p class="footer-info" style="margin-top:14px">Tlalnepantla, Estado de México</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Ecosistema Digital — Facultad de Estudios Superiores Iztacala, UNAM. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══ MODAL: NUEVO PROYECTO 475 ANIVERSARIO UNAM ═══ -->
+<div class="proyecto-overlay" id="proyectoOverlay" onclick="handleOverlayClick(event)">
+  <div class="proyecto-card" id="proyectoCard">
+    <div class="proyecto-card-bg"></div>
+    <div class="proyecto-card-noise"></div>
+
+    <!-- Stars bg -->
+    <div class="star-field" id="starField"></div>
+
+    <!-- Pulse rings -->
+    <div class="proyecto-ring proyecto-ring-1"></div>
+    <div class="proyecto-ring proyecto-ring-2"></div>
+    <div class="proyecto-ring proyecto-ring-3"></div>
+
+    <!-- Falling leaves -->
+    <div class="proyecto-leaves" id="proyectoLeaves"></div>
+
+    <!-- Close -->
+    <button class="proyecto-close" onclick="closeProyecto()">✕</button>
+
+    <div class="proyecto-inner">
+      <!-- 475 -->
+      <div class="badge-475">475</div>
+      <div class="aniversario-label">✦ Aniversario ✦</div>
+
+      <!-- Tree SVG -->
+      <div class="tree-wrap">
+        <svg class="tree-svg" width="120" height="130" viewBox="0 0 120 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Trunk -->
+          <rect x="52" y="95" width="16" height="28" rx="4" fill="#5D3A1A"/>
+          <rect x="55" y="95" width="5" height="28" rx="2" fill="#7D5A2A" opacity=".5"/>
+          <!-- Root left -->
+          <path d="M52 118 Q38 122 30 126" stroke="#5D3A1A" stroke-width="3" stroke-linecap="round"/>
+          <!-- Root right -->
+          <path d="M68 118 Q80 122 90 126" stroke="#5D3A1A" stroke-width="3" stroke-linecap="round"/>
+          <!-- Canopy back -->
+          <ellipse cx="60" cy="72" rx="38" ry="32" fill="#1a5c1a" opacity=".6"/>
+          <!-- Canopy mid -->
+          <ellipse cx="60" cy="65" rx="32" ry="28" fill="#2d8c2d"/>
+          <!-- Canopy front -->
+          <ellipse cx="60" cy="58" rx="26" ry="22" fill="#3aad3a"/>
+          <!-- Top cluster -->
+          <ellipse cx="60" cy="44" rx="20" ry="18" fill="#44cc44"/>
+          <ellipse cx="44" cy="55" rx="15" ry="13" fill="#3aad3a"/>
+          <ellipse cx="76" cy="55" rx="15" ry="13" fill="#3aad3a"/>
+          <ellipse cx="60" cy="32" rx="14" ry="13" fill="#55e055"/>
+          <!-- Highlights -->
+          <ellipse cx="50" cy="44" rx="8" ry="6" fill="#77ee77" opacity=".4"/>
+          <ellipse cx="65" cy="36" rx="5" ry="4" fill="#aaffaa" opacity=".3"/>
+          <!-- Small flowers/dots -->
+          <circle cx="48" cy="56" r="3" fill="#ffdd44" opacity=".9"/>
+          <circle cx="72" cy="50" r="2.5" fill="#ffdd44" opacity=".85"/>
+          <circle cx="60" cy="72" r="2.5" fill="#ffdd44" opacity=".75"/>
+          <circle cx="38" cy="65" r="2" fill="#ffcc33" opacity=".8"/>
+          <circle cx="82" cy="64" r="2" fill="#ffcc33" opacity=".8"/>
+          <circle cx="56" cy="34" r="2" fill="#ffffaa" opacity=".7"/>
+        </svg>
+        <div class="tree-glow"></div>
+      </div>
+
+      <h2 class="proyecto-title">475 Aniversario<br>UNAM</h2>
+      <p class="proyecto-subtitle">Un proyecto digital que celebra la historia, el conocimiento y el futuro de la máxima casa de estudios de México.</p>
+
+      <a href="https://unam-fesi.github.io/arbol-unam-475/" target="_blank" rel="noopener" class="btn-proyecto">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/>
+          <path d="M12 2c-2.76 4-2.76 16 0 20M12 2c2.76 4 2.76 16 0 20M2 12h20"/>
+        </svg>
+        Explorar proyecto
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+
+      <p style="font-size:11px;color:rgba(255,255,255,0.25);margin-top:18px;letter-spacing:0.5px">FES Iztacala · UNAM · 2026</p>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/></svg>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+/* ─── DATA ─── */
+const carreras=[
+  {name:"Médico Cirujano",emoji:"🏥",color:"#7C3AED"},
+  {name:"Enfermería",emoji:"⚕️",color:"#059669"},
+  {name:"Cirujano Dentista",emoji:"🦷",color:"#2563EB"},
+  {name:"Psicología",emoji:"🧠",color:"#0891B2"},
+  {name:"Psicología SUAyED",emoji:"💡",color:"#6366F1"},
+  {name:"Optometría",emoji:"👁️",color:"#EA580C"},
+  {name:"Ecología",emoji:"🌿",color:"#16A34A"},
+  {name:"Biología",emoji:"🧬",color:"#DC2626"},
+  {name:"Div. Investigación y Posgrado",emoji:"🔬",color:"#8B5CF6"}
+];
+const servicios=[
+  {emoji:'🧠',title:'Inteligencia Artificial',color:'#4F46E5',desc:'Soluciones basadas en IA para el análisis de información, la automatización de procesos, la innovación educativa y el apoyo y gestión del conocimiento.',tags:['Análisis predictivo','Automatización','Innovación educativa','Gestión del conocimiento']},
+  {emoji:'🥽',title:'Realidad Virtual',color:'#7C3AED',desc:'Simulación y experiencias inmersivas para apoyo a procesos de enseñanza y aprendizaje, con escenarios formativos y demostrativos.',tags:['Simulación clínica','Entornos inmersivos','Escenarios formativos','Aprendizaje experiencial']},
+  {emoji:'📱',title:'Realidad Aumentada',color:'#EA580C',desc:'Visualización enriquecida e interacción con recursos digitales para apoyo a la enseñanza y comprensión de procesos complejos.',tags:['Visualización 3D','Recursos interactivos','Material didáctico','Contenido enriquecido']},
+  {emoji:'🗄️',title:'Uso de Bases de Datos',color:'#0891B2',desc:'Organización, consulta, integración, análisis y aprovechamiento de información para proyectos académicos.',tags:['Organización de datos','Consultas avanzadas','Análisis estadístico','Visualización de datos']},
+  {emoji:'🏥',title:'Telemedicina',color:'#059669',desc:'Orientación, asesoría, acompañamiento e interacción remota para apoyo en procesos vinculados con salud digital.',tags:['Orientación en salud','Asesoría remota','Acompañamiento','Salud digital']}
+];
+const objetivos=[
+  "Articular las capacidades de las carreras en torno a proyectos de tecnología digital.",
+  "Facilitar el acceso a tecnologías emergentes como IA, realidad virtual y aumentada.",
+  "Generar espacios de formación, simulación y análisis de información.",
+  "Fomentar la investigación interdisciplinaria y la innovación educativa.",
+  "Fortalecer la vinculación entre la academia, la tecnología y la sociedad.",
+  "Ofrecer servicios de acompañamiento y asesoría en telemedicina."
+];
+const impactoItems=[
+  {emoji:'⭐',title:'Fortalecimiento académico',desc:'Formación universitaria enriquecida con tecnologías de vanguardia.'},
+  {emoji:'💡',title:'Innovación interdisciplinaria',desc:'Colaboración creativa entre carreras para soluciones integrales.'},
+  {emoji:'👥',title:'Apoyo formativo',desc:'Simulación, visualización y análisis que transforman la enseñanza.'},
+  {emoji:'📊',title:'Tecnologías emergentes',desc:'Acceso a IA, realidad virtual, aumentada y análisis de datos.'},
+  {emoji:'🔗',title:'Vinculación entre carreras',desc:'Trabajo colaborativo y visión compartida interdisciplinaria.'},
+  {emoji:'🌐',title:'Impacto social',desc:'Mejora en análisis, simulación y atención con impacto en la comunidad.'}
+];
+const galeriaItems=[
+  {l:'Inteligencia Artificial',e:'🧠',g:'linear-gradient(135deg,#2563EB,#06B6D4)'},
+  {l:'Realidad Virtual',e:'🥽',g:'linear-gradient(135deg,#7C3AED,#EC4899)'},
+  {l:'Realidad Aumentada',e:'📱',g:'linear-gradient(135deg,#EA580C,#FACC15)'},
+  {l:'Telemedicina',e:'🏥',g:'linear-gradient(135deg,#059669,#14B8A6)'},
+  {l:'Análisis de Datos',e:'📊',g:'linear-gradient(135deg,#4F46E5,#3B82F6)'},
+  {l:'Simulación',e:'🔬',g:'linear-gradient(135deg,#F43F5E,#F97316)'},
+  {l:'Conectividad',e:'🌐',g:'linear-gradient(135deg,#0EA5E9,#4F46E5)'},
+  {l:'Colaboración',e:'🤝',g:'linear-gradient(135deg,#8B5CF6,#A855F7)'}
+];
+
+/* ─── RENDER ─── */
+// Carreras
+const cg=document.getElementById('carrerasGrid');
+carreras.forEach((c,i)=>{
+  const el=document.createElement('div');
+  el.className='carrera-card reveal';
+  el.style.cssText=`--carrera-color:${c.color};transition-delay:${i*0.05}s`;
+  el.innerHTML=`<span class="carrera-emoji">${c.emoji}</span><p class="carrera-name">${c.name}</p>`;
+  cg.appendChild(el);
+});
+
+// Objetivos
+const og=document.getElementById('objGrid');
+objetivos.forEach((o,i)=>{
+  og.innerHTML+=`<div class="card reveal" style="display:flex;gap:14px;align-items:flex-start;padding:24px;transition-delay:${i*0.07}s">
+    <div style="min-width:32px;height:32px;border-radius:8px;background:rgba(196,162,78,0.1);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--gold);font-size:14px;flex-shrink:0">${i+1}</div>
+    <p style="font-size:14px;color:#64748B;line-height:1.75;margin:4px 0 0">${o}</p>
+  </div>`;
+});
+
+// Servicios accordion
+const sa=document.getElementById('serviciosAccordion');
+servicios.forEach((s,i)=>{
+  sa.innerHTML+=`<div class="accordion-item${i===0?' open':''}" id="acc-${i}">
+    <button class="accordion-trigger" onclick="toggleAccordion(${i})">
+      <div class="accordion-icon-wrap" style="background:${s.color}18"><span style="font-size:28px">${s.emoji}</span></div>
+      <div class="accordion-trigger-text"><h3>${s.title}</h3><p>Conocer más sobre este servicio</p></div>
+      <div class="accordion-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/></svg></div>
+    </button>
+    <div class="accordion-body">
+      <div class="accordion-body-inner">
+        <p>${s.desc}</p>
+        <div class="acc-tags">${s.tags.map(t=>`<span class="acc-tag">${t}</span>`).join('')}</div>
+        <div style="margin-top:22px"><a href="#solicitud" class="btn btn-outline-gold btn-sm">Solicitar este servicio</a></div>
+      </div>
+    </div>
+  </div>`;
+});
+
+// Counters (with animation)
+const counters=[{n:'9',target:9,l:'Carreras participantes'},{n:'5',target:5,l:'Servicios tecnológicos'},{n:'3',target:3,l:'Modalidades de atención'},{n:'∞',target:null,l:'Posibilidades'}];
+const cnt=document.getElementById('counterGrid');
+counters.forEach(c=>{
+  cnt.innerHTML+=`<div class="counter-card"><div class="counter-num" data-target="${c.target||''}" data-symbol="${c.n}">${c.n}</div><div class="counter-label">${c.l}</div></div>`;
+});
+
+// Impacto
+const ig=document.getElementById('impactoGrid');
+impactoItems.forEach((item,i)=>{
+  ig.innerHTML+=`<div class="card-dark reveal d${(i%3)+1}">
+    <div style="font-size:32px;margin-bottom:16px">${item.emoji}</div>
+    <h3 style="font-size:17px;font-weight:700;color:#fff;margin-bottom:10px">${item.title}</h3>
+    <p style="font-size:14px;color:rgba(255,255,255,0.5);line-height:1.75">${item.desc}</p>
+  </div>`;
+});
+
+// Galería
+const gg=document.getElementById('galeriaGrid');
+galeriaItems.forEach((g,i)=>{
+  gg.innerHTML+=`<div class="gallery-item reveal d${(i%4)+1}">
+    <div class="gallery-bg" style="background:${g.g}"></div>
+    <div class="gallery-content"><span class="emoji">${g.e}</span><p>${g.l}</p></div>
+  </div>`;
+});
+
+/* ─── SCROLL LOGIC ─── */
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement.scrollHeight-window.innerHeight;
+  document.getElementById('scrollProgress').style.width=(window.scrollY/h*100)+'%';
+  document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>60);
+  // Active nav
+  const y=window.scrollY+260;
+  const secs=['inicio','quienes','servicios','solicitud','espacio','telemedicina','contacto'];
+  for(let i=secs.length-1;i>=0;i--){
+    const el=document.getElementById(secs[i]);
+    if(el&&el.offsetTop<=y){
+      document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
+      const a=document.querySelector(`.nav-links a[data-section="${secs[i]}"]`);
+      if(a)a.classList.add('active');
+      break;
+    }
+  }
+  // Parallax hero
+  if(window.scrollY<window.innerHeight){
+    const p=window.scrollY*0.35;
+    const hc=document.getElementById('heroContent');
+    const hr=document.getElementById('heroRadial');
+    if(hc)hc.style.transform=`translateY(${p}px)`;
+    if(hr)hr.style.transform=`translate(-50%,-50%) translateY(${p*0.5}px)`;
+  }
+});
+
+/* ─── REVEAL OBSERVER ─── */
+const observer=new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      entry.target.classList.add('visible');
+      // Counter animation
+      const num=entry.target.querySelector('.counter-num[data-target]');
+      if(num&&num.dataset.target){
+        const target=parseInt(num.dataset.target);
+        let count=0;
+        const step=()=>{
+          count=Math.min(count+1,target);
+          num.textContent=count;
+          if(count<target)requestAnimationFrame(step);
+        };
+        setTimeout(step,200);
+      }
+    }
+  });
+},{threshold:0.12,rootMargin:'0px 0px -40px 0px'});
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+/* ─── CURSOR GLOW ─── */
+const cursorGlow=document.getElementById('cursorGlow');
+let mouseX=0,mouseY=0,glowX=0,glowY=0;
+document.addEventListener('mousemove',e=>{mouseX=e.clientX;mouseY=e.clientY;});
+function animGlow(){
+  glowX+=(mouseX-glowX)*0.08;
+  glowY+=(mouseY-glowY)*0.08;
+  cursorGlow.style.left=glowX+'px';
+  cursorGlow.style.top=glowY+'px';
+  requestAnimationFrame(animGlow);
+}
+animGlow();
+
+/* ─── HERO PARTICLES ─── */
+const pp=document.getElementById('heroParticles');
+for(let i=0;i<28;i++){
+  const p=document.createElement('div');
+  p.className='particle';
+  const size=1+Math.random()*4;
+  p.style.cssText=`left:${Math.random()*100}%;bottom:-10px;width:${size}px;height:${size}px;
+    background:${Math.random()>0.5?'var(--gold)':'rgba(255,255,255,0.6)'};
+    animation-delay:${Math.random()*6}s;animation-duration:${3+Math.random()*4}s;`;
+  pp.appendChild(p);
+}
+
+/* ─── CARD 3D TILT ─── */
+document.querySelectorAll('.card,.card-glass,.card-dark,.gallery-item').forEach(card=>{
+  card.addEventListener('mousemove',e=>{
+    const rect=card.getBoundingClientRect();
+    const x=(e.clientX-rect.left)/rect.width-0.5;
+    const y=(e.clientY-rect.top)/rect.height-0.5;
+    card.style.transform=`translateY(-8px) perspective(800px) rotateX(${-y*8}deg) rotateY(${x*8}deg)`;
+  });
+  card.addEventListener('mouseleave',()=>{card.style.transform='';});
+});
+
+/* ─── INTERACTIONS ─── */
+document.getElementById('hamburgerBtn').addEventListener('click',()=>
+  document.getElementById('mobileMenu').classList.toggle('open'));
+document.querySelectorAll('.mobile-menu a').forEach(a=>
+  a.addEventListener('click',()=>document.getElementById('mobileMenu').classList.remove('open')));
+
+function toggleAccordion(idx){
+  const item=document.getElementById('acc-'+idx);
+  const isOpen=item.classList.contains('open');
+  document.querySelectorAll('.accordion-item').forEach(el=>el.classList.remove('open'));
+  if(!isOpen)item.classList.add('open');
+}
+function switchTab(group,id,btn){
+  btn.parentElement.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll(`[id^="${group}-"]`).forEach(el=>el.classList.remove('active'));
+  document.getElementById(`${group}-${id}`).classList.add('active');
+  // Re-run reveal observer for newly visible elements
+  setTimeout(()=>{
+    document.querySelectorAll('.reveal:not(.visible)').forEach(el=>observer.observe(el));
+  },50);
+}
+function toggleGroup(id,show){document.getElementById(id).style.display=show?'block':'none';}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.style.transform='translateX(-50%) translateY(0)';
+  setTimeout(()=>{t.style.transform='translateX(-50%) translateY(120px)';},3500);
+}
+
+/* ─── PROYECTO 475 MODAL ─── */
+function openProyecto(){
+  const overlay=document.getElementById('proyectoOverlay');
+  overlay.classList.add('active');
+  document.body.style.overflow='hidden';
+  // Reset card animation
+  const card=document.getElementById('proyectoCard');
+  card.style.animation='none';
+  requestAnimationFrame(()=>{
+    card.style.animation='modalIn 0.6s cubic-bezier(.22,1,.36,1) both';
+  });
+  // Build stars
+  const sf=document.getElementById('starField');
+  if(!sf.children.length){
+    for(let i=0;i<55;i++){
+      const s=document.createElement('div');
+      s.className='star';
+      const sz=0.5+Math.random()*2.5;
+      s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${sz}px;height:${sz}px;opacity:${0.1+Math.random()*0.5}`;
+      sf.appendChild(s);
+    }
+  }
+  // Build falling leaves
+  const lc=document.getElementById('proyectoLeaves');
+  if(!lc.children.length){
+    const leafEmojis=['🍃','🌿','🍀','🌱','🍂'];
+    for(let i=0;i<18;i++){
+      const l=document.createElement('div');
+      l.className='leaf';
+      const lx=(Math.random()-0.5)*200;
+      const lr=(Math.random()-0.5)*360;
+      l.style.cssText=`left:${5+Math.random()*90}%;
+        --lx:${lx}px;--lr:${lr}deg;
+        animation-delay:${Math.random()*8}s;
+        animation-duration:${5+Math.random()*6}s;
+        font-size:${10+Math.random()*14}px;opacity:${0.5+Math.random()*0.5}`;
+      l.textContent=leafEmojis[Math.floor(Math.random()*leafEmojis.length)];
+      lc.appendChild(l);
+    }
+  }
+}
+function closeProyecto(){
+  const overlay=document.getElementById('proyectoOverlay');
+  const card=document.getElementById('proyectoCard');
+  card.style.animation='modalIn 0.35s cubic-bezier(.22,1,.36,1) reverse both';
+  setTimeout(()=>{
+    overlay.classList.remove('active');
+    document.body.style.overflow='';
+  },320);
+}
+function handleOverlayClick(e){
+  if(e.target===document.getElementById('proyectoOverlay'))closeProyecto();
+}
+// Close on Escape key
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeProyecto();});
+</script>
+</body>
+</html>
