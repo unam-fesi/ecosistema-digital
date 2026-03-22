@@ -205,7 +205,7 @@ body { font-family:'Inter',system-ui,-apple-system,sans-serif; color:#1E293B; ba
   animation:float 1.5s ease-in-out infinite; }
 
 /* ─── SECTIONS ─── */
-.section { padding:110px 24px; position:relative; }
+.section { padding:40px 24px; position:relative; }
 .section-cream { background:var(--cream); }
 .section-white { background:#fff; }
 .section-gradient { background:linear-gradient(180deg,var(--navy) 0%,#06101E 100%); position:relative; overflow:hidden; }
@@ -801,7 +801,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 /* ─── COLLAPSIBLE SECTIONS ─── */
 .section-collapse-header {
   display:flex; align-items:center; gap:16px; cursor:pointer;
-  padding:20px 32px; margin:-110px -24px 0; padding-top:110px;
+  padding:16px 32px; margin:-40px -24px 0; padding-top:40px;
   user-select:none; position:relative; z-index:2;
 }
 .section-collapse-icon {
@@ -834,19 +834,15 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 .section-collapsed .section-body {
   max-height:0 !important; opacity:0; pointer-events:none;
 }
-/* Floating logo watermark behind sections */
-.section-watermark {
-  position:relative; overflow:hidden;
-}
-.section-watermark::after {
-  content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
-  width:400px; height:400px;
+/* Fixed floating logo watermark behind ALL content */
+.global-watermark {
+  position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:500px; height:500px;
   background:url('assets/logo-ecosistema-digital.png') center/contain no-repeat;
-  opacity:0.03; pointer-events:none; z-index:0;
-  filter:grayscale(30%);
+  opacity:0.06; pointer-events:none; z-index:0;
+  filter:grayscale(20%);
+  animation:floatSlow 10s ease-in-out infinite;
 }
-.section-gradient .section-watermark::after,
-.section-gradient.section-watermark::after { opacity:0.04; filter:grayscale(30%) brightness(2); }
 
 /* VR Catalog */
 .vr-tabs-nav {
@@ -885,9 +881,77 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   font-size:13px; color:#475569; line-height:1.6;
 }
 
+/* ─── AULA INMERSIVA MODAL ─── */
+.aii-overlay {
+  position:fixed; inset:0; z-index:10000; background:rgba(12,35,64,0.7);
+  backdrop-filter:blur(8px); display:none; align-items:center; justify-content:center;
+  padding:20px; opacity:0; transition:opacity 0.3s;
+}
+.aii-overlay.active { display:flex; opacity:1; }
+.aii-modal {
+  background:#fff; border-radius:24px; max-width:820px; width:100%;
+  max-height:88vh; display:flex; flex-direction:column; position:relative;
+  box-shadow:0 40px 120px rgba(0,0,0,0.25);
+  animation:aiiModalIn 0.4s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes aiiModalIn { from{opacity:0;transform:scale(0.92) translateY(20px)} to{opacity:1;transform:scale(1) translateY(0)} }
+.aii-close {
+  position:absolute; top:16px; right:16px; width:36px; height:36px;
+  border-radius:10px; border:1px solid #E8ECF1; background:#fff; cursor:pointer;
+  font-size:16px; display:flex; align-items:center; justify-content:center;
+  transition:all 0.2s; z-index:2; color:#64748B;
+}
+.aii-close:hover { border-color:var(--gold); color:var(--navy); background:rgba(196,162,78,0.05); }
+.aii-modal-header { padding:28px 28px 0; flex-shrink:0; }
+.aii-tabs {
+  display:flex; gap:4px; border-bottom:2px solid #E8ECF1; padding-bottom:0;
+}
+.aii-tab {
+  padding:10px 20px; background:none; border:none; border-bottom:2px solid transparent;
+  margin-bottom:-2px; cursor:pointer; font-weight:600; font-size:14px;
+  color:#94A3B8; transition:all 0.3s; border-radius:8px 8px 0 0;
+}
+.aii-tab:hover { color:var(--navy); background:rgba(196,162,78,0.05); }
+.aii-tab.active { color:var(--gold); border-bottom-color:var(--gold); }
+.aii-modal-body { padding:28px; overflow-y:auto; flex:1; }
+.aii-tab-content { display:none; }
+.aii-tab-content.active { display:block; }
+.aii-modal-footer {
+  padding:20px 28px; border-top:1px solid #E8ECF1; display:flex;
+  align-items:center; justify-content:space-between; gap:16px; flex-shrink:0;
+  flex-wrap:wrap;
+}
+/* AII Casos accordion */
+.aii-caso { border:1px solid #E8ECF1; border-radius:14px; overflow:hidden; transition:all 0.3s; }
+.aii-caso:hover { border-color:rgba(196,162,78,0.3); }
+.aii-caso-trigger {
+  display:flex; align-items:center; gap:12px; width:100%; padding:16px 20px;
+  background:none; border:none; cursor:pointer; font-size:14px; color:var(--navy);
+  transition:background 0.2s;
+}
+.aii-caso-trigger:hover { background:rgba(196,162,78,0.04); }
+.aii-caso-chevron { transition:transform 0.3s; flex-shrink:0; }
+.aii-caso.open .aii-caso-chevron { transform:rotate(180deg); }
+.aii-caso-body {
+  max-height:0; overflow:hidden; transition:max-height 0.4s cubic-bezier(.22,1,.36,1);
+}
+.aii-caso-body p {
+  padding:0 20px 16px; color:#64748B; font-size:14px; line-height:1.75; margin:0;
+}
+.aii-caso.open .aii-caso-body { max-height:300px; }
+@media(max-width:600px){
+  .aii-modal-header { padding:20px 20px 0; }
+  .aii-modal-body { padding:20px; }
+  .aii-modal-footer { padding:16px 20px; }
+  .aii-tabs { overflow-x:auto; gap:0; }
+  .aii-tab { padding:8px 14px; font-size:13px; white-space:nowrap; }
+}
+
 </style>
 </head>
 <body>
+
+<div class="global-watermark"></div>
 
 <!-- Cursor glow -->
 <div class="cursor-glow" id="cursorGlow"></div>
@@ -911,7 +975,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
       <a href="#cursos" data-section="cursos">Cursos</a>
       <a href="#comunidad" data-section="comunidad">Comunidad</a>
       <a href="#badges" data-section="badges">Logros</a>
-      <a href="#vr" data-section="vr">VR</a>
+      <a href="#aula-inmersiva" data-section="aula-inmersiva">Aula</a>
       <a href="#contacto" data-section="contacto">Contacto</a>
       <a href="#" onclick="showLoginModal();return false" class="nav-login-btn" style="background:rgba(196,162,78,0.12);color:var(--gold);border:1px solid rgba(196,162,78,0.25);margin-left:8px;font-weight:600">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
@@ -928,7 +992,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
     <a href="#inicio">Inicio</a><a href="#quienes">Quiénes somos</a>
     <a href="#servicios">Servicios</a><a href="#solicitud">Solicitud de servicios</a>
     <a href="#espacio">Uso del espacio</a><a href="#telemedicina">Telemedicina</a>
-    <a href="#cursos">Cursos</a><a href="#comunidad">Comunidad</a><a href="#badges">Logros</a><a href="#vr">Catálogo VR</a><a href="#contacto">Contacto</a>
+    <a href="#cursos">Cursos</a><a href="#comunidad">Comunidad</a><a href="#badges">Logros</a><a href="#aula-inmersiva">Aula Inmersiva</a><a href="#contacto">Contacto</a>
     <a href="#" onclick="showLoginModal();document.getElementById('mobileMenu').classList.remove('open');return false" style="color:var(--gold);border-top:1px solid rgba(196,162,78,0.15);margin-top:8px;padding-top:14px">🔐 Acceso</a>
   </div>
 </nav>
@@ -990,7 +1054,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 </section>
 
 <!-- QUIÉNES SOMOS -->
-<section class="section section-cream section-watermark" id="quienes" style="position:relative;overflow:hidden">
+<section class="section section-cream section-collapsed" id="quienes" style="position:relative;overflow:hidden">
   <div class="section-collapse-header" onclick="toggleSection('quienes')">
     <div class="section-collapse-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3" stroke="var(--gold)" stroke-width="2"/><path d="M6 20c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/></svg>
@@ -1000,7 +1064,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
     </div>
   </div>
-  <div class="section-body" style="max-height:none">
+  <div class="section-body" style="max-height:0">
     <div class="floating-shapes">
       <div class="shape shape-1"></div>
       <div class="shape shape-2"></div>
@@ -1059,7 +1123,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 </section>
 
 <!-- SERVICIOS -->
-<section class="section section-white section-watermark" id="servicios">
+<section class="section section-white section-collapsed" id="servicios">
   <div class="section-collapse-header" onclick="toggleSection('servicios')">
     <div class="section-collapse-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" stroke="var(--gold)" stroke-width="2"/><rect x="14" y="3" width="7" height="7" stroke="var(--gold)" stroke-width="2"/><rect x="3" y="14" width="7" height="7" stroke="var(--gold)" stroke-width="2"/><rect x="14" y="14" width="7" height="7" stroke="var(--gold)" stroke-width="2"/></svg>
@@ -1069,7 +1133,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
     </div>
   </div>
-  <div class="section-body" style="max-height:none">
+  <div class="section-body" style="max-height:0">
     <div class="container-md">
       <div class="sec-header reveal">
         <div class="sec-tag"><span class="dot"></span> Nuestros servicios</div>
@@ -1077,12 +1141,33 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
         <p>Soluciones tecnológicas para fortalecer la formación, la investigación y la atención.</p>
       </div>
       <div class="accordion reveal d1" id="serviciosAccordion"></div>
+
+      <!-- VR CATALOG SUBSECTION -->
+      <div id="vrCatalogSubsection" style="display:none;margin-top:40px;padding-top:30px;border-top:2px solid rgba(196,162,78,0.15)">
+        <div class="sec-header" style="margin-bottom:30px">
+          <div class="sec-tag"><span class="dot"></span> Catálogo de Software</div>
+          <h2 class="serif" style="font-size:clamp(22px,3vw,32px)">Software de Realidad Virtual</h2>
+          <p>Explora las aplicaciones VR disponibles para tu carrera.</p>
+        </div>
+        <div class="vr-tabs-nav">
+          <button class="vr-tab-btn active" onclick="switchVRTab('Médico Cirujano',this)">🏥 Médico Cirujano</button>
+          <button class="vr-tab-btn" onclick="switchVRTab('Enfermería',this)">⚕️ Enfermería</button>
+          <button class="vr-tab-btn" onclick="switchVRTab('Biología',this)">🧬 Biología</button>
+          <button class="vr-tab-btn" onclick="switchVRTab('Psicología',this)">🧠 Psicología</button>
+          <button class="vr-tab-btn" onclick="switchVRTab('Cirujano Dentista',this)">🦷 Cirujano Dentista</button>
+        </div>
+        <div id="vr-Médico Cirujano" class="vr-tab-content active" style="margin-top:30px"></div>
+        <div id="vr-Enfermería" class="vr-tab-content" style="margin-top:30px"></div>
+        <div id="vr-Biología" class="vr-tab-content" style="margin-top:30px"></div>
+        <div id="vr-Psicología" class="vr-tab-content" style="margin-top:30px"></div>
+        <div id="vr-Cirujano Dentista" class="vr-tab-content" style="margin-top:30px"></div>
+      </div>
     </div>
   </div>
 </section>
 
 <!-- SOLICITUD -->
-<section class="section section-cream section-watermark" id="solicitud">
+<section class="section section-cream section-collapsed" id="solicitud">
   <div class="section-collapse-header" onclick="toggleSection('solicitud')">
     <div class="section-collapse-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/><polyline points="13 2 13 9 20 9" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/></svg>
@@ -1092,7 +1177,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
     </div>
   </div>
-  <div class="section-body" style="max-height:none">
+  <div class="section-body" style="max-height:0">
     <div class="container-sm">
       <div class="sec-header reveal">
         <div class="sec-tag"><span class="dot"></span> Solicitar servicio</div>
@@ -1145,7 +1230,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 </section>
 
 <!-- USO DEL ESPACIO -->
-<section class="section section-white section-watermark" id="espacio">
+<section class="section section-white section-collapsed" id="espacio">
   <div class="section-collapse-header" onclick="toggleSection('espacio')">
     <div class="section-collapse-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/><polyline points="9 22 9 12 15 12 15 22" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/></svg>
@@ -1155,7 +1240,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
     </div>
   </div>
-  <div class="section-body" style="max-height:none">
+  <div class="section-body" style="max-height:0">
     <div class="container-sm">
       <div class="sec-header reveal">
         <div class="sec-tag"><span class="dot"></span> Reservar espacio</div>
@@ -1207,7 +1292,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 </section>
 
 <!-- TELEMEDICINA -->
-<section class="section section-watermark" id="telemedicina" style="background:linear-gradient(180deg,#FAF8F4 0%,#fff 100%);position:relative;overflow:hidden">
+<section class="section section-collapsed" id="telemedicina" style="background:linear-gradient(180deg,#FAF8F4 0%,#fff 100%);position:relative;overflow:hidden">
   <div class="section-collapse-header" onclick="toggleSection('telemedicina')">
     <div class="section-collapse-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/></svg>
@@ -1217,7 +1302,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
     </div>
   </div>
-  <div class="section-body" style="max-height:none">
+  <div class="section-body" style="max-height:0">
     <div class="floating-shapes"><div class="shape shape-2" style="opacity:0.03"></div></div>
     <div class="container" style="position:relative;z-index:1">
       <div class="sec-header reveal">
@@ -1274,7 +1359,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 </section>
 
 <!-- IMPACTO -->
-<section class="section section-gradient section-watermark" id="impacto">
+<section class="section section-gradient section-collapsed" id="impacto">
   <div class="section-collapse-header" onclick="toggleSection('impacto')">
     <div class="section-collapse-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="17 6 23 6 23 12" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1284,7 +1369,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
     </div>
   </div>
-  <div class="section-body" style="max-height:none">
+  <div class="section-body" style="max-height:0">
     <div class="container" style="position:relative;z-index:2">
       <div class="sec-header light reveal">
         <div class="sec-tag"><span class="dot"></span> Impacto</div>
@@ -1298,7 +1383,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 </section>
 
 <!-- GALERÍA -->
-<section class="section section-cream section-watermark" id="galeria">
+<section class="section section-cream section-collapsed" id="galeria">
   <div class="section-collapse-header" onclick="toggleSection('galeria')">
     <div class="section-collapse-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="var(--gold)" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="var(--gold)"/><path d="M21 15l-5-5-6 6-3-3" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1308,7 +1393,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
     </div>
   </div>
-  <div class="section-body" style="max-height:none">
+  <div class="section-body" style="max-height:0">
     <div class="container">
       <div class="sec-header reveal">
         <div class="sec-tag"><span class="dot"></span> Tecnología</div>
@@ -1321,7 +1406,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 </section>
 
 <!-- CURSOS -->
-<section class="section section-white section-watermark" id="cursos">
+<section class="section section-white section-collapsed" id="cursos">
   <div class="section-collapse-header" onclick="toggleSection('cursos')">
     <div class="section-collapse-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/></svg>
@@ -1331,7 +1416,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
     </div>
   </div>
-  <div class="section-body" style="max-height:none">
+  <div class="section-body" style="max-height:0">
     <div class="container">
       <div class="sec-header reveal">
         <div class="sec-tag"><span class="dot"></span> Formación continua</div>
@@ -1371,7 +1456,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 </div>
 
 <!-- COMUNIDAD -->
-<section class="section section-white section-watermark" id="comunidad">
+<section class="section section-white section-collapsed" id="comunidad">
   <div class="section-collapse-header" onclick="toggleSection('comunidad')">
     <div class="section-collapse-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="7" r="4" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1381,7 +1466,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
     </div>
   </div>
-  <div class="section-body" style="max-height:none">
+  <div class="section-body" style="max-height:0">
     <div class="container">
       <div class="sec-header reveal">
         <div class="sec-tag"><span class="dot"></span> Colaboración</div>
@@ -1449,7 +1534,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 </div>
 
 <!-- BADGES/LOGROS -->
-<section class="section section-white section-watermark" id="badges">
+<section class="section section-white section-collapsed" id="badges">
   <div class="section-collapse-header" onclick="toggleSection('badges')">
     <div class="section-collapse-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 5l6 4v7a6 6 0 0 1-6 6 6 6 0 0 1-6-6V9z" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1459,7 +1544,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
     </div>
   </div>
-  <div class="section-body" style="max-height:none">
+  <div class="section-body" style="max-height:0">
     <div class="container">
       <div class="sec-header reveal">
         <div class="sec-tag"><span class="dot"></span> Gamificación</div>
@@ -1494,46 +1579,56 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   </div>
 </section>
 
-<!-- VR CATALOG -->
-<section class="section section-white section-watermark" id="vr">
-  <div class="section-collapse-header" onclick="toggleSection('vr')">
+<!-- AULA INMERSIVA -->
+<section class="section section-cream section-collapsed" id="aula-inmersiva">
+  <div class="section-collapse-header" onclick="toggleSection('aula-inmersiva')">
     <div class="section-collapse-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 7v10a2 2 0 0 0 2 2h2.5l2 2-2-2h8.5a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 13a3 3 0 1 1 6 0 3 3 0 0 1-6 0z" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 10h16M4 14h16M4 18h16" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/><circle cx="19" cy="6" r="2" fill="var(--gold)"/><circle cx="14" cy="10" r="2" fill="var(--gold)"/><circle cx="17" cy="14" r="2" fill="var(--gold)"/><circle cx="12" cy="18" r="2" fill="var(--gold)"/></svg>
     </div>
-    <span class="section-collapse-title">Catálogo de Software VR</span>
+    <span class="section-collapse-title">Aula Inmersiva Interprofesional</span>
     <div class="section-collapse-chevron">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
     </div>
   </div>
-  <div class="section-body" style="max-height:none">
+  <div class="section-body" style="max-height:0">
     <div class="container">
       <div class="sec-header reveal">
-        <div class="sec-tag"><span class="dot"></span> Realidad Virtual</div>
-        <h2 class="serif">Catálogo de Software VR</h2>
-        <p>Explora las mejores aplicaciones de realidad virtual disponibles para cada carrera.</p>
+        <div class="sec-tag"><span class="dot"></span> Innovación educativa</div>
+        <h2 class="serif">Aula Inmersiva Interprofesional (AII)</h2>
+        <p>Un entorno donde los estudiantes de salud practican lo que no se puede enseñar en el aula tradicional: la incertidumbre, la presión, el trabajo en equipo y la empatía clínica — sin riesgo real para nadie.</p>
       </div>
 
-      <!-- VR Tabs -->
-      <div class="reveal d1">
-        <div class="vr-tabs-nav">
-          <button class="vr-tab-btn active" onclick="switchVRTab('Médico Cirujano',this)">🏥 Médico Cirujano</button>
-          <button class="vr-tab-btn" onclick="switchVRTab('Enfermería',this)">⚕️ Enfermería</button>
-          <button class="vr-tab-btn" onclick="switchVRTab('Biología',this)">🧬 Biología</button>
-          <button class="vr-tab-btn" onclick="switchVRTab('Psicología',this)">🧠 Psicología</button>
-          <button class="vr-tab-btn" onclick="switchVRTab('Cirujano Dentista',this)">🦷 Cirujano Dentista</button>
+      <!-- Service Card Grid -->
+      <div class="card-grid reveal d1" style="grid-template-columns:1fr 1fr;gap:24px;margin-bottom:50px">
+        <!-- Main AII Card (spans 2 columns) -->
+        <div class="card" style="grid-column:1/-1;position:relative;border:2px solid rgba(196,162,78,0.3);cursor:pointer" onclick="openAIIModal()">
+          <div style="position:absolute;top:16px;right:16px;background:linear-gradient(135deg,#EF4444,#F97316);color:#fff;font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;box-shadow:0 4px 12px rgba(239,68,68,0.3)">Nuevo</div>
+          <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
+            <div style="min-width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,#7C3AED,#2563EB);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0">🏥</div>
+            <div style="flex:1;min-width:280px">
+              <h3 class="serif" style="font-size:24px;color:var(--navy);margin-bottom:10px">Aula Inmersiva Interprofesional</h3>
+              <p style="font-size:15px;color:#64748B;line-height:1.85;margin-bottom:18px">Entorno seguro de simulación clínica donde estudiantes de distintas carreras de salud desarrollan habilidades blandas esenciales mediante escenarios inmersivos con tecnología de vanguardia.</p>
+              <div style="display:flex;flex-wrap:wrap;gap:8px">
+                <span class="acc-tag" style="background:rgba(124,58,237,0.1);color:#7C3AED;border:1px solid rgba(124,58,237,0.2)">Trabajo en equipo</span>
+                <span class="acc-tag" style="background:rgba(37,99,235,0.1);color:#2563EB;border:1px solid rgba(37,99,235,0.2)">Comunicación efectiva</span>
+                <span class="acc-tag" style="background:rgba(5,150,105,0.1);color:#059669;border:1px solid rgba(5,150,105,0.2)">Análisis crítico</span>
+                <span class="acc-tag" style="background:rgba(234,88,12,0.1);color:#EA580C;border:1px solid rgba(234,88,12,0.2)">Manejo de la frustración</span>
+                <span class="acc-tag" style="background:rgba(220,38,38,0.1);color:#DC2626;border:1px solid rgba(220,38,38,0.2)">Seguridad del paciente</span>
+              </div>
+              <p style="margin-top:16px;font-size:13px;color:var(--gold);font-weight:600;display:flex;align-items:center;gap:6px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                Haz clic para conocer más detalles
+              </p>
+            </div>
+          </div>
         </div>
-        <div id="vr-Médico Cirujano" class="vr-tab-content active" style="margin-top:40px"></div>
-        <div id="vr-Enfermería" class="vr-tab-content" style="margin-top:40px"></div>
-        <div id="vr-Biología" class="vr-tab-content" style="margin-top:40px"></div>
-        <div id="vr-Psicología" class="vr-tab-content" style="margin-top:40px"></div>
-        <div id="vr-Cirujano Dentista" class="vr-tab-content" style="margin-top:40px"></div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- CONTACTO -->
-<section class="section section-white section-watermark" id="contacto">
+<section class="section section-white section-collapsed" id="contacto">
   <div class="section-collapse-header" onclick="toggleSection('contacto')">
     <div class="section-collapse-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="2" stroke="var(--gold)" stroke-width="2"/><path d="M2 4l10 8 10-8" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1543,7 +1638,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
     </div>
   </div>
-  <div class="section-body" style="max-height:none">
+  <div class="section-body" style="max-height:0">
     <div class="container-md">
       <div class="sec-header reveal">
         <div class="sec-tag"><span class="dot"></span> Contáctenos</div>
@@ -1607,7 +1702,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
         <a href="#cursos" class="footer-link">Cursos</a>
         <a href="#comunidad" class="footer-link">Comunidad</a>
         <a href="#badges" class="footer-link">Logros</a>
-        <a href="#vr" class="footer-link">Catálogo VR</a>
+        <a href="#aula-inmersiva" class="footer-link">Aula Inmersiva</a>
         <a href="#contacto" class="footer-link">Contacto</a>
       </div>
       <div>
@@ -1720,6 +1815,212 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
       <button type="submit" class="btn-login" id="btnLogin">Iniciar sesión</button>
     </form>
     <a href="#" class="back-link" onclick="hideLoginModal();return false">← Regresar al sitio</a>
+  </div>
+</div>
+
+<!-- ═══ AULA INMERSIVA MODAL ═══ -->
+<div class="aii-overlay" id="aiiModal" role="dialog" aria-modal="true" onclick="if(event.target===this)closeAIIModal()">
+  <div class="aii-modal">
+    <button class="aii-close" onclick="closeAIIModal()" aria-label="Cerrar modal">✕</button>
+
+    <div class="aii-modal-header">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+        <div style="width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#7C3AED,#2563EB);display:flex;align-items:center;justify-content:center;font-size:28px">🏥</div>
+        <div>
+          <h2 class="serif" style="font-size:clamp(22px,3vw,30px);color:var(--navy);margin:0">Aula Inmersiva Interprofesional</h2>
+          <p style="color:#64748B;font-size:14px;margin:4px 0 0">Simulación clínica de vanguardia</p>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="aii-tabs">
+        <button class="aii-tab active" onclick="switchAIITab('proposito',this)">Propósito</button>
+        <button class="aii-tab" onclick="switchAIITab('tecnologia',this)">Tecnología</button>
+        <button class="aii-tab" onclick="switchAIITab('seguridad',this)">Seguridad</button>
+        <button class="aii-tab" onclick="switchAIITab('casos',this)">Casos de éxito</button>
+      </div>
+    </div>
+
+    <div class="aii-modal-body">
+      <!-- Tab: Propósito -->
+      <div id="aii-proposito" class="aii-tab-content active">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;margin-bottom:30px">
+          <div style="padding:24px;background:#F8FAFC;border-radius:16px;border:1px solid #E8ECF1">
+            <div style="font-size:28px;margin-bottom:12px">🎯</div>
+            <h4 style="color:var(--navy);margin-bottom:8px;font-size:16px">Aprendizaje experiencial</h4>
+            <p style="color:#64748B;font-size:14px;line-height:1.7">Los estudiantes aprenden haciendo, enfrentando escenarios clínicos realistas que desafían su capacidad de decisión bajo presión.</p>
+          </div>
+          <div style="padding:24px;background:#F8FAFC;border-radius:16px;border:1px solid #E8ECF1">
+            <div style="font-size:28px;margin-bottom:12px">🤝</div>
+            <h4 style="color:var(--navy);margin-bottom:8px;font-size:16px">Colaboración interprofesional</h4>
+            <p style="color:#64748B;font-size:14px;line-height:1.7">Médicos, enfermeros, psicólogos y odontólogos trabajan juntos como lo harán en la práctica real, rompiendo silos disciplinarios.</p>
+          </div>
+          <div style="padding:24px;background:#F8FAFC;border-radius:16px;border:1px solid #E8ECF1">
+            <div style="font-size:28px;margin-bottom:12px">💡</div>
+            <h4 style="color:var(--navy);margin-bottom:8px;font-size:16px">Seguridad psicológica</h4>
+            <p style="color:#64748B;font-size:14px;line-height:1.7">Un espacio donde equivocarse es parte del proceso formativo, sin consecuencias reales para pacientes ni para los estudiantes.</p>
+          </div>
+          <div style="padding:24px;background:#F8FAFC;border-radius:16px;border:1px solid #E8ECF1">
+            <div style="font-size:28px;margin-bottom:12px">📊</div>
+            <h4 style="color:var(--navy);margin-bottom:8px;font-size:16px">Evaluación objetiva</h4>
+            <p style="color:#64748B;font-size:14px;line-height:1.7">Métricas de desempeño en tiempo real: comunicación, liderazgo, toma de decisiones y manejo emocional documentados por IA.</p>
+          </div>
+        </div>
+        <div style="padding:24px;background:linear-gradient(135deg,rgba(196,162,78,0.08),rgba(196,162,78,0.03));border-radius:16px;border-left:4px solid var(--gold);text-align:center">
+          <p style="font-style:italic;color:var(--navy);font-size:16px;line-height:1.8;margin:0">"La simulación no reemplaza la práctica clínica real — la hace posible antes de que haya un paciente de por medio."</p>
+          <p style="color:var(--gold);font-size:13px;margin-top:8px;font-weight:600">— Filosofía del Aula Inmersiva</p>
+        </div>
+      </div>
+
+      <!-- Tab: Tecnología -->
+      <div id="aii-tecnologia" class="aii-tab-content">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;gap:16px;align-items:flex-start;padding:20px;background:#F8FAFC;border-radius:14px;border:1px solid #E8ECF1">
+            <div style="font-size:24px;flex-shrink:0">🎭</div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+                <h4 style="color:var(--navy);font-size:15px;margin:0">Simulación con paciente estandarizado</h4>
+                <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;background:rgba(5,150,105,0.1);color:#059669;text-transform:uppercase;letter-spacing:0.5px">Presencial</span>
+              </div>
+              <p style="color:#64748B;font-size:13px;line-height:1.65;margin:0">Actores entrenados representan pacientes con síntomas y respuestas emocionales realistas para escenarios de alta fidelidad.</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:16px;align-items:flex-start;padding:20px;background:#F8FAFC;border-radius:14px;border:1px solid #E8ECF1">
+            <div style="font-size:24px;flex-shrink:0">🥽</div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+                <h4 style="color:var(--navy);font-size:15px;margin:0">Realidad Virtual inmersiva</h4>
+                <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;background:rgba(124,58,237,0.1);color:#7C3AED;text-transform:uppercase;letter-spacing:0.5px">Inmersivo</span>
+              </div>
+              <p style="color:#64748B;font-size:13px;line-height:1.65;margin:0">Escenarios clínicos envolventes con headsets de última generación para práctica de procedimientos y toma de decisiones.</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:16px;align-items:flex-start;padding:20px;background:#F8FAFC;border-radius:14px;border:1px solid #E8ECF1">
+            <div style="font-size:24px;flex-shrink:0">🤖</div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+                <h4 style="color:var(--navy);font-size:15px;margin:0">IA — Paciente virtual adaptativo</h4>
+                <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;background:rgba(37,99,235,0.1);color:#2563EB;text-transform:uppercase;letter-spacing:0.5px">IA</span>
+              </div>
+              <p style="color:#64748B;font-size:13px;line-height:1.65;margin:0">Pacientes virtuales con IA que responden de forma dinámica a las decisiones del estudiante, adaptando síntomas y emociones.</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:16px;align-items:flex-start;padding:20px;background:#F8FAFC;border-radius:14px;border:1px solid #E8ECF1">
+            <div style="font-size:24px;flex-shrink:0">📱</div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+                <h4 style="color:var(--navy);font-size:15px;margin:0">Realidad Aumentada anatómica</h4>
+                <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;background:rgba(234,88,12,0.1);color:#EA580C;text-transform:uppercase;letter-spacing:0.5px">AR</span>
+              </div>
+              <p style="color:#64748B;font-size:13px;line-height:1.65;margin:0">Superposición de estructuras anatómicas sobre modelos físicos para comprensión tridimensional en tiempo real.</p>
+            </div>
+          </div>
+          <div style="display:flex;gap:16px;align-items:flex-start;padding:20px;background:#F8FAFC;border-radius:14px;border:1px solid #E8ECF1">
+            <div style="font-size:24px;flex-shrink:0">📊</div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">
+                <h4 style="color:var(--navy);font-size:15px;margin:0">Dashboard de evaluación en tiempo real</h4>
+                <span style="font-size:10px;font-weight:700;padding:3px 10px;border-radius:12px;background:rgba(220,38,38,0.1);color:#DC2626;text-transform:uppercase;letter-spacing:0.5px">Analytics</span>
+              </div>
+              <p style="color:#64748B;font-size:13px;line-height:1.65;margin:0">Panel de métricas en vivo que evalúa comunicación, liderazgo, empatía y toma de decisiones con indicadores objetivos.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Seguridad -->
+      <div id="aii-seguridad" class="aii-tab-content">
+        <h3 style="color:var(--navy);font-size:18px;margin-bottom:24px;text-align:center">Protocolo de seguridad en 5 pasos</h3>
+        <div style="display:flex;flex-direction:column;gap:0;position:relative">
+          <!-- Vertical line -->
+          <div style="position:absolute;left:24px;top:24px;bottom:24px;width:2px;background:linear-gradient(180deg,var(--gold),rgba(196,162,78,0.2));z-index:0"></div>
+
+          <div style="display:flex;gap:20px;align-items:flex-start;padding:18px 0;position:relative;z-index:1">
+            <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--navy);font-size:18px;flex-shrink:0;box-shadow:0 4px 12px rgba(196,162,78,0.3)">1</div>
+            <div><h4 style="color:var(--navy);margin-bottom:4px">Briefing estructurado</h4><p style="color:#64748B;font-size:14px;line-height:1.65">Presentación del escenario, roles asignados, objetivos de aprendizaje y reglas del entorno seguro. Todos los participantes conocen el contexto antes de iniciar.</p></div>
+          </div>
+          <div style="display:flex;gap:20px;align-items:flex-start;padding:18px 0;position:relative;z-index:1">
+            <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--navy);font-size:18px;flex-shrink:0;box-shadow:0 4px 12px rgba(196,162,78,0.3)">2</div>
+            <div><h4 style="color:var(--navy);margin-bottom:4px">Time-out emocional</h4><p style="color:#64748B;font-size:14px;line-height:1.65">Cualquier participante puede solicitar una pausa si siente malestar emocional. Sin penalización ni juicio. La seguridad psicológica es prioridad.</p></div>
+          </div>
+          <div style="display:flex;gap:20px;align-items:flex-start;padding:18px 0;position:relative;z-index:1">
+            <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--navy);font-size:18px;flex-shrink:0;box-shadow:0 4px 12px rgba(196,162,78,0.3)">3</div>
+            <div><h4 style="color:var(--navy);margin-bottom:4px">Facilitador presente</h4><p style="color:#64748B;font-size:14px;line-height:1.65">Un docente capacitado en simulación clínica supervisa en todo momento, guiando la experiencia y asegurando el cumplimiento del protocolo.</p></div>
+          </div>
+          <div style="display:flex;gap:20px;align-items:flex-start;padding:18px 0;position:relative;z-index:1">
+            <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--navy);font-size:18px;flex-shrink:0;box-shadow:0 4px 12px rgba(196,162,78,0.3)">4</div>
+            <div><h4 style="color:var(--navy);margin-bottom:4px">Debriefing reflexivo</h4><p style="color:#64748B;font-size:14px;line-height:1.65">Sesión guiada post-simulación donde el equipo analiza decisiones, emociones y aprendizajes. El momento más valioso del proceso formativo.</p></div>
+          </div>
+          <div style="display:flex;gap:20px;align-items:flex-start;padding:18px 0;position:relative;z-index:1">
+            <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--navy);font-size:18px;flex-shrink:0;box-shadow:0 4px 12px rgba(196,162,78,0.3)">5</div>
+            <div><h4 style="color:var(--navy);margin-bottom:4px">Apoyo psicológico posterior</h4><p style="color:#64748B;font-size:14px;line-height:1.65">Canal de seguimiento disponible para estudiantes que necesiten procesar experiencias emocionalmente intensas después de la simulación.</p></div>
+          </div>
+        </div>
+
+        <div style="margin-top:30px;padding:20px;background:rgba(196,162,78,0.08);border:1px solid rgba(196,162,78,0.2);border-radius:14px;display:flex;gap:14px;align-items:flex-start">
+          <div style="font-size:22px;flex-shrink:0">⚠️</div>
+          <div>
+            <p style="font-weight:700;color:var(--navy);font-size:14px;margin-bottom:4px">Estándares internacionales</p>
+            <p style="color:#64748B;font-size:13px;line-height:1.65;margin:0">Este protocolo se diseña conforme a las mejores prácticas de la <strong>INACSL</strong> (International Nursing Association for Clinical Simulation and Learning) y la <strong>SSH</strong> (Society for Simulation in Healthcare).</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab: Casos de éxito -->
+      <div id="aii-casos" class="aii-tab-content">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="aii-caso">
+            <button class="aii-caso-trigger" onclick="toggleAIICaso(this)">
+              <span style="font-size:18px">🇬🇧</span>
+              <span style="flex:1;text-align:left"><strong>University of Leeds, UK</strong> — Simulación interprofesional</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="aii-caso-chevron"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="aii-caso-body">
+              <p>La Universidad de Leeds implementó un programa de simulación interprofesional donde estudiantes de medicina, enfermería y farmacia practican escenarios de emergencia juntos. Los resultados mostraron mejora significativa en comunicación interprofesional y confianza clínica, con 94% de los estudiantes reportando mayor preparación para el trabajo en equipo real.</p>
+            </div>
+          </div>
+          <div class="aii-caso">
+            <button class="aii-caso-trigger" onclick="toggleAIICaso(this)">
+              <span style="font-size:18px">🇺🇸</span>
+              <span style="flex:1;text-align:left"><strong>Texas Health Resources, USA</strong> — VR para habilidades blandas</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="aii-caso-chevron"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="aii-caso-body">
+              <p>Texas Health integró realidad virtual para entrenamiento en empatía y comunicación de malas noticias. Los residentes que completaron el programa VR mostraron 40% más de puntaje en evaluaciones de empatía clínica y redujeron quejas de pacientes relacionadas con comunicación en un 32%.</p>
+            </div>
+          </div>
+          <div class="aii-caso">
+            <button class="aii-caso-trigger" onclick="toggleAIICaso(this)">
+              <span style="font-size:18px">🇲🇽</span>
+              <span style="flex:1;text-align:left"><strong>IPN — ENMH, México</strong> — Simulación con paciente estandarizado</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="aii-caso-chevron"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="aii-caso-body">
+              <p>La Escuela Nacional de Medicina y Homeopatía del IPN desarrolló un centro de simulación con pacientes estandarizados donde estudiantes practican consultas completas. El programa demostró mejora del 45% en habilidades de entrevista clínica y diagnóstico diferencial en comparación con métodos tradicionales de enseñanza.</p>
+            </div>
+          </div>
+          <div class="aii-caso">
+            <button class="aii-caso-trigger" onclick="toggleAIICaso(this)">
+              <span style="font-size:18px">🇲🇽</span>
+              <span style="flex:1;text-align:left"><strong>Tec de Monterrey</strong> — IA y simulación adaptativa</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" class="aii-caso-chevron"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
+            </button>
+            <div class="aii-caso-body">
+              <p>El Tec de Monterrey implementó simuladores con IA que adaptan la dificultad del caso según el desempeño del estudiante. Su centro de simulación integra pacientes robóticos, VR y debriefing con analítica de datos, reportando un incremento del 60% en la retención de procedimientos clínicos a 6 meses.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="aii-modal-footer">
+      <p style="color:#64748B;font-size:14px;margin:0">¿Quieres implementar este servicio en tu carrera?</p>
+      <a href="#solicitud" class="btn btn-gold" onclick="closeAIIModal();setTimeout(()=>{toggleSection('solicitud');},300)" style="padding:12px 32px;white-space:nowrap">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg>
+        Solicitar información
+      </a>
+    </div>
   </div>
 </div>
 
@@ -1995,7 +2296,7 @@ window.addEventListener('scroll',()=>{
   document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>60);
   // Active nav
   const y=window.scrollY+260;
-  const secs=['inicio','quienes','servicios','solicitud','espacio','telemedicina','impacto','galeria','cursos','comunidad','badges','vr','contacto'];
+  const secs=['inicio','quienes','servicios','solicitud','espacio','telemedicina','impacto','galeria','cursos','comunidad','badges','aula-inmersiva','contacto'];
   for(let i=secs.length-1;i>=0;i--){
     const el=document.getElementById(secs[i]);
     if(el&&el.offsetTop<=y){
@@ -2073,6 +2374,29 @@ document.querySelectorAll('.card,.card-glass,.card-dark,.gallery-item').forEach(
   card.addEventListener('mouseleave',()=>{card.style.transform='';});
 });
 
+/* ─── AULA INMERSIVA MODAL ─── */
+function openAIIModal(){
+  const modal=document.getElementById('aiiModal');
+  modal.style.display='flex';
+  requestAnimationFrame(()=>modal.classList.add('active'));
+  document.body.style.overflow='hidden';
+}
+function closeAIIModal(){
+  const modal=document.getElementById('aiiModal');
+  modal.classList.remove('active');
+  setTimeout(()=>{modal.style.display='none';document.body.style.overflow='';},300);
+}
+function switchAIITab(tabId,btn){
+  document.querySelectorAll('.aii-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.aii-tab-content').forEach(c=>c.classList.remove('active'));
+  document.getElementById('aii-'+tabId).classList.add('active');
+}
+function toggleAIICaso(btn){
+  const caso=btn.closest('.aii-caso');
+  caso.classList.toggle('open');
+}
+
 /* ─── INTERACTIONS ─── */
 document.getElementById('hamburgerBtn').addEventListener('click',()=>
   document.getElementById('mobileMenu').classList.toggle('open'));
@@ -2084,6 +2408,11 @@ function toggleAccordion(idx){
   const isOpen=item.classList.contains('open');
   document.querySelectorAll('.accordion-item').forEach(el=>el.classList.remove('open'));
   if(!isOpen)item.classList.add('open');
+  // Show VR catalog when Realidad Virtual (index 1) is open
+  const vrSub=document.getElementById('vrCatalogSubsection');
+  if(vrSub){
+    vrSub.style.display=(!isOpen && idx===1)?'block':'none';
+  }
 }
 function toggleSection(sectionId){
   const section=document.getElementById(sectionId);
@@ -2174,7 +2503,7 @@ function handleOverlayClick(e){
 }
 // Close on Escape key
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeProyecto();hideLoginModal();if(chatOpen)toggleChat();}
+  if(e.key==='Escape'){closeProyecto();hideLoginModal();closeAIIModal();if(chatOpen)toggleChat();}
 });
 
 /* ─── LOGIN MODAL ─── */
