@@ -277,3 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Renderizar mensaje de bienvenida
   renderWelcome();
 });
+
+  // Renderizar mensaje de bienvenida
+  renderWelcome();
+});
