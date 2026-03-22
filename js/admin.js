@@ -189,7 +189,7 @@ async function fetchCursos() {
 async function fetchInscripciones() {
   try {
     const { data, error } = await supabaseClient
-      .from('inscripciones')
+      .from('inscripciones_cursos')
       .select('*')
       .order('created_at', { ascending: false });
 
@@ -2032,7 +2032,7 @@ function displaySentimentResults(responseText) {
     return;
   }
 
-  // Display each section
+  // Display each section - use fallback if parsing fails for individual sections
   const summaryText = summaryMatch ? summaryMatch[1].trim() : 'No se pudo extraer el resumen.';
   const strengthsText = strengthsMatch ? strengthsMatch[1].trim() : 'No se pudieron extraer los puntos fuertes.';
   const improvementsText = improvementsMatch ? improvementsMatch[1].trim() : 'No se pudieron extraer las áreas de mejora.';
