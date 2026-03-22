@@ -33,13 +33,36 @@ function getUserRole(session) {
 /**
  * Inicia sesión con email y contraseña
  */
+// Rate limiter for login attempts
+const _loginAttempts = { count: 0, lastAttempt: 0, lockUntil: 0 };
+
 async function loginUser(email, password) {
+  // Brute force protection
+  const now = Date.now();
+  if (_loginAttempts.lockUntil > now) {
+    const waitSecs = Math.ceil((_loginAttempts.lockUntil - now) / 1000);
+    return { success: false, error: 'Demasiados intentos. Espera ' + waitSecs + ' segundos.' };
+  }
+  // Reset counter after 5 minutes of inactivity
+  if (now - _loginAttempts.lastAttempt > 300000) {
+    _loginAttempts.count = 0;
+  }
+  _loginAttempts.lastAttempt = now;
+  _loginAttempts.count++;
+  // Lock after 5 failed attempts for 30 seconds
+  if (_loginAttempts.count > 5) {
+    _loginAttempts.lockUntil = now + 30000;
+    _loginAttempts.count = 0;
+    return { success: false, error: 'Demasiados intentos fallidos. Espera 30 segundos.' };
+  }
+
   try {
     const { data, error } = await supabaseClient.auth.signInWithPassword({
-      email,
-      password
+      email: email,
+      password: password
     });
     if (error) throw error;
+    _loginAttempts.count = 0; // Reset on success
     return { success: true, data };
   } catch (error) {
     console.error('Error en login:', error.message);
