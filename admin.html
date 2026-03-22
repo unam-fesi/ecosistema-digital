@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Panel de Administración - Ecosistema Digital</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
@@ -197,7 +197,7 @@
             left: 0;
             top: 0;
             width: var(--sidebar-width);
-            height: 100vh;
+            height: 100vh; height: 100dvh;
             background-color: var(--navy);
             color: white;
             padding: 30px 20px;
@@ -2139,9 +2139,11 @@
                     <div class="table-filters">
                         <select id="filterServicio" class="filter-select">
                             <option value="">Todos los servicios</option>
-                            <option value="ti">Tecnología e Información</option>
-                            <option value="admin">Administración</option>
-                            <option value="operaciones">Operaciones</option>
+                            <option value="Inteligencia Artificial">Inteligencia Artificial</option>
+                            <option value="Realidad Virtual">Realidad Virtual</option>
+                            <option value="Realidad Aumentada">Realidad Aumentada</option>
+                            <option value="Uso de Bases de Datos">Uso de Bases de Datos</option>
+                            <option value="Telemedicina">Telemedicina</option>
                         </select>
                         <button class="btn-primary" onclick="showAddHardwareForm()">+ Agregar Hardware</button>
                     </div>
@@ -2236,9 +2238,11 @@
                     <div class="table-filters">
                         <select id="filterServicioSoftware" class="filter-select">
                             <option value="">Todos los servicios</option>
-                            <option value="ti">Tecnología e Información</option>
-                            <option value="admin">Administración</option>
-                            <option value="operaciones">Operaciones</option>
+                            <option value="Inteligencia Artificial">Inteligencia Artificial</option>
+                            <option value="Realidad Virtual">Realidad Virtual</option>
+                            <option value="Realidad Aumentada">Realidad Aumentada</option>
+                            <option value="Uso de Bases de Datos">Uso de Bases de Datos</option>
+                            <option value="Telemedicina">Telemedicina</option>
                         </select>
                         <button class="btn-primary" onclick="showAddSoftwareForm()">+ Agregar Software</button>
                     </div>
@@ -2377,9 +2381,11 @@
                         <label for="inventarioServicio">Servicio</label>
                         <select id="inventarioServicio" class="form-input">
                             <option value="">Seleccionar servicio</option>
-                            <option value="ti">Tecnología e Información</option>
-                            <option value="admin">Administración</option>
-                            <option value="operaciones">Operaciones</option>
+                            <option value="Inteligencia Artificial">Inteligencia Artificial</option>
+                            <option value="Realidad Virtual">Realidad Virtual</option>
+                            <option value="Realidad Aumentada">Realidad Aumentada</option>
+                            <option value="Uso de Bases de Datos">Uso de Bases de Datos</option>
+                            <option value="Telemedicina">Telemedicina</option>
                         </select>
                     </div>
 
@@ -2401,6 +2407,7 @@
                         <select id="inventarioEstado" class="form-input">
                             <option value="operativo">Operativo</option>
                             <option value="mantenimiento">En Mantenimiento</option>
+                            <option value="en_reparacion">En Reparación</option>
                             <option value="baja">Dado de Baja</option>
                         </select>
                     </div>
@@ -2424,8 +2431,8 @@
                             <option value="">Seleccionar tipo</option>
                             <option value="perpetua">Perpetua</option>
                             <option value="suscripcion">Suscripción</option>
-                            <option value="open-source">Open Source</option>
-                            <option value="trial">Prueba</option>
+                            <option value="open_source">Open Source</option>
+                            <option value="educativa">Educativa</option>
                         </select>
                     </div>
 
@@ -2613,44 +2620,19 @@
         }
 
         function saveInventoryItem() {
-            const type = document.getElementById('inventarioType').value;
-            const nombre = document.getElementById('inventarioNombre').value;
-            const servicio = document.getElementById('inventarioServicio').value;
-            const estado = document.getElementById('inventarioEstado').value;
-
-            if (!nombre || !servicio) {
-                alert('Por favor complete los campos obligatorios');
-                return;
+            // Delegate to admin.js DB function
+            if (typeof saveInventoryItemToDB === 'function') {
+                saveInventoryItemToDB();
+            } else {
+                console.error('saveInventoryItemToDB not loaded');
+                alert('Error: función de guardado no disponible');
             }
-
-            // Collect item data
-            const itemData = {
-                nombre,
-                servicio,
-                estado,
-                valor: document.getElementById('inventarioValor').value,
-                notas: document.getElementById('inventarioNotas').value
-            };
-
-            if (type === 'hardware') {
-                itemData.marca = document.getElementById('inventarioMarca').value;
-                itemData.serie = document.getElementById('inventarioSerie').value;
-            } else if (type === 'software') {
-                itemData.version = document.getElementById('inventarioVersion').value;
-                itemData.licencia = document.getElementById('inventarioLicencia').value;
-                itemData.vencimiento = document.getElementById('inventarioVencimiento').value;
-                itemData.costo = document.getElementById('inventarioCosto').value;
-            }
-
-            console.log('Saving inventory item:', itemData);
-            // Save functionality handled by admin.js
-
-            closeInventoryModal();
-            alert('Item guardado exitosamente');
         }
 
         function closeInventoryModal() {
             document.getElementById('modalInventario').classList.remove('show');
+            currentInventoryEditId = null;
+            currentInventoryEditType = null;
         }
 
         // Hamburger menu toggle
