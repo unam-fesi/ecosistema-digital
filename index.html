@@ -112,6 +112,22 @@ body { font-family:'Inter',system-ui,-apple-system,sans-serif; color:#1E293B; ba
 @media(max-width:1024px){ .nav-links{display:none!important} .hamburger{display:block!important} .nav-name-full{display:none} }
 @media(min-width:1025px){ .nav-name-short{display:none} }
 
+/* ─── NOTIFICATIONS BANNER ─── */
+#notificationsBanner { position:fixed; top:56px; left:0; right:0; z-index:999;
+  background:linear-gradient(90deg, var(--gold), var(--gold-light)); color:var(--navy);
+  padding:14px 20px; font-size:14px; font-weight:500; display:flex; align-items:center;
+  justify-content:space-between; gap:16px; min-height:54px; max-height:200px; overflow:hidden;
+  box-shadow:0 4px 20px rgba(196,162,78,0.3); }
+#notificationsBanner.hidden { display:none; }
+#notificationsBanner.empty { display:none; }
+.notifications-content { flex:1; display:flex; align-items:center; gap:12px; }
+.notifications-bell { font-size:18px; animation:pulse 2s ease-in-out infinite; }
+.notifications-text { line-height:1.4; overflow:hidden; max-height:52px; }
+.notification-item { padding:6px 0; white-space:pre-wrap; word-break:break-word; }
+.notification-dismiss { background:rgba(12,35,64,0.15); border:none; border-radius:8px; padding:6px 12px;
+  color:var(--navy); cursor:pointer; font-weight:600; font-size:12px; transition:all 0.2s; }
+.notification-dismiss:hover { background:rgba(12,35,64,0.25); }
+
 /* ─── BUTTONS ─── */
 .btn { display:inline-flex; align-items:center; gap:8px; font-family:'Inter',sans-serif; font-weight:600;
   font-size:15px; border:none; border-radius:var(--radius-sm); cursor:pointer;
@@ -256,6 +272,103 @@ body { font-family:'Inter',system-ui,-apple-system,sans-serif; color:#1E293B; ba
 .card-grid-2 { grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); }
 .card-grid-3 { grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); }
 .card-grid-4 { grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
+
+/* ─── CURSO CARD ─── */
+.curso-card { background:#fff; border:1px solid #E2E8F0; border-radius:var(--radius);
+  padding:24px; transition:all 0.3s; display:flex; flex-direction:column; gap:14px; }
+.curso-card:hover { border-color:var(--gold); box-shadow:var(--shadow-hover); transform:translateY(-4px); }
+.curso-emoji { font-size:32px; width:56px; height:56px; display:flex; align-items:center; justify-content:center;
+  background:rgba(196,162,78,0.08); border-radius:12px; }
+.curso-meta { display:flex; align-items:center; gap:8px; font-size:13px; color:#64748B; }
+.curso-title { font-size:18px; font-weight:700; color:var(--navy); margin:0; }
+.curso-instructor { font-size:14px; color:#94A3B8; }
+.curso-progress-bar { height:8px; background:#E8ECF1; border-radius:4px; overflow:hidden; }
+.curso-progress-fill { height:100%; background:linear-gradient(90deg,var(--gold),var(--gold-light)); }
+.curso-badge { display:inline-block; font-size:11px; font-weight:700; padding:5px 10px;
+  border-radius:6px; background:rgba(196,162,78,0.1); color:var(--gold); text-transform:uppercase; }
+.curso-btn { width:100%; padding:12px; background:linear-gradient(135deg,var(--gold),var(--gold-light));
+  color:var(--navy); border:none; border-radius:var(--radius-sm); font-weight:600; cursor:pointer;
+  transition:all 0.3s; }
+.curso-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(196,162,78,0.35); }
+
+/* ─── PROYECTO CARD ─── */
+.proyecto-card { background:#fff; border:1px solid #E2E8F0; border-radius:var(--radius);
+  padding:24px; transition:all 0.3s; display:flex; flex-direction:column; gap:12px; }
+.proyecto-card:hover { border-color:var(--gold); box-shadow:var(--shadow-hover); transform:translateY(-4px); }
+.proyecto-badge { display:inline-block; font-size:11px; font-weight:700; padding:6px 12px;
+  border-radius:6px; width:fit-content; }
+.proyecto-badge.idea { background:#E0E7FF; color:#4F46E5; }
+.proyecto-badge.busco_equipo { background:#FEF3C7; color:#D97706; }
+.proyecto-badge.en_desarrollo { background:#DBEAFE; color:#0284C7; }
+.proyecto-badge.completado { background:#DCFCE7; color:#16A34A; }
+.proyecto-title { font-size:18px; font-weight:700; color:var(--navy); margin:0; }
+.proyecto-descripcion { font-size:14px; color:#64748B; line-height:1.5; display:-webkit-box;
+  -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+.proyecto-meta { font-size:12px; color:#94A3B8; margin-top:8px; }
+.proyecto-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+.proyecto-tag { font-size:11px; padding:4px 10px; background:#F1F5F9; color:#475569; border-radius:6px; }
+.proyecto-actions { display:flex; gap:12px; margin-top:12px; padding-top:12px; border-top:1px solid #E8ECF1; }
+.proyecto-like, .proyecto-comment { flex:1; padding:8px; background:#F8FAFC; border:1px solid #E8ECF1;
+  border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; color:#64748B; text-align:center;
+  transition:all 0.2s; }
+.proyecto-like:hover, .proyecto-comment:hover { background:rgba(196,162,78,0.08); color:var(--navy); }
+
+/* ─── BADGE CARD ─── */
+.badge-card { background:#fff; border:1px solid #E8ECF1; border-radius:16px;
+  padding:20px; display:flex; flex-direction:column; align-items:center; text-align:center;
+  transition:all 0.3s; }
+.badge-card:hover { border-color:var(--gold); box-shadow:0 12px 40px rgba(196,162,78,0.1);
+  transform:scale(1.05); }
+.badge-icon { font-size:48px; margin-bottom:12px; }
+.badge-name { font-size:14px; font-weight:700; color:var(--navy); margin-bottom:6px; }
+.badge-desc { font-size:12px; color:#94A3B8; line-height:1.4; margin-bottom:10px; }
+.badge-pts { font-size:12px; font-weight:700; color:var(--gold); }
+
+/* ─── PREMIO CARD ─── */
+.premio-card { background:#fff; border:1px solid #E8ECF1; border-radius:var(--radius);
+  padding:24px; display:flex; flex-direction:column; align-items:center; text-align:center;
+  transition:all 0.3s; }
+.premio-card:hover { border-color:var(--gold); box-shadow:var(--shadow-hover); transform:translateY(-4px); }
+.premio-icon { font-size:48px; margin-bottom:12px; }
+.premio-name { font-size:16px; font-weight:700; color:var(--navy); margin-bottom:8px; }
+.premio-pts { font-size:13px; color:var(--gold); font-weight:700; margin-bottom:12px; }
+.premio-stock { font-size:12px; color:#94A3B8; }
+
+/* ─── LEADERBOARD ─── */
+.leaderboard-item { display:flex; align-items:center; gap:16px; padding:16px; background:#fff;
+  border:1px solid #E8ECF1; border-radius:12px; transition:all 0.2s; }
+.leaderboard-item:hover { border-color:var(--gold); box-shadow:0 4px 12px rgba(196,162,78,0.1); }
+.leaderboard-rank { width:40px; height:40px; display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg,var(--gold),var(--gold-light)); color:#fff; font-weight:700;
+  border-radius:50%; flex-shrink:0; }
+.leaderboard-info { flex:1; text-align:left; }
+.leaderboard-name { font-size:14px; font-weight:700; color:var(--navy); }
+.leaderboard-email { font-size:12px; color:#94A3B8; }
+.leaderboard-badges { font-size:14px; font-weight:700; color:var(--gold); }
+
+/* ─── CALENDAR WIDGET ─── */
+.calendar-widget { background:#fff; border:1px solid #E8ECF1; border-radius:var(--radius);
+  padding:20px; margin-bottom:30px; }
+.calendar-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; }
+.calendar-header h4 { margin:0; color:var(--navy); font-weight:700; font-size:14px; }
+.calendar-nav { display:flex; gap:8px; }
+.calendar-nav-btn { background:rgba(196,162,78,0.1); border:1px solid rgba(196,162,78,0.2);
+  color:var(--navy); padding:6px 12px; border-radius:6px; cursor:pointer; font-size:12px;
+  font-weight:600; transition:all 0.2s; }
+.calendar-nav-btn:hover { background:var(--gold); color:#fff; border-color:var(--gold); }
+.calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+.calendar-day-header { text-align:center; font-weight:700; color:#94A3B8; font-size:11px;
+  padding:8px 0; text-transform:uppercase; }
+.calendar-day { aspect-ratio:1; border:1px solid #E8ECF1; border-radius:8px; display:flex;
+  align-items:center; justify-content:center; font-size:12px; color:#64748B; cursor:pointer;
+  transition:all 0.2s; font-weight:500; }
+.calendar-day.other-month { opacity:0.3; }
+.calendar-day.reserved { background:rgba(196,162,78,0.15); color:var(--navy);
+  border-color:var(--gold); font-weight:700; position:relative; }
+.calendar-day.reserved::after { content:'•'; position:absolute; bottom:2px; right:4px;
+  color:var(--gold); font-weight:900; }
+.calendar-day.selected { background:var(--gold); color:var(--navy); border-color:var(--gold); }
+.calendar-day:hover:not(.other-month) { border-color:var(--gold); background:rgba(196,162,78,0.06); }
 
 /* ─── ACCORDION ─── */
 .accordion { display:flex; flex-direction:column; gap:14px; }
@@ -707,10 +820,13 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
       <a href="#solicitud" data-section="solicitud">Solicitud</a>
       <a href="#espacio" data-section="espacio">Espacio</a>
       <a href="#telemedicina" data-section="telemedicina">Telemedicina</a>
+      <a href="#cursos" data-section="cursos">Cursos</a>
+      <a href="#comunidad" data-section="comunidad">Comunidad</a>
+      <a href="#badges" data-section="badges">Logros</a>
       <a href="#contacto" data-section="contacto">Contacto</a>
       <a href="#" onclick="showLoginModal();return false" class="nav-login-btn" style="background:rgba(196,162,78,0.12);color:var(--gold);border:1px solid rgba(196,162,78,0.25);margin-left:8px;font-weight:600">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
-        Admin
+        Acceso
       </a>
     </div>
     <button class="hamburger" id="hamburgerBtn">
@@ -723,10 +839,19 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
     <a href="#inicio">Inicio</a><a href="#quienes">Quiénes somos</a>
     <a href="#servicios">Servicios</a><a href="#solicitud">Solicitud de servicios</a>
     <a href="#espacio">Uso del espacio</a><a href="#telemedicina">Telemedicina</a>
-    <a href="#contacto">Contacto</a>
-    <a href="#" onclick="showLoginModal();document.getElementById('mobileMenu').classList.remove('open');return false" style="color:var(--gold);border-top:1px solid rgba(196,162,78,0.15);margin-top:8px;padding-top:14px">🔐 Admin</a>
+    <a href="#cursos">Cursos</a><a href="#comunidad">Comunidad</a><a href="#badges">Logros</a><a href="#contacto">Contacto</a>
+    <a href="#" onclick="showLoginModal();document.getElementById('mobileMenu').classList.remove('open');return false" style="color:var(--gold);border-top:1px solid rgba(196,162,78,0.15);margin-top:8px;padding-top:14px">🔐 Acceso</a>
   </div>
 </nav>
+
+<!-- NOTIFICATIONS BANNER -->
+<div id="notificationsBanner" class="empty">
+  <div class="notifications-content">
+    <span class="notifications-bell">🔔</span>
+    <div class="notifications-text" id="notificationsText"></div>
+  </div>
+  <button class="notification-dismiss" onclick="document.getElementById('notificationsBanner').classList.add('hidden')">✕</button>
+</div>
 
 <!-- HERO -->
 <section class="hero" id="inicio">
@@ -900,6 +1025,20 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
       <div class="notice-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
       <p>La disponibilidad del espacio estará sujeta a revisión y confirmación por parte de la coordinación del Ecosistema Digital.</p>
     </div>
+    <!-- MINI CALENDAR -->
+    <div class="calendar-widget reveal">
+      <div class="calendar-header">
+        <h4>📅 Disponibilidad del espacio</h4>
+        <div class="calendar-nav">
+          <button class="calendar-nav-btn" onclick="prevCalendarMonth()">← Anterior</button>
+          <span style="padding:6px 12px;font-weight:600;color:var(--navy);min-width:120px;text-align:center" id="calendarTitle">Marzo 2026</span>
+          <button class="calendar-nav-btn" onclick="nextCalendarMonth()">Siguiente →</button>
+        </div>
+      </div>
+      <div class="calendar-grid" id="calendarGrid"></div>
+      <p style="font-size:12px;color:#94A3B8;margin-top:12px;text-align:center">• = Fecha con reserva | Selecciona una fecha disponible</p>
+    </div>
+
     <div class="form-card reveal d1">
       <form onsubmit="event.preventDefault();showToast('Solicitud de espacio registrada')">
         <div class="form-grid">
@@ -998,6 +1137,150 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   </div>
 </section>
 
+<!-- CURSOS -->
+<section class="section section-white" id="cursos">
+  <div class="container">
+    <div class="sec-header reveal">
+      <div class="sec-tag"><span class="dot"></span> Formación continua</div>
+      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
+      <h2 class="serif">Cursos y Talleres</h2>
+      <p>Amplía tus conocimientos con nuestros programas de formación continua en tecnología e innovación.</p>
+    </div>
+    <div class="card-grid card-grid-3 reveal d1" id="cursosGrid" style="min-height:300px;align-items:center;justify-content:center">
+      <div style="grid-column:1/-1;text-align:center;color:#94A3B8;font-size:14px">Cargando cursos disponibles...</div>
+    </div>
+  </div>
+</section>
+
+<!-- MODAL: INSCRIPCIÓN CURSOS -->
+<div class="login-overlay" id="inscripcionCursoModal" onclick="if(event.target===this)closeInscripcionCurso()">
+  <div class="login-card" style="max-width:480px">
+    <h2 style="color:var(--navy);margin-bottom:6px" id="cursoTituloModal">Inscripción al curso</h2>
+    <p class="sub" id="cursoInstructorModal">Instructor</p>
+    <form id="inscripcionCursoForm" onsubmit="event.preventDefault();submitInscripcionCurso()">
+      <div class="form-group">
+        <label class="form-label">Nombre completo <span class="req">*</span></label>
+        <input class="input" id="insNombre" placeholder="Tu nombre" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Correo electrónico <span class="req">*</span></label>
+        <input class="input" type="email" id="insCorreo" placeholder="correo@iztacala.unam.mx" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Carrera <span class="req">*</span></label>
+        <input class="input" id="insCarrera" placeholder="Tu carrera" required>
+      </div>
+      <div class="login-error" id="cursoFormError"></div>
+      <button type="submit" class="btn-login" style="background:linear-gradient(135deg,var(--gold),var(--gold-light))">Inscribirme</button>
+    </form>
+    <a href="#" class="back-link" onclick="closeInscripcionCurso();return false">← Cancelar</a>
+  </div>
+</div>
+
+<!-- COMUNIDAD -->
+<section class="section section-white" id="comunidad">
+  <div class="container">
+    <div class="sec-header reveal">
+      <div class="sec-tag"><span class="dot"></span> Colaboración</div>
+      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
+      <h2 class="serif">Muro de Proyectos</h2>
+      <p>Conecta con otros estudiantes y colabora en proyectos interdisciplinarios innovadores.</p>
+    </div>
+    <div style="margin-bottom:40px;text-align:center;reveal">
+      <button class="btn btn-gold" onclick="openPublicarProyecto()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Publicar proyecto
+      </button>
+    </div>
+    <div class="card-grid card-grid-3 reveal d1" id="proyectosGrid" style="min-height:300px;align-items:center;justify-content:center">
+      <div style="grid-column:1/-1;text-align:center;color:#94A3B8;font-size:14px">Cargando proyectos...</div>
+    </div>
+  </div>
+</section>
+
+<!-- MODAL: PUBLICAR PROYECTO -->
+<div class="login-overlay" id="publicarProyectoModal" onclick="if(event.target===this)closePublicarProyecto()">
+  <div class="login-card" style="max-width:540px;max-height:90vh;overflow-y:auto">
+    <h2 style="color:var(--navy);margin-bottom:6px">Publicar Proyecto</h2>
+    <p class="sub">Comparte tu idea con la comunidad</p>
+    <form id="publicarProyectoForm" onsubmit="event.preventDefault();submitPublicarProyecto()">
+      <div class="form-group">
+        <label class="form-label">Título <span class="req">*</span></label>
+        <input class="input" id="proyTitulo" placeholder="Nombre de tu proyecto" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descripción <span class="req">*</span></label>
+        <textarea class="input" id="proyDescripcion" placeholder="Describe tu proyecto..." rows="4" required></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tu nombre <span class="req">*</span></label>
+        <input class="input" id="proyAutor" placeholder="Nombre completo" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Correo electrónico <span class="req">*</span></label>
+        <input class="input" type="email" id="proyCorreo" placeholder="correo@iztacala.unam.mx" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Carrera <span class="req">*</span></label>
+        <input class="input" id="proyCarrera" placeholder="Tu carrera" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Categoría <span class="req">*</span></label>
+        <select class="input" id="proyCategoria" required>
+          <option value="">Seleccionar categoría...</option>
+          <option value="idea">💡 Idea</option>
+          <option value="busco_equipo">👥 Busco equipo</option>
+          <option value="en_desarrollo">🔨 En desarrollo</option>
+          <option value="completado">✅ Completado</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Etiquetas (separadas por comas)</label>
+        <input class="input" id="proyTags" placeholder="ej: web, mobile, AI">
+      </div>
+      <div class="login-error" id="proyFormError"></div>
+      <button type="submit" class="btn-login" style="background:linear-gradient(135deg,var(--gold),var(--gold-light))">Publicar</button>
+    </form>
+    <a href="#" class="back-link" onclick="closePublicarProyecto();return false">← Cancelar</a>
+  </div>
+</div>
+
+<!-- BADGES/LOGROS -->
+<section class="section section-white" id="badges">
+  <div class="container">
+    <div class="sec-header reveal">
+      <div class="sec-tag"><span class="dot"></span> Gamificación</div>
+      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
+      <h2 class="serif">Insignias y Premios</h2>
+      <p>Gana insignias participando y accede a premios exclusivos por tu desempeño.</p>
+    </div>
+
+    <!-- Insignias -->
+    <div style="margin-bottom:60px">
+      <h3 class="serif" style="text-align:center;color:var(--navy);margin-bottom:8px;font-size:24px">Insignias disponibles</h3>
+      <div class="card-grid card-grid-4 reveal d1" id="badgesGrid" style="min-height:200px;align-items:center;justify-content:center">
+        <div style="grid-column:1/-1;text-align:center;color:#94A3B8;font-size:14px">Cargando insignias...</div>
+      </div>
+    </div>
+
+    <!-- Premios -->
+    <div style="margin-bottom:60px">
+      <h3 class="serif" style="text-align:center;color:var(--navy);margin-bottom:8px;font-size:24px">Premios canjeables</h3>
+      <div class="card-grid card-grid-3 reveal d2" id="premiosGrid" style="min-height:200px;align-items:center;justify-content:center">
+        <div style="grid-column:1/-1;text-align:center;color:#94A3B8;font-size:14px">Cargando premios...</div>
+      </div>
+    </div>
+
+    <!-- Leaderboard -->
+    <div style="background:#F8FAFC;border-radius:var(--radius);padding:40px;border:1px solid #E8ECF1">
+      <h3 class="serif" style="text-align:center;color:var(--navy);margin-bottom:24px;font-size:24px">🏆 Top 5 Logros</h3>
+      <div id="leaderboardList" style="display:flex;flex-direction:column;gap:12px">
+        <div style="text-align:center;color:#94A3B8;font-size:14px;padding:20px">Cargando leaderboard...</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- CONTACTO -->
 <section class="section section-white" id="contacto">
   <div class="container-md">
@@ -1060,6 +1343,9 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
         <a href="#solicitud" class="footer-link">Solicitud</a>
         <a href="#espacio" class="footer-link">Uso del espacio</a>
         <a href="#telemedicina" class="footer-link">Telemedicina</a>
+        <a href="#cursos" class="footer-link">Cursos</a>
+        <a href="#comunidad" class="footer-link">Comunidad</a>
+        <a href="#badges" class="footer-link">Logros</a>
         <a href="#contacto" class="footer-link">Contacto</a>
       </div>
       <div>
@@ -1157,12 +1443,12 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 <div class="login-overlay" id="loginModal">
   <div class="login-card">
     <img src="assets/logo-ecosistema-digital.png" alt="Ecosistema Digital" onerror="this.style.display='none'">
-    <h2>Acceso Administrativo</h2>
-    <p class="sub">Ecosistema Digital — FES Iztacala, UNAM</p>
+    <h2>Iniciar Sesión</h2>
+    <p class="sub">Acceso al Ecosistema Digital — FES Iztacala, UNAM</p>
     <form id="loginForm" onsubmit="event.preventDefault();handleLogin()">
       <div class="form-group">
         <label class="form-label">Correo electrónico</label>
-        <input class="input" type="email" id="loginEmail" placeholder="admin@ecosistemadigital.unam.mx" required>
+        <input class="input" type="email" id="loginEmail" placeholder="correo@iztacala.unam.mx" required>
       </div>
       <div class="form-group">
         <label class="form-label">Contraseña</label>
@@ -1642,6 +1928,357 @@ async function sendChatMessage(){
     });
   });
 })();
+
+/* ─── CURSOS SECTION ─── */
+function openInscripcionCurso(cursoId,titulo,instructor){
+  document.getElementById('inscripcionCursoForm').dataset.cursoId=cursoId;
+  document.getElementById('cursoTituloModal').textContent=titulo;
+  document.getElementById('cursoInstructorModal').textContent='Instructor: '+instructor;
+  document.getElementById('inscripcionCursoModal').classList.add('active');
+  document.body.style.overflow='hidden';
+}
+function closeInscripcionCurso(){
+  document.getElementById('inscripcionCursoModal').classList.remove('active');
+  document.getElementById('inscripcionCursoForm').reset();
+  document.getElementById('cursoFormError').textContent='';
+  document.body.style.overflow='';
+}
+async function submitInscripcionCurso(){
+  if(!window.supabaseClient){
+    showToast('Cargando sistema...');
+    return;
+  }
+  const cursoId=document.getElementById('inscripcionCursoForm').dataset.cursoId;
+  const nombre=document.getElementById('insNombre').value.trim();
+  const correo=document.getElementById('insCorreo').value.trim();
+  const carrera=document.getElementById('insCarrera').value.trim();
+  const err=document.getElementById('cursoFormError');
+  err.textContent='';
+  try{
+    const{data,error}=await supabaseClient.from('inscripciones_cursos').insert([{
+      curso_id:cursoId,nombre,correo,carrera
+    }]);
+    if(error)throw error;
+    closeInscripcionCurso();
+    showToast('¡Inscripción completada! Te enviaremos confirmación a tu correo.');
+  }catch(e){err.textContent=e.message||'Error al inscribirse';}
+}
+function loadCursos(){
+  if(!window.supabaseClient){
+    setTimeout(loadCursos,200);
+    return;
+  }
+  (async()=>{
+    try{
+      const{data,error}=await supabaseClient.from('cursos').select('*').eq('activo',true).order('created_at',{ascending:false});
+      if(error)throw error;
+      const grid=document.getElementById('cursosGrid');
+      if(data&&data.length>0){
+        grid.innerHTML=data.map((c,i)=>{
+          const progreso=c.cupo_maximo>0?(c.inscritos/c.cupo_maximo)*100:0;
+          return`<div class="curso-card reveal${i<3?' d'+(i+1):''}">
+            <div class="curso-emoji">${c.categoria_emoji||'📚'}</div>
+            <h3 class="curso-title">${escapeHTML(c.titulo)}</h3>
+            <p class="curso-instructor">👨‍🏫 ${escapeHTML(c.instructor)}</p>
+            <div class="curso-meta">
+              <span>📅 ${escapeHTML(c.fechas)}</span>
+              <span>⏰ ${escapeHTML(c.horario)}</span>
+            </div>
+            <span class="curso-badge">${escapeHTML(c.modalidad)}</span>
+            <div class="curso-progress-bar">
+              <div class="curso-progress-fill" style="width:${progreso}%"></div>
+            </div>
+            <small style="color:#94A3B8;font-size:12px">${c.inscritos}/${c.cupo_maximo} inscritos</small>
+            <button class="curso-btn" onclick="openInscripcionCurso('${c.id}','${escapeHTML(c.titulo)}','${escapeHTML(c.instructor)}')">Inscribirme</button>
+          </div>`;
+        }).join('');
+        document.querySelectorAll('.curso-card.reveal').forEach(el=>observer.observe(el));
+      }else{
+        grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#94A3B8;padding:40px">No hay cursos disponibles en este momento</div>';
+      }
+    }catch(e){console.log('Cursos error:',e.message);}
+  })();
+}
+
+/* ─── COMUNIDAD SECTION ─── */
+function openPublicarProyecto(){
+  document.getElementById('publicarProyectoModal').classList.add('active');
+  document.body.style.overflow='hidden';
+}
+function closePublicarProyecto(){
+  document.getElementById('publicarProyectoModal').classList.remove('active');
+  document.getElementById('publicarProyectoForm').reset();
+  document.getElementById('proyFormError').textContent='';
+  document.body.style.overflow='';
+}
+async function submitPublicarProyecto(){
+  if(!window.supabaseClient){
+    showToast('Cargando sistema...');
+    return;
+  }
+  const titulo=document.getElementById('proyTitulo').value.trim();
+  const descripcion=document.getElementById('proyDescripcion').value.trim();
+  const autor=document.getElementById('proyAutor').value.trim();
+  const correo=document.getElementById('proyCorreo').value.trim();
+  const carrera=document.getElementById('proyCarrera').value.trim();
+  const categoria=document.getElementById('proyCategoria').value;
+  const tags=document.getElementById('proyTags').value.trim().split(',').map(t=>t.trim()).filter(t=>t);
+  const err=document.getElementById('proyFormError');
+  err.textContent='';
+  try{
+    const{data,error}=await supabaseClient.from('proyectos_comunidad').insert([{
+      titulo,descripcion,autor,correo,carrera,categoria,tags,activo:true,likes:0,comentarios:0
+    }]);
+    if(error)throw error;
+    closePublicarProyecto();
+    showToast('¡Proyecto publicado! Aparecerá en el muro próximamente.');
+    loadProyectos();
+  }catch(e){err.textContent=e.message||'Error al publicar proyecto';}
+}
+function loadProyectos(){
+  if(!window.supabaseClient){
+    setTimeout(loadProyectos,200);
+    return;
+  }
+  (async()=>{
+    try{
+      const{data,error}=await supabaseClient.from('proyectos_comunidad').select('*').eq('activo',true).order('created_at',{ascending:false});
+      if(error)throw error;
+      const grid=document.getElementById('proyectosGrid');
+      if(data&&data.length>0){
+        const categoriaEmoji={'idea':'💡','busco_equipo':'👥','en_desarrollo':'🔨','completado':'✅'};
+        grid.innerHTML=data.map((p,i)=>{
+          const catEmoji=categoriaEmoji[p.categoria]||'📌';
+          const catLabel={idea:'Idea',busco_equipo:'Busco equipo',en_desarrollo:'En desarrollo',completado:'Completado'}[p.categoria];
+          return`<div class="proyecto-card reveal${i<3?' d'+(i+1):''}">
+            <span class="proyecto-badge ${p.categoria}">${catEmoji} ${catLabel}</span>
+            <h3 class="proyecto-title">${escapeHTML(p.titulo)}</h3>
+            <p class="proyecto-descripcion">${escapeHTML(p.descripcion)}</p>
+            <div class="proyecto-meta">
+              <strong>${escapeHTML(p.autor)}</strong> · ${escapeHTML(p.carrera)}
+            </div>
+            ${p.tags&&p.tags.length?'<div class="proyecto-tags">'+p.tags.map(t=>'<span class="proyecto-tag">'+escapeHTML(t)+'</span>').join('')+'</div>':''}
+            <div class="proyecto-actions">
+              <button class="proyecto-like" onclick="showToast('❤️ Me gusta!')">❤️ ${p.likes||0}</button>
+              <button class="proyecto-comment" onclick="showToast('💬 Comentarios')">💬 ${p.comentarios||0}</button>
+            </div>
+          </div>`;
+        }).join('');
+        document.querySelectorAll('.proyecto-card.reveal').forEach(el=>observer.observe(el));
+      }else{
+        grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#94A3B8;padding:40px">No hay proyectos publicados aún. ¡Sé el primero!</div>';
+      }
+    }catch(e){console.log('Proyectos error:',e.message);}
+  })();
+}
+
+/* ─── BADGES SECTION ─── */
+function loadBadges(){
+  if(!window.supabaseClient){
+    setTimeout(loadBadges,200);
+    return;
+  }
+  (async()=>{
+    try{
+      const{data:badges,error:error1}=await supabaseClient.from('badges').select('*');
+      if(error1)throw error1;
+      const grid=document.getElementById('badgesGrid');
+      if(badges&&badges.length>0){
+        grid.innerHTML=badges.map((b,i)=>`<div class="badge-card reveal${i<4?' d'+(i+1):''}">
+          <div class="badge-icon">${escapeHTML(b.icono)}</div>
+          <h3 class="badge-name">${escapeHTML(b.nombre)}</h3>
+          <p class="badge-desc">${escapeHTML(b.descripcion)}</p>
+          <p class="badge-pts">⭐ ${b.puntos} pts</p>
+        </div>`).join('');
+        document.querySelectorAll('.badge-card.reveal').forEach(el=>observer.observe(el));
+      }else{
+        grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#94A3B8;padding:40px">No hay insignias disponibles</div>';
+      }
+    }catch(e){console.log('Badges error:',e.message);}
+  })();
+}
+function loadPremios(){
+  if(!window.supabaseClient){
+    setTimeout(loadPremios,200);
+    return;
+  }
+  (async()=>{
+    try{
+      const{data:premios,error}=await supabaseClient.from('premios').select('*').order('puntos_requeridos');
+      if(error)throw error;
+      const grid=document.getElementById('premiosGrid');
+      if(premios&&premios.length>0){
+        grid.innerHTML=premios.map((p,i)=>`<div class="premio-card reveal${i<3?' d'+(i+1):''}">
+          <div class="premio-icon">${escapeHTML(p.icono)}</div>
+          <h3 class="premio-name">${escapeHTML(p.nombre)}</h3>
+          <p class="premio-pts">💰 ${p.puntos_requeridos} puntos</p>
+          <p class="premio-stock">Stock: ${p.stock||0}</p>
+        </div>`).join('');
+        document.querySelectorAll('.premio-card.reveal').forEach(el=>observer.observe(el));
+      }else{
+        grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#94A3B8;padding:40px">No hay premios disponibles</div>';
+      }
+    }catch(e){console.log('Premios error:',e.message);}
+  })();
+}
+function loadLeaderboard(){
+  if(!window.supabaseClient){
+    setTimeout(loadLeaderboard,200);
+    return;
+  }
+  (async()=>{
+    try{
+      const{data:userBadges,error}=await supabaseClient.from('badges_usuarios').select('usuario_correo').order('created_at',{ascending:false});
+      if(error)throw error;
+      const counts={};
+      if(userBadges){
+        userBadges.forEach(ub=>{
+          counts[ub.usuario_correo]=(counts[ub.usuario_correo]||0)+1;
+        });
+      }
+      const sorted=Object.entries(counts)
+        .sort((a,b)=>b[1]-a[1])
+        .slice(0,5);
+      const list=document.getElementById('leaderboardList');
+      if(sorted.length>0){
+        list.innerHTML=sorted.map((entry,i)=>`<div class="leaderboard-item reveal d${i+1}">
+          <div class="leaderboard-rank">#${i+1}</div>
+          <div class="leaderboard-info">
+            <p class="leaderboard-name">${escapeHTML(entry[0])}</p>
+            <p class="leaderboard-email">${entry[0]}</p>
+          </div>
+          <div class="leaderboard-badges">⭐ ${entry[1]}</div>
+        </div>`).join('');
+        document.querySelectorAll('.leaderboard-item.reveal').forEach(el=>observer.observe(el));
+      }else{
+        list.innerHTML='<div style="text-align:center;color:#94A3B8;padding:40px">Aún no hay insignias ganadas</div>';
+      }
+    }catch(e){console.log('Leaderboard error:',e.message);}
+  })();
+}
+
+/* ─── NOTIFICATIONS BANNER ─── */
+function loadNotifications(){
+  if(!window.supabaseClient){
+    setTimeout(loadNotifications,200);
+    return;
+  }
+  (async()=>{
+    try{
+      const{data,error}=await supabaseClient
+        .from('notificaciones')
+        .select('*')
+        .eq('activa',true)
+        .order('created_at',{ascending:false})
+        .limit(1);
+      if(error)throw error;
+      const banner=document.getElementById('notificationsBanner');
+      const textEl=document.getElementById('notificationsText');
+      if(data&&data.length>0){
+        const notif=data[0];
+        textEl.innerHTML='<div class="notification-item">'+escapeHTML(notif.mensaje)+'</div>';
+        banner.classList.remove('empty','hidden');
+      }else{
+        banner.classList.add('empty');
+      }
+    }catch(e){console.log('Notificaciones: ',e.message);}
+  })();
+}
+/* ─── CALENDAR FUNCTIONS ─── */
+let currentCalendarDate=new Date();
+let reservedDates=[];
+async function loadReservedDates(){
+  if(!window.supabaseClient)return;
+  try{
+    const{data,error}=await supabaseClient.from('solicitudes_espacios').select('fecha');
+    if(error)throw error;
+    reservedDates=data?data.map(d=>d.fecha):[];
+  }catch(e){console.log('Calendar error:',e.message);}
+}
+function renderCalendar(){
+  const year=currentCalendarDate.getFullYear();
+  const month=currentCalendarDate.getMonth();
+  const today=new Date();
+  const firstDay=new Date(year,month,1);
+  const lastDay=new Date(year,month+1,0);
+  const startDate=new Date(firstDay);
+  startDate.setDate(startDate.getDate()-firstDay.getDay());
+
+  document.getElementById('calendarTitle').textContent=new Intl.DateTimeFormat('es-ES',{month:'long',year:'numeric'}).format(firstDay);
+
+  const grid=document.getElementById('calendarGrid');
+  grid.innerHTML='';
+
+  // Day headers
+  const days=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  days.forEach(d=>{
+    const h=document.createElement('div');
+    h.className='calendar-day-header';
+    h.textContent=d;
+    grid.appendChild(h);
+  });
+
+  // Days
+  let current=new Date(startDate);
+  while(current.getMonth()===month||current.getMonth()===(month+1)%12){
+    const dayDiv=document.createElement('div');
+    dayDiv.className='calendar-day';
+    const dateStr=current.toISOString().split('T')[0];
+
+    if(current.getMonth()!==month)dayDiv.classList.add('other-month');
+    if(reservedDates.includes(dateStr))dayDiv.classList.add('reserved');
+    if(current.toDateString()===today.toDateString())dayDiv.classList.add('today');
+
+    dayDiv.textContent=current.getDate();
+    dayDiv.onclick=()=>selectCalendarDate(dateStr);
+    grid.appendChild(dayDiv);
+    current.setDate(current.getDate()+1);
+  }
+}
+function prevCalendarMonth(){
+  currentCalendarDate.setMonth(currentCalendarDate.getMonth()-1);
+  renderCalendar();
+}
+function nextCalendarMonth(){
+  currentCalendarDate.setMonth(currentCalendarDate.getMonth()+1);
+  renderCalendar();
+}
+function selectCalendarDate(dateStr){
+  const reserved=reservedDates.includes(dateStr);
+  if(reserved){
+    showToast('Esta fecha ya tiene reserva');
+    return;
+  }
+  const dateInput=document.querySelector('input[type="date"]');
+  if(dateInput)dateInput.value=dateStr;
+  document.querySelectorAll('.calendar-day').forEach(d=>d.classList.remove('selected'));
+  event.target.classList.add('selected');
+  showToast('Fecha seleccionada');
+}
+
+function initCalendar(){
+  if(!window.supabaseClient){
+    setTimeout(initCalendar,200);
+    return;
+  }
+  loadReservedDates();
+  renderCalendar();
+}
+
+function initSupabaseFeatures(){
+  if(!window.supabaseClient){
+    setTimeout(initSupabaseFeatures,200);
+    return;
+  }
+  loadNotifications();
+  loadCursos();
+  loadProyectos();
+  loadBadges();
+  loadPremios();
+  loadLeaderboard();
+  initCalendar();
+}
+initSupabaseFeatures();
 </script>
 <!-- Supabase SDK + config (carga después para no bloquear) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
