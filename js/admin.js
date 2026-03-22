@@ -282,7 +282,7 @@ async function addSeguimiento(tipo, id, nota) {
  * Renderiza la tabla de solicitudes de servicios
  */
 function renderTableServicios() {
-  const tableBody = document.getElementById('serviciosTableBody');
+  const tableBody = document.getElementById('bodyServicios');
   if (!tableBody) return;
 
   tableBody.innerHTML = '';
@@ -309,7 +309,7 @@ function renderTableServicios() {
  * Renderiza la tabla de solicitudes de espacios
  */
 function renderTableEspacios() {
-  const tableBody = document.getElementById('espaciosTableBody');
+  const tableBody = document.getElementById('bodyEspacios');
   if (!tableBody) return;
 
   tableBody.innerHTML = '';
@@ -321,7 +321,7 @@ function renderTableEspacios() {
       <td>${formatDate(item.created_at)}</td>
       <td>${escapeHTML(item.nombre_solicitante || 'N/A')}</td>
       <td>${escapeHTML(item.motivo || 'N/A')}</td>
-      <td>${formatDate(item.fecha_reserva)}</td>
+      <td>${formatDate(item.fecha)}</td>
       <td>${escapeHTML(item.hora_inicio || 'N/A')}</td>
       <td><span class="badge ${getStatusBadgeClass(item.estado)}">${formatStatus(item.estado)}</span></td>
       <td>${escapeHTML(item.asignado_a || 'Sin asignar')}</td>
@@ -337,7 +337,7 @@ function renderTableEspacios() {
  * Renderiza la tabla de solicitudes de asesoría
  */
 function renderTableAsesoria() {
-  const tableBody = document.getElementById('asesoriaTableBody');
+  const tableBody = document.getElementById('bodyAsesorias');
   if (!tableBody) return;
 
   tableBody.innerHTML = '';
@@ -364,7 +364,7 @@ function renderTableAsesoria() {
  * Renderiza la tabla de contactos
  */
 function renderTableContactos() {
-  const tableBody = document.getElementById('contactosTableBody');
+  const tableBody = document.getElementById('bodyContactos');
   if (!tableBody) return;
 
   tableBody.innerHTML = '';
@@ -487,13 +487,13 @@ async function showDetailModal(tipo, id) {
         <label>Motivo:</label> <span>${escapeHTML(item.motivo || 'N/A')}</span>
       </div>
       <div class="info-group">
-        <label>Fecha de Reserva:</label> <span>${formatDate(item.fecha_reserva)}</span>
+        <label>Fecha de Reserva:</label> <span>${formatDate(item.fecha)}</span>
       </div>
       <div class="info-group">
         <label>Hora Inicio:</label> <span>${escapeHTML(item.hora_inicio || 'N/A')}</span>
       </div>
       <div class="info-group">
-        <label>Hora Fin:</label> <span>${escapeHTML(item.hora_fin || 'N/A')}</span>
+        <label>Hora Fin:</label> <span>${escapeHTML(item.hora_termino || 'N/A')}</span>
       </div>
       <div class="info-group">
         <label>Número de Asistentes:</label> <span>${escapeHTML(item.numero_asistentes || 'N/A')}</span>
@@ -664,10 +664,10 @@ function updateSummaryCards() {
   const stats = calculateStats();
 
   const cards = {
-    'totalSolicitudes': stats.totalSolicitudes,
-    'pendientes': stats.pendientes,
-    'enProceso': stats.enProceso,
-    'completadas': stats.completadas
+    'cardTotal': stats.totalSolicitudes,
+    'cardPending': stats.pendientes,
+    'cardProcessing': stats.enProceso,
+    'cardCompleted': stats.completadas
   };
 
   Object.keys(cards).forEach(key => {
@@ -825,24 +825,25 @@ function renderChartTendencia() {
  * Cambia entre pestañas
  * @param {string} tabName - Nombre de la pestaña
  */
-function switchTab(tabName) {
+function switchTab(tabName, clickedBtn) {
   currentTab = tabName;
 
-  // Ocultar todas las tablas
-  const tables = document.querySelectorAll('.table-section');
-  tables.forEach(table => {
-    table.style.display = 'none';
+  // Ocultar todos los tab-content
+  const tabs = document.querySelectorAll('.tab-content');
+  tabs.forEach(tab => {
+    tab.classList.remove('active');
+    tab.style.display = 'none';
   });
 
-  // Mostrar tabla seleccionada
-  const selectedTable = document.getElementById(`${tabName}Section`);
-  if (selectedTable) {
-    selectedTable.style.display = 'block';
+  // Mostrar tab seleccionado
+  const selectedTab = document.getElementById(tabName);
+  if (selectedTab) {
+    selectedTab.classList.add('active');
+    selectedTab.style.display = 'block';
   }
 
-  // Actualizar botones de pestaña
-  const buttons = document.querySelectorAll('.tab-button');
-  buttons.forEach(btn => {
+  // Actualizar botones de pestaña (tab-btn y nav-link)
+  document.querySelectorAll('.tab-btn, .nav-link').forEach(btn => {
     btn.classList.remove('active');
     if (btn.dataset.tab === tabName) {
       btn.classList.add('active');
@@ -917,7 +918,7 @@ function exportToCSV(tipo) {
           value = item.motivo || '';
           break;
         case 'Fecha Reserva':
-          value = formatDate(item.fecha_reserva);
+          value = formatDate(item.fecha);
           break;
         case 'Hora':
           value = item.hora_inicio || '';
@@ -1204,9 +1205,11 @@ Asegúrate de que tu respuesta sea práctica, accionable y esté fundamentada en
 
     const data = await response.json();
 
-    // Extract the response text
+    // Extract the response text - edge function returns {reply: "..."}
     let responseText = '';
-    if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+    if (data.reply) {
+      responseText = data.reply;
+    } else if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
       responseText = data.candidates[0].content.parts[0].text;
     } else if (data.text) {
       responseText = data.text;
