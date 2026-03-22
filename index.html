@@ -798,6 +798,93 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   text-decoration:none; transition:color 0.2s; }
 .login-card .back-link:hover { color:var(--gold); }
 
+/* ─── COLLAPSIBLE SECTIONS ─── */
+.section-collapse-header {
+  display:flex; align-items:center; gap:16px; cursor:pointer;
+  padding:20px 32px; margin:-110px -24px 0; padding-top:110px;
+  user-select:none; position:relative; z-index:2;
+}
+.section-collapse-icon {
+  width:48px; height:48px; border-radius:14px; display:flex; align-items:center; justify-content:center;
+  background:rgba(196,162,78,0.1); border:1.5px solid rgba(196,162,78,0.2); flex-shrink:0;
+  transition:all 0.3s;
+}
+.section-collapse-header:hover .section-collapse-icon {
+  background:rgba(196,162,78,0.18); border-color:var(--gold);
+  box-shadow:0 0 20px rgba(196,162,78,0.2);
+}
+.section-collapse-icon svg { width:24px; height:24px; }
+.section-collapse-title {
+  flex:1; font-family:'Playfair Display',Georgia,serif;
+  font-size:clamp(22px,3vw,32px); font-weight:700; color:var(--navy);
+}
+.section-gradient .section-collapse-title { color:#fff; }
+.section-collapse-chevron {
+  width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center;
+  background:rgba(196,162,78,0.08); transition:all 0.4s cubic-bezier(.22,1,.36,1);
+}
+.section-collapse-header:hover .section-collapse-chevron {
+  background:rgba(196,162,78,0.15);
+}
+.section-collapsed .section-collapse-chevron { transform:rotate(-90deg); }
+.section-body {
+  overflow:hidden; transition:max-height 0.6s cubic-bezier(.22,1,.36,1), opacity 0.4s ease;
+  position:relative; z-index:1;
+}
+.section-collapsed .section-body {
+  max-height:0 !important; opacity:0; pointer-events:none;
+}
+/* Floating logo watermark behind sections */
+.section-watermark {
+  position:relative; overflow:hidden;
+}
+.section-watermark::after {
+  content:''; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  width:400px; height:400px;
+  background:url('assets/logo-ecosistema-digital.png') center/contain no-repeat;
+  opacity:0.03; pointer-events:none; z-index:0;
+  filter:grayscale(30%);
+}
+.section-gradient .section-watermark::after,
+.section-gradient.section-watermark::after { opacity:0.04; filter:grayscale(30%) brightness(2); }
+
+/* VR Catalog */
+.vr-tabs-nav {
+  display:flex; gap:12px; flex-wrap:wrap; margin-bottom:40px; justify-content:center;
+}
+.vr-tab-btn {
+  padding:12px 24px; border:2px solid rgba(196,162,78,0.2); background:transparent;
+  border-radius:10px; cursor:pointer; font-weight:600; color:var(--navy);
+  transition:all 0.3s; font-size:14px;
+}
+.vr-tab-btn:hover { border-color:var(--gold); background:rgba(196,162,78,0.05); }
+.vr-tab-btn.active { background:var(--gold); color:var(--navy); border-color:var(--gold); }
+.vr-tab-content { display:none; }
+.vr-tab-content.active { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:24px; }
+.vr-software-card {
+  background:#fff; border:1px solid #E8ECF1; border-radius:16px; padding:24px;
+  transition:all 0.3s cubic-bezier(.22,1,.36,1);
+}
+.vr-software-card:hover {
+  transform:translateY(-8px); box-shadow:var(--shadow-hover); border-color:rgba(196,162,78,0.25);
+}
+.vr-software-card h3 {
+  font-size:18px; font-weight:700; color:var(--navy); margin-bottom:8px;
+}
+.vr-software-card .desc {
+  font-size:14px; color:#64748B; margin-bottom:16px; line-height:1.6;
+}
+.vr-software-detail {
+  margin-bottom:14px; padding-bottom:12px; border-bottom:1px solid #E8ECF1;
+}
+.vr-software-detail:last-child { border:none; margin-bottom:0; padding-bottom:0; }
+.vr-software-detail-label {
+  font-weight:600; color:var(--gold); font-size:12px; letter-spacing:0.5px; margin-bottom:4px;
+}
+.vr-software-detail-text {
+  font-size:13px; color:#475569; line-height:1.6;
+}
+
 </style>
 </head>
 <body>
@@ -824,6 +911,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
       <a href="#cursos" data-section="cursos">Cursos</a>
       <a href="#comunidad" data-section="comunidad">Comunidad</a>
       <a href="#badges" data-section="badges">Logros</a>
+      <a href="#vr" data-section="vr">VR</a>
       <a href="#contacto" data-section="contacto">Contacto</a>
       <a href="#" onclick="showLoginModal();return false" class="nav-login-btn" style="background:rgba(196,162,78,0.12);color:var(--gold);border:1px solid rgba(196,162,78,0.25);margin-left:8px;font-weight:600">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
@@ -840,7 +928,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
     <a href="#inicio">Inicio</a><a href="#quienes">Quiénes somos</a>
     <a href="#servicios">Servicios</a><a href="#solicitud">Solicitud de servicios</a>
     <a href="#espacio">Uso del espacio</a><a href="#telemedicina">Telemedicina</a>
-    <a href="#cursos">Cursos</a><a href="#comunidad">Comunidad</a><a href="#badges">Logros</a><a href="#contacto">Contacto</a>
+    <a href="#cursos">Cursos</a><a href="#comunidad">Comunidad</a><a href="#badges">Logros</a><a href="#vr">Catálogo VR</a><a href="#contacto">Contacto</a>
     <a href="#" onclick="showLoginModal();document.getElementById('mobileMenu').classList.remove('open');return false" style="color:var(--gold);border-top:1px solid rgba(196,162,78,0.15);margin-top:8px;padding-top:14px">🔐 Acceso</a>
   </div>
 </nav>
@@ -868,7 +956,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 
   <div class="hero-content parallax-layer" id="heroContent">
     <div class="hero-logo-wrap" style="display:flex;justify-content:center;width:100%">
-      <img src="assets/logo-ecosistema-digital.png" alt="Ecosistema Digital" style="height:160px;width:auto;filter:drop-shadow(0 0 30px rgba(196,162,78,0.5))" onerror="this.parentElement.innerHTML='<div style=\'width:140px;height:140px;border:2.5px solid var(--gold);border-radius:28px;display:flex;align-items:center;justify-content:center;background:rgba(196,162,78,0.1)\'><span style=\'color:var(--gold);font-size:48px;font-weight:700\'>ED</span></div>'">
+      <img src="assets/logo-ecosistema-digital.png" alt="Ecosistema Digital" style="height:260px;width:auto;filter:drop-shadow(0 0 40px rgba(196,162,78,0.6))" onerror="this.parentElement.innerHTML='<div style=\'width:140px;height:140px;border:2.5px solid var(--gold);border-radius:28px;display:flex;align-items:center;justify-content:center;background:rgba(196,162,78,0.1)\'><span style=\'color:var(--gold);font-size:48px;font-weight:700\'>ED</span></div>'">
     </div>
     <div class="hero-badge">
       <span class="pulse-dot"></span>
@@ -902,22 +990,31 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 </section>
 
 <!-- QUIÉNES SOMOS -->
-<section class="section section-cream" id="quienes" style="position:relative;overflow:hidden">
-  <div class="floating-shapes">
-    <div class="shape shape-1"></div>
-    <div class="shape shape-2"></div>
-    <div class="shape shape-3"></div>
-  </div>
-  <div class="container" style="position:relative;z-index:1">
-    <div class="sec-header reveal">
-      <div class="sec-tag"><span class="dot"></span> Quiénes somos</div>
-      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
-      <h2 class="serif">Sobre el Ecosistema Digital</h2>
-      <p>Una iniciativa interdisciplinaria que articula saberes y capacidades para el desarrollo tecnológico universitario.</p>
+<section class="section section-cream section-watermark" id="quienes" style="position:relative;overflow:hidden">
+  <div class="section-collapse-header" onclick="toggleSection('quienes')">
+    <div class="section-collapse-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3" stroke="var(--gold)" stroke-width="2"/><path d="M6 20c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/></svg>
     </div>
+    <span class="section-collapse-title">Sobre el Ecosistema Digital</span>
+    <div class="section-collapse-chevron">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+  <div class="section-body" style="max-height:none">
+    <div class="floating-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
+    <div class="container" style="position:relative;z-index:1">
+      <div class="sec-header reveal">
+        <div class="sec-tag"><span class="dot"></span> Quiénes somos</div>
+        <h2 class="serif">Sobre el Ecosistema Digital</h2>
+        <p>Una iniciativa interdisciplinaria que articula saberes y capacidades para el desarrollo tecnológico universitario.</p>
+      </div>
 
-    <!-- Tabs -->
-    <div class="reveal d1">
+      <!-- Tabs -->
+      <div class="reveal d1">
       <div class="tabs-nav">
         <button class="tab-btn active" onclick="switchTab('about','desc',this)">Descripción</button>
         <button class="tab-btn" onclick="switchTab('about','mission',this)">Misión y Visión</button>
@@ -957,32 +1054,52 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
         <div class="carreras-grid" id="carrerasGrid"></div>
       </div>
     </div>
+    </div>
   </div>
 </section>
 
 <!-- SERVICIOS -->
-<section class="section section-white" id="servicios">
-  <div class="container-md">
-    <div class="sec-header reveal">
-      <div class="sec-tag"><span class="dot"></span> Nuestros servicios</div>
-      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
-      <h2 class="serif">Servicios del ecosistema</h2>
-      <p>Soluciones tecnológicas para fortalecer la formación, la investigación y la atención.</p>
+<section class="section section-white section-watermark" id="servicios">
+  <div class="section-collapse-header" onclick="toggleSection('servicios')">
+    <div class="section-collapse-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" stroke="var(--gold)" stroke-width="2"/><rect x="14" y="3" width="7" height="7" stroke="var(--gold)" stroke-width="2"/><rect x="3" y="14" width="7" height="7" stroke="var(--gold)" stroke-width="2"/><rect x="14" y="14" width="7" height="7" stroke="var(--gold)" stroke-width="2"/></svg>
     </div>
-    <div class="accordion reveal d1" id="serviciosAccordion"></div>
+    <span class="section-collapse-title">Servicios del ecosistema</span>
+    <div class="section-collapse-chevron">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+  <div class="section-body" style="max-height:none">
+    <div class="container-md">
+      <div class="sec-header reveal">
+        <div class="sec-tag"><span class="dot"></span> Nuestros servicios</div>
+        <h2 class="serif">Servicios del ecosistema</h2>
+        <p>Soluciones tecnológicas para fortalecer la formación, la investigación y la atención.</p>
+      </div>
+      <div class="accordion reveal d1" id="serviciosAccordion"></div>
+    </div>
   </div>
 </section>
 
 <!-- SOLICITUD -->
-<section class="section section-cream" id="solicitud">
-  <div class="container-sm">
-    <div class="sec-header reveal">
-      <div class="sec-tag"><span class="dot"></span> Solicitar servicio</div>
-      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
-      <h2 class="serif">Solicitud de servicios</h2>
-      <p>Complete el formulario y nos pondremos en contacto a la brevedad.</p>
+<section class="section section-cream section-watermark" id="solicitud">
+  <div class="section-collapse-header" onclick="toggleSection('solicitud')">
+    <div class="section-collapse-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/><polyline points="13 2 13 9 20 9" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/></svg>
     </div>
-    <div class="form-card reveal d1">
+    <span class="section-collapse-title">Solicitud de servicios</span>
+    <div class="section-collapse-chevron">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+  <div class="section-body" style="max-height:none">
+    <div class="container-sm">
+      <div class="sec-header reveal">
+        <div class="sec-tag"><span class="dot"></span> Solicitar servicio</div>
+        <h2 class="serif">Solicitud de servicios</h2>
+        <p>Complete el formulario y nos pondremos en contacto a la brevedad.</p>
+      </div>
+      <div class="form-card reveal d1">
       <form onsubmit="event.preventDefault();showToast('Solicitud enviada exitosamente')">
         <div class="form-grid">
           <div class="form-group"><label class="form-label">Nombre completo <span class="req">*</span></label><input class="input" placeholder="Nombre y apellidos" required></div>
@@ -1023,19 +1140,29 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
         <div style="text-align:right;margin-top:8px"><button type="submit" class="btn btn-gold" style="padding:14px 52px">Enviar solicitud</button></div>
       </form>
     </div>
+    </div>
   </div>
 </section>
 
 <!-- USO DEL ESPACIO -->
-<section class="section section-white" id="espacio">
-  <div class="container-sm">
-    <div class="sec-header reveal">
-      <div class="sec-tag"><span class="dot"></span> Reservar espacio</div>
-      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
-      <h2 class="serif">Solicitud de uso del espacio</h2>
-      <p>Reserve el espacio físico del Ecosistema Digital.</p>
+<section class="section section-white section-watermark" id="espacio">
+  <div class="section-collapse-header" onclick="toggleSection('espacio')">
+    <div class="section-collapse-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/><polyline points="9 22 9 12 15 12 15 22" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/></svg>
     </div>
-    <div class="notice reveal">
+    <span class="section-collapse-title">Solicitud de uso del espacio</span>
+    <div class="section-collapse-chevron">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+  <div class="section-body" style="max-height:none">
+    <div class="container-sm">
+      <div class="sec-header reveal">
+        <div class="sec-tag"><span class="dot"></span> Reservar espacio</div>
+        <h2 class="serif">Solicitud de uso del espacio</h2>
+        <p>Reserve el espacio físico del Ecosistema Digital.</p>
+      </div>
+      <div class="notice reveal">
       <div class="notice-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
       <p>La disponibilidad del espacio estará sujeta a revisión y confirmación por parte de la coordinación del Ecosistema Digital.</p>
     </div>
@@ -1075,20 +1202,30 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
         <div style="text-align:right;margin-top:8px"><button type="submit" class="btn btn-gold" style="padding:14px 52px">Solicitar espacio</button></div>
       </form>
     </div>
+    </div>
   </div>
 </section>
 
 <!-- TELEMEDICINA -->
-<section class="section" id="telemedicina" style="background:linear-gradient(180deg,#FAF8F4 0%,#fff 100%);position:relative;overflow:hidden">
-  <div class="floating-shapes"><div class="shape shape-2" style="opacity:0.03"></div></div>
-  <div class="container" style="position:relative;z-index:1">
-    <div class="sec-header reveal">
-      <div class="sec-tag"><span class="dot"></span> Salud digital</div>
-      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
-      <h2 class="serif">Telemedicina</h2>
-      <p>Orientación, acompañamiento y asesoría remota en procesos vinculados con salud digital.</p>
+<section class="section section-watermark" id="telemedicina" style="background:linear-gradient(180deg,#FAF8F4 0%,#fff 100%);position:relative;overflow:hidden">
+  <div class="section-collapse-header" onclick="toggleSection('telemedicina')">
+    <div class="section-collapse-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/></svg>
     </div>
-    <div class="card-grid card-grid-2" style="align-items:start">
+    <span class="section-collapse-title">Telemedicina</span>
+    <div class="section-collapse-chevron">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+  <div class="section-body" style="max-height:none">
+    <div class="floating-shapes"><div class="shape shape-2" style="opacity:0.03"></div></div>
+    <div class="container" style="position:relative;z-index:1">
+      <div class="sec-header reveal">
+        <div class="sec-tag"><span class="dot"></span> Salud digital</div>
+        <h2 class="serif">Telemedicina</h2>
+        <p>Orientación, acompañamiento y asesoría remota en procesos vinculados con salud digital.</p>
+      </div>
+      <div class="card-grid card-grid-2" style="align-items:start">
       <div class="reveal from-right d1">
         <h3 class="serif" style="font-size:24px;color:var(--navy);margin-bottom:18px">Acerca del servicio</h3>
         <p style="font-size:15px;color:#64748B;line-height:1.95;margin-bottom:30px">El servicio de telemedicina ofrece un canal de comunicación profesional para brindar orientación, asesoría y acompañamiento en procesos relacionados con la salud, facilitando la interacción remota entre profesionales, estudiantes e interesados.</p>
@@ -1132,47 +1269,78 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
         </form>
       </div>
     </div>
+    </div>
   </div>
 </section>
 
 <!-- IMPACTO -->
-<section class="section section-gradient">
-  <div class="container" style="position:relative;z-index:2">
-    <div class="sec-header light reveal">
-      <div class="sec-tag"><span class="dot"></span> Impacto</div>
-      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
-      <h2 class="serif">Impacto y beneficios</h2>
-      <p>Un ecosistema que transforma la interacción con la tecnología y el conocimiento.</p>
+<section class="section section-gradient section-watermark" id="impacto">
+  <div class="section-collapse-header" onclick="toggleSection('impacto')">
+    <div class="section-collapse-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="17 6 23 6 23 12" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
-    <div class="counter-grid reveal d1" id="counterGrid"></div>
-    <div class="card-grid card-grid-3 reveal d2" id="impactoGrid"></div>
+    <span class="section-collapse-title">Impacto y beneficios</span>
+    <div class="section-collapse-chevron">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+  <div class="section-body" style="max-height:none">
+    <div class="container" style="position:relative;z-index:2">
+      <div class="sec-header light reveal">
+        <div class="sec-tag"><span class="dot"></span> Impacto</div>
+        <h2 class="serif">Impacto y beneficios</h2>
+        <p>Un ecosistema que transforma la interacción con la tecnología y el conocimiento.</p>
+      </div>
+      <div class="counter-grid reveal d1" id="counterGrid"></div>
+      <div class="card-grid card-grid-3 reveal d2" id="impactoGrid"></div>
+    </div>
   </div>
 </section>
 
 <!-- GALERÍA -->
-<section class="section section-cream">
-  <div class="container">
-    <div class="sec-header reveal">
-      <div class="sec-tag"><span class="dot"></span> Tecnología</div>
-      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
-      <h2 class="serif">Entorno tecnológico</h2>
-      <p>Las áreas de innovación que convergen en nuestro ecosistema digital.</p>
+<section class="section section-cream section-watermark" id="galeria">
+  <div class="section-collapse-header" onclick="toggleSection('galeria')">
+    <div class="section-collapse-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="var(--gold)" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="var(--gold)"/><path d="M21 15l-5-5-6 6-3-3" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
-    <div class="card-grid card-grid-4 reveal d1" id="galeriaGrid"></div>
+    <span class="section-collapse-title">Entorno tecnológico</span>
+    <div class="section-collapse-chevron">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+  <div class="section-body" style="max-height:none">
+    <div class="container">
+      <div class="sec-header reveal">
+        <div class="sec-tag"><span class="dot"></span> Tecnología</div>
+        <h2 class="serif">Entorno tecnológico</h2>
+        <p>Las áreas de innovación que convergen en nuestro ecosistema digital.</p>
+      </div>
+      <div class="card-grid card-grid-4 reveal d1" id="galeriaGrid"></div>
+    </div>
   </div>
 </section>
 
 <!-- CURSOS -->
-<section class="section section-white" id="cursos">
-  <div class="container">
-    <div class="sec-header reveal">
-      <div class="sec-tag"><span class="dot"></span> Formación continua</div>
-      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
-      <h2 class="serif">Cursos y Talleres</h2>
-      <p>Amplía tus conocimientos con nuestros programas de formación continua en tecnología e innovación.</p>
+<section class="section section-white section-watermark" id="cursos">
+  <div class="section-collapse-header" onclick="toggleSection('cursos')">
+    <div class="section-collapse-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/></svg>
     </div>
-    <div class="card-grid card-grid-3 reveal d1" id="cursosGrid" style="min-height:300px;align-items:center;justify-content:center">
-      <div style="grid-column:1/-1;text-align:center;color:#94A3B8;font-size:14px">Cargando cursos disponibles...</div>
+    <span class="section-collapse-title">Cursos y Talleres</span>
+    <div class="section-collapse-chevron">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+  <div class="section-body" style="max-height:none">
+    <div class="container">
+      <div class="sec-header reveal">
+        <div class="sec-tag"><span class="dot"></span> Formación continua</div>
+        <h2 class="serif">Cursos y Talleres</h2>
+        <p>Amplía tus conocimientos con nuestros programas de formación continua en tecnología e innovación.</p>
+      </div>
+      <div class="card-grid card-grid-3 reveal d1" id="cursosGrid" style="min-height:300px;align-items:center;justify-content:center">
+        <div style="grid-column:1/-1;text-align:center;color:#94A3B8;font-size:14px">Cargando cursos disponibles...</div>
+      </div>
     </div>
   </div>
 </section>
@@ -1203,22 +1371,32 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 </div>
 
 <!-- COMUNIDAD -->
-<section class="section section-white" id="comunidad">
-  <div class="container">
-    <div class="sec-header reveal">
-      <div class="sec-tag"><span class="dot"></span> Colaboración</div>
-      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
-      <h2 class="serif">Muro de Proyectos</h2>
-      <p>Conecta con otros estudiantes y colabora en proyectos interdisciplinarios innovadores.</p>
+<section class="section section-white section-watermark" id="comunidad">
+  <div class="section-collapse-header" onclick="toggleSection('comunidad')">
+    <div class="section-collapse-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="7" r="4" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
-    <div style="margin-bottom:40px;text-align:center;reveal">
-      <button class="btn btn-gold" onclick="openPublicarProyecto()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-        Publicar proyecto
-      </button>
+    <span class="section-collapse-title">Muro de Proyectos</span>
+    <div class="section-collapse-chevron">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
     </div>
-    <div class="card-grid card-grid-3 reveal d1" id="proyectosGrid" style="min-height:300px;align-items:center;justify-content:center">
-      <div style="grid-column:1/-1;text-align:center;color:#94A3B8;font-size:14px">Cargando proyectos...</div>
+  </div>
+  <div class="section-body" style="max-height:none">
+    <div class="container">
+      <div class="sec-header reveal">
+        <div class="sec-tag"><span class="dot"></span> Colaboración</div>
+        <h2 class="serif">Muro de Proyectos</h2>
+        <p>Conecta con otros estudiantes y colabora en proyectos interdisciplinarios innovadores.</p>
+      </div>
+      <div style="margin-bottom:40px;text-align:center;reveal">
+        <button class="btn btn-gold" onclick="openPublicarProyecto()">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+          Publicar proyecto
+        </button>
+      </div>
+      <div class="card-grid card-grid-3 reveal d1" id="proyectosGrid" style="min-height:300px;align-items:center;justify-content:center">
+        <div style="grid-column:1/-1;text-align:center;color:#94A3B8;font-size:14px">Cargando proyectos...</div>
+      </div>
     </div>
   </div>
 </section>
@@ -1271,17 +1449,26 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 </div>
 
 <!-- BADGES/LOGROS -->
-<section class="section section-white" id="badges">
-  <div class="container">
-    <div class="sec-header reveal">
-      <div class="sec-tag"><span class="dot"></span> Gamificación</div>
-      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
-      <h2 class="serif">Insignias y Premios</h2>
-      <p>Gana insignias participando y accede a premios exclusivos por tu desempeño.</p>
+<section class="section section-white section-watermark" id="badges">
+  <div class="section-collapse-header" onclick="toggleSection('badges')">
+    <div class="section-collapse-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 5l6 4v7a6 6 0 0 1-6 6 6 6 0 0 1-6-6V9z" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
+    <span class="section-collapse-title">Insignias y Premios</span>
+    <div class="section-collapse-chevron">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+  <div class="section-body" style="max-height:none">
+    <div class="container">
+      <div class="sec-header reveal">
+        <div class="sec-tag"><span class="dot"></span> Gamificación</div>
+        <h2 class="serif">Insignias y Premios</h2>
+        <p>Gana insignias participando y accede a premios exclusivos por tu desempeño.</p>
+      </div>
 
-    <!-- Insignias -->
-    <div style="margin-bottom:60px">
+      <!-- Insignias -->
+      <div style="margin-bottom:60px">
       <h3 class="serif" style="text-align:center;color:var(--navy);margin-bottom:8px;font-size:24px">Insignias disponibles</h3>
       <div class="card-grid card-grid-4 reveal d1" id="badgesGrid" style="min-height:200px;align-items:center;justify-content:center">
         <div style="grid-column:1/-1;text-align:center;color:#94A3B8;font-size:14px">Cargando insignias...</div>
@@ -1303,19 +1490,67 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
         <div style="text-align:center;color:#94A3B8;font-size:14px;padding:20px">Cargando leaderboard...</div>
       </div>
     </div>
+    </div>
+  </div>
+</section>
+
+<!-- VR CATALOG -->
+<section class="section section-white section-watermark" id="vr">
+  <div class="section-collapse-header" onclick="toggleSection('vr')">
+    <div class="section-collapse-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 7v10a2 2 0 0 0 2 2h2.5l2 2-2-2h8.5a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 13a3 3 0 1 1 6 0 3 3 0 0 1-6 0z" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <span class="section-collapse-title">Catálogo de Software VR</span>
+    <div class="section-collapse-chevron">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+  <div class="section-body" style="max-height:none">
+    <div class="container">
+      <div class="sec-header reveal">
+        <div class="sec-tag"><span class="dot"></span> Realidad Virtual</div>
+        <h2 class="serif">Catálogo de Software VR</h2>
+        <p>Explora las mejores aplicaciones de realidad virtual disponibles para cada carrera.</p>
+      </div>
+
+      <!-- VR Tabs -->
+      <div class="reveal d1">
+        <div class="vr-tabs-nav">
+          <button class="vr-tab-btn active" onclick="switchVRTab('Médico Cirujano',this)">🏥 Médico Cirujano</button>
+          <button class="vr-tab-btn" onclick="switchVRTab('Enfermería',this)">⚕️ Enfermería</button>
+          <button class="vr-tab-btn" onclick="switchVRTab('Biología',this)">🧬 Biología</button>
+          <button class="vr-tab-btn" onclick="switchVRTab('Psicología',this)">🧠 Psicología</button>
+          <button class="vr-tab-btn" onclick="switchVRTab('Cirujano Dentista',this)">🦷 Cirujano Dentista</button>
+        </div>
+        <div id="vr-Médico Cirujano" class="vr-tab-content active" style="margin-top:40px"></div>
+        <div id="vr-Enfermería" class="vr-tab-content" style="margin-top:40px"></div>
+        <div id="vr-Biología" class="vr-tab-content" style="margin-top:40px"></div>
+        <div id="vr-Psicología" class="vr-tab-content" style="margin-top:40px"></div>
+        <div id="vr-Cirujano Dentista" class="vr-tab-content" style="margin-top:40px"></div>
+      </div>
+    </div>
   </div>
 </section>
 
 <!-- CONTACTO -->
-<section class="section section-white" id="contacto">
-  <div class="container-md">
-    <div class="sec-header reveal">
-      <div class="sec-tag"><span class="dot"></span> Contáctenos</div>
-      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
-      <h2 class="serif">Contacto</h2>
-      <p>Estamos a su disposición para resolver cualquier duda.</p>
+<section class="section section-white section-watermark" id="contacto">
+  <div class="section-collapse-header" onclick="toggleSection('contacto')">
+    <div class="section-collapse-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="2" stroke="var(--gold)" stroke-width="2"/><path d="M2 4l10 8 10-8" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
-    <div class="card-grid card-grid-2" style="align-items:start">
+    <span class="section-collapse-title">Contacto</span>
+    <div class="section-collapse-chevron">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+  <div class="section-body" style="max-height:none">
+    <div class="container-md">
+      <div class="sec-header reveal">
+        <div class="sec-tag"><span class="dot"></span> Contáctenos</div>
+        <h2 class="serif">Contacto</h2>
+        <p>Estamos a su disposición para resolver cualquier duda.</p>
+      </div>
+      <div class="card-grid card-grid-2" style="align-items:start">
       <div class="reveal from-right d1">
         <div style="display:flex;flex-direction:column;gap:8px">
           <div class="contact-card">
@@ -1346,6 +1581,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
         </form>
       </div>
     </div>
+    </div>
   </div>
 </section>
 
@@ -1371,6 +1607,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
         <a href="#cursos" class="footer-link">Cursos</a>
         <a href="#comunidad" class="footer-link">Comunidad</a>
         <a href="#badges" class="footer-link">Logros</a>
+        <a href="#vr" class="footer-link">Catálogo VR</a>
         <a href="#contacto" class="footer-link">Contacto</a>
       </div>
       <div>
@@ -1596,6 +1833,47 @@ const galeriaItems=[
   {l:'Colaboración',e:'🤝',g:'linear-gradient(135deg,#8B5CF6,#A855F7)'}
 ];
 
+const vrCatalog={
+  'Médico Cirujano':[
+    {name:'Human Anatomy VR for Institutions',desc:'Experiencia educativa inmersiva de anatomía humana con modelos 3D de alta calidad.',ventajas:'Modelos detallados, múltiples sistemas anatómicos, ideal para estudio institucional',desventajas:'Requiere headset VR de gama media-alta, costo de licencia institucional'},
+    {name:'Medical Holodeck',desc:'Plataforma de simulación médica en realidad virtual para entrenamiento clínico.',ventajas:'Simulaciones realistas, múltiples escenarios clínicos, seguimiento de progreso',desventajas:'Requiere hardware potente, curva de aprendizaje inicial'},
+    {name:'Anatomy X',desc:'Atlas anatómico interactivo en VR con visualización detallada de estructuras.',ventajas:'Interfaz intuitiva, buena resolución de modelos, múltiples modos de visualización',desventajas:'Catálogo limitado comparado con competidores, actualizaciones poco frecuentes'},
+    {name:'3D Organon XR',desc:'Aplicación de anatomía en realidad mixta con modelos certificados médicamente.',ventajas:'Certificación médica, compatible con múltiples dispositivos XR, más de 15,000 estructuras',desventajas:'Suscripción costosa, requiere conexión estable'},
+    {name:'VR Anatomy Lab',desc:'Laboratorio virtual de anatomía con disección interactiva.',ventajas:'Disección virtual realista, ideal para práctica previa, sin necesidad de cadáveres',desventajas:'Limitado a anatomía macro, sin patologías'},
+    {name:'Awake Heart',desc:'Simulador cardíaco en VR para entender la anatomía y fisiología del corazón.',ventajas:'Especializado en cardiología, animaciones dinámicas, educativo',desventajas:'Muy específico (solo corazón), contenido limitado'},
+    {name:'Oxford Medical Simulation',desc:'Simulaciones clínicas basadas en casos reales con pacientes virtuales.',ventajas:'Casos clínicos realistas, feedback inmediato, reconocido internacionalmente',desventajas:'Requiere licencia institucional costosa, en inglés'},
+    {name:'Nanome AppLab',desc:'Visualización molecular y trabajo colaborativo en VR para investigación.',ventajas:'Colaboración en tiempo real, visualización molecular avanzada, gratuito en AppLab',desventajas:'Orientado a investigación molecular, curva de aprendizaje'},
+    {name:'ONE LAB VR',desc:'Laboratorio virtual multidisciplinario para prácticas de ciencias de la salud.',ventajas:'Múltiples disciplinas, entorno seguro para práctica, repetible',desventajas:'Limitado en procedimientos avanzados'}
+  ],
+  'Enfermería':[
+    {name:'AcroXeR NursingVR',desc:'Simulador de enfermería en VR para prácticas de procedimientos clínicos.',ventajas:'Procedimientos específicos de enfermería, evaluación automática, repetible',desventajas:'Catálogo de procedimientos en desarrollo, interfaz básica'},
+    {name:'VR Nurse Sim By Simlogic',desc:'Simulador completo de escenarios de enfermería con pacientes virtuales.',ventajas:'Escenarios realistas, toma de decisiones clínicas, feedback detallado',desventajas:'Solo en inglés, requiere Quest 2 o superior'},
+    {name:'Aseptic Work - FarmasiaVR',desc:'Entrenamiento en técnicas asépticas y preparación farmacéutica en VR.',ventajas:'Específico para técnicas asépticas, entorno controlado, evaluación objetiva',desventajas:'Muy especializado, contenido limitado'},
+    {name:'Auscultation Training',desc:'Entrenamiento en auscultación con sonidos cardíacos y pulmonares en VR.',ventajas:'Sonidos reales, múltiples patologías, práctica repetible',desventajas:'Solo auscultación, requiere auriculares de calidad'},
+    {name:'Panoee',desc:'Plataforma de tours virtuales 360° para entornos hospitalarios y clínicos.',ventajas:'Fácil creación de tours, accesible sin headset, personalizable',desventajas:'No es VR inmersiva completa, limitado a visualización'}
+  ],
+  'Biología':[
+    {name:'Dissection Simulator Frog Edition',desc:'Simulador de disección virtual de rana con guía paso a paso.',ventajas:'Alternativa ética a disección real, repetible, guía interactiva',desventajas:'Solo rana, gráficos básicos'},
+    {name:'Nanome AppLab',desc:'Visualización molecular y colaboración en VR para estudio biológico.',ventajas:'Visualización 3D de moléculas, colaborativo, gratuito',desventajas:'Enfocado en nivel molecular, requiere conocimientos previos'},
+    {name:'Veterinary Anatomy and Physiology',desc:'Atlas de anatomía veterinaria en VR con modelos animales detallados.',ventajas:'Modelos animales detallados, múltiples especies, interactivo',desventajas:'Enfocado en veterinaria, no cubre todas las especies'},
+    {name:'Panoee',desc:'Tours virtuales 360° para ecosistemas y ambientes naturales.',ventajas:'Visualización de ecosistemas, accesible, personalizable',desventajas:'Experiencia pasiva, no interactiva'}
+  ],
+  'Psicología':[
+    {name:'Human Brain Time',desc:'Exploración interactiva del cerebro humano en VR con línea temporal evolutiva.',ventajas:'Perspectiva neurocientífica, visualización cerebral detallada, educativo',desventajas:'Contenido en inglés, enfoque limitado'},
+    {name:'Alcohol and Your Brain',desc:'Experiencia educativa sobre los efectos del alcohol en el cerebro.',ventajas:'Visualización de efectos, educativo para prevención, impactante',desventajas:'Muy específico, contenido breve'},
+    {name:'Liminal',desc:'Experiencias inmersivas de relajación y mindfulness en VR.',ventajas:'Entornos relajantes, útil para terapia, variedad de ambientes',desventajas:'No es herramienta clínica certificada'},
+    {name:'TRIPP',desc:'Plataforma de meditación y bienestar mental en realidad virtual.',ventajas:'Meditaciones guiadas en VR, seguimiento de progreso, premium',desventajas:'Suscripción requerida, efectividad no clínicamente validada'},
+    {name:'Bodyswaps',desc:'Simulación de escenarios interpersonales para desarrollo de soft skills.',ventajas:'Escenarios de comunicación, empatía virtual, feedback IA',desventajas:'Enfocado en soft skills, no clínico'},
+    {name:'AI Therapist',desc:'Simulador de sesiones terapéuticas con pacientes virtuales para práctica.',ventajas:'Práctica segura de técnicas terapéuticas, múltiples perfiles, IA adaptativa',desventajas:'No sustituye supervisión clínica real, respuestas limitadas'},
+    {name:'FloatVR Relaxation',desc:'Experiencia de flotación virtual para relajación y reducción de estrés.',ventajas:'Experiencia inmersiva de relajación, fácil de usar, efectos sensoriales',desventajas:'Uso limitado, no terapéutico'}
+  ],
+  'Cirujano Dentista':[
+    {name:'Anatomy X',desc:'Atlas anatómico interactivo con enfoque en estructuras craneofaciales.',ventajas:'Detalle craneofacial, interactivo, múltiples capas anatómicas',desventajas:'No específico para odontología, general'},
+    {name:'3D Organon XR',desc:'Anatomía dental y maxilofacial en realidad mixta con modelos certificados.',ventajas:'Modelos certificados, detalle dental, compatible con múltiples dispositivos',desventajas:'Costo de suscripción, requiere setup'},
+    {name:'Human Anatomy VR for Institutions',desc:'Anatomía general con módulos de cabeza y cuello relevantes para odontología.',ventajas:'Módulos de cabeza/cuello, calidad institucional, detallado',desventajas:'No específico dental, requiere filtrar contenido relevante'}
+  ]
+};
+
 /* ─── RENDER ─── */
 // Carreras
 const cg=document.getElementById('carrerasGrid');
@@ -1661,6 +1939,48 @@ galeriaItems.forEach((g,i)=>{
   </div>`;
 });
 
+// VR Catalog
+function renderVRCatalog(carrera){
+  const softwareList=vrCatalog[carrera]||[];
+  let html='';
+  softwareList.forEach(soft=>{
+    html+=`<div class="vr-software-card">
+      <h3>${soft.name}</h3>
+      <p class="desc">${soft.desc}</p>
+      <div class="vr-software-detail">
+        <div class="vr-software-detail-label">VENTAJAS</div>
+        <div class="vr-software-detail-text">${soft.ventajas}</div>
+      </div>
+      <div class="vr-software-detail">
+        <div class="vr-software-detail-label">DESVENTAJAS</div>
+        <div class="vr-software-detail-text">${soft.desventajas}</div>
+      </div>
+    </div>`;
+  });
+  return html;
+}
+function switchVRTab(carrera,btn){
+  document.querySelectorAll('.vr-tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.vr-tab-content').forEach(el=>el.classList.remove('active'));
+  const tabId='vr-'+carrera;
+  const tab=document.getElementById(tabId);
+  if(tab){
+    tab.classList.add('active');
+    if(!tab.innerHTML.trim()){
+      tab.innerHTML=renderVRCatalog(carrera);
+    }
+  }
+}
+// Initialize VR catalog
+Object.keys(vrCatalog).forEach(carrera=>{
+  const tabId='vr-'+carrera;
+  const tab=document.getElementById(tabId);
+  if(tab&&carrera==='Médico Cirujano'){
+    tab.innerHTML=renderVRCatalog(carrera);
+  }
+});
+
 /* ─── ESCAPE HTML ─── */
 function escapeHTML(text){
   if(!text)return '';
@@ -1675,7 +1995,7 @@ window.addEventListener('scroll',()=>{
   document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>60);
   // Active nav
   const y=window.scrollY+260;
-  const secs=['inicio','quienes','servicios','solicitud','espacio','telemedicina','contacto'];
+  const secs=['inicio','quienes','servicios','solicitud','espacio','telemedicina','impacto','galeria','cursos','comunidad','badges','vr','contacto'];
   for(let i=secs.length-1;i>=0;i--){
     const el=document.getElementById(secs[i]);
     if(el&&el.offsetTop<=y){
@@ -1764,6 +2084,22 @@ function toggleAccordion(idx){
   const isOpen=item.classList.contains('open');
   document.querySelectorAll('.accordion-item').forEach(el=>el.classList.remove('open'));
   if(!isOpen)item.classList.add('open');
+}
+function toggleSection(sectionId){
+  const section=document.getElementById(sectionId);
+  if(!section)return;
+  section.classList.toggle('section-collapsed');
+  const body=section.querySelector('.section-body');
+  if(body&&!section.classList.contains('section-collapsed')){
+    body.style.maxHeight=body.scrollHeight+'px';
+    setTimeout(()=>{body.style.maxHeight='none';},600);
+  }else if(body){
+    body.style.maxHeight=body.scrollHeight+'px';
+    requestAnimationFrame(()=>{body.style.maxHeight='0';});
+  }
+  setTimeout(()=>{
+    document.querySelectorAll('.reveal:not(.visible)').forEach(el=>observer.observe(el));
+  },100);
 }
 function switchTab(group,id,btn){
   btn.parentElement.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
