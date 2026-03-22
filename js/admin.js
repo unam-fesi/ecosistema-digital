@@ -82,7 +82,7 @@ async function fetchSolicitudesServicios() {
     const { data, error } = await supabaseClient
       .from('solicitudes_servicios')
       .select('*')
-      .order('fecha_solicitud', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     allServicios = data || [];
@@ -102,7 +102,7 @@ async function fetchSolicitudesEspacios() {
     const { data, error } = await supabaseClient
       .from('solicitudes_espacios')
       .select('*')
-      .order('fecha_solicitud', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     allEspacios = data || [];
@@ -122,7 +122,7 @@ async function fetchSolicitudesAsesoria() {
     const { data, error } = await supabaseClient
       .from('solicitudes_asesoria')
       .select('*')
-      .order('fecha_solicitud', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     allAsesoria = data || [];
@@ -142,7 +142,7 @@ async function fetchContactos() {
     const { data, error } = await supabaseClient
       .from('contactos')
       .select('*')
-      .order('fecha', { ascending: false });
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     allContactos = data || [];
@@ -165,8 +165,8 @@ async function fetchSeguimientos(tipo, id) {
       .from('seguimientos')
       .select('*')
       .eq('tipo_solicitud', tipo)
-      .eq('id_solicitud', id)
-      .order('fecha_creacion', { ascending: false });
+      .eq('solicitud_id', id)
+      .order('created_at', { ascending: false });
 
     if (error) throw error;
     return data || [];
@@ -260,9 +260,8 @@ async function addSeguimiento(tipo, id, nota) {
       .from('seguimientos')
       .insert([{
         tipo_solicitud: tipo,
-        id_solicitud: id,
-        nota,
-        fecha_creacion: new Date().toISOString()
+        solicitud_id: id,
+        nota
       }]);
 
     if (error) throw error;
@@ -292,7 +291,7 @@ function renderTableServicios() {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${escapeHTML(item.id)}</td>
-      <td>${formatDate(item.fecha_solicitud)}</td>
+      <td>${formatDate(item.created_at)}</td>
       <td>${escapeHTML(item.nombre_solicitante || 'N/A')}</td>
       <td>${escapeHTML(item.tipo_servicio || 'N/A')}</td>
       <td>${escapeHTML(item.modalidad || 'N/A')}</td>
@@ -319,7 +318,7 @@ function renderTableEspacios() {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${escapeHTML(item.id)}</td>
-      <td>${formatDate(item.fecha_solicitud)}</td>
+      <td>${formatDate(item.created_at)}</td>
       <td>${escapeHTML(item.nombre_solicitante || 'N/A')}</td>
       <td>${escapeHTML(item.motivo || 'N/A')}</td>
       <td>${formatDate(item.fecha_reserva)}</td>
@@ -347,7 +346,7 @@ function renderTableAsesoria() {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${escapeHTML(item.id)}</td>
-      <td>${formatDate(item.fecha_solicitud)}</td>
+      <td>${formatDate(item.created_at)}</td>
       <td>${escapeHTML(item.nombre_solicitante || 'N/A')}</td>
       <td>${escapeHTML(item.tipo_asesoria || 'N/A')}</td>
       <td>${escapeHTML(item.modalidad || 'N/A')}</td>
@@ -374,7 +373,7 @@ function renderTableContactos() {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${escapeHTML(item.id)}</td>
-      <td>${formatDate(item.fecha)}</td>
+      <td>${formatDate(item.created_at)}</td>
       <td>${escapeHTML(item.nombre || 'N/A')}</td>
       <td>${escapeHTML(item.correo || 'N/A')}</td>
       <td>${escapeHTML(item.asunto || 'N/A')}</td>
@@ -430,7 +429,7 @@ async function showDetailModal(tipo, id) {
         <label>ID:</label> <span>${escapeHTML(item.id)}</span>
       </div>
       <div class="info-group">
-        <label>Fecha:</label> <span>${formatDate(item.fecha_solicitud)}</span>
+        <label>Fecha:</label> <span>${formatDate(item.created_at)}</span>
       </div>
       <div class="info-group">
         <label>Nombre:</label> <span>${escapeHTML(item.nombre_solicitante || 'N/A')}</span>
@@ -473,7 +472,7 @@ async function showDetailModal(tipo, id) {
         <label>ID:</label> <span>${escapeHTML(item.id)}</span>
       </div>
       <div class="info-group">
-        <label>Fecha:</label> <span>${formatDate(item.fecha_solicitud)}</span>
+        <label>Fecha:</label> <span>${formatDate(item.created_at)}</span>
       </div>
       <div class="info-group">
         <label>Nombre:</label> <span>${escapeHTML(item.nombre_solicitante || 'N/A')}</span>
@@ -522,7 +521,7 @@ async function showDetailModal(tipo, id) {
         <label>ID:</label> <span>${escapeHTML(item.id)}</span>
       </div>
       <div class="info-group">
-        <label>Fecha:</label> <span>${formatDate(item.fecha_solicitud)}</span>
+        <label>Fecha:</label> <span>${formatDate(item.created_at)}</span>
       </div>
       <div class="info-group">
         <label>Nombre:</label> <span>${escapeHTML(item.nombre_solicitante || 'N/A')}</span>
@@ -565,7 +564,7 @@ async function showDetailModal(tipo, id) {
         <label>ID:</label> <span>${escapeHTML(item.id)}</span>
       </div>
       <div class="info-group">
-        <label>Fecha:</label> <span>${formatDate(item.fecha)}</span>
+        <label>Fecha:</label> <span>${formatDate(item.created_at)}</span>
       </div>
       <div class="info-group">
         <label>Nombre:</label> <span>${escapeHTML(item.nombre || 'N/A')}</span>
@@ -602,7 +601,7 @@ async function showDetailModal(tipo, id) {
     seguimientos.forEach(seg => {
       infoHTML += `
         <div class="timeline-item">
-          <div class="timeline-date">${formatDate(seg.fecha_creacion)}</div>
+          <div class="timeline-date">${formatDate(seg.created_at)}</div>
           <div class="timeline-content">${escapeHTML(seg.nota)}</div>
         </div>
       `;
@@ -780,7 +779,7 @@ function renderChartTendencia() {
 
   // Contar solicitudes por fecha
   allItems.forEach(item => {
-    const itemDate = item.fecha_solicitud || item.fecha;
+    const itemDate = item.created_at || item.fecha;
     if (itemDate) {
       const dateStr = itemDate.split('T')[0];
       if (dates[dateStr] !== undefined) {
@@ -894,7 +893,7 @@ function exportToCSV(tipo) {
           value = item.id;
           break;
         case 'Fecha':
-          value = formatDate(item.fecha_solicitud || item.fecha);
+          value = formatDate(item.created_at || item.fecha);
           break;
         case 'Nombre':
           value = item.nombre_solicitante || item.nombre || '';
@@ -1099,3 +1098,195 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   console.log('Admin panel initialized');
 });
+
+// ============= SENTIMENT ANALYSIS FUNCTION =============
+
+/**
+ * Ejecuta análisis de sentimiento en todos los datos usando PUM-AI
+ */
+async function runSentimentAnalysis() {
+  const spinner = document.getElementById('sentimentLoadingSpinner');
+  const resultsArea = document.getElementById('sentimentResultsArea');
+  const errorArea = document.getElementById('sentimentErrorArea');
+
+  // Show loading state
+  spinner.style.display = 'block';
+  resultsArea.style.display = 'none';
+  errorArea.style.display = 'none';
+
+  try {
+    // Collect all text data from the 4 arrays
+    let allTexts = [];
+
+    // From allServicios - collect descripcion
+    allServicios.forEach(item => {
+      if (item.descripcion) {
+        allTexts.push(item.descripcion);
+      }
+    });
+
+    // From allEspacios - collect motivo and observaciones
+    allEspacios.forEach(item => {
+      if (item.motivo) allTexts.push(item.motivo);
+      if (item.observaciones) allTexts.push(item.observaciones);
+    });
+
+    // From allAsesoria - collect descripcion and observaciones
+    allAsesoria.forEach(item => {
+      if (item.descripcion) allTexts.push(item.descripcion);
+      if (item.observaciones) allTexts.push(item.observaciones);
+    });
+
+    // From allContactos - collect mensaje and comentarios
+    allContactos.forEach(item => {
+      if (item.mensaje) allTexts.push(item.mensaje);
+      if (item.comentarios) allTexts.push(item.comentarios);
+    });
+
+    if (allTexts.length === 0) {
+      throw new Error('No hay datos de texto para analizar. Por favor, asegúrate de que hay solicitudes o comentarios en el sistema.');
+    }
+
+    // Create the analysis prompt in Spanish
+    const prompt = `Como un experto en análisis de retroalimentación, por favor analiza el siguiente texto recopilado de descripciones, comentarios y mensajes de usuarios sobre nuestros servicios. Proporciona un análisis estructurado con las siguientes secciones:
+
+TEXTO A ANALIZAR:
+${allTexts.join('\n---\n')}
+
+Por favor, proporciona tu respuesta en las siguientes secciones exactas:
+
+## RESUMEN GENERAL
+Proporciona una evaluación general del sentimiento y satisfacción de los usuarios (positivo, neutral, negativo o mixto). Incluye porcentajes estimados.
+
+## LO QUE HACEMOS BIEN
+Lista los 3-5 aspectos más positivos mencionados por los usuarios que funcionan bien en nuestros servicios.
+
+## ÁREAS DE MEJORA
+Lista los 3-5 aspectos principales que los usuarios sienten que necesitan mejora o que generan insatisfacción.
+
+## ACCIONES RECOMENDADAS
+Proporciona 4-6 acciones específicas y concretas que podemos tomar para mejorar la experiencia basadas en el análisis.
+
+Asegúrate de que tu respuesta sea práctica, accionable y esté fundamentada en los comentarios reales de los usuarios.`;
+
+    // Get Supabase configuration from window (should be set in index.html or main script)
+    if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+      throw new Error('Configuración de Supabase no encontrada. Por favor, recarga la página.');
+    }
+
+    // Call the Supabase edge function
+    const response = await fetch(
+      window.SUPABASE_URL + '/functions/v1/gemini-chat',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + window.SUPABASE_ANON_KEY
+        },
+        body: JSON.stringify({
+          messages: [
+            {
+              role: 'user',
+              parts: [
+                { text: prompt }
+              ]
+            }
+          ]
+        })
+      }
+    );
+
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('API response:', errorData);
+      throw new Error('Error en la API: ' + response.status + ' ' + response.statusText);
+    }
+
+    const data = await response.json();
+
+    // Extract the response text
+    let responseText = '';
+    if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+      responseText = data.candidates[0].content.parts[0].text;
+    } else if (data.text) {
+      responseText = data.text;
+    } else {
+      throw new Error('Formato de respuesta inesperado de la API');
+    }
+
+    // Parse the response and display it
+    displaySentimentResults(responseText);
+
+    // Show results
+    spinner.style.display = 'none';
+    resultsArea.style.display = 'block';
+    errorArea.style.display = 'none';
+
+  } catch (error) {
+    console.error('Error in sentiment analysis:', error);
+
+    // Show error
+    spinner.style.display = 'none';
+    resultsArea.style.display = 'none';
+    errorArea.style.display = 'block';
+    document.getElementById('sentimentErrorMessage').textContent = error.message;
+  }
+}
+
+/**
+ * Parses and displays sentiment analysis results
+ * @param {string} responseText - Raw response text from the API
+ */
+function displaySentimentResults(responseText) {
+  // Parse the response into sections
+  const summaryMatch = responseText.match(/## RESUMEN GENERAL\n([\s\S]*?)(?=## LO QUE HACEMOS BIEN|$)/);
+  const strengthsMatch = responseText.match(/## LO QUE HACEMOS BIEN\n([\s\S]*?)(?=## ÁREAS DE MEJORA|$)/);
+  const improvementsMatch = responseText.match(/## ÁREAS DE MEJORA\n([\s\S]*?)(?=## ACCIONES RECOMENDADAS|$)/);
+  const actionsMatch = responseText.match(/## ACCIONES RECOMENDADAS\n([\s\S]*?)$/);
+
+  // Function to convert markdown-like formatting to HTML
+  function formatContent(text) {
+    if (!text) return '';
+
+    // Escape HTML first
+    text = escapeHTML(text);
+
+    // Convert markdown-style lists to HTML
+    text = text.replace(/^\s*[-•*]\s+/gm, '<li>');
+    text = text.replace(/\n(?=\s*[-•*])/g, '</li>\n');
+    text = text.replace(/^(?!<li>)/gm, (match, offset, string) => {
+      const beforeChar = offset > 0 ? string[offset - 1] : '';
+      if (beforeChar === '\n' && string[offset] !== '<') return '';
+      return match;
+    });
+
+    // If there are list items, wrap them in a ul
+    if (text.includes('<li>')) {
+      text = '<ul style="margin: 10px 0; padding-left: 20px;">' + text.trim() + '</li></ul>';
+    }
+
+    // Convert line breaks to paragraphs for regular text
+    if (!text.includes('<ul>')) {
+      text = text.split('\n\n').map(para => {
+        para = para.trim();
+        if (para && !para.startsWith('<')) {
+          return '<p style="margin: 10px 0;">' + para + '</p>';
+        }
+        return para;
+      }).join('');
+    }
+
+    return text;
+  }
+
+  // Display each section
+  const summaryText = summaryMatch ? summaryMatch[1].trim() : 'No se pudo extraer el resumen.';
+  const strengthsText = strengthsMatch ? strengthsMatch[1].trim() : 'No se pudieron extraer los puntos fuertes.';
+  const improvementsText = improvementsMatch ? improvementsMatch[1].trim() : 'No se pudieron extraer las áreas de mejora.';
+  const actionsText = actionsMatch ? actionsMatch[1].trim() : 'No se pudieron extraer las acciones recomendadas.';
+
+  document.getElementById('sentimentSummary').innerHTML = formatContent(summaryText);
+  document.getElementById('sentimentStrengths').innerHTML = formatContent(strengthsText);
+  document.getElementById('sentimentImprovements').innerHTML = formatContent(improvementsText);
+  document.getElementById('sentimentActions').innerHTML = formatContent(actionsText);
+}
