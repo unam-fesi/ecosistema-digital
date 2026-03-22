@@ -1919,6 +1919,7 @@ Asegúrate de que tu respuesta sea práctica, accionable y esté fundamentada en
           'Authorization': 'Bearer ' + window.SUPABASE_ANON_KEY
         },
         body: JSON.stringify({
+          mode: 'analysis',
           messages: [
             {
               role: 'user',
@@ -2017,6 +2018,18 @@ function displaySentimentResults(responseText) {
     }
 
     return text;
+  }
+
+  // If no sections found at all, put ALL text in summary and show friendly messages in others
+  const noSections = !summaryMatch && !strengthsMatch && !improvementsMatch && !actionsMatch;
+
+  if (noSections) {
+    // Display full response in the summary area
+    document.getElementById('sentimentSummary').innerHTML = formatContent(txt);
+    document.getElementById('sentimentStrengths').innerHTML = '<p style="color:#64748B;font-style:italic">El análisis completo se muestra arriba.</p>';
+    document.getElementById('sentimentImprovements').innerHTML = '<p style="color:#64748B;font-style:italic">El análisis completo se muestra arriba.</p>';
+    document.getElementById('sentimentActions').innerHTML = '<p style="color:#64748B;font-style:italic">El análisis completo se muestra arriba.</p>';
+    return;
   }
 
   // Display each section
