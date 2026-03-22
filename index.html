@@ -402,6 +402,45 @@ body { font-family:'Inter',system-ui,-apple-system,sans-serif; color:#1E293B; ba
   color:var(--navy); font-weight:500; transition:all 0.2s; }
 .acc-tag:hover { background:rgba(196,162,78,0.1); color:var(--navy); }
 
+/* ─── SERVICIOS CARDS ─── */
+.servicios-cards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:24px; }
+.servicio-card { background:#fff; border:1.5px solid #E8ECF1; border-radius:20px; padding:32px 24px;
+  text-align:center; cursor:pointer; transition:all 0.5s cubic-bezier(.22,1,.36,1);
+  position:relative; overflow:hidden; }
+.servicio-card::before { content:''; position:absolute; inset:0; opacity:0;
+  transition:opacity 0.5s; border-radius:20px; }
+.servicio-card:hover { transform:translateY(-10px); border-color:transparent;
+  box-shadow:0 20px 60px rgba(12,35,64,0.12), 0 0 0 1px rgba(196,162,78,0.2); }
+.servicio-card:hover::before { opacity:1; }
+.servicio-card-emoji { font-size:48px; margin-bottom:16px; display:block;
+  transition:transform 0.4s; }
+.servicio-card:hover .servicio-card-emoji { transform:scale(1.15) rotate(-5deg); }
+.servicio-card-title { font-size:18px; font-weight:700; color:var(--navy); margin-bottom:10px; }
+.servicio-card-desc { font-size:13px; color:#64748B; line-height:1.7; margin-bottom:16px; }
+.servicio-card-tags { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; }
+.servicio-card-tag { font-size:11px; padding:4px 10px; border-radius:6px;
+  background:rgba(12,35,64,0.04); color:var(--navy); font-weight:500; }
+.servicio-card-cta { display:inline-flex; align-items:center; gap:6px; margin-top:16px;
+  font-size:13px; font-weight:600; color:var(--gold); }
+
+/* Servicio Detail Modal */
+.servicio-modal-overlay { position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(8px); display:none; align-items:center; justify-content:center;
+  opacity:0; transition:opacity 0.35s; }
+.servicio-modal-overlay.active { display:flex; opacity:1; }
+.servicio-modal-card { background:#fff; border-radius:24px; width:90%; max-width:560px;
+  max-height:85vh; overflow-y:auto; position:relative;
+  animation:modalIn 0.5s cubic-bezier(.22,1,.36,1) both; }
+.servicio-modal-close { position:absolute; top:16px; right:16px; width:36px; height:36px;
+  border-radius:10px; border:none; background:rgba(0,0,0,0.06); cursor:pointer;
+  font-size:18px; display:flex; align-items:center; justify-content:center;
+  color:#64748B; transition:all 0.2s; z-index:2; }
+.servicio-modal-close:hover { background:rgba(0,0,0,0.1); color:#1E293B; }
+.servicio-modal-header { padding:40px 32px 24px; text-align:center; }
+.servicio-modal-emoji { font-size:56px; display:block; margin-bottom:16px; }
+.servicio-modal-header h2 { font-size:24px; font-weight:800; color:var(--navy); }
+.servicio-modal-body { padding:0 32px 32px; }
+
 /* ─── CARRERAS ─── */
 .carreras-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:16px; }
 .carrera-card { background:#fff; border:1px solid #E8ECF1; border-radius:16px;
@@ -481,8 +520,26 @@ select.input { appearance:none;
 .counter-label { font-size:13px; color:rgba(255,255,255,0.55); font-weight:500; }
 
 /* ─── GALLERY ─── */
+/* ─── ENTORNO TECNOLÓGICO CARDS ─── */
+.entorno-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:24px; }
+.entorno-card { border-radius:20px; overflow:hidden; position:relative; cursor:pointer;
+  background:#fff; border:1.5px solid #E8ECF1;
+  transition:all 0.5s cubic-bezier(.22,1,.36,1); }
+.entorno-card:hover { transform:translateY(-10px);
+  box-shadow:0 24px 60px rgba(0,0,0,0.12); border-color:rgba(196,162,78,0.3); }
+.entorno-card-img { width:100%; height:200px; object-fit:cover; display:block;
+  transition:transform 0.5s; }
+.entorno-card:hover .entorno-card-img { transform:scale(1.05); }
+.entorno-card-body { padding:20px; }
+.entorno-card-title { font-size:16px; font-weight:700; color:var(--navy); margin-bottom:8px;
+  display:flex; align-items:center; gap:8px; }
+.entorno-card-desc { font-size:13px; color:#64748B; line-height:1.7;
+  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+.entorno-card-cta { display:inline-flex; align-items:center; gap:6px; margin-top:12px;
+  font-size:12px; font-weight:600; color:var(--gold); }
+/* Legacy gallery classes kept for compatibility */
 .gallery-item { border-radius:var(--radius); overflow:hidden; position:relative;
-  height:210px; cursor:default; transition:all 0.5s cubic-bezier(.22,1,.36,1); }
+  height:210px; cursor:pointer; transition:all 0.5s cubic-bezier(.22,1,.36,1); }
 .gallery-item:hover { transform:translateY(-10px) scale(1.02);
   box-shadow:0 24px 80px rgba(0,0,0,0.25); }
 .gallery-bg { position:absolute; inset:0; opacity:0.85; transition:opacity 0.4s; }
@@ -493,11 +550,26 @@ select.input { appearance:none;
 .gallery-item:hover .emoji { transform:scale(1.2) translateY(-5px); }
 .gallery-content p { font-size:15px; font-weight:700; color:#fff; text-align:center;
   text-shadow:0 2px 10px rgba(0,0,0,0.35); }
-/* Shine overlay */
 .gallery-item::after { content:''; position:absolute; inset:0; opacity:0;
   background:linear-gradient(135deg,rgba(255,255,255,0.15) 0%,transparent 50%);
   transition:opacity 0.4s; }
 .gallery-item:hover::after { opacity:1; }
+
+/* ─── LABORATORIO PRÓXIMAMENTE ─── */
+.lab-proximamente { text-align:center; padding:40px 20px; margin-bottom:32px; }
+.lab-proximamente-text {
+  font-family:'Playfair Display',serif; font-size:clamp(36px,6vw,64px); font-weight:900;
+  letter-spacing:8px; color:transparent;
+  background:linear-gradient(135deg,var(--gold),var(--navy),var(--gold),var(--navy-light));
+  background-size:300% 300%;
+  -webkit-background-clip:text; background-clip:text;
+  animation:gradientShift 4s ease-in-out infinite;
+  text-shadow:none; position:relative;
+}
+@keyframes gradientShift {
+  0%,100% { background-position:0% 50%; }
+  50% { background-position:100% 50%; }
+}
 
 /* ─── CONTACT ─── */
 .contact-card { display:flex; gap:18px; align-items:flex-start; padding:22px;
@@ -766,6 +838,14 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   display:flex; align-items:center; justify-content:center; flex-shrink:0;
   transition:all 0.2s; }
 .pumai-send-btn:hover { transform:scale(1.08); box-shadow:0 4px 16px rgba(196,162,78,0.4); }
+.pumai-quick-actions { padding:16px; display:flex; flex-direction:column; gap:8px; background:#FAFBFC; }
+.pumai-action-btn { display:flex; align-items:center; gap:10px; padding:12px 16px;
+  background:#fff; border:1.5px solid #E2E8F0; border-radius:12px; cursor:pointer;
+  font-size:13px; font-family:'Inter',sans-serif; color:#334155; font-weight:600;
+  transition:all 0.25s; text-align:left; }
+.pumai-action-btn:hover { border-color:var(--gold); background:rgba(196,162,78,0.06);
+  transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.06); }
+.pumai-action-btn span { font-size:18px; }
 @media(max-width:440px) { .pumai-panel { right:8px; left:8px; width:auto; bottom:90px; } }
 
 /* ─── LOGIN MODAL ─── */
@@ -972,10 +1052,12 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
       <a href="#solicitud" data-section="solicitud">Solicitud</a>
       <a href="#espacio" data-section="espacio">Espacio</a>
       <a href="#telemedicina" data-section="telemedicina">Telemedicina</a>
+      <a href="#galeria" data-section="galeria">Entorno</a>
       <a href="#cursos" data-section="cursos">Cursos</a>
       <a href="#comunidad" data-section="comunidad">Comunidad</a>
       <a href="#badges" data-section="badges">Logros</a>
       <a href="#aula-inmersiva" data-section="aula-inmersiva">Aula</a>
+      <a href="#laboratorio" data-section="laboratorio">Lab</a>
       <a href="#contacto" data-section="contacto">Contacto</a>
       <a href="#" onclick="showLoginModal();return false" class="nav-login-btn" style="background:rgba(196,162,78,0.12);color:var(--gold);border:1px solid rgba(196,162,78,0.25);margin-left:8px;font-weight:600">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
@@ -992,7 +1074,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
     <a href="#inicio">Inicio</a><a href="#quienes">Quiénes somos</a>
     <a href="#servicios">Servicios</a><a href="#solicitud">Solicitud de servicios</a>
     <a href="#espacio">Uso del espacio</a><a href="#telemedicina">Telemedicina</a>
-    <a href="#cursos">Cursos</a><a href="#comunidad">Comunidad</a><a href="#badges">Logros</a><a href="#aula-inmersiva">Aula Inmersiva</a><a href="#contacto">Contacto</a>
+    <a href="#galeria">Entorno Tecnológico</a><a href="#cursos">Cursos</a><a href="#comunidad">Comunidad</a><a href="#badges">Logros</a><a href="#aula-inmersiva">Aula Inmersiva</a><a href="#laboratorio">Laboratorio</a><a href="#contacto">Contacto</a>
     <a href="#" onclick="showLoginModal();document.getElementById('mobileMenu').classList.remove('open');return false" style="color:var(--gold);border-top:1px solid rgba(196,162,78,0.15);margin-top:8px;padding-top:14px">🔐 Acceso</a>
   </div>
 </nav>
@@ -1140,7 +1222,8 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
         <h2 class="serif">Servicios del ecosistema</h2>
         <p>Soluciones tecnológicas para fortalecer la formación, la investigación y la atención.</p>
       </div>
-      <div class="accordion reveal d1" id="serviciosAccordion"></div>
+      <p class="reveal" style="text-align:center;color:#64748B;font-size:14px;margin-bottom:10px">Los servicios estarán disponibles en la <strong>Unidad de Tecnologías de la Información y Comunicación</strong>, próximamente.</p>
+      <div class="servicios-cards-grid reveal d1" id="serviciosCardsGrid"></div>
 
       <!-- VR CATALOG SUBSECTION -->
       <div id="vrCatalogSubsection" style="display:none;margin-top:40px;padding-top:30px;border-top:2px solid rgba(196,162,78,0.15)">
@@ -1400,7 +1483,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
         <h2 class="serif">Entorno tecnológico</h2>
         <p>Las áreas de innovación que convergen en nuestro ecosistema digital.</p>
       </div>
-      <div class="card-grid card-grid-4 reveal d1" id="galeriaGrid"></div>
+      <div class="entorno-grid" id="galeriaGrid"></div>
     </div>
   </div>
 </section>
@@ -1608,12 +1691,27 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
             <div style="flex:1;min-width:280px">
               <h3 class="serif" style="font-size:24px;color:var(--navy);margin-bottom:10px">Aula Inmersiva Interprofesional</h3>
               <p style="font-size:15px;color:#64748B;line-height:1.85;margin-bottom:18px">Entorno seguro de simulación clínica donde estudiantes de distintas carreras de salud desarrollan habilidades blandas esenciales mediante escenarios inmersivos con tecnología de vanguardia.</p>
-              <div style="display:flex;flex-wrap:wrap;gap:8px">
-                <span class="acc-tag" style="background:rgba(124,58,237,0.1);color:#7C3AED;border:1px solid rgba(124,58,237,0.2)">Trabajo en equipo</span>
-                <span class="acc-tag" style="background:rgba(37,99,235,0.1);color:#2563EB;border:1px solid rgba(37,99,235,0.2)">Comunicación efectiva</span>
-                <span class="acc-tag" style="background:rgba(5,150,105,0.1);color:#059669;border:1px solid rgba(5,150,105,0.2)">Análisis crítico</span>
-                <span class="acc-tag" style="background:rgba(234,88,12,0.1);color:#EA580C;border:1px solid rgba(234,88,12,0.2)">Manejo de la frustración</span>
-                <span class="acc-tag" style="background:rgba(220,38,38,0.1);color:#DC2626;border:1px solid rgba(220,38,38,0.2)">Seguridad del paciente</span>
+              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:4px">
+                <div style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:12px;padding:14px 12px;text-align:center">
+                  <div style="font-size:24px;margin-bottom:6px">🤝</div>
+                  <div style="font-size:12px;font-weight:700;color:#7C3AED">Trabajo en equipo</div>
+                </div>
+                <div style="background:rgba(37,99,235,0.06);border:1px solid rgba(37,99,235,0.15);border-radius:12px;padding:14px 12px;text-align:center">
+                  <div style="font-size:24px;margin-bottom:6px">💬</div>
+                  <div style="font-size:12px;font-weight:700;color:#2563EB">Comunicación efectiva</div>
+                </div>
+                <div style="background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.15);border-radius:12px;padding:14px 12px;text-align:center">
+                  <div style="font-size:24px;margin-bottom:6px">🧠</div>
+                  <div style="font-size:12px;font-weight:700;color:#059669">Análisis crítico</div>
+                </div>
+                <div style="background:rgba(234,88,12,0.06);border:1px solid rgba(234,88,12,0.15);border-radius:12px;padding:14px 12px;text-align:center">
+                  <div style="font-size:24px;margin-bottom:6px">💪</div>
+                  <div style="font-size:12px;font-weight:700;color:#EA580C">Manejo de frustración</div>
+                </div>
+                <div style="background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.15);border-radius:12px;padding:14px 12px;text-align:center">
+                  <div style="font-size:24px;margin-bottom:6px">🛡️</div>
+                  <div style="font-size:12px;font-weight:700;color:#DC2626">Seguridad del paciente</div>
+                </div>
               </div>
               <p style="margin-top:16px;font-size:13px;color:var(--gold);font-weight:600;display:flex;align-items:center;gap:6px">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
@@ -1627,8 +1725,63 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   </div>
 </section>
 
+<!-- LABORATORIO DE APLICACIONES -->
+<section class="section section-white section-collapsed" id="laboratorio">
+  <div class="section-collapse-header" onclick="toggleSection('laboratorio')">
+    <div class="section-collapse-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 3h6v2H9V3z" stroke="var(--gold)" stroke-width="2"/><path d="M8 5V3m8 2V3M5 8h14v13H5V8z" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/><path d="M9 12h6m-3-3v6" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/></svg>
+    </div>
+    <span class="section-collapse-title">Laboratorio de Aplicaciones</span>
+    <div class="section-collapse-chevron">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+  <div class="section-body" style="max-height:0">
+    <div class="container-md">
+      <div class="sec-header reveal">
+        <div class="sec-tag"><span class="dot"></span> Nuevo espacio</div>
+        <h2 class="serif">Laboratorio de Aplicaciones</h2>
+        <p>Un espacio para la creación, innovación y colaboración tecnológica.</p>
+      </div>
+
+      <div class="lab-proximamente reveal d1">
+        <div class="lab-proximamente-text">PRÓXIMAMENTE</div>
+      </div>
+
+      <div class="lab-description reveal d2" style="text-align:center;max-width:700px;margin:0 auto 40px">
+        <p style="font-size:15px;color:#475569;line-height:1.85">
+          El <strong>Laboratorio de Aplicaciones</strong> será un espacio ubicado en el edificio de tecnología, dedicado a la creación de material multitecnológico. Nace como una <strong>iniciativa estudiantil</strong> para fomentar la innovación, la colaboración interescolar y la investigación aplicada.
+        </p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;margin-bottom:40px">
+        <div class="card reveal d1" style="padding:28px;text-align:center">
+          <div style="font-size:40px;margin-bottom:12px">🏗️</div>
+          <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Creación Multitecnológica</h3>
+          <p style="font-size:13px;color:#64748B;line-height:1.7">Espacio equipado para la creación de material que integre múltiples tecnologías: IA, RV, RA, bases de datos y más.</p>
+        </div>
+        <div class="card reveal d2" style="padding:28px;text-align:center">
+          <div style="font-size:40px;margin-bottom:12px">🎓</div>
+          <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Iniciativa Estudiantil</h3>
+          <p style="font-size:13px;color:#64748B;line-height:1.7">Proyecto impulsado por estudiantes para estudiantes. Un espacio donde tus ideas cobran vida con el apoyo del Ecosistema Digital.</p>
+        </div>
+        <div class="card reveal d3" style="padding:28px;text-align:center">
+          <div style="font-size:40px;margin-bottom:12px">🤝</div>
+          <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Colaboración Interescolar</h3>
+          <p style="font-size:13px;color:#64748B;line-height:1.7">Colaboración entre carreras de ingeniería y FES Iztacala para proyectos de investigación y desarrollo tecnológico conjunto.</p>
+        </div>
+        <div class="card reveal d1" style="padding:28px;text-align:center">
+          <div style="font-size:40px;margin-bottom:12px">🔬</div>
+          <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Investigación Aplicada</h3>
+          <p style="font-size:13px;color:#64748B;line-height:1.7">Espacio para la investigación interdisciplinaria y la formación continua de docentes en tecnologías emergentes.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- CONTACTO -->
-<section class="section section-white section-collapsed" id="contacto">
+<section class="section section-cream section-collapsed" id="contacto">
   <div class="section-collapse-header" onclick="toggleSection('contacto')">
     <div class="section-collapse-icon">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="2" stroke="var(--gold)" stroke-width="2"/><path d="M2 4l10 8 10-8" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -2026,32 +2179,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 
 <!-- ═══ PUM-AI FLOATING BUTTON ═══ -->
 <div class="pumai-fab" id="pumaiBtn" onclick="toggleChat()">
-  <svg class="robot-icon" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Antenna -->
-    <circle cx="32" cy="6" r="4" fill="#C4A24E" opacity="0.9"><animate attributeName="r" values="4;5;4" dur="2s" repeatCount="indefinite"/></circle>
-    <line x1="32" y1="10" x2="32" y2="18" stroke="#C4A24E" stroke-width="2.5" stroke-linecap="round"/>
-    <!-- Head -->
-    <rect x="14" y="18" width="36" height="28" rx="10" fill="#fff" stroke="#C4A24E" stroke-width="2"/>
-    <!-- Eyes -->
-    <circle cx="24" cy="30" r="4" fill="#0C2340"><animate attributeName="cy" values="30;28;30" dur="3s" repeatCount="indefinite"/></circle>
-    <circle cx="40" cy="30" r="4" fill="#0C2340"><animate attributeName="cy" values="30;28;30" dur="3s" repeatCount="indefinite"/></circle>
-    <!-- Eye shine -->
-    <circle cx="25.5" cy="28.5" r="1.5" fill="#fff"/>
-    <circle cx="41.5" cy="28.5" r="1.5" fill="#fff"/>
-    <!-- Mouth -->
-    <path d="M26 38 Q32 43 38 38" stroke="#C4A24E" stroke-width="2" fill="none" stroke-linecap="round">
-      <animate attributeName="d" values="M26 38 Q32 43 38 38;M26 39 Q32 42 38 39;M26 38 Q32 43 38 38" dur="4s" repeatCount="indefinite"/>
-    </path>
-    <!-- Body -->
-    <rect x="20" y="46" width="24" height="12" rx="6" fill="#C4A24E" opacity="0.2" stroke="#C4A24E" stroke-width="1.5"/>
-    <!-- Arms -->
-    <line x1="14" y1="50" x2="6" y2="46" stroke="#C4A24E" stroke-width="2.5" stroke-linecap="round">
-      <animate attributeName="y2" values="46;42;46" dur="2s" repeatCount="indefinite"/>
-    </line>
-    <line x1="50" y1="50" x2="58" y2="46" stroke="#C4A24E" stroke-width="2.5" stroke-linecap="round">
-      <animate attributeName="y2" values="46;42;46" dur="2s" repeatCount="indefinite" begin="0.3s"/>
-    </line>
-  </svg>
+  <img src="assets/PUM-AI.gif" alt="PUM-AI" class="robot-icon" style="width:38px;height:38px;border-radius:10px">
   PUM-AI
   <span class="fab-pulse"></span>
 </div>
@@ -2059,13 +2187,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 <!-- ═══ PUM-AI CHAT PANEL ═══ -->
 <div class="pumai-panel" id="pumaiPanel">
   <div class="pumai-panel-header">
-    <svg class="robot-sm" viewBox="0 0 64 64" fill="none">
-      <circle cx="32" cy="6" r="3" fill="#C4A24E"><animate attributeName="r" values="3;4;3" dur="2s" repeatCount="indefinite"/></circle>
-      <line x1="32" y1="9" x2="32" y2="16" stroke="#C4A24E" stroke-width="2"/>
-      <rect x="16" y="16" width="32" height="24" rx="8" fill="rgba(255,255,255,0.15)" stroke="#C4A24E" stroke-width="1.5"/>
-      <circle cx="25" cy="27" r="3" fill="#fff"/><circle cx="39" cy="27" r="3" fill="#fff"/>
-      <path d="M27 34 Q32 38 37 34" stroke="#C4A24E" stroke-width="1.5" fill="none"/>
-    </svg>
+    <img src="assets/PUM-AI.gif" alt="PUM-AI" class="robot-sm" style="width:36px;height:36px;border-radius:8px">
     <div>
       <h4>PUM-AI</h4>
       <p>Asistente del Ecosistema Digital</p>
@@ -2073,11 +2195,59 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
     <button class="pumai-panel-close" onclick="toggleChat()">✕</button>
   </div>
   <div class="pumai-messages" id="pumaiMessages"></div>
-  <div class="pumai-input-area">
+  <div class="pumai-quick-actions" id="pumaiQuickActions">
+    <p style="font-size:12px;color:#64748B;text-align:center;margin:0 0 10px">¿En qué puedo ayudarte?</p>
+    <button class="pumai-action-btn" onclick="pumaiSelectAction('servicios')">
+      <span>🛠️</span> Dudas sobre servicios
+    </button>
+    <button class="pumai-action-btn" onclick="pumaiSelectAction('proyectos')">
+      <span>💡</span> Ideas para proyectos
+    </button>
+    <button class="pumai-action-btn" onclick="pumaiSelectAction('otro')">
+      <span>💬</span> Otro tema
+    </button>
+  </div>
+  <div class="pumai-input-area" id="pumaiInputArea" style="display:none">
     <input type="text" id="pumaiInput" placeholder="Escribe tu pregunta..." onkeydown="if(event.key==='Enter')sendChatMessage()">
     <button class="pumai-send-btn" onclick="sendChatMessage()">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4z"/></svg>
     </button>
+  </div>
+</div>
+
+<!-- ═══ ENTORNO TECNOLÓGICO DETAIL MODAL ═══ -->
+<div class="servicio-modal-overlay" id="entornoModalOverlay" onclick="if(event.target===this)closeEntornoModal()">
+  <div class="servicio-modal-card" id="entornoModalCard">
+    <button class="servicio-modal-close" onclick="closeEntornoModal()">✕</button>
+    <div id="entornoModalImgWrap" style="width:100%;max-height:280px;overflow:hidden;border-radius:24px 24px 0 0">
+      <img id="entornoModalImg" style="width:100%;height:280px;object-fit:cover" src="" alt="">
+    </div>
+    <div class="servicio-modal-header" style="padding-top:24px">
+      <span class="servicio-modal-emoji" id="entornoModalEmoji"></span>
+      <h2 id="entornoModalTitle"></h2>
+    </div>
+    <div class="servicio-modal-body">
+      <p id="entornoModalDesc" style="color:#475569;line-height:1.8;font-size:15px"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SERVICIO DETAIL MODAL ═══ -->
+<div class="servicio-modal-overlay" id="servicioModalOverlay" onclick="if(event.target===this)closeServicioModal()">
+  <div class="servicio-modal-card" id="servicioModalCard">
+    <button class="servicio-modal-close" onclick="closeServicioModal()">✕</button>
+    <div class="servicio-modal-header" id="servicioModalHeader">
+      <span class="servicio-modal-emoji" id="servicioModalEmoji"></span>
+      <h2 id="servicioModalTitle"></h2>
+    </div>
+    <div class="servicio-modal-body">
+      <p id="servicioModalDesc" style="color:#475569;line-height:1.8;font-size:15px;margin-bottom:24px"></p>
+      <div id="servicioModalTags" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px"></div>
+      <div id="servicioModalExtra"></div>
+      <div style="text-align:center;margin-top:28px">
+        <a href="#solicitud" class="btn btn-outline-gold" onclick="closeServicioModal()">Solicitar este servicio</a>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2087,958 +2257,16 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   <span id="toastMsg"></span>
 </div>
 
-<script>
-/* ─── DATA ─── */
-const carreras=[
-  {name:"Médico Cirujano",emoji:"🏥",color:"#7C3AED"},
-  {name:"Enfermería",emoji:"⚕️",color:"#059669"},
-  {name:"Cirujano Dentista",emoji:"🦷",color:"#2563EB"},
-  {name:"Psicología",emoji:"🧠",color:"#0891B2"},
-  {name:"Psicología SUAyED",emoji:"💡",color:"#6366F1"},
-  {name:"Optometría",emoji:"👁️",color:"#EA580C"},
-  {name:"Ecología",emoji:"🌿",color:"#16A34A"},
-  {name:"Biología",emoji:"🧬",color:"#DC2626"},
-  {name:"Div. Investigación y Posgrado",emoji:"🔬",color:"#8B5CF6"}
-];
-const servicios=[
-  {emoji:'🧠',title:'Inteligencia Artificial',color:'#4F46E5',desc:'Soluciones basadas en IA para el análisis de información, la automatización de procesos, la innovación educativa y el apoyo y gestión del conocimiento.',tags:['Análisis predictivo','Automatización','Innovación educativa','Gestión del conocimiento']},
-  {emoji:'🥽',title:'Realidad Virtual',color:'#7C3AED',desc:'Simulación y experiencias inmersivas para apoyo a procesos de enseñanza y aprendizaje, con escenarios formativos y demostrativos.',tags:['Simulación clínica','Entornos inmersivos','Escenarios formativos','Aprendizaje experiencial']},
-  {emoji:'📱',title:'Realidad Aumentada',color:'#EA580C',desc:'Visualización enriquecida e interacción con recursos digitales para apoyo a la enseñanza y comprensión de procesos complejos.',tags:['Visualización 3D','Recursos interactivos','Material didáctico','Contenido enriquecido']},
-  {emoji:'🗄️',title:'Uso de Bases de Datos',color:'#0891B2',desc:'Organización, consulta, integración, análisis y aprovechamiento de información para proyectos académicos.',tags:['Organización de datos','Consultas avanzadas','Análisis estadístico','Visualización de datos']},
-  {emoji:'🏥',title:'Telemedicina',color:'#059669',desc:'Orientación, asesoría, acompañamiento e interacción remota para apoyo en procesos vinculados con salud digital.',tags:['Orientación en salud','Asesoría remota','Acompañamiento','Salud digital']}
-];
-const objetivos=[
-  "Articular las capacidades de las carreras en torno a proyectos de tecnología digital.",
-  "Facilitar el acceso a tecnologías emergentes como IA, realidad virtual y aumentada.",
-  "Generar espacios de formación, simulación y análisis de información.",
-  "Fomentar la investigación interdisciplinaria y la innovación educativa.",
-  "Fortalecer la vinculación entre la academia, la tecnología y la sociedad.",
-  "Ofrecer servicios de acompañamiento y asesoría en telemedicina."
-];
-const impactoItems=[
-  {emoji:'⭐',title:'Fortalecimiento académico',desc:'Formación universitaria enriquecida con tecnologías de vanguardia.'},
-  {emoji:'💡',title:'Innovación interdisciplinaria',desc:'Colaboración creativa entre carreras para soluciones integrales.'},
-  {emoji:'👥',title:'Apoyo formativo',desc:'Simulación, visualización y análisis que transforman la enseñanza.'},
-  {emoji:'📊',title:'Tecnologías emergentes',desc:'Acceso a IA, realidad virtual, aumentada y análisis de datos.'},
-  {emoji:'🔗',title:'Vinculación entre carreras',desc:'Trabajo colaborativo y visión compartida interdisciplinaria.'},
-  {emoji:'🌐',title:'Impacto social',desc:'Mejora en análisis, simulación y atención con impacto en la comunidad.'}
-];
-const galeriaItems=[
-  {l:'Inteligencia Artificial',e:'🧠',g:'linear-gradient(135deg,#2563EB,#06B6D4)'},
-  {l:'Realidad Virtual',e:'🥽',g:'linear-gradient(135deg,#7C3AED,#EC4899)'},
-  {l:'Realidad Aumentada',e:'📱',g:'linear-gradient(135deg,#EA580C,#FACC15)'},
-  {l:'Telemedicina',e:'🏥',g:'linear-gradient(135deg,#059669,#14B8A6)'},
-  {l:'Análisis de Datos',e:'📊',g:'linear-gradient(135deg,#4F46E5,#3B82F6)'},
-  {l:'Simulación',e:'🔬',g:'linear-gradient(135deg,#F43F5E,#F97316)'},
-  {l:'Conectividad',e:'🌐',g:'linear-gradient(135deg,#0EA5E9,#4F46E5)'},
-  {l:'Colaboración',e:'🤝',g:'linear-gradient(135deg,#8B5CF6,#A855F7)'}
-];
-
-const vrCatalog={
-  'Médico Cirujano':[
-    {name:'Human Anatomy VR for Institutions',desc:'Experiencia educativa inmersiva de anatomía humana con modelos 3D de alta calidad.',ventajas:'Modelos detallados, múltiples sistemas anatómicos, ideal para estudio institucional',desventajas:'Requiere headset VR de gama media-alta, costo de licencia institucional'},
-    {name:'Medical Holodeck',desc:'Plataforma de simulación médica en realidad virtual para entrenamiento clínico.',ventajas:'Simulaciones realistas, múltiples escenarios clínicos, seguimiento de progreso',desventajas:'Requiere hardware potente, curva de aprendizaje inicial'},
-    {name:'Anatomy X',desc:'Atlas anatómico interactivo en VR con visualización detallada de estructuras.',ventajas:'Interfaz intuitiva, buena resolución de modelos, múltiples modos de visualización',desventajas:'Catálogo limitado comparado con competidores, actualizaciones poco frecuentes'},
-    {name:'3D Organon XR',desc:'Aplicación de anatomía en realidad mixta con modelos certificados médicamente.',ventajas:'Certificación médica, compatible con múltiples dispositivos XR, más de 15,000 estructuras',desventajas:'Suscripción costosa, requiere conexión estable'},
-    {name:'VR Anatomy Lab',desc:'Laboratorio virtual de anatomía con disección interactiva.',ventajas:'Disección virtual realista, ideal para práctica previa, sin necesidad de cadáveres',desventajas:'Limitado a anatomía macro, sin patologías'},
-    {name:'Awake Heart',desc:'Simulador cardíaco en VR para entender la anatomía y fisiología del corazón.',ventajas:'Especializado en cardiología, animaciones dinámicas, educativo',desventajas:'Muy específico (solo corazón), contenido limitado'},
-    {name:'Oxford Medical Simulation',desc:'Simulaciones clínicas basadas en casos reales con pacientes virtuales.',ventajas:'Casos clínicos realistas, feedback inmediato, reconocido internacionalmente',desventajas:'Requiere licencia institucional costosa, en inglés'},
-    {name:'Nanome AppLab',desc:'Visualización molecular y trabajo colaborativo en VR para investigación.',ventajas:'Colaboración en tiempo real, visualización molecular avanzada, gratuito en AppLab',desventajas:'Orientado a investigación molecular, curva de aprendizaje'},
-    {name:'ONE LAB VR',desc:'Laboratorio virtual multidisciplinario para prácticas de ciencias de la salud.',ventajas:'Múltiples disciplinas, entorno seguro para práctica, repetible',desventajas:'Limitado en procedimientos avanzados'}
-  ],
-  'Enfermería':[
-    {name:'AcroXeR NursingVR',desc:'Simulador de enfermería en VR para prácticas de procedimientos clínicos.',ventajas:'Procedimientos específicos de enfermería, evaluación automática, repetible',desventajas:'Catálogo de procedimientos en desarrollo, interfaz básica'},
-    {name:'VR Nurse Sim By Simlogic',desc:'Simulador completo de escenarios de enfermería con pacientes virtuales.',ventajas:'Escenarios realistas, toma de decisiones clínicas, feedback detallado',desventajas:'Solo en inglés, requiere Quest 2 o superior'},
-    {name:'Aseptic Work - FarmasiaVR',desc:'Entrenamiento en técnicas asépticas y preparación farmacéutica en VR.',ventajas:'Específico para técnicas asépticas, entorno controlado, evaluación objetiva',desventajas:'Muy especializado, contenido limitado'},
-    {name:'Auscultation Training',desc:'Entrenamiento en auscultación con sonidos cardíacos y pulmonares en VR.',ventajas:'Sonidos reales, múltiples patologías, práctica repetible',desventajas:'Solo auscultación, requiere auriculares de calidad'},
-    {name:'Panoee',desc:'Plataforma de tours virtuales 360° para entornos hospitalarios y clínicos.',ventajas:'Fácil creación de tours, accesible sin headset, personalizable',desventajas:'No es VR inmersiva completa, limitado a visualización'}
-  ],
-  'Biología':[
-    {name:'Dissection Simulator Frog Edition',desc:'Simulador de disección virtual de rana con guía paso a paso.',ventajas:'Alternativa ética a disección real, repetible, guía interactiva',desventajas:'Solo rana, gráficos básicos'},
-    {name:'Nanome AppLab',desc:'Visualización molecular y colaboración en VR para estudio biológico.',ventajas:'Visualización 3D de moléculas, colaborativo, gratuito',desventajas:'Enfocado en nivel molecular, requiere conocimientos previos'},
-    {name:'Veterinary Anatomy and Physiology',desc:'Atlas de anatomía veterinaria en VR con modelos animales detallados.',ventajas:'Modelos animales detallados, múltiples especies, interactivo',desventajas:'Enfocado en veterinaria, no cubre todas las especies'},
-    {name:'Panoee',desc:'Tours virtuales 360° para ecosistemas y ambientes naturales.',ventajas:'Visualización de ecosistemas, accesible, personalizable',desventajas:'Experiencia pasiva, no interactiva'}
-  ],
-  'Psicología':[
-    {name:'Human Brain Time',desc:'Exploración interactiva del cerebro humano en VR con línea temporal evolutiva.',ventajas:'Perspectiva neurocientífica, visualización cerebral detallada, educativo',desventajas:'Contenido en inglés, enfoque limitado'},
-    {name:'Alcohol and Your Brain',desc:'Experiencia educativa sobre los efectos del alcohol en el cerebro.',ventajas:'Visualización de efectos, educativo para prevención, impactante',desventajas:'Muy específico, contenido breve'},
-    {name:'Liminal',desc:'Experiencias inmersivas de relajación y mindfulness en VR.',ventajas:'Entornos relajantes, útil para terapia, variedad de ambientes',desventajas:'No es herramienta clínica certificada'},
-    {name:'TRIPP',desc:'Plataforma de meditación y bienestar mental en realidad virtual.',ventajas:'Meditaciones guiadas en VR, seguimiento de progreso, premium',desventajas:'Suscripción requerida, efectividad no clínicamente validada'},
-    {name:'Bodyswaps',desc:'Simulación de escenarios interpersonales para desarrollo de soft skills.',ventajas:'Escenarios de comunicación, empatía virtual, feedback IA',desventajas:'Enfocado en soft skills, no clínico'},
-    {name:'AI Therapist',desc:'Simulador de sesiones terapéuticas con pacientes virtuales para práctica.',ventajas:'Práctica segura de técnicas terapéuticas, múltiples perfiles, IA adaptativa',desventajas:'No sustituye supervisión clínica real, respuestas limitadas'},
-    {name:'FloatVR Relaxation',desc:'Experiencia de flotación virtual para relajación y reducción de estrés.',ventajas:'Experiencia inmersiva de relajación, fácil de usar, efectos sensoriales',desventajas:'Uso limitado, no terapéutico'}
-  ],
-  'Cirujano Dentista':[
-    {name:'Anatomy X',desc:'Atlas anatómico interactivo con enfoque en estructuras craneofaciales.',ventajas:'Detalle craneofacial, interactivo, múltiples capas anatómicas',desventajas:'No específico para odontología, general'},
-    {name:'3D Organon XR',desc:'Anatomía dental y maxilofacial en realidad mixta con modelos certificados.',ventajas:'Modelos certificados, detalle dental, compatible con múltiples dispositivos',desventajas:'Costo de suscripción, requiere setup'},
-    {name:'Human Anatomy VR for Institutions',desc:'Anatomía general con módulos de cabeza y cuello relevantes para odontología.',ventajas:'Módulos de cabeza/cuello, calidad institucional, detallado',desventajas:'No específico dental, requiere filtrar contenido relevante'}
-  ]
-};
-
-/* ─── RENDER ─── */
-// Carreras
-const cg=document.getElementById('carrerasGrid');
-carreras.forEach((c,i)=>{
-  const el=document.createElement('div');
-  el.className='carrera-card reveal';
-  el.style.cssText=`--carrera-color:${c.color};transition-delay:${i*0.05}s`;
-  el.innerHTML=`<span class="carrera-emoji">${c.emoji}</span><p class="carrera-name">${c.name}</p>`;
-  cg.appendChild(el);
-});
-
-// Objetivos
-const og=document.getElementById('objGrid');
-objetivos.forEach((o,i)=>{
-  og.innerHTML+=`<div class="card reveal" style="display:flex;gap:14px;align-items:flex-start;padding:24px;transition-delay:${i*0.07}s">
-    <div style="min-width:32px;height:32px;border-radius:8px;background:rgba(196,162,78,0.1);display:flex;align-items:center;justify-content:center;font-weight:700;color:var(--gold);font-size:14px;flex-shrink:0">${i+1}</div>
-    <p style="font-size:14px;color:#64748B;line-height:1.75;margin:4px 0 0">${o}</p>
-  </div>`;
-});
-
-// Servicios accordion
-const sa=document.getElementById('serviciosAccordion');
-servicios.forEach((s,i)=>{
-  sa.innerHTML+=`<div class="accordion-item${i===0?' open':''}" id="acc-${i}">
-    <button class="accordion-trigger" onclick="toggleAccordion(${i})">
-      <div class="accordion-icon-wrap" style="background:${s.color}18"><span style="font-size:28px">${s.emoji}</span></div>
-      <div class="accordion-trigger-text"><h3>${s.title}</h3><p>Conocer más sobre este servicio</p></div>
-      <div class="accordion-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#94A3B8" stroke-width="2" stroke-linecap="round"/></svg></div>
-    </button>
-    <div class="accordion-body">
-      <div class="accordion-body-inner">
-        <p>${s.desc}</p>
-        <div class="acc-tags">${s.tags.map(t=>`<span class="acc-tag">${t}</span>`).join('')}</div>
-        <div style="margin-top:22px"><a href="#solicitud" class="btn btn-outline-gold btn-sm">Solicitar este servicio</a></div>
-      </div>
-    </div>
-  </div>`;
-});
-
-// Counters (with animation)
-const counters=[{n:'9',target:9,l:'Carreras participantes'},{n:'5',target:5,l:'Servicios tecnológicos'},{n:'3',target:3,l:'Modalidades de atención'},{n:'∞',target:null,l:'Posibilidades'}];
-const cnt=document.getElementById('counterGrid');
-counters.forEach(c=>{
-  cnt.innerHTML+=`<div class="counter-card"><div class="counter-num" data-target="${c.target||''}" data-symbol="${c.n}">${c.n}</div><div class="counter-label">${c.l}</div></div>`;
-});
-
-// Impacto
-const ig=document.getElementById('impactoGrid');
-impactoItems.forEach((item,i)=>{
-  ig.innerHTML+=`<div class="card-dark reveal d${(i%3)+1}">
-    <div style="font-size:32px;margin-bottom:16px">${item.emoji}</div>
-    <h3 style="font-size:17px;font-weight:700;color:#fff;margin-bottom:10px">${item.title}</h3>
-    <p style="font-size:14px;color:rgba(255,255,255,0.5);line-height:1.75">${item.desc}</p>
-  </div>`;
-});
-
-// Galería
-const gg=document.getElementById('galeriaGrid');
-galeriaItems.forEach((g,i)=>{
-  gg.innerHTML+=`<div class="gallery-item reveal d${(i%4)+1}">
-    <div class="gallery-bg" style="background:${g.g}"></div>
-    <div class="gallery-content"><span class="emoji">${g.e}</span><p>${g.l}</p></div>
-  </div>`;
-});
-
-// VR Catalog
-function renderVRCatalog(carrera){
-  const softwareList=vrCatalog[carrera]||[];
-  let html='';
-  softwareList.forEach(soft=>{
-    html+=`<div class="vr-software-card">
-      <h3>${soft.name}</h3>
-      <p class="desc">${soft.desc}</p>
-      <div class="vr-software-detail">
-        <div class="vr-software-detail-label">VENTAJAS</div>
-        <div class="vr-software-detail-text">${soft.ventajas}</div>
-      </div>
-      <div class="vr-software-detail">
-        <div class="vr-software-detail-label">DESVENTAJAS</div>
-        <div class="vr-software-detail-text">${soft.desventajas}</div>
-      </div>
-    </div>`;
-  });
-  return html;
-}
-function switchVRTab(carrera,btn){
-  document.querySelectorAll('.vr-tab-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.vr-tab-content').forEach(el=>el.classList.remove('active'));
-  const tabId='vr-'+carrera;
-  const tab=document.getElementById(tabId);
-  if(tab){
-    tab.classList.add('active');
-    if(!tab.innerHTML.trim()){
-      tab.innerHTML=renderVRCatalog(carrera);
-    }
-  }
-}
-// Initialize VR catalog
-Object.keys(vrCatalog).forEach(carrera=>{
-  const tabId='vr-'+carrera;
-  const tab=document.getElementById(tabId);
-  if(tab&&carrera==='Médico Cirujano'){
-    tab.innerHTML=renderVRCatalog(carrera);
-  }
-});
-
-/* ─── ESCAPE HTML ─── */
-function escapeHTML(text){
-  if(!text)return '';
-  const map={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
-  return String(text).replace(/[&<>"']/g,char=>map[char]);
-}
-
-/* ─── SCROLL LOGIC ─── */
-window.addEventListener('scroll',()=>{
-  const h=document.documentElement.scrollHeight-window.innerHeight;
-  document.getElementById('scrollProgress').style.width=(window.scrollY/h*100)+'%';
-  document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>60);
-  // Active nav
-  const y=window.scrollY+260;
-  const secs=['inicio','quienes','servicios','solicitud','espacio','telemedicina','impacto','galeria','cursos','comunidad','badges','aula-inmersiva','contacto'];
-  for(let i=secs.length-1;i>=0;i--){
-    const el=document.getElementById(secs[i]);
-    if(el&&el.offsetTop<=y){
-      document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
-      const a=document.querySelector(`.nav-links a[data-section="${secs[i]}"]`);
-      if(a)a.classList.add('active');
-      break;
-    }
-  }
-  // Parallax hero
-  if(window.scrollY<window.innerHeight){
-    const p=window.scrollY*0.35;
-    const hc=document.getElementById('heroContent');
-    const hr=document.getElementById('heroRadial');
-    if(hc)hc.style.transform=`translateY(${p}px)`;
-    if(hr)hr.style.transform=`translate(-50%,-50%) translateY(${p*0.5}px)`;
-  }
-});
-
-/* ─── REVEAL OBSERVER ─── */
-const observer=new IntersectionObserver((entries)=>{
-  entries.forEach(entry=>{
-    if(entry.isIntersecting){
-      entry.target.classList.add('visible');
-      // Counter animation
-      const num=entry.target.querySelector('.counter-num[data-target]');
-      if(num&&num.dataset.target){
-        const target=parseInt(num.dataset.target);
-        let count=0;
-        const step=()=>{
-          count=Math.min(count+1,target);
-          num.textContent=count;
-          if(count<target)requestAnimationFrame(step);
-        };
-        setTimeout(step,200);
-      }
-    }
-  });
-},{threshold:0.12,rootMargin:'0px 0px -40px 0px'});
-document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
-
-/* ─── CURSOR GLOW ─── */
-const cursorGlow=document.getElementById('cursorGlow');
-let mouseX=0,mouseY=0,glowX=0,glowY=0;
-document.addEventListener('mousemove',e=>{mouseX=e.clientX;mouseY=e.clientY;});
-function animGlow(){
-  glowX+=(mouseX-glowX)*0.08;
-  glowY+=(mouseY-glowY)*0.08;
-  cursorGlow.style.left=glowX+'px';
-  cursorGlow.style.top=glowY+'px';
-  requestAnimationFrame(animGlow);
-}
-animGlow();
-
-/* ─── HERO PARTICLES ─── */
-const pp=document.getElementById('heroParticles');
-for(let i=0;i<28;i++){
-  const p=document.createElement('div');
-  p.className='particle';
-  const size=1+Math.random()*4;
-  p.style.cssText=`left:${Math.random()*100}%;bottom:-10px;width:${size}px;height:${size}px;
-    background:${Math.random()>0.5?'var(--gold)':'rgba(255,255,255,0.6)'};
-    animation-delay:${Math.random()*6}s;animation-duration:${3+Math.random()*4}s;`;
-  pp.appendChild(p);
-}
-
-/* ─── CARD 3D TILT ─── */
-document.querySelectorAll('.card,.card-glass,.card-dark,.gallery-item').forEach(card=>{
-  card.addEventListener('mousemove',e=>{
-    const rect=card.getBoundingClientRect();
-    const x=(e.clientX-rect.left)/rect.width-0.5;
-    const y=(e.clientY-rect.top)/rect.height-0.5;
-    card.style.transform=`translateY(-8px) perspective(800px) rotateX(${-y*8}deg) rotateY(${x*8}deg)`;
-  });
-  card.addEventListener('mouseleave',()=>{card.style.transform='';});
-});
-
-/* ─── AULA INMERSIVA MODAL ─── */
-function openAIIModal(){
-  const modal=document.getElementById('aiiModal');
-  modal.style.display='flex';
-  requestAnimationFrame(()=>modal.classList.add('active'));
-  document.body.style.overflow='hidden';
-}
-function closeAIIModal(){
-  const modal=document.getElementById('aiiModal');
-  modal.classList.remove('active');
-  setTimeout(()=>{modal.style.display='none';document.body.style.overflow='';},300);
-}
-function switchAIITab(tabId,btn){
-  document.querySelectorAll('.aii-tab').forEach(t=>t.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.aii-tab-content').forEach(c=>c.classList.remove('active'));
-  document.getElementById('aii-'+tabId).classList.add('active');
-}
-function toggleAIICaso(btn){
-  const caso=btn.closest('.aii-caso');
-  caso.classList.toggle('open');
-}
-
-/* ─── INTERACTIONS ─── */
-document.getElementById('hamburgerBtn').addEventListener('click',()=>
-  document.getElementById('mobileMenu').classList.toggle('open'));
-document.querySelectorAll('.mobile-menu a').forEach(a=>
-  a.addEventListener('click',()=>document.getElementById('mobileMenu').classList.remove('open')));
-
-function toggleAccordion(idx){
-  const item=document.getElementById('acc-'+idx);
-  const isOpen=item.classList.contains('open');
-  document.querySelectorAll('.accordion-item').forEach(el=>el.classList.remove('open'));
-  if(!isOpen)item.classList.add('open');
-  // Show VR catalog when Realidad Virtual (index 1) is open
-  const vrSub=document.getElementById('vrCatalogSubsection');
-  if(vrSub){
-    vrSub.style.display=(!isOpen && idx===1)?'block':'none';
-  }
-}
-function toggleSection(sectionId){
-  const section=document.getElementById(sectionId);
-  if(!section)return;
-  section.classList.toggle('section-collapsed');
-  const body=section.querySelector('.section-body');
-  if(body&&!section.classList.contains('section-collapsed')){
-    body.style.maxHeight=body.scrollHeight+'px';
-    setTimeout(()=>{body.style.maxHeight='none';},600);
-  }else if(body){
-    body.style.maxHeight=body.scrollHeight+'px';
-    requestAnimationFrame(()=>{body.style.maxHeight='0';});
-  }
-  setTimeout(()=>{
-    document.querySelectorAll('.reveal:not(.visible)').forEach(el=>observer.observe(el));
-  },100);
-}
-function switchTab(group,id,btn){
-  btn.parentElement.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll(`[id^="${group}-"]`).forEach(el=>el.classList.remove('active'));
-  document.getElementById(`${group}-${id}`).classList.add('active');
-  // Re-run reveal observer for newly visible elements
-  setTimeout(()=>{
-    document.querySelectorAll('.reveal:not(.visible)').forEach(el=>observer.observe(el));
-  },50);
-}
-function toggleGroup(id,show){document.getElementById(id).style.display=show?'block':'none';}
-function showToast(msg){
-  const t=document.getElementById('toast');
-  document.getElementById('toastMsg').textContent=msg;
-  t.style.transform='translateX(-50%) translateY(0)';
-  setTimeout(()=>{t.style.transform='translateX(-50%) translateY(120px)';},3500);
-}
-
-/* ─── PROYECTO 475 MODAL ─── */
-function openProyecto(){
-  const overlay=document.getElementById('proyectoOverlay');
-  overlay.classList.add('active');
-  document.body.style.overflow='hidden';
-  // Reset card animation
-  const card=document.getElementById('proyectoCard');
-  card.style.animation='none';
-  requestAnimationFrame(()=>{
-    card.style.animation='modalIn 0.6s cubic-bezier(.22,1,.36,1) both';
-  });
-  // Build stars
-  const sf=document.getElementById('starField');
-  if(!sf.children.length){
-    for(let i=0;i<55;i++){
-      const s=document.createElement('div');
-      s.className='star';
-      const sz=0.5+Math.random()*2.5;
-      s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${sz}px;height:${sz}px;opacity:${0.1+Math.random()*0.5}`;
-      sf.appendChild(s);
-    }
-  }
-  // Build falling leaves
-  const lc=document.getElementById('proyectoLeaves');
-  if(!lc.children.length){
-    const leafEmojis=['🍃','🌿','🍀','🌱','🍂'];
-    for(let i=0;i<18;i++){
-      const l=document.createElement('div');
-      l.className='leaf';
-      const lx=(Math.random()-0.5)*200;
-      const lr=(Math.random()-0.5)*360;
-      l.style.cssText=`left:${5+Math.random()*90}%;
-        --lx:${lx}px;--lr:${lr}deg;
-        animation-delay:${Math.random()*8}s;
-        animation-duration:${5+Math.random()*6}s;
-        font-size:${10+Math.random()*14}px;opacity:${0.5+Math.random()*0.5}`;
-      l.textContent=leafEmojis[Math.floor(Math.random()*leafEmojis.length)];
-      lc.appendChild(l);
-    }
-  }
-}
-function closeProyecto(){
-  const overlay=document.getElementById('proyectoOverlay');
-  const card=document.getElementById('proyectoCard');
-  card.style.animation='modalIn 0.35s cubic-bezier(.22,1,.36,1) reverse both';
-  setTimeout(()=>{
-    overlay.classList.remove('active');
-    document.body.style.overflow='';
-  },320);
-}
-function handleOverlayClick(e){
-  if(e.target===document.getElementById('proyectoOverlay'))closeProyecto();
-}
-// Close on Escape key
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeProyecto();hideLoginModal();closeAIIModal();if(chatOpen)toggleChat();}
-});
-
-/* ─── LOGIN MODAL ─── */
-function showLoginModal(){document.getElementById('loginModal').classList.add('active');}
-function hideLoginModal(){document.getElementById('loginModal').classList.remove('active');}
-async function handleLogin(){
-  const email=document.getElementById('loginEmail').value;
-  const pass=document.getElementById('loginPassword').value;
-  const err=document.getElementById('loginError');
-  const btn=document.getElementById('btnLogin');
-  err.textContent='';
-  btn.textContent='Ingresando...';btn.disabled=true;
-  try{
-    if(typeof supabaseClient!=='undefined'){
-      const{data,error}=await supabaseClient.auth.signInWithPassword({email,password:pass});
-      if(error)throw error;
-      window.location.href='admin.html';
-    } else { err.textContent='Sistema de autenticación no disponible. Configure Supabase.'; }
-  }catch(e){err.textContent=e.message||'Credenciales incorrectas';}
-  finally{btn.textContent='Iniciar sesión';btn.disabled=false;}
-}
-
-/* ─── PUM-AI CHAT ─── */
-let chatOpen=false;
-let chatHistory=[];
-const PUMAI_SYSTEM="Eres PUM-AI, el asistente virtual del Ecosistema Digital de la FES Iztacala, UNAM. Ayudas con información sobre: servicios (IA, Realidad Virtual, Realidad Aumentada, Bases de Datos, Telemedicina), cómo solicitar un servicio o espacio, el proyecto 475 Aniversario UNAM, las carreras participantes, y asesorías de telemedicina. Responde siempre en español, de forma amable y concisa. Si preguntan algo fuera de estos temas, indica que solo puedes ayudar con información del Ecosistema Digital.";
-
-function toggleChat(){
-  chatOpen=!chatOpen;
-  document.getElementById('pumaiPanel').classList.toggle('open',chatOpen);
-  if(chatOpen && !document.getElementById('pumaiMessages').children.length){
-    addBotMsg("¡Hola! Soy PUM-AI 🤖, tu asistente del Ecosistema Digital de la FES Iztacala. ¿En qué puedo ayudarte hoy?");
-  }
-}
-function addBotMsg(text){
-  const m=document.createElement('div');m.className='msg msg-bot';m.textContent=text;
-  document.getElementById('pumaiMessages').appendChild(m);scrollChat();
-}
-function addUserMsg(text){
-  const m=document.createElement('div');m.className='msg msg-user';m.textContent=text;
-  document.getElementById('pumaiMessages').appendChild(m);scrollChat();
-}
-function showTyping(){
-  const t=document.createElement('div');t.className='msg msg-bot msg-typing';t.id='typingIndicator';
-  t.innerHTML='<span></span><span></span><span></span>';
-  document.getElementById('pumaiMessages').appendChild(t);scrollChat();
-}
-function hideTyping(){const t=document.getElementById('typingIndicator');if(t)t.remove();}
-function scrollChat(){const c=document.getElementById('pumaiMessages');c.scrollTop=c.scrollHeight;}
-async function sendChatMessage(){
-  const input=document.getElementById('pumaiInput');
-  const text=input.value.trim();if(!text)return;
-  input.value='';addUserMsg(text);
-  chatHistory.push({role:'user',parts:[{text}]});
-  showTyping();
-  try{
-    if(typeof supabaseClient!=='undefined' && SUPABASE_URL && SUPABASE_URL!=='https://PLACEHOLDER.supabase.co'){
-      const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-chat',{
-        method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPABASE_ANON_KEY},
-        body:JSON.stringify({messages:chatHistory})
-      });
-      const data=await res.json();
-      hideTyping();
-      if(data.reply){addBotMsg(data.reply);chatHistory.push({role:'model',parts:[{text:data.reply}]});}
-      else{addBotMsg('Disculpa, no pude procesar tu consulta. Intenta de nuevo.');}
-    }else{
-      hideTyping();
-      // Respuestas locales de fallback
-      const lower=text.toLowerCase();
-      let reply='Gracias por tu consulta. Para obtener respuestas completas, el sistema de chat se está configurando. Mientras tanto, puedes navegar las secciones del sitio o contactarnos directamente.';
-      if(lower.includes('servicio'))reply='Ofrecemos 5 servicios: Inteligencia Artificial, Realidad Virtual, Realidad Aumentada, Bases de Datos y Telemedicina. Puedes solicitarlos desde la sección "Solicitud de servicios" del sitio.';
-      else if(lower.includes('espacio'))reply='Puedes reservar el espacio físico del Ecosistema Digital desde la sección "Uso del espacio". La disponibilidad está sujeta a confirmación de la coordinación.';
-      else if(lower.includes('carrera'))reply='Participan 9 carreras: Médico Cirujano, Enfermería, Cirujano Dentista, Psicología, Psicología SUAyED, Optometría, Ecología, Biología y la División de Investigación y Posgrado.';
-      else if(lower.includes('475')||lower.includes('aniversario'))reply='El proyecto del 475 Aniversario de la UNAM es una iniciativa digital que celebra la historia y el futuro de nuestra universidad. Haz clic en "Nuevos proyectos" en la sección de inicio para conocer más.';
-      else if(lower.includes('telemedicina')||lower.includes('asesor'))reply='El servicio de telemedicina ofrece orientación, asesoría y acompañamiento remoto en procesos vinculados con salud digital. Puedes solicitarlo desde la sección de Telemedicina.';
-      else if(lower.includes('contacto'))reply='Puedes contactarnos en ecosistemadigital@iztacala.unam.mx o al teléfono 55 5623 1100. Nuestro horario es de lunes a viernes de 9:00 a 17:00 horas.';
-      else if(lower.includes('hola')||lower.includes('buenas'))reply='¡Hola! Bienvenido al Ecosistema Digital. ¿En qué puedo ayudarte? Puedo informarte sobre nuestros servicios, cómo solicitar uno, reservar el espacio o información sobre los proyectos.';
-      addBotMsg(reply);
-    }
-  }catch(e){hideTyping();addBotMsg('Lo siento, ocurrió un error. Intenta de nuevo en un momento.');}
-}
-
-/* ─── VALIDACIÓN DE FECHAS Y HORAS: no permitir fechas/horas anteriores ─── */
-(function(){
-  const today=new Date();
-  const yyyy=today.getFullYear();
-  const mm=String(today.getMonth()+1).padStart(2,'0');
-  const dd=String(today.getDate()).padStart(2,'0');
-  const minDate=`${yyyy}-${mm}-${dd}`;
-
-  // Establecer min en todos los inputs type="date"
-  document.querySelectorAll('input[type="date"]').forEach(inp=>{
-    inp.setAttribute('min',minDate);
-    inp.addEventListener('change',function(){
-      if(this.value && this.value<minDate){
-        this.value='';
-        showToast('No puedes seleccionar una fecha anterior a hoy');
-      }
-    });
-  });
-
-  // Validación de hora: si la fecha es hoy, la hora no puede ser anterior a la actual
-  document.querySelectorAll('input[type="time"]').forEach(inp=>{
-    inp.addEventListener('change',function(){
-      const form=this.closest('form');
-      if(!form)return;
-      const dateInput=form.querySelector('input[type="date"]');
-      if(!dateInput||!dateInput.value)return;
-      if(dateInput.value===minDate){
-        const now=new Date();
-        const hh=String(now.getHours()).padStart(2,'0');
-        const mi=String(now.getMinutes()).padStart(2,'0');
-        const currentTime=`${hh}:${mi}`;
-        if(this.value && this.value<currentTime){
-          this.value='';
-          showToast('No puedes seleccionar una hora que ya pasó');
-        }
-      }
-    });
-  });
-})();
-
-/* ─── CURSOS SECTION ─── */
-function openInscripcionCurso(cursoId,titulo,instructor){
-  document.getElementById('inscripcionCursoForm').dataset.cursoId=cursoId;
-  document.getElementById('cursoTituloModal').textContent=titulo;
-  document.getElementById('cursoInstructorModal').textContent='Instructor: '+instructor;
-  document.getElementById('inscripcionCursoModal').classList.add('active');
-  document.body.style.overflow='hidden';
-}
-function closeInscripcionCurso(){
-  document.getElementById('inscripcionCursoModal').classList.remove('active');
-  document.getElementById('inscripcionCursoForm').reset();
-  document.getElementById('cursoFormError').textContent='';
-  document.body.style.overflow='';
-}
-async function submitInscripcionCurso(){
-  if(!window.supabaseClient){
-    showToast('Cargando sistema...');
-    return;
-  }
-  const cursoId=document.getElementById('inscripcionCursoForm').dataset.cursoId;
-  const nombre=document.getElementById('insNombre').value.trim();
-  const correo=document.getElementById('insCorreo').value.trim();
-  const carrera=document.getElementById('insCarrera').value.trim();
-  const err=document.getElementById('cursoFormError');
-  err.textContent='';
-  try{
-    const{data,error}=await supabaseClient.from('inscripciones_cursos').insert([{
-      curso_id:cursoId,nombre,correo,carrera
-    }]);
-    if(error)throw error;
-    closeInscripcionCurso();
-    showToast('¡Inscripción completada! Te enviaremos confirmación a tu correo.');
-  }catch(e){err.textContent=e.message||'Error al inscribirse';}
-}
-function loadCursos(){
-  if(!window.supabaseClient){
-    setTimeout(loadCursos,200);
-    return;
-  }
-  (async()=>{
-    try{
-      const{data,error}=await supabaseClient.from('cursos').select('*').eq('activo',true).order('fecha_inicio',{ascending:true});
-      if(error)throw error;
-      const grid=document.getElementById('cursosGrid');
-      if(data&&data.length>0){
-        grid.innerHTML=data.map((c,i)=>{
-          const progreso=c.cupo_maximo>0?(c.inscritos/c.cupo_maximo)*100:0;
-          return`<div class="curso-card reveal${i<3?' d'+(i+1):''}">
-            <div class="curso-emoji">${c.categoria_emoji||'📚'}</div>
-            <h3 class="curso-title">${escapeHTML(c.titulo)}</h3>
-            <p class="curso-instructor">👨‍🏫 ${escapeHTML(c.instructor)}</p>
-            <div class="curso-meta">
-              <span>📅 ${escapeHTML(c.fechas)}</span>
-              <span>⏰ ${escapeHTML(c.horario)}</span>
-            </div>
-            <span class="curso-badge">${escapeHTML(c.modalidad)}</span>
-            <div class="curso-progress-bar">
-              <div class="curso-progress-fill" style="width:${progreso}%"></div>
-            </div>
-            <small style="color:#94A3B8;font-size:12px">${c.inscritos}/${c.cupo_maximo} inscritos</small>
-            <button class="curso-btn" onclick="openInscripcionCurso('${c.id}','${escapeHTML(c.titulo)}','${escapeHTML(c.instructor)}')">Inscribirme</button>
-          </div>`;
-        }).join('');
-        document.querySelectorAll('.curso-card.reveal').forEach(el=>observer.observe(el));
-      }else{
-        grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#94A3B8;padding:40px">No hay cursos disponibles en este momento</div>';
-      }
-    }catch(e){console.log('Cursos error:',e.message);}
-  })();
-}
-
-/* ─── COMUNIDAD SECTION ─── */
-function openPublicarProyecto(){
-  document.getElementById('publicarProyectoModal').classList.add('active');
-  document.body.style.overflow='hidden';
-}
-function closePublicarProyecto(){
-  document.getElementById('publicarProyectoModal').classList.remove('active');
-  document.getElementById('publicarProyectoForm').reset();
-  document.getElementById('proyFormError').textContent='';
-  document.body.style.overflow='';
-}
-async function submitPublicarProyecto(){
-  if(!window.supabaseClient){
-    showToast('Cargando sistema...');
-    return;
-  }
-  const titulo=document.getElementById('proyTitulo').value.trim();
-  const descripcion=document.getElementById('proyDescripcion').value.trim();
-  const autor=document.getElementById('proyAutor').value.trim();
-  const correo=document.getElementById('proyCorreo').value.trim();
-  const carrera=document.getElementById('proyCarrera').value.trim();
-  const categoria=document.getElementById('proyCategoria').value;
-  const tags=document.getElementById('proyTags').value.trim().split(',').map(t=>t.trim()).filter(t=>t);
-  const err=document.getElementById('proyFormError');
-  err.textContent='';
-  try{
-    const{data,error}=await supabaseClient.from('proyectos_comunidad').insert([{
-      titulo,descripcion,autor,correo,carrera,categoria,tags,activo:true,likes:0,comentarios:0
-    }]);
-    if(error)throw error;
-    closePublicarProyecto();
-    showToast('¡Proyecto publicado! Aparecerá en el muro próximamente.');
-    loadProyectos();
-  }catch(e){err.textContent=e.message||'Error al publicar proyecto';}
-}
-function loadProyectos(){
-  if(!window.supabaseClient){
-    setTimeout(loadProyectos,200);
-    return;
-  }
-  (async()=>{
-    try{
-      const{data,error}=await supabaseClient.from('proyectos_comunidad').select('*').eq('activo',true).order('created_at',{ascending:false});
-      if(error)throw error;
-      const grid=document.getElementById('proyectosGrid');
-      if(data&&data.length>0){
-        const categoriaEmoji={'idea':'💡','busco_equipo':'👥','en_desarrollo':'🔨','completado':'✅'};
-        grid.innerHTML=data.map((p,i)=>{
-          const catEmoji=categoriaEmoji[p.categoria]||'📌';
-          const catLabel={idea:'Idea',busco_equipo:'Busco equipo',en_desarrollo:'En desarrollo',completado:'Completado'}[p.categoria];
-          return`<div class="proyecto-card reveal${i<3?' d'+(i+1):''}">
-            <span class="proyecto-badge ${p.categoria}">${catEmoji} ${catLabel}</span>
-            <h3 class="proyecto-title">${escapeHTML(p.titulo)}</h3>
-            <p class="proyecto-descripcion">${escapeHTML(p.descripcion)}</p>
-            <div class="proyecto-meta">
-              <strong>${escapeHTML(p.autor)}</strong> · ${escapeHTML(p.carrera)}
-            </div>
-            ${p.tags&&p.tags.length?'<div class="proyecto-tags">'+p.tags.map(t=>'<span class="proyecto-tag">'+escapeHTML(t)+'</span>').join('')+'</div>':''}
-            <div class="proyecto-actions">
-              <button class="proyecto-like" onclick="showToast('❤️ Me gusta!')">❤️ ${p.likes||0}</button>
-              <button class="proyecto-comment" onclick="showToast('💬 Comentarios')">💬 ${p.comentarios||0}</button>
-            </div>
-          </div>`;
-        }).join('');
-        document.querySelectorAll('.proyecto-card.reveal').forEach(el=>observer.observe(el));
-      }else{
-        grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#94A3B8;padding:40px">No hay proyectos publicados aún. ¡Sé el primero!</div>';
-      }
-    }catch(e){console.log('Proyectos error:',e.message);}
-  })();
-}
-
-/* ─── BADGES SECTION ─── */
-function loadBadges(){
-  if(!window.supabaseClient){
-    setTimeout(loadBadges,200);
-    return;
-  }
-  (async()=>{
-    try{
-      const{data:badges,error:error1}=await supabaseClient.from('badges').select('*').eq('activo',true);
-      if(error1)throw error1;
-      const grid=document.getElementById('badgesGrid');
-      if(badges&&badges.length>0){
-        grid.innerHTML=badges.map((b,i)=>`<div class="badge-card reveal${i<4?' d'+(i+1):''}">
-          <div class="badge-icon">${escapeHTML(b.icono)}</div>
-          <h3 class="badge-name">${escapeHTML(b.nombre)}</h3>
-          <p class="badge-desc">${escapeHTML(b.descripcion)}</p>
-          <p class="badge-pts">⭐ ${b.puntos} pts</p>
-        </div>`).join('');
-        document.querySelectorAll('.badge-card.reveal').forEach(el=>observer.observe(el));
-      }else{
-        grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#94A3B8;padding:40px">No hay insignias disponibles</div>';
-      }
-    }catch(e){console.log('Badges error:',e.message);}
-  })();
-}
-function loadPremios(){
-  if(!window.supabaseClient){
-    setTimeout(loadPremios,200);
-    return;
-  }
-  (async()=>{
-    try{
-      const{data:premios,error}=await supabaseClient.from('premios').select('*').eq('activo',true).order('puntos_requeridos');
-      if(error)throw error;
-      const grid=document.getElementById('premiosGrid');
-      if(premios&&premios.length>0){
-        grid.innerHTML=premios.map((p,i)=>`<div class="premio-card reveal${i<3?' d'+(i+1):''}">
-          <div class="premio-icon">${escapeHTML(p.icono)}</div>
-          <h3 class="premio-name">${escapeHTML(p.nombre)}</h3>
-          <p class="premio-pts">💰 ${p.puntos_requeridos} puntos</p>
-          <p class="premio-stock">Stock: ${p.stock||0}</p>
-        </div>`).join('');
-        document.querySelectorAll('.premio-card.reveal').forEach(el=>observer.observe(el));
-      }else{
-        grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#94A3B8;padding:40px">No hay premios disponibles</div>';
-      }
-    }catch(e){console.log('Premios error:',e.message);}
-  })();
-}
-function loadLeaderboard(){
-  if(!window.supabaseClient){
-    setTimeout(loadLeaderboard,200);
-    return;
-  }
-  (async()=>{
-    try{
-      const{data:userBadges,error}=await supabaseClient.from('badges_usuarios').select('usuario_correo').order('created_at',{ascending:false});
-      if(error)throw error;
-      const counts={};
-      if(userBadges){
-        userBadges.forEach(ub=>{
-          counts[ub.usuario_correo]=(counts[ub.usuario_correo]||0)+1;
-        });
-      }
-      const sorted=Object.entries(counts)
-        .sort((a,b)=>b[1]-a[1])
-        .slice(0,5);
-      const list=document.getElementById('leaderboardList');
-      if(sorted.length>0){
-        list.innerHTML=sorted.map((entry,i)=>`<div class="leaderboard-item reveal d${i+1}">
-          <div class="leaderboard-rank">#${i+1}</div>
-          <div class="leaderboard-info">
-            <p class="leaderboard-name">${escapeHTML(entry[0])}</p>
-            <p class="leaderboard-email">${entry[0]}</p>
-          </div>
-          <div class="leaderboard-badges">⭐ ${entry[1]}</div>
-        </div>`).join('');
-        document.querySelectorAll('.leaderboard-item.reveal').forEach(el=>observer.observe(el));
-      }else{
-        list.innerHTML='<div style="text-align:center;color:#94A3B8;padding:40px">Aún no hay insignias ganadas</div>';
-      }
-    }catch(e){console.log('Leaderboard error:',e.message);}
-  })();
-}
-
-/* ─── NOTIFICATIONS BANNER ─── */
-function loadNotifications(){
-  if(!window.supabaseClient){
-    setTimeout(loadNotifications,200);
-    return;
-  }
-  (async()=>{
-    try{
-      const today=new Date().toISOString().split('T')[0];
-      const{data,error}=await supabaseClient
-        .from('notificaciones')
-        .select('*')
-        .eq('activa',true)
-        .lte('fecha_inicio',today)
-        .gte('fecha_fin',today)
-        .order('created_at',{ascending:false})
-        .limit(1);
-      if(error)throw error;
-      const banner=document.getElementById('notificationsBanner');
-      const textEl=document.getElementById('notificationsText');
-      if(data&&data.length>0){
-        const notif=data[0];
-        textEl.innerHTML='<div class="notification-item">'+escapeHTML(notif.mensaje)+'</div>';
-        banner.classList.remove('empty','hidden');
-      }else{
-        banner.classList.add('empty');
-      }
-    }catch(e){console.log('Notificaciones: ',e.message);}
-  })();
-}
-/* ─── CALENDAR FUNCTIONS (REFACTORED & REUSABLE) ─── */
-const calendarState={
-  espacios:{date:new Date(),reservedDates:[]},
-  servicios:{date:new Date(),reservedDates:[]},
-  telemedicina:{date:new Date(),reservedDates:[]}
-};
-
-async function loadReservedDatesForCalendar(type,table,dateField){
-  if(!window.supabaseClient)return;
-  try{
-    const{data,error}=await supabaseClient.from(table).select(dateField);
-    if(error)throw error;
-    calendarState[type].reservedDates=data?data.map(d=>d[dateField]):[];
-  }catch(e){console.log('Calendar error for '+type+':',e.message);}
-}
-
-function renderCalendarForType(type){
-  const state=calendarState[type];
-  const year=state.date.getFullYear();
-  const month=state.date.getMonth();
-  const today=new Date();
-  const firstDay=new Date(year,month,1);
-  const startDate=new Date(firstDay);
-  startDate.setDate(startDate.getDate()-firstDay.getDay());
-
-  // Handle both 'espacios' (no suffix) and other types (with suffix)
-  let titleId='calendarTitle';
-  let gridId='calendarGrid';
-  if(type!=='espacios'){
-    titleId='calendarTitle_'+type;
-    gridId='calendarGrid_'+type;
-  }
-
-  const titleEl=document.getElementById(titleId);
-  if(titleEl){
-    titleEl.textContent=new Intl.DateTimeFormat('es-ES',{month:'long',year:'numeric'}).format(firstDay);
-  }
-
-  const grid=document.getElementById(gridId);
-  if(!grid)return;
-  grid.innerHTML='';
-
-  // Day headers
-  const days=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-  days.forEach(d=>{
-    const h=document.createElement('div');
-    h.className='calendar-day-header';
-    h.textContent=d;
-    grid.appendChild(h);
-  });
-
-  // Days
-  let current=new Date(startDate);
-  while(current.getMonth()===month||current.getMonth()===(month+1)%12){
-    const dayDiv=document.createElement('div');
-    dayDiv.className='calendar-day';
-    const dateStr=current.toISOString().split('T')[0];
-    const isPastDate=current<today&&current.toDateString()!==today.toDateString();
-
-    if(current.getMonth()!==month)dayDiv.classList.add('other-month');
-    if(state.reservedDates.includes(dateStr))dayDiv.classList.add('reserved');
-    if(current.toDateString()===today.toDateString())dayDiv.classList.add('today');
-    if(isPastDate)dayDiv.classList.add('other-month');
-
-    dayDiv.textContent=current.getDate();
-    if(!isPastDate){
-      dayDiv.onclick=()=>selectCalendarDate(type,dateStr);
-    }else{
-      dayDiv.style.cursor='not-allowed';
-    }
-    grid.appendChild(dayDiv);
-    current.setDate(current.getDate()+1);
-  }
-}
-
-function prevCalendarMonth(type){
-  calendarState[type].date.setMonth(calendarState[type].date.getMonth()-1);
-  renderCalendarForType(type);
-}
-
-function nextCalendarMonth(type){
-  calendarState[type].date.setMonth(calendarState[type].date.getMonth()+1);
-  renderCalendarForType(type);
-}
-
-function selectCalendarDate(type,dateStr){
-  const state=calendarState[type];
-  const reserved=state.reservedDates.includes(dateStr);
-  if(reserved){
-    showToast('Esta fecha ya tiene una solicitud registrada');
-    return;
-  }
-
-  // Set the hidden date input for the corresponding form
-  const inputMap={
-    'espacios':'espacioDateInput',
-    'servicios':'serviciosDateInput',
-    'telemedicina':'telemedicinaDateInput'
-  };
-  const dateInput=document.getElementById(inputMap[type]);
-  if(dateInput)dateInput.value=dateStr;
-
-  // Update selected state only for this calendar
-  let gridId='calendarGrid';
-  if(type!=='espacios'){
-    gridId='calendarGrid_'+type;
-  }
-  const grid=document.getElementById(gridId);
-  if(grid){
-    grid.querySelectorAll('.calendar-day').forEach(d=>d.classList.remove('selected'));
-    event.target.classList.add('selected');
-  }
-  showToast('Fecha seleccionada: '+new Date(dateStr).toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'}));
-}
-
-function initCalendars(){
-  if(!window.supabaseClient){
-    setTimeout(initCalendars,200);
-    return;
-  }
-  // Load reserved dates for all calendar types
-  loadReservedDatesForCalendar('espacios','solicitudes_espacios','fecha');
-  loadReservedDatesForCalendar('servicios','solicitudes_servicios','fecha_deseada');
-  loadReservedDatesForCalendar('telemedicina','solicitudes_asesoria','fecha_estimada');
-
-  // Render all calendars
-  setTimeout(()=>{
-    renderCalendarForType('espacios');
-    renderCalendarForType('servicios');
-    renderCalendarForType('telemedicina');
-  },100);
-}
-
-function initSupabaseFeatures(){
-  if(!window.supabaseClient){
-    setTimeout(initSupabaseFeatures,200);
-    return;
-  }
-  loadNotifications();
-  loadCursos();
-  loadProyectos();
-  loadBadges();
-  loadPremios();
-  loadLeaderboard();
-  initCalendars();
-}
-// Wait for DOM to be ready and for deferred scripts to load
-if(document.readyState==='loading'){
-  document.addEventListener('DOMContentLoaded',()=>setTimeout(initSupabaseFeatures,500));
-}else{
-  setTimeout(initSupabaseFeatures,500);
-}
-</script>
-<!-- Supabase SDK + config (carga después para no bloquear) -->
+<!-- JS Modules (order matters: data first, then UI/render, then features) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="js/config.js" defer></script>
+<script src="js/data.js" defer></script>
+<script src="js/ui.js" defer></script>
+<script src="js/render.js" defer></script>
+<script src="js/interactions.js" defer></script>
+<script src="js/modals.js" defer></script>
+<script src="js/pumai.js" defer></script>
+<script src="js/supabase-features.js" defer></script>
+
 </body>
 </html>
