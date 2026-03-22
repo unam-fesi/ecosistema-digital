@@ -1,3 +1,27 @@
+/* ─── SECURITY UTILITIES ─── */
+const _formSubmitTimestamps = {};
+function rateLimitCheck(formId, cooldownMs) {
+  cooldownMs = cooldownMs || 5000;
+  const now = Date.now();
+  if (_formSubmitTimestamps[formId] && (now - _formSubmitTimestamps[formId]) < cooldownMs) {
+    showToast('Por favor espera unos segundos antes de enviar de nuevo.');
+    return false;
+  }
+  _formSubmitTimestamps[formId] = now;
+  return true;
+}
+function validateEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+function sanitizeInput(str, maxLen) {
+  maxLen = maxLen || 500;
+  if (!str) return '';
+  // Strip potential script tags and limit length
+  return str.replace(/<script[^>]*>.*?<\/script>/gi, '')
+            .replace(/<[^>]*>/g, '')
+            .substring(0, maxLen).trim();
+}
+
 /* ─── CURSOS SECTION ─── */
 function openInscripcionCurso(cursoId,titulo,instructor){
   document.getElementById('inscripcionCursoForm').dataset.cursoId=cursoId;
@@ -13,16 +37,16 @@ function closeInscripcionCurso(){
   document.body.style.overflow='';
 }
 async function submitInscripcionCurso(){
-  if(!window.supabaseClient){
-    showToast('Cargando sistema...');
-    return;
-  }
+  if(!window.supabaseClient){ showToast('Cargando sistema...'); return; }
+  if(!rateLimitCheck('inscripcion')) return;
   const cursoId=document.getElementById('inscripcionCursoForm').dataset.cursoId;
-  const nombre=document.getElementById('insNombre').value.trim();
+  const nombre=sanitizeInput(document.getElementById('insNombre').value, 100);
   const correo=document.getElementById('insCorreo').value.trim();
-  const carrera=document.getElementById('insCarrera').value.trim();
+  const carrera=sanitizeInput(document.getElementById('insCarrera').value, 100);
   const err=document.getElementById('cursoFormError');
   err.textContent='';
+  if(!nombre||nombre.length<2){ err.textContent='Ingresa un nombre válido'; return; }
+  if(!validateEmail(correo)){ err.textContent='Ingresa un correo electrónico válido'; return; }
   try{
     const{data,error}=await supabaseClient.from('inscripciones_cursos').insert([{
       curso_id:cursoId,nombre,correo,carrera
@@ -81,22 +105,25 @@ function closePublicarProyecto(){
   document.body.style.overflow='';
 }
 async function submitPublicarProyecto(){
-  if(!window.supabaseClient){
-    showToast('Cargando sistema...');
-    return;
-  }
-  const titulo=document.getElementById('proyTitulo').value.trim();
-  const descripcion=document.getElementById('proyDescripcion').value.trim();
-  const autor=document.getElementById('proyAutor').value.trim();
+  if(!window.supabaseClient){ showToast('Cargando sistema...'); return; }
+  if(!rateLimitCheck('publicarProyecto', 10000)) return;
+  const titulo=sanitizeInput(document.getElementById('proyTitulo').value, 150);
+  const descripcion=sanitizeInput(document.getElementById('proyDescripcion').value, 1000);
+  const autor=sanitizeInput(document.getElementById('proyAutor').value, 100);
   const correo=document.getElementById('proyCorreo').value.trim();
-  const carrera=document.getElementById('proyCarrera').value.trim();
+  const carrera=sanitizeInput(document.getElementById('proyCarrera').value, 100);
   const categoria=document.getElementById('proyCategoria').value;
-  const tags=document.getElementById('proyTags').value.trim().split(',').map(t=>t.trim()).filter(t=>t);
+  const tags=document.getElementById('proyTags').value.trim().split(',').map(function(t){return sanitizeInput(t,30);}).filter(function(t){return t;}).slice(0,10);
   const err=document.getElementById('proyFormError');
   err.textContent='';
+  if(!titulo||titulo.length<3){ err.textContent='El título debe tener al menos 3 caracteres'; return; }
+  if(!descripcion||descripcion.length<10){ err.textContent='La descripción debe tener al menos 10 caracteres'; return; }
+  if(!autor||autor.length<2){ err.textContent='Ingresa un nombre válido'; return; }
+  if(!validateEmail(correo)){ err.textContent='Ingresa un correo electrónico válido'; return; }
+  if(!categoria){ err.textContent='Selecciona una categoría'; return; }
   try{
     const{data,error}=await supabaseClient.from('proyectos_comunidad').insert([{
-      titulo,descripcion,autor,correo,carrera,categoria,tags,activo:true,likes:0,comentarios:0
+      titulo,descripcion,autor,correo_autor:correo,carrera,categoria,tags,activo:true,likes:0,comentarios:0
     }]);
     if(error)throw error;
     closePublicarProyecto();
