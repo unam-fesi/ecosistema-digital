@@ -122,14 +122,7 @@ function clearLoginError() {
 // Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', async () => {
   // Verificar si estamos en admin.html
-  if (window.location.pathname.includes('admin.html')) {
-    const session = await checkAuth();
-
-    if (!session) {
-      // Redirigir a index si no está autenticado
-      window.location.href = 'index.html';
-    }
-  }
+  // (la lógica de mostrar/ocultar modal se maneja en admin.js)
 
   // Configurar event listener del formulario de login
   const loginForm = document.getElementById('loginForm');
@@ -138,8 +131,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       e.preventDefault();
       clearLoginError();
 
-      const email = document.getElementById('adminEmail').value;
-      const password = document.getElementById('adminPassword').value;
+      const email = (document.getElementById('loginEmail') || document.getElementById('adminEmail'))?.value;
+      const password = (document.getElementById('loginPassword') || document.getElementById('adminPassword'))?.value;
 
       // Validaciones básicas
       if (!email || !password) {
