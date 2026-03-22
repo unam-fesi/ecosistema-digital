@@ -1161,6 +1161,12 @@
                     Reportes
                 </button>
             </li>
+            <li class="nav-item">
+                <button class="nav-link" data-tab="tabAnalisisIA" onclick="switchTab('tabAnalisisIA', this)">
+                    <span style="display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; font-size: 18px;">🧠</span>
+                    Análisis IA
+                </button>
+            </li>
         </ul>
 
         <div class="sidebar-footer">
@@ -1193,6 +1199,7 @@
             <button class="tab-btn" data-tab="tabAsesorias" onclick="switchTab('tabAsesorias', this)">Asesorías / Telemedicina</button>
             <button class="tab-btn" data-tab="tabContactos" onclick="switchTab('tabContactos', this)">Contactos</button>
             <button class="tab-btn" data-tab="tabReportes" onclick="switchTab('tabReportes', this)">Reportes</button>
+            <button class="tab-btn" data-tab="tabAnalisisIA" onclick="switchTab('tabAnalisisIA', this)">Análisis IA</button>
         </div>
 
         <!-- Dashboard Tab -->
@@ -1558,7 +1565,81 @@
                 </div>
             </div>
         </div>
+
+        <!-- Análisis IA Tab -->
+        <div id="tabAnalisisIA" class="tab-content">
+            <div style="background-color: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 30px;">
+                    <div style="font-size: 32px;">🧠</div>
+                    <div>
+                        <h2 style="margin: 0; font-size: 28px; color: #0C2340; font-weight: 700;">Análisis de Sentimiento y Retroalimentación</h2>
+                        <p style="margin: 5px 0 0 0; color: #666; font-size: 14px;">Utiliza PUM-AI para analizar el sentimiento en descripciones, comentarios y mensajes de usuarios</p>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <button class="btn-primary" onclick="runSentimentAnalysis()" style="background-color: #0C2340; color: white; padding: 12px 30px; border: none; border-radius: 6px; font-size: 16px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background-color 0.3s ease;">
+                        <span>⚡</span>
+                        <span>Ejecutar Análisis con PUM-AI</span>
+                    </button>
+                </div>
+
+                <!-- Loading Spinner -->
+                <div id="sentimentLoadingSpinner" style="display: none; text-align: center; margin: 40px 0;">
+                    <div style="display: inline-block;">
+                        <div style="
+                            width: 50px;
+                            height: 50px;
+                            border: 4px solid #0C2340;
+                            border-top: 4px solid #C4A24E;
+                            border-radius: 50%;
+                            animation: spin 1s linear infinite;
+                        "></div>
+                    </div>
+                    <p style="margin-top: 15px; color: #666; font-size: 14px;">Analizando datos... Por favor espera</p>
+                </div>
+
+                <!-- Results Area -->
+                <div id="sentimentResultsArea" style="display: none;">
+                    <!-- Resumen General -->
+                    <div style="background-color: #FAF8F4; padding: 20px; border-left: 4px solid #C4A24E; margin-bottom: 20px; border-radius: 4px;">
+                        <h3 style="margin-top: 0; color: #0C2340; font-size: 18px;">Resumen General</h3>
+                        <div id="sentimentSummary" style="color: #333; line-height: 1.6; font-size: 15px;"></div>
+                    </div>
+
+                    <!-- Lo que hacemos bien -->
+                    <div style="background-color: #E8F5E9; padding: 20px; border-left: 4px solid #4CAF50; margin-bottom: 20px; border-radius: 4px;">
+                        <h3 style="margin-top: 0; color: #2E7D32; font-size: 18px;">✓ Lo que hacemos bien</h3>
+                        <div id="sentimentStrengths" style="color: #333; line-height: 1.6; font-size: 15px;"></div>
+                    </div>
+
+                    <!-- Áreas de mejora -->
+                    <div style="background-color: #FFF3E0; padding: 20px; border-left: 4px solid #FF9800; margin-bottom: 20px; border-radius: 4px;">
+                        <h3 style="margin-top: 0; color: #E65100; font-size: 18px;">⚠ Áreas de mejora</h3>
+                        <div id="sentimentImprovements" style="color: #333; line-height: 1.6; font-size: 15px;"></div>
+                    </div>
+
+                    <!-- Acciones recomendadas -->
+                    <div style="background-color: #E3F2FD; padding: 20px; border-left: 4px solid #2196F3; margin-bottom: 20px; border-radius: 4px;">
+                        <h3 style="margin-top: 0; color: #1565C0; font-size: 18px;">📋 Acciones recomendadas</h3>
+                        <div id="sentimentActions" style="color: #333; line-height: 1.6; font-size: 15px;"></div>
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <div id="sentimentErrorArea" style="display: none; background-color: #FFEBEE; padding: 20px; border-left: 4px solid #F44336; border-radius: 4px; color: #C62828;">
+                    <h3 style="margin-top: 0; font-size: 16px;">Error al ejecutar análisis</h3>
+                    <p id="sentimentErrorMessage" style="margin-bottom: 0; font-size: 15px;"></p>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <style>
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 
     <!-- Detail Modal -->
     <div id="modalDetalle" class="modal">
