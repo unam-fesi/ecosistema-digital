@@ -1041,6 +1041,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 
     <div class="form-card reveal d1">
       <form onsubmit="event.preventDefault();showToast('Solicitud de espacio registrada')">
+        <input type="hidden" id="espacioDateInput" name="espacio_fecha" value="">
         <div class="form-grid">
           <div class="form-group"><label class="form-label">Nombre <span class="req">*</span></label><input class="input" placeholder="Nombre completo" required></div>
           <div class="form-group"><label class="form-label">Correo <span class="req">*</span></label><input class="input" type="email" placeholder="correo@ejemplo.com" required></div>
@@ -1052,8 +1053,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
         <div class="form-group"><label class="form-label">Motivo <span class="req">*</span></label><input class="input" placeholder="Ej. Práctica de simulación clínica" required></div>
         <div class="form-group"><label class="form-label">Actividad a realizar</label><textarea class="input" rows="3" placeholder="Describa la actividad..."></textarea></div>
         <div class="form-group"><label class="form-label">Tecnología requerida</label><select class="input"><option value="">Seleccionar...</option><option>Inteligencia Artificial</option><option>Realidad Virtual</option><option>Realidad Aumentada</option><option>Bases de Datos</option><option>Telemedicina</option><option>Otro</option><option>Ninguno</option></select></div>
-        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0 20px">
-          <div class="form-group"><label class="form-label">Fecha <span class="req">*</span></label><input class="input" type="date" required></div>
+        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0 20px">
           <div class="form-group"><label class="form-label">Hora inicio <span class="req">*</span></label><input class="input" type="time" required></div>
           <div class="form-group"><label class="form-label">Hora término <span class="req">*</span></label><input class="input" type="time" required></div>
         </div>
@@ -1636,6 +1636,13 @@ galeriaItems.forEach((g,i)=>{
   </div>`;
 });
 
+/* ─── ESCAPE HTML ─── */
+function escapeHTML(text){
+  if(!text)return '';
+  const map={'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
+  return String(text).replace(/[&<>"']/g,char=>map[char]);
+}
+
 /* ─── SCROLL LOGIC ─── */
 window.addEventListener('scroll',()=>{
   const h=document.documentElement.scrollHeight-window.innerHeight;
@@ -1970,7 +1977,7 @@ function loadCursos(){
   }
   (async()=>{
     try{
-      const{data,error}=await supabaseClient.from('cursos').select('*').eq('activo',true).order('created_at',{ascending:false});
+      const{data,error}=await supabaseClient.from('cursos').select('*').eq('activo',true).order('fecha_inicio',{ascending:true});
       if(error)throw error;
       const grid=document.getElementById('cursosGrid');
       if(data&&data.length>0){
@@ -2080,7 +2087,7 @@ function loadBadges(){
   }
   (async()=>{
     try{
-      const{data:badges,error:error1}=await supabaseClient.from('badges').select('*');
+      const{data:badges,error:error1}=await supabaseClient.from('badges').select('*').eq('activo',true);
       if(error1)throw error1;
       const grid=document.getElementById('badgesGrid');
       if(badges&&badges.length>0){
@@ -2104,7 +2111,7 @@ function loadPremios(){
   }
   (async()=>{
     try{
-      const{data:premios,error}=await supabaseClient.from('premios').select('*').order('puntos_requeridos');
+      const{data:premios,error}=await supabaseClient.from('premios').select('*').eq('activo',true).order('puntos_requeridos');
       if(error)throw error;
       const grid=document.getElementById('premiosGrid');
       if(premios&&premios.length>0){
@@ -2165,10 +2172,13 @@ function loadNotifications(){
   }
   (async()=>{
     try{
+      const today=new Date().toISOString().split('T')[0];
       const{data,error}=await supabaseClient
         .from('notificaciones')
         .select('*')
         .eq('activa',true)
+        .lte('fecha_inicio',today)
+        .gte('fecha_fin',today)
         .order('created_at',{ascending:false})
         .limit(1);
       if(error)throw error;
@@ -2249,11 +2259,12 @@ function selectCalendarDate(dateStr){
     showToast('Esta fecha ya tiene reserva');
     return;
   }
-  const dateInput=document.querySelector('input[type="date"]');
+  // Set the hidden date input for the espacio form
+  const dateInput=document.getElementById('espacioDateInput');
   if(dateInput)dateInput.value=dateStr;
   document.querySelectorAll('.calendar-day').forEach(d=>d.classList.remove('selected'));
   event.target.classList.add('selected');
-  showToast('Fecha seleccionada');
+  showToast('Fecha seleccionada: '+dateStr);
 }
 
 function initCalendar(){
@@ -2278,7 +2289,12 @@ function initSupabaseFeatures(){
   loadLeaderboard();
   initCalendar();
 }
-initSupabaseFeatures();
+// Wait for DOM to be ready and for deferred scripts to load
+if(document.readyState==='loading'){
+  document.addEventListener('DOMContentLoaded',()=>setTimeout(initSupabaseFeatures,500));
+}else{
+  setTimeout(initSupabaseFeatures,500);
+}
 </script>
 <!-- Supabase SDK + config (carga después para no bloquear) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
