@@ -1602,6 +1602,46 @@ async function sendChatMessage(){
     }
   }catch(e){hideTyping();addBotMsg('Lo siento, ocurrió un error. Intenta de nuevo en un momento.');}
 }
+
+/* ─── VALIDACIÓN DE FECHAS Y HORAS: no permitir fechas/horas anteriores ─── */
+(function(){
+  const today=new Date();
+  const yyyy=today.getFullYear();
+  const mm=String(today.getMonth()+1).padStart(2,'0');
+  const dd=String(today.getDate()).padStart(2,'0');
+  const minDate=`${yyyy}-${mm}-${dd}`;
+
+  // Establecer min en todos los inputs type="date"
+  document.querySelectorAll('input[type="date"]').forEach(inp=>{
+    inp.setAttribute('min',minDate);
+    inp.addEventListener('change',function(){
+      if(this.value && this.value<minDate){
+        this.value='';
+        showToast('No puedes seleccionar una fecha anterior a hoy');
+      }
+    });
+  });
+
+  // Validación de hora: si la fecha es hoy, la hora no puede ser anterior a la actual
+  document.querySelectorAll('input[type="time"]').forEach(inp=>{
+    inp.addEventListener('change',function(){
+      const form=this.closest('form');
+      if(!form)return;
+      const dateInput=form.querySelector('input[type="date"]');
+      if(!dateInput||!dateInput.value)return;
+      if(dateInput.value===minDate){
+        const now=new Date();
+        const hh=String(now.getHours()).padStart(2,'0');
+        const mi=String(now.getMinutes()).padStart(2,'0');
+        const currentTime=`${hh}:${mi}`;
+        if(this.value && this.value<currentTime){
+          this.value='';
+          showToast('No puedes seleccionar una hora que ya pasó');
+        }
+      }
+    });
+  });
+})();
 </script>
 <!-- Supabase SDK + config (carga después para no bloquear) -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
