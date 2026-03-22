@@ -79,7 +79,7 @@ function formatStatus(estado) {
  */
 async function fetchSolicitudesServicios() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('solicitudes_servicios')
       .select('*')
       .order('fecha_solicitud', { ascending: false });
@@ -99,7 +99,7 @@ async function fetchSolicitudesServicios() {
  */
 async function fetchSolicitudesEspacios() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('solicitudes_espacios')
       .select('*')
       .order('fecha_solicitud', { ascending: false });
@@ -119,7 +119,7 @@ async function fetchSolicitudesEspacios() {
  */
 async function fetchSolicitudesAsesoria() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('solicitudes_asesoria')
       .select('*')
       .order('fecha_solicitud', { ascending: false });
@@ -139,7 +139,7 @@ async function fetchSolicitudesAsesoria() {
  */
 async function fetchContactos() {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('contactos')
       .select('*')
       .order('fecha', { ascending: false });
@@ -161,7 +161,7 @@ async function fetchContactos() {
  */
 async function fetchSeguimientos(tipo, id) {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
       .from('seguimientos')
       .select('*')
       .eq('tipo_solicitud', tipo)
@@ -192,7 +192,7 @@ async function updateEstado(tabla, id, estado) {
   }
 
   try {
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from(tabla)
       .update({ estado })
       .eq('id', id);
@@ -222,7 +222,7 @@ async function updateAsignado(tabla, id, asignado) {
   }
 
   try {
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from(tabla)
       .update({ asignado_a: asignado })
       .eq('id', id);
@@ -256,7 +256,7 @@ async function addSeguimiento(tipo, id, nota) {
   }
 
   try {
-    const { error } = await supabase
+    const { error } = await supabaseClient
       .from('seguimientos')
       .insert([{
         tipo_solicitud: tipo,
@@ -980,7 +980,7 @@ async function loadAllData() {
  */
 function setupRealtimeUpdates() {
   // Suscribirse a cambios en solicitudes_servicios
-  supabase
+  supabaseClient
     .channel('servicios_changes')
     .on('postgres_changes', {
       event: '*',
@@ -996,7 +996,7 @@ function setupRealtimeUpdates() {
     .subscribe();
 
   // Similar para otras tablas
-  supabase
+  supabaseClient
     .channel('espacios_changes')
     .on('postgres_changes', {
       event: '*',
@@ -1010,7 +1010,7 @@ function setupRealtimeUpdates() {
     })
     .subscribe();
 
-  supabase
+  supabaseClient
     .channel('asesoria_changes')
     .on('postgres_changes', {
       event: '*',
@@ -1024,7 +1024,7 @@ function setupRealtimeUpdates() {
     })
     .subscribe();
 
-  supabase
+  supabaseClient
     .channel('contactos_changes')
     .on('postgres_changes', {
       event: '*',
