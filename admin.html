@@ -1207,6 +1207,12 @@
                     Badges
                 </button>
             </li>
+            <li class="nav-item">
+                <button class="nav-link" data-tab="tabInventario" onclick="switchTab('tabInventario', this)">
+                    <span style="display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; font-size: 18px;">📦</span>
+                    Inventario
+                </button>
+            </li>
         </ul>
 
         <div class="sidebar-footer">
@@ -2061,6 +2067,217 @@
                 </div>
             </div>
         </div>
+
+        <!-- Inventario Tab -->
+        <div id="tabInventario" class="tab-content">
+            <!-- Tab Navigation -->
+            <div style="margin-bottom: 20px; border-bottom: 2px solid var(--border-gray); display: flex; gap: 20px;">
+                <button class="tab-switch-btn active" onclick="switchInventorySubtab('hardware', this)" style="padding: 10px 20px; border: none; background: none; font-size: 16px; font-weight: 600; cursor: pointer; color: #0C2340; border-bottom: 3px solid #C4A24E; margin-bottom: -2px;">Hardware</button>
+                <button class="tab-switch-btn" onclick="switchInventorySubtab('software', this)" style="padding: 10px 20px; border: none; background: none; font-size: 16px; font-weight: 600; cursor: pointer; color: #666; margin-bottom: -2px;">Software</button>
+            </div>
+
+            <!-- Hardware Section -->
+            <div id="hardwareSection" class="subtab-content active">
+                <h2 style="color: #0C2340; margin-top: 20px; margin-bottom: 20px;">Gestión de Hardware</h2>
+
+                <!-- Summary Cards -->
+                <div class="summary-grid" style="margin-bottom: 30px;">
+                    <div class="summary-card">
+                        <div class="summary-card-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2z" fill="white"/>
+                            </svg>
+                        </div>
+                        <div class="summary-card-content">
+                            <h3>Total Items</h3>
+                            <div class="number" id="totalHardware">0</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-card-icon" style="background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="white"/>
+                            </svg>
+                        </div>
+                        <div class="summary-card-content">
+                            <h3>Operativos</h3>
+                            <div class="number" id="operativosHardware">0</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-card-icon" style="background: linear-gradient(135deg, #FFC107 0%, #FFB300 100%);">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="white"/>
+                            </svg>
+                        </div>
+                        <div class="summary-card-content">
+                            <h3>En Mantenimiento</h3>
+                            <div class="number" id="mantenimientoHardware">0</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-card-icon" style="background: linear-gradient(135deg, #F44336 0%, #DA190B 100%);">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41z" fill="white"/>
+                            </svg>
+                        </div>
+                        <div class="summary-card-content">
+                            <h3>Dados de Baja</h3>
+                            <div class="number" id="bajasHardware">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters and Actions -->
+                <div class="table-header" style="margin-bottom: 20px;">
+                    <div class="table-search">
+                        <input type="text" id="searchHardware" placeholder="Buscar hardware...">
+                    </div>
+                    <div class="table-filters">
+                        <select id="filterServicio" class="filter-select">
+                            <option value="">Todos los servicios</option>
+                            <option value="ti">Tecnología e Información</option>
+                            <option value="admin">Administración</option>
+                            <option value="operaciones">Operaciones</option>
+                        </select>
+                        <button class="btn-primary" onclick="showAddHardwareForm()">+ Agregar Hardware</button>
+                    </div>
+                </div>
+
+                <!-- Hardware Table -->
+                <div class="table-wrapper">
+                    <table id="tablaHardware">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nombre</th>
+                                <th>Servicio</th>
+                                <th>Marca/Modelo</th>
+                                <th>No. Serie</th>
+                                <th>Estado</th>
+                                <th>Valor Actual</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyHardware">
+                            <tr>
+                                <td colspan="8" class="empty-state">
+                                    <p>No hay items de hardware. Cuando se agreguen, aparecerán aquí.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Software Section -->
+            <div id="softwareSection" class="subtab-content" style="display: none;">
+                <h2 style="color: #0C2340; margin-top: 20px; margin-bottom: 20px;">Gestión de Software</h2>
+
+                <!-- Summary Cards -->
+                <div class="summary-grid" style="margin-bottom: 30px;">
+                    <div class="summary-card">
+                        <div class="summary-card-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4V4c0-1.1-.9-2-2-2z" fill="white"/>
+                            </svg>
+                        </div>
+                        <div class="summary-card-content">
+                            <h3>Total Software</h3>
+                            <div class="number" id="totalSoftware">0</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-card-icon" style="background: linear-gradient(135deg, #FF6B6B 0%, #FF5252 100%);">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" fill="white"/>
+                            </svg>
+                        </div>
+                        <div class="summary-card-content">
+                            <h3>Vencen Pronto (90 días)</h3>
+                            <div class="number" id="vencenProntoSoftware">0</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-card-icon" style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" fill="white"/>
+                            </svg>
+                        </div>
+                        <div class="summary-card-content">
+                            <h3>Open Source</h3>
+                            <div class="number" id="openSourceSoftware">0</div>
+                        </div>
+                    </div>
+
+                    <div class="summary-card">
+                        <div class="summary-card-icon" style="background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%);">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="white"/>
+                            </svg>
+                        </div>
+                        <div class="summary-card-content">
+                            <h3>Suscripciones Activas</h3>
+                            <div class="number" id="activeSoftware">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filters and Actions -->
+                <div class="table-header" style="margin-bottom: 20px;">
+                    <div class="table-search">
+                        <input type="text" id="searchSoftware" placeholder="Buscar software...">
+                    </div>
+                    <div class="table-filters">
+                        <select id="filterServicioSoftware" class="filter-select">
+                            <option value="">Todos los servicios</option>
+                            <option value="ti">Tecnología e Información</option>
+                            <option value="admin">Administración</option>
+                            <option value="operaciones">Operaciones</option>
+                        </select>
+                        <button class="btn-primary" onclick="showAddSoftwareForm()">+ Agregar Software</button>
+                    </div>
+                </div>
+
+                <!-- Software Table -->
+                <div class="table-wrapper">
+                    <table id="tablaSoftware">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nombre</th>
+                                <th>Servicio</th>
+                                <th>Versión</th>
+                                <th>Tipo Licencia</th>
+                                <th>Vencimiento</th>
+                                <th>Costo</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodySoftware">
+                            <tr>
+                                <td colspan="8" class="empty-state">
+                                    <p>No hay software registrado. Cuando se agregue, aparecerá aquí.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Depreciation Chart -->
+            <div style="margin-top: 40px; background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
+                <h3 style="color: #0C2340; margin-top: 0;">Gráfico de Depreciación</h3>
+                <div id="depreciationChart" style="height: 300px;">
+                    <!-- Chart will be rendered here -->
+                </div>
+            </div>
+        </div>
     </div>
 
     <style>
@@ -2132,6 +2349,108 @@
                 <!-- Botones -->
                 <div class="button-group" style="margin-top: 30px;">
                     <button class="btn-secondary" onclick="closeModal()">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Modal -->
+    <div id="modalInventario" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 id="inventarioModalTitle">Agregar Hardware</h2>
+                <button class="modal-close" onclick="closeInventoryModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
+                    <!-- Type selector (hidden but available) -->
+                    <input type="hidden" id="inventarioType" value="hardware">
+
+                    <!-- Nombre -->
+                    <div class="form-group-modal">
+                        <label for="inventarioNombre">Nombre</label>
+                        <input type="text" id="inventarioNombre" placeholder="Ej: Laptop Dell XPS" class="form-input">
+                    </div>
+
+                    <!-- Servicio -->
+                    <div class="form-group-modal">
+                        <label for="inventarioServicio">Servicio</label>
+                        <select id="inventarioServicio" class="form-input">
+                            <option value="">Seleccionar servicio</option>
+                            <option value="ti">Tecnología e Información</option>
+                            <option value="admin">Administración</option>
+                            <option value="operaciones">Operaciones</option>
+                        </select>
+                    </div>
+
+                    <!-- Marca/Modelo -->
+                    <div class="form-group-modal" id="hardwareMarkField" style="display: none;">
+                        <label for="inventarioMarca">Marca/Modelo</label>
+                        <input type="text" id="inventarioMarca" placeholder="Ej: Dell XPS 15" class="form-input">
+                    </div>
+
+                    <!-- Número de Serie -->
+                    <div class="form-group-modal" id="hardwareSerieField" style="display: none;">
+                        <label for="inventarioSerie">Número de Serie</label>
+                        <input type="text" id="inventarioSerie" placeholder="Ej: ABC123456" class="form-input">
+                    </div>
+
+                    <!-- Estado -->
+                    <div class="form-group-modal">
+                        <label for="inventarioEstado">Estado</label>
+                        <select id="inventarioEstado" class="form-input">
+                            <option value="operativo">Operativo</option>
+                            <option value="mantenimiento">En Mantenimiento</option>
+                            <option value="baja">Dado de Baja</option>
+                        </select>
+                    </div>
+
+                    <!-- Valor Actual -->
+                    <div class="form-group-modal">
+                        <label for="inventarioValor">Valor Actual ($)</label>
+                        <input type="number" id="inventarioValor" placeholder="0.00" class="form-input" step="0.01">
+                    </div>
+
+                    <!-- Versión (Software only) -->
+                    <div class="form-group-modal" id="softwareVersionField" style="display: none;">
+                        <label for="inventarioVersion">Versión</label>
+                        <input type="text" id="inventarioVersion" placeholder="Ej: 2.5.1" class="form-input">
+                    </div>
+
+                    <!-- Tipo Licencia (Software only) -->
+                    <div class="form-group-modal" id="softwareLicenseField" style="display: none;">
+                        <label for="inventarioLicencia">Tipo Licencia</label>
+                        <select id="inventarioLicencia" class="form-input">
+                            <option value="">Seleccionar tipo</option>
+                            <option value="perpetua">Perpetua</option>
+                            <option value="suscripcion">Suscripción</option>
+                            <option value="open-source">Open Source</option>
+                            <option value="trial">Prueba</option>
+                        </select>
+                    </div>
+
+                    <!-- Vencimiento (Software only) -->
+                    <div class="form-group-modal" id="softwareExpiryField" style="display: none;">
+                        <label for="inventarioVencimiento">Fecha de Vencimiento</label>
+                        <input type="date" id="inventarioVencimiento" class="form-input">
+                    </div>
+
+                    <!-- Costo (Software only) -->
+                    <div class="form-group-modal" id="softwareCostField" style="display: none;">
+                        <label for="inventarioCosto">Costo ($)</label>
+                        <input type="number" id="inventarioCosto" placeholder="0.00" class="form-input" step="0.01">
+                    </div>
+
+                    <!-- Notas -->
+                    <div class="form-group-modal">
+                        <label for="inventarioNotas">Notas</label>
+                        <textarea id="inventarioNotas" placeholder="Observaciones adicionales..." class="form-input" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="button-group" style="margin-top: 20px;">
+                    <button class="btn-primary" onclick="saveInventoryItem()">Guardar</button>
+                    <button class="btn-secondary" onclick="closeInventoryModal()">Cancelar</button>
                 </div>
             </div>
         </div>
@@ -2220,6 +2539,120 @@
             console.log('Adding note');
         }
 
+        // Inventory Management Functions
+        function switchInventorySubtab(section, buttonElement) {
+            // Hide all subtabs
+            document.getElementById('hardwareSection').style.display = 'none';
+            document.getElementById('softwareSection').style.display = 'none';
+
+            // Remove active class from buttons
+            document.querySelectorAll('.tab-switch-btn').forEach(btn => {
+                btn.style.color = '#666';
+                btn.style.borderBottom = 'none';
+            });
+
+            // Show selected section
+            if (section === 'hardware') {
+                document.getElementById('hardwareSection').style.display = 'block';
+            } else if (section === 'software') {
+                document.getElementById('softwareSection').style.display = 'block';
+            }
+
+            // Highlight active button
+            buttonElement.style.color = '#0C2340';
+            buttonElement.style.borderBottom = '3px solid #C4A24E';
+            buttonElement.style.marginBottom = '-2px';
+        }
+
+        function showAddHardwareForm() {
+            document.getElementById('inventarioType').value = 'hardware';
+            document.getElementById('inventarioModalTitle').textContent = 'Agregar Hardware';
+
+            // Show hardware fields, hide software fields
+            document.getElementById('hardwareMarkField').style.display = 'block';
+            document.getElementById('hardwareSerieField').style.display = 'block';
+            document.getElementById('softwareVersionField').style.display = 'none';
+            document.getElementById('softwareLicenseField').style.display = 'none';
+            document.getElementById('softwareExpiryField').style.display = 'none';
+            document.getElementById('softwareCostField').style.display = 'none';
+
+            // Clear form
+            clearInventoryForm();
+            document.getElementById('modalInventario').classList.add('show');
+        }
+
+        function showAddSoftwareForm() {
+            document.getElementById('inventarioType').value = 'software';
+            document.getElementById('inventarioModalTitle').textContent = 'Agregar Software';
+
+            // Hide hardware fields, show software fields
+            document.getElementById('hardwareMarkField').style.display = 'none';
+            document.getElementById('hardwareSerieField').style.display = 'none';
+            document.getElementById('softwareVersionField').style.display = 'block';
+            document.getElementById('softwareLicenseField').style.display = 'block';
+            document.getElementById('softwareExpiryField').style.display = 'block';
+            document.getElementById('softwareCostField').style.display = 'block';
+
+            // Clear form
+            clearInventoryForm();
+            document.getElementById('modalInventario').classList.add('show');
+        }
+
+        function clearInventoryForm() {
+            document.getElementById('inventarioNombre').value = '';
+            document.getElementById('inventarioServicio').value = '';
+            document.getElementById('inventarioMarca').value = '';
+            document.getElementById('inventarioSerie').value = '';
+            document.getElementById('inventarioEstado').value = 'operativo';
+            document.getElementById('inventarioValor').value = '';
+            document.getElementById('inventarioVersion').value = '';
+            document.getElementById('inventarioLicencia').value = '';
+            document.getElementById('inventarioVencimiento').value = '';
+            document.getElementById('inventarioCosto').value = '';
+            document.getElementById('inventarioNotas').value = '';
+        }
+
+        function saveInventoryItem() {
+            const type = document.getElementById('inventarioType').value;
+            const nombre = document.getElementById('inventarioNombre').value;
+            const servicio = document.getElementById('inventarioServicio').value;
+            const estado = document.getElementById('inventarioEstado').value;
+
+            if (!nombre || !servicio) {
+                alert('Por favor complete los campos obligatorios');
+                return;
+            }
+
+            // Collect item data
+            const itemData = {
+                nombre,
+                servicio,
+                estado,
+                valor: document.getElementById('inventarioValor').value,
+                notas: document.getElementById('inventarioNotas').value
+            };
+
+            if (type === 'hardware') {
+                itemData.marca = document.getElementById('inventarioMarca').value;
+                itemData.serie = document.getElementById('inventarioSerie').value;
+            } else if (type === 'software') {
+                itemData.version = document.getElementById('inventarioVersion').value;
+                itemData.licencia = document.getElementById('inventarioLicencia').value;
+                itemData.vencimiento = document.getElementById('inventarioVencimiento').value;
+                itemData.costo = document.getElementById('inventarioCosto').value;
+            }
+
+            console.log('Saving inventory item:', itemData);
+            // Save functionality handled by admin.js
+
+            closeInventoryModal();
+            alert('Item guardado exitosamente');
+        }
+
+        function closeInventoryModal() {
+            document.getElementById('modalInventario').classList.remove('show');
+        }
+
         // Hamburger menu toggle
         document.getElementById('hamburgerBtn').addEventListener('click', function() {
             const sidebar = document.getElementById('sidebar');
@@ -2266,6 +2699,13 @@
         document.getElementById('modalDetalle').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeModal();
+            }
+        });
+
+        // Close inventory modal when clicking outside
+        document.getElementById('modalInventario').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeInventoryModal();
             }
         });
     </script>
