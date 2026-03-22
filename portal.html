@@ -2,1152 +2,278 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Mi Portal - Ecosistema Digital</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        * { margin:0; padding:0; box-sizing:border-box; }
         :root {
-            --navy: #0C2340;
-            --gold: #C4A24E;
-            --cream: #FAF8F4;
-            --light-gray: #F5F3F0;
-            --dark-gray: #3A3A3A;
-            --success: #10B981;
-            --warning: #F59E0B;
-            --info: #3B82F6;
-            --pending: #FBBF24;
-            --in-process: #60A5FA;
-            --completed: #34D399;
+            --navy:#0C2340; --gold:#C4A24E; --cream:#FAF8F4;
+            --light-gray:#F5F3F0; --dark-gray:#3A3A3A;
+            --success:#10B981; --warning:#F59E0B; --info:#3B82F6;
         }
+        body { font-family:'Inter',sans-serif; background:var(--cream); color:var(--dark-gray); line-height:1.6; }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--cream);
-            color: var(--dark-gray);
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Top Navigation Bar */
+        /* Top Bar */
         .top-bar {
-            background: linear-gradient(135deg, var(--navy) 0%, #1a3555 100%);
-            color: white;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            background:linear-gradient(135deg,var(--navy) 0%,#1a3555 100%);
+            color:#fff; padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center;
+            position:sticky; top:0; z-index:100; box-shadow:0 2px 12px rgba(0,0,0,0.12);
         }
-
-        .top-bar-left {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
+        .top-bar-left { display:flex; align-items:center; gap:14px; }
         .user-avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background-color: var(--gold);
-            color: var(--navy);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 18px;
+            width:44px; height:44px; border-radius:50%; background:var(--gold); color:var(--navy);
+            display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px;
         }
-
-        .user-info {
-            display: flex;
-            flex-direction: column;
+        .user-info { display:flex; flex-direction:column; }
+        .user-name { font-weight:600; font-size:15px; }
+        .user-email { font-size:12px; opacity:0.8; }
+        .top-bar-right { display:flex; gap:12px; align-items:center; }
+        .btn-home {
+            background:transparent; border:1px solid rgba(255,255,255,0.3); color:#fff;
+            padding:8px 16px; border-radius:8px; cursor:pointer; font-size:13px; text-decoration:none;
+            transition:all 0.2s;
         }
-
-        .user-name {
-            font-weight: 600;
-            font-size: 16px;
+        .btn-home:hover { background:rgba(255,255,255,0.1); }
+        .btn-logout {
+            background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#FCA5A5;
+            padding:8px 16px; border-radius:8px; cursor:pointer; font-size:13px; transition:all 0.2s;
         }
-
-        .user-email {
-            font-size: 12px;
-            opacity: 0.9;
-        }
-
-        .top-bar-right {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .logout-btn {
-            background-color: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-color: var(--gold);
-        }
-
-        /* Welcome Section */
-        .welcome-section {
-            background: linear-gradient(135deg, var(--navy) 0%, #1a3555 100%);
-            color: white;
-            padding: 3rem 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .welcome-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .welcome-greeting {
-            font-family: 'Playfair Display', serif;
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
-
-        .welcome-subtext {
-            font-size: 16px;
-            opacity: 0.95;
-            margin-bottom: 2rem;
-        }
-
-        .stats-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(196, 162, 78, 0.3);
-            border-radius: 8px;
-            padding: 1.5rem;
-            backdrop-filter: blur(10px);
-        }
-
-        .stat-number {
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--gold);
-        }
-
-        .stat-label {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-top: 0.5rem;
-        }
-
-        /* Horizontal Navigation */
-        .nav-pills {
-            max-width: 1200px;
-            margin: 2rem auto 0;
-            padding: 0 2rem;
-            display: flex;
-            gap: 1rem;
-            overflow-x: auto;
-            scroll-behavior: smooth;
-            padding-bottom: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .nav-pills::-webkit-scrollbar {
-            height: 4px;
-        }
-
-        .nav-pills::-webkit-scrollbar-track {
-            background: var(--light-gray);
-            border-radius: 4px;
-        }
-
-        .nav-pills::-webkit-scrollbar-thumb {
-            background: var(--gold);
-            border-radius: 4px;
-        }
-
-        .nav-pill {
-            background: white;
-            border: 2px solid transparent;
-            color: var(--navy);
-            padding: 0.75rem 1.5rem;
-            border-radius: 24px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            white-space: nowrap;
-            font-size: 14px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-
-        .nav-pill:hover {
-            border-color: var(--gold);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .nav-pill.active {
-            background: var(--gold);
-            border-color: var(--gold);
-            color: var(--navy);
-        }
+        .btn-logout:hover { background:rgba(239,68,68,0.3); }
 
         /* Main Content */
-        .main-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem 3rem;
+        .portal-container { max-width:1100px; margin:0 auto; padding:24px 20px 60px; }
+
+        /* Welcome */
+        .portal-welcome {
+            background:linear-gradient(135deg,var(--navy),#1a3555);
+            color:#fff; border-radius:16px; padding:28px 32px; margin-bottom:24px;
+            display:flex; justify-content:space-between; align-items:center;
+        }
+        .portal-welcome h1 { font-family:'Playfair Display',serif; font-size:24px; margin-bottom:4px; }
+        .portal-welcome p { opacity:0.85; font-size:14px; }
+        .portal-welcome-right { text-align:right; }
+        .portal-welcome-right span { font-size:36px; }
+
+        /* Summary Cards */
+        .summary-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+        .summary-card {
+            background:#fff; border-radius:14px; padding:20px; text-align:center;
+            box-shadow:0 2px 12px rgba(12,35,64,0.06); border:1px solid rgba(12,35,64,0.06);
+            transition:transform 0.2s;
+        }
+        .summary-card:hover { transform:translateY(-2px); }
+        .summary-card .sc-icon { font-size:28px; margin-bottom:8px; }
+        .summary-card .sc-value { font-size:28px; font-weight:700; color:var(--navy); }
+        .summary-card .sc-label { font-size:12px; color:#94A3B8; margin-top:4px; }
+
+        /* Notifications Banner */
+        .notif-banner { margin-bottom:24px; }
+        .notif-card {
+            display:flex; align-items:flex-start; gap:12px; background:#fff;
+            border-radius:12px; padding:14px 18px; margin-bottom:8px;
+            border-left:4px solid var(--gold); box-shadow:0 1px 6px rgba(0,0,0,0.04);
+        }
+        .notif-icon { font-size:20px; flex-shrink:0; margin-top:2px; }
+
+        /* Navigation Tabs */
+        .portal-nav {
+            display:flex; gap:4px; background:#fff; border-radius:14px; padding:6px;
+            margin-bottom:24px; box-shadow:0 2px 8px rgba(0,0,0,0.04);
+            overflow-x:auto;
+        }
+        .portal-nav-btn {
+            padding:10px 20px; border:none; background:transparent; border-radius:10px;
+            cursor:pointer; font-size:13px; font-weight:500; color:#64748B;
+            transition:all 0.2s; white-space:nowrap;
+        }
+        .portal-nav-btn.active { background:var(--navy); color:#fff; }
+        .portal-nav-btn:hover:not(.active) { background:var(--light-gray); }
+
+        /* Tab Content */
+        .portal-tab-content { display:none; }
+        .portal-tab-content.active-tab { display:block; }
+
+        /* Section Card */
+        .portal-section {
+            background:#fff; border-radius:14px; padding:24px;
+            box-shadow:0 2px 12px rgba(12,35,64,0.06); margin-bottom:20px;
+        }
+        .portal-section h2 {
+            font-size:18px; color:var(--navy); margin-bottom:16px;
+            padding-bottom:12px; border-bottom:2px solid var(--light-gray);
         }
 
-        .content-section {
-            display: none;
+        /* List Items */
+        .portal-list-item {
+            display:flex; align-items:center; gap:14px; padding:14px 0;
+            border-bottom:1px solid #F1F5F9;
+        }
+        .portal-list-item:last-child { border-bottom:none; }
+        .portal-list-icon {
+            width:42px; height:42px; border-radius:10px; display:flex; align-items:center;
+            justify-content:center; font-size:18px; color:#fff; flex-shrink:0;
+        }
+        .portal-list-info { flex:1; display:flex; flex-direction:column; gap:2px; }
+        .portal-list-info strong { font-size:14px; color:var(--navy); }
+        .portal-list-info span { font-size:12px; color:#64748B; }
+        .portal-status { font-size:12px; font-weight:600; white-space:nowrap; }
+        .portal-badge-tag {
+            padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600;
         }
 
-        .content-section.active {
-            display: block;
-            animation: fadeIn 0.3s ease;
+        /* Badges Grid */
+        .badges-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:16px; }
+        .badge-card-portal {
+            background:var(--light-gray); border-radius:14px; padding:20px; text-align:center;
+            transition:transform 0.2s;
         }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .section-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 28px;
-            font-weight: 700;
-            color: var(--navy);
-            margin-bottom: 2rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .section-icon {
-            font-size: 32px;
-        }
-
-        /* Cards Grid */
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
-            border: 1px solid transparent;
-        }
-
-        .card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
-            border-color: var(--gold);
-        }
-
-        .card-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid var(--light-gray);
-        }
-
-        .card-icon {
-            font-size: 28px;
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--navy);
-            margin: 0;
-        }
-
-        .card-content {
-            color: var(--dark-gray);
-            font-size: 14px;
-            line-height: 1.8;
-        }
-
-        /* Course Card Specific */
-        .course-meta {
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--light-gray);
-            font-size: 13px;
-            color: #666;
-        }
-
-        .course-instructor {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .course-dates {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 6px;
-            background: var(--light-gray);
-            border-radius: 3px;
-            margin-top: 1rem;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--gold), var(--navy));
-            border-radius: 3px;
-            transition: width 0.3s ease;
-        }
-
-        /* Status Badge */
-        .status-badge {
-            display: inline-block;
-            padding: 0.35rem 0.85rem;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-top: 1rem;
-        }
-
-        .status-badge.pending {
-            background-color: #FEF3C7;
-            color: #92400E;
-        }
-
-        .status-badge.in-process {
-            background-color: #DBEAFE;
-            color: #1E40AF;
-        }
-
-        .status-badge.completed {
-            background-color: #D1FAE5;
-            color: #065F46;
-        }
-
-        .status-badge.active {
-            background-color: #D1FAE5;
-            color: #065F46;
-        }
-
-        /* Badge Card */
-        .badge-item {
-            text-align: center;
-            padding: 1.5rem;
-        }
-
-        .badge-image {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 1rem;
-            border-radius: 8px;
-            background: var(--light-gray);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-        }
-
-        .badge-name {
-            font-weight: 600;
-            color: var(--navy);
-            margin-bottom: 0.5rem;
-        }
-
-        .badge-date {
-            font-size: 12px;
-            color: #999;
-        }
-
-        /* Project Card */
-        .project-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .project-tag {
-            background: var(--light-gray);
-            color: var(--navy);
-            padding: 0.25rem 0.75rem;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .project-stats {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 1px solid var(--light-gray);
-            font-size: 13px;
-        }
-
-        .project-stat {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
+        .badge-card-portal:hover { transform:translateY(-3px); }
+        .badge-icon-large { font-size:40px; margin-bottom:8px; }
+        .badge-card-portal strong { font-size:14px; color:var(--navy); display:block; }
 
         /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 3rem 2rem;
-            background: var(--light-gray);
-            border-radius: 12px;
-            color: var(--dark-gray);
-        }
-
-        .empty-icon {
-            font-size: 48px;
-            margin-bottom: 1rem;
-        }
-
-        .empty-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--navy);
-            margin-bottom: 0.5rem;
-        }
-
-        .empty-text {
-            font-size: 14px;
-            color: #666;
-            line-height: 1.6;
-        }
-
-        /* Loading Skeleton */
-        .skeleton {
-            background: linear-gradient(90deg, var(--light-gray) 0%, #fff 50%, var(--light-gray) 100%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            border-radius: 4px;
-        }
-
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-
-        .skeleton-card {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-        }
-
-        .skeleton-title {
-            height: 20px;
-            width: 40%;
-            margin-bottom: 1rem;
-        }
-
-        .skeleton-text {
-            height: 12px;
-            width: 100%;
-            margin-bottom: 0.5rem;
-        }
-
-        /* Info Section */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .info-card {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
-            text-decoration: none;
-            color: inherit;
-            display: block;
-        }
-
-        .info-card:hover {
-            border-color: var(--gold);
-            transform: translateY(-2px);
-        }
-
-        .info-card-icon {
-            font-size: 36px;
-            margin-bottom: 1rem;
-        }
-
-        .info-card-title {
-            font-weight: 600;
-            color: var(--navy);
-            margin-bottom: 0.5rem;
-        }
-
-        .info-card-text {
-            font-size: 13px;
-            color: #666;
-        }
+        .empty-state { text-align:center; padding:40px 20px; color:#94A3B8; }
+        .empty-state p { font-size:14px; }
 
         /* Responsive */
-        @media (max-width: 768px) {
-            .top-bar {
-                flex-direction: column;
-                gap: 1rem;
-            }
-
-            .top-bar-left {
-                width: 100%;
-                justify-content: space-between;
-            }
-
-            .welcome-greeting {
-                font-size: 24px;
-            }
-
-            .stats-container {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
-            }
-
-            .nav-pills {
-                padding: 0 1rem;
-                margin-bottom: 1.5rem;
-            }
-
-            .cards-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .main-container {
-                padding: 0 1rem 2rem;
-            }
-
-            .section-title {
-                font-size: 22px;
-            }
-
-            .welcome-section {
-                padding: 2rem 1rem;
-                margin-bottom: 1rem;
-            }
+        @media (max-width:768px) {
+            .summary-grid { grid-template-columns:repeat(2,1fr); }
+            .portal-welcome { flex-direction:column; text-align:center; gap:12px; }
+            .portal-welcome-right { text-align:center; }
+            .portal-container { padding:16px 12px 40px; }
+            .badges-grid { grid-template-columns:repeat(2,1fr); }
         }
-
-        @media (max-width: 480px) {
-            .top-bar {
-                padding: 0.75rem 1rem;
-            }
-
-            .user-avatar {
-                width: 36px;
-                height: 36px;
-                font-size: 14px;
-            }
-
-            .welcome-greeting {
-                font-size: 20px;
-            }
-
-            .stats-container {
-                grid-template-columns: 1fr;
-            }
-
-            .nav-pills {
-                gap: 0.5rem;
-            }
-
-            .nav-pill {
-                padding: 0.5rem 1rem;
-                font-size: 12px;
-            }
+        @media (max-width:480px) {
+            .summary-grid { grid-template-columns:1fr 1fr; gap:10px; }
+            .summary-card { padding:14px; }
+            .summary-card .sc-value { font-size:22px; }
+            .top-bar { padding:0.8rem 1rem; }
+            .portal-nav-btn { padding:8px 14px; font-size:12px; }
         }
     </style>
 </head>
 <body>
-    <!-- Top Navigation Bar -->
+    <!-- Top Bar -->
     <div class="top-bar">
         <div class="top-bar-left">
-            <div class="user-avatar" id="userAvatar">ED</div>
+            <div class="user-avatar" id="portalUserAvatar">U</div>
             <div class="user-info">
-                <div class="user-name" id="userName">Cargando...</div>
-                <div class="user-email" id="userEmail">user@example.com</div>
+                <span class="user-name" id="portalUserName">Usuario</span>
+                <span class="user-email" id="portalUserEmail">correo@iztacala.unam.mx</span>
             </div>
         </div>
         <div class="top-bar-right">
-            <button class="logout-btn" id="logoutBtn">Cerrar sesión</button>
+            <a href="index.html" class="btn-home">Ir al sitio</a>
+            <button class="btn-logout" id="portalLogoutBtn">Cerrar sesión</button>
         </div>
     </div>
 
-    <!-- Welcome Section -->
-    <div class="welcome-section">
-        <div class="welcome-container">
-            <div class="welcome-greeting" id="greeting">Bienvenido de vuelta</div>
-            <div class="welcome-subtext" id="welcomeSubtext">Tu espacio personal en el Ecosistema Digital</div>
-            <div class="stats-container">
-                <div class="stat-card">
-                    <div class="stat-number" id="coursesCount">0</div>
-                    <div class="stat-label">Cursos inscritos</div>
+    <div class="portal-container">
+        <!-- Welcome Banner -->
+        <div class="portal-welcome">
+            <div>
+                <h1>Bienvenido a tu Portal</h1>
+                <p>Ecosistema Digital — FES Iztacala, UNAM</p>
+            </div>
+            <div class="portal-welcome-right">
+                <span>🎓</span>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="sc-icon">📚</div>
+                <div class="sc-value" id="totalCursosInscritos">0</div>
+                <div class="sc-label">Cursos Inscritos</div>
+            </div>
+            <div class="summary-card">
+                <div class="sc-icon">📋</div>
+                <div class="sc-value" id="totalSolicitudes">0</div>
+                <div class="sc-label">Mis Solicitudes</div>
+            </div>
+            <div class="summary-card">
+                <div class="sc-icon">🏅</div>
+                <div class="sc-value" id="totalBadges">0</div>
+                <div class="sc-label">Badges Obtenidos</div>
+            </div>
+            <div class="summary-card">
+                <div class="sc-icon">💡</div>
+                <div class="sc-value" id="totalProyectos">0</div>
+                <div class="sc-label">Mis Proyectos</div>
+            </div>
+        </div>
+
+        <!-- Notifications -->
+        <div class="notif-banner" id="notificacionesList"></div>
+
+        <!-- Navigation Tabs -->
+        <div class="portal-nav">
+            <button class="portal-nav-btn active" onclick="switchPortalTab('cursos',this)">Mis Cursos</button>
+            <button class="portal-nav-btn" onclick="switchPortalTab('servicios',this)">Solicitudes de Servicio</button>
+            <button class="portal-nav-btn" onclick="switchPortalTab('espacios',this)">Reservas de Espacio</button>
+            <button class="portal-nav-btn" onclick="switchPortalTab('badges',this)">Mis Badges</button>
+            <button class="portal-nav-btn" onclick="switchPortalTab('proyectos',this)">Mis Proyectos</button>
+        </div>
+
+        <!-- Tab: Cursos -->
+        <div class="portal-tab-content active-tab" id="portal-cursos" style="display:block">
+            <div class="portal-section">
+                <h2>Cursos en los que estoy inscrito</h2>
+                <div id="misCursosList">
+                    <div class="empty-state"><p>Cargando...</p></div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="badgesCount">0</div>
-                    <div class="stat-label">Insignias ganadas</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="projectsCount">0</div>
-                    <div class="stat-label">Proyectos publicados</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="requestsCount">0</div>
-                    <div class="stat-label">Solicitudes activas</div>
+            </div>
+        </div>
+
+        <!-- Tab: Solicitudes Servicios -->
+        <div class="portal-tab-content" id="portal-servicios">
+            <div class="portal-section">
+                <h2>Mis Solicitudes de Servicio</h2>
+                <div id="misSolicitudesServiciosList">
+                    <div class="empty-state"><p>Cargando...</p></div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Horizontal Navigation -->
-    <div class="nav-pills">
-        <button class="nav-pill active" data-section="cursos">📚 Mis Cursos</button>
-        <button class="nav-pill" data-section="insignias">⭐ Mis Insignias</button>
-        <button class="nav-pill" data-section="proyectos">🚀 Mis Proyectos</button>
-        <button class="nav-pill" data-section="solicitudes">📋 Mis Solicitudes</button>
-        <button class="nav-pill" data-section="notificaciones">🔔 Notificaciones</button>
-        <button class="nav-pill" data-section="info">ℹ️ Información</button>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-container">
-        <!-- Mis Cursos Section -->
-        <div class="content-section active" id="section-cursos">
-            <div class="section-title">
-                <span class="section-icon">📚</span>
-                Mis Cursos
-            </div>
-            <div class="cards-grid" id="cursosGrid">
-                <!-- Loaded dynamically -->
-            </div>
-            <div class="empty-state" id="cursosEmpty" style="display: none;">
-                <div class="empty-icon">📚</div>
-                <div class="empty-title">Sin cursos inscritos</div>
-                <div class="empty-text">Aún no te has inscrito en ningún curso. Explora nuestro catálogo y comienza tu aprendizaje.</div>
+        <!-- Tab: Reservas Espacios -->
+        <div class="portal-tab-content" id="portal-espacios">
+            <div class="portal-section">
+                <h2>Mis Reservas de Espacio</h2>
+                <div id="misSolicitudesEspaciosList">
+                    <div class="empty-state"><p>Cargando...</p></div>
+                </div>
             </div>
         </div>
 
-        <!-- Mis Insignias Section -->
-        <div class="content-section" id="section-insignias">
-            <div class="section-title">
-                <span class="section-icon">⭐</span>
-                Mis Insignias
-            </div>
-            <div class="cards-grid" id="insigniasGrid">
-                <!-- Loaded dynamically -->
-            </div>
-            <div class="empty-state" id="insigniasEmpty" style="display: none;">
-                <div class="empty-icon">⭐</div>
-                <div class="empty-title">Aún no tienes insignias</div>
-                <div class="empty-text">¡Participa en cursos y proyectos para ganar insignias y desbloquear logros!</div>
+        <!-- Tab: Badges -->
+        <div class="portal-tab-content" id="portal-badges">
+            <div class="portal-section">
+                <h2>Mis Badges y Reconocimientos</h2>
+                <div id="misBadgesList">
+                    <div class="empty-state"><p>Cargando...</p></div>
+                </div>
             </div>
         </div>
 
-        <!-- Mis Proyectos Section -->
-        <div class="content-section" id="section-proyectos">
-            <div class="section-title">
-                <span class="section-icon">🚀</span>
-                Mis Proyectos
-            </div>
-            <div class="cards-grid" id="proyectosGrid">
-                <!-- Loaded dynamically -->
-            </div>
-            <div class="empty-state" id="proyectosEmpty" style="display: none;">
-                <div class="empty-icon">🚀</div>
-                <div class="empty-title">Sin proyectos publicados</div>
-                <div class="empty-text">¡Comparte tus ideas y creatividad! Publica tu primer proyecto en la comunidad.</div>
-            </div>
-        </div>
-
-        <!-- Mis Solicitudes Section -->
-        <div class="content-section" id="section-solicitudes">
-            <div class="section-title">
-                <span class="section-icon">📋</span>
-                Mis Solicitudes
-            </div>
-            <div class="cards-grid" id="solicitudesGrid">
-                <!-- Loaded dynamically -->
-            </div>
-            <div class="empty-state" id="solicitudesEmpty" style="display: none;">
-                <div class="empty-icon">📋</div>
-                <div class="empty-title">Sin solicitudes</div>
-                <div class="empty-text">No tienes solicitudes activas en este momento.</div>
-            </div>
-        </div>
-
-        <!-- Notificaciones Section -->
-        <div class="content-section" id="section-notificaciones">
-            <div class="section-title">
-                <span class="section-icon">🔔</span>
-                Notificaciones
-            </div>
-            <div class="cards-grid" id="notificacionesGrid">
-                <!-- Loaded dynamically -->
-            </div>
-            <div class="empty-state" id="notificacionesEmpty" style="display: none;">
-                <div class="empty-icon">🔔</div>
-                <div class="empty-title">Sin notificaciones</div>
-                <div class="empty-text">No hay notificaciones nuevas en este momento.</div>
-            </div>
-        </div>
-
-        <!-- Información General Section -->
-        <div class="content-section" id="section-info">
-            <div class="section-title">
-                <span class="section-icon">ℹ️</span>
-                Información General
-            </div>
-            <div class="info-grid">
-                <a href="index.html#cursos" class="info-card">
-                    <div class="info-card-icon">📖</div>
-                    <div class="info-card-title">Catálogo de Cursos</div>
-                    <div class="info-card-text">Explora todos nuestros cursos disponibles</div>
-                </a>
-                <a href="index.html#proyectos" class="info-card">
-                    <div class="info-card-icon">🌐</div>
-                    <div class="info-card-title">Muro de Proyectos</div>
-                    <div class="info-card-text">Descubre proyectos de la comunidad</div>
-                </a>
-                <a href="index.html#insignias" class="info-card">
-                    <div class="info-card-icon">🏆</div>
-                    <div class="info-card-title">Sistema de Insignias</div>
-                    <div class="info-card-text">Aprende sobre nuestras insignias y logros</div>
-                </a>
-                <a href="index.html#vr" class="info-card">
-                    <div class="info-card-icon">🥽</div>
-                    <div class="info-card-title">Catálogo VR</div>
-                    <div class="info-card-text">Experimenta el aprendizaje en realidad virtual</div>
-                </a>
+        <!-- Tab: Proyectos -->
+        <div class="portal-tab-content" id="portal-proyectos">
+            <div class="portal-section">
+                <h2>Mis Proyectos en Comunidad</h2>
+                <div id="misProyectosList">
+                    <div class="empty-state"><p>Cargando...</p></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="js/config.js" defer></script>
-    <script>
-        // XSS Prevention
-        function escapeHTML(text) {
-            if (!text) return '';
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return String(text).replace(/[&<>"']/g, m => map[m]);
-        }
-
-        // Supabase Client
-        let supabaseClient = window.supabaseClient || window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-        // Global State
-        let currentUser = null;
-        let userEmail = null;
-
-        // Initialize
-        async function init() {
-            try {
-                // Check authentication
-                const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
-
-                if (sessionError || !session) {
-                    window.location.href = 'index.html';
-                    return;
-                }
-
-                userEmail = session.user.email;
-                currentUser = session.user;
-
-                // Update UI with user info
-                updateUserInfo();
-
-                // Load all data
-                await loadAllData();
-            } catch (error) {
-                console.error('Init error:', error);
-                window.location.href = 'index.html';
-            }
-        }
-
-        function updateUserInfo() {
-            const name = currentUser.user_metadata?.full_name || userEmail.split('@')[0] || 'Usuario';
-            const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-
-            document.getElementById('userAvatar').textContent = initials;
-            document.getElementById('userName').textContent = name;
-            document.getElementById('userEmail').textContent = userEmail;
-
-            // Update greeting based on time of day
-            const hour = new Date().getHours();
-            let greetingText = 'Bienvenido de vuelta';
-            if (hour < 12) {
-                greetingText = '¡Buenos días!';
-            } else if (hour < 18) {
-                greetingText = '¡Buenas tardes!';
-            } else {
-                greetingText = '¡Buenas noches!';
-            }
-            document.getElementById('greeting').textContent = greetingText + ', ' + name;
-        }
-
-        async function loadAllData() {
-            try {
-                const [cursosData, insigniasData, proyectosData, solicitudesData, notificacionesData] = await Promise.all([
-                    loadCursos(),
-                    loadInsignias(),
-                    loadProyectos(),
-                    loadSolicitudes(),
-                    loadNotificaciones()
-                ]);
-
-                // Update stats
-                document.getElementById('coursesCount').textContent = cursosData.length;
-                document.getElementById('badgesCount').textContent = insigniasData.length;
-                document.getElementById('projectsCount').textContent = proyectosData.length;
-                document.getElementById('requestsCount').textContent = solicitudesData.length;
-
-                // Render sections
-                renderCursos(cursosData);
-                renderInsignias(insigniasData);
-                renderProyectos(proyectosData);
-                renderSolicitudes(solicitudesData);
-                renderNotificaciones(notificacionesData);
-            } catch (error) {
-                console.error('Error loading data:', error);
-            }
-        }
-
-        async function loadCursos() {
-            try {
-                const { data: inscripciones, error } = await supabaseClient
-                    .from('inscripciones_cursos')
-                    .select('*, cursos(*)')
-                    .eq('correo', userEmail);
-
-                if (error) throw error;
-                return inscripciones || [];
-            } catch (error) {
-                console.error('Error loading courses:', error);
-                return [];
-            }
-        }
-
-        function renderCursos(cursos) {
-            const grid = document.getElementById('cursosGrid');
-            const empty = document.getElementById('cursosEmpty');
-
-            if (cursos.length === 0) {
-                grid.style.display = 'none';
-                empty.style.display = 'block';
-                return;
-            }
-
-            grid.style.display = 'grid';
-            empty.style.display = 'none';
-            grid.innerHTML = cursos.map(insc => {
-                const curso = insc.cursos;
-                const progress = insc.progreso || 0;
-                const status = insc.estado || 'activo';
-
-                return `
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon">📚</div>
-                            <div class="card-title">${escapeHTML(curso.nombre)}</div>
-                        </div>
-                        <div class="card-content">
-                            <div class="course-instructor">
-                                👨‍🏫 <strong>${escapeHTML(curso.instructor || 'Instructor')}</strong>
-                            </div>
-                            <div class="course-dates">
-                                📅 ${curso.fecha_inicio ? new Date(curso.fecha_inicio).toLocaleDateString('es-ES') : 'Por definir'} - ${curso.fecha_fin ? new Date(curso.fecha_fin).toLocaleDateString('es-ES') : 'Por definir'}
-                            </div>
-                            <div>Descripción: ${escapeHTML((curso.descripcion || '').substring(0, 100))}</div>
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: ${progress}%"></div>
-                            </div>
-                            <div style="margin-top: 0.5rem; font-size: 12px; color: #666;">Progreso: ${progress}%</div>
-                            <div class="status-badge ${status.toLowerCase()}">${status}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        async function loadInsignias() {
-            try {
-                const { data: badges, error } = await supabaseClient
-                    .from('badges_usuarios')
-                    .select('*, badges(*)')
-                    .eq('correo_usuario', userEmail);
-
-                if (error) throw error;
-                return badges || [];
-            } catch (error) {
-                console.error('Error loading badges:', error);
-                return [];
-            }
-        }
-
-        function renderInsignias(insignias) {
-            const grid = document.getElementById('insigniasGrid');
-            const empty = document.getElementById('insigniasEmpty');
-
-            if (insignias.length === 0) {
-                grid.style.display = 'none';
-                empty.style.display = 'block';
-                return;
-            }
-
-            grid.style.display = 'grid';
-            empty.style.display = 'none';
-            grid.innerHTML = insignias.map(item => {
-                const badge = item.badges;
-                const earnedDate = new Date(item.fecha_obtencion).toLocaleDateString('es-ES');
-
-                return `
-                    <div class="card">
-                        <div class="badge-item">
-                            <div class="badge-image">${badge.emoji || '⭐'}</div>
-                            <div class="badge-name">${escapeHTML(badge.nombre)}</div>
-                            <div class="card-content">${escapeHTML((badge.descripcion || '').substring(0, 80))}</div>
-                            <div class="badge-date">Obtenida: ${earnedDate}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        async function loadProyectos() {
-            try {
-                const { data: proyectos, error } = await supabaseClient
-                    .from('proyectos_comunidad')
-                    .select('*')
-                    .eq('correo_autor', userEmail);
-
-                if (error) throw error;
-                return proyectos || [];
-            } catch (error) {
-                console.error('Error loading projects:', error);
-                return [];
-            }
-        }
-
-        function renderProyectos(proyectos) {
-            const grid = document.getElementById('proyectosGrid');
-            const empty = document.getElementById('proyectosEmpty');
-
-            if (proyectos.length === 0) {
-                grid.style.display = 'none';
-                empty.style.display = 'block';
-                return;
-            }
-
-            grid.style.display = 'grid';
-            empty.style.display = 'none';
-            grid.innerHTML = proyectos.map(proyecto => {
-                const tags = proyecto.tags ? proyecto.tags.split(',').map(t => t.trim()) : [];
-
-                return `
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon">🚀</div>
-                            <div class="card-title">${escapeHTML(proyecto.titulo)}</div>
-                        </div>
-                        <div class="card-content">
-                            <div><strong>Categoría:</strong> ${escapeHTML(proyecto.categoria || 'Sin categoría')}</div>
-                            <div>${escapeHTML((proyecto.descripcion || '').substring(0, 100))}</div>
-                            <div class="project-meta">
-                                ${tags.map(tag => `<span class="project-tag">${escapeHTML(tag)}</span>`).join('')}
-                            </div>
-                            <div class="project-stats">
-                                <div class="project-stat">❤️ ${proyecto.likes || 0} Me gusta</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        async function loadSolicitudes() {
-            try {
-                const [servicios, espacios, asesorias] = await Promise.all([
-                    supabaseClient.from('solicitudes_servicios').select('*').eq('correo', userEmail),
-                    supabaseClient.from('solicitudes_espacios').select('*').eq('correo', userEmail),
-                    supabaseClient.from('solicitudes_asesoria').select('*').eq('correo', userEmail)
-                ]);
-
-                const all = [];
-                if (servicios.data) all.push(...servicios.data.map(s => ({ ...s, tipo: 'Servicio' })));
-                if (espacios.data) all.push(...espacios.data.map(e => ({ ...e, tipo: 'Espacio' })));
-                if (asesorias.data) all.push(...asesorias.data.map(a => ({ ...a, tipo: 'Asesoría' })));
-
-                return all;
-            } catch (error) {
-                console.error('Error loading requests:', error);
-                return [];
-            }
-        }
-
-        function renderSolicitudes(solicitudes) {
-            const grid = document.getElementById('solicitudesGrid');
-            const empty = document.getElementById('solicitudesEmpty');
-
-            if (solicitudes.length === 0) {
-                grid.style.display = 'none';
-                empty.style.display = 'block';
-                return;
-            }
-
-            grid.style.display = 'grid';
-            empty.style.display = 'none';
-            grid.innerHTML = solicitudes.map(solicitud => {
-                const estado = solicitud.estado || 'pendiente';
-                const statusClass = estado === 'completado' ? 'completed' : estado === 'en_proceso' ? 'in-process' : 'pending';
-
-                return `
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon">📋</div>
-                            <div class="card-title">${escapeHTML(solicitud.tipo)}</div>
-                        </div>
-                        <div class="card-content">
-                            <div><strong>Descripción:</strong> ${escapeHTML((solicitud.descripcion || '').substring(0, 100))}</div>
-                            <div style="margin-top: 0.5rem;"><strong>Fecha:</strong> ${new Date(solicitud.fecha_solicitud || solicitud.created_at).toLocaleDateString('es-ES')}</div>
-                            <div class="status-badge ${statusClass}">${estado}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        async function loadNotificaciones() {
-            try {
-                const { data: notificaciones, error } = await supabaseClient
-                    .from('notificaciones')
-                    .select('*')
-                    .eq('activa', true)
-                    .order('created_at', { ascending: false });
-
-                if (error) throw error;
-                return notificaciones || [];
-            } catch (error) {
-                console.error('Error loading notifications:', error);
-                return [];
-            }
-        }
-
-        function renderNotificaciones(notificaciones) {
-            const grid = document.getElementById('notificacionesGrid');
-            const empty = document.getElementById('notificacionesEmpty');
-
-            if (notificaciones.length === 0) {
-                grid.style.display = 'none';
-                empty.style.display = 'block';
-                return;
-            }
-
-            grid.style.display = 'grid';
-            empty.style.display = 'none';
-            grid.innerHTML = notificaciones.map(notif => {
-                return `
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-icon">🔔</div>
-                            <div class="card-title">${escapeHTML(notif.titulo)}</div>
-                        </div>
-                        <div class="card-content">
-                            <div>${escapeHTML(notif.contenido)}</div>
-                            <div style="margin-top: 1rem; font-size: 12px; color: #999;">
-                                ${new Date(notif.created_at).toLocaleDateString('es-ES')}
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Navigation
-        document.querySelectorAll('.nav-pill').forEach(pill => {
-            pill.addEventListener('click', function() {
-                document.querySelectorAll('.nav-pill').forEach(p => p.classList.remove('active'));
-                this.classList.add('active');
-
-                const section = this.getAttribute('data-section');
-                document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-                document.getElementById(`section-${section}`).classList.add('active');
-
-                // Scroll to top
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            });
-        });
-
-        // Logout
-        document.getElementById('logoutBtn').addEventListener('click', async () => {
-            try {
-                await supabaseClient.auth.signOut();
-                window.location.href = 'index.html';
-            } catch (error) {
-                console.error('Logout error:', error);
-                window.location.href = 'index.html';
-            }
-        });
-
-        // Initialize on load
-        window.addEventListener('load', init);
-    </script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/portal.js"></script>
 </body>
 </html>
