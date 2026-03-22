@@ -1,6 +1,6 @@
 /**
- * Lógica de autenticación de administrador
- * Gestiona el login, logout y verificación de sesión
+ * Lógica de autenticación — Ecosistema Digital FES Iztacala
+ * Gestiona login, logout, verificación de sesión y ruteo por rol
  */
 
 const ADMIN_EMAIL = 'admin@ecosistemadigital.unam.mx';
@@ -20,22 +20,26 @@ async function checkAuth() {
 }
 
 /**
- * Inicia sesión con email y contraseña
- * @param {string} email - Email del administrador
- * @param {string} password - Contraseña
- * @returns {Promise<Object>} Datos de autenticación o error
+ * Determina el rol del usuario autenticado
+ * @param {Object} session - Sesión de Supabase
+ * @returns {string} 'admin' | 'usuario'
  */
-async function loginAdmin(email, password) {
+function getUserRole(session) {
+  if (!session || !session.user) return 'usuario';
+  if (session.user.email === ADMIN_EMAIL) return 'admin';
+  return 'usuario';
+}
+
+/**
+ * Inicia sesión con email y contraseña
+ */
+async function loginUser(email, password) {
   try {
     const { data, error } = await supabaseClient.auth.signInWithPassword({
       email,
       password
     });
-
-    if (error) {
-      throw error;
-    }
-
+    if (error) throw error;
     return { success: true, data };
   } catch (error) {
     console.error('Error en login:', error.message);
@@ -44,10 +48,9 @@ async function loginAdmin(email, password) {
 }
 
 /**
- * Cierra la sesión del administrador
- * @returns {Promise<void>}
+ * Cierra la sesión
  */
-async function logoutAdmin() {
+async function logoutUser() {
   try {
     await supabaseClient.auth.signOut();
     window.location.href = 'index.html';
@@ -55,6 +58,10 @@ async function logoutAdmin() {
     console.error('Error en logout:', error);
   }
 }
+
+// Alias por compatibilidad
+const loginAdmin = loginUser;
+const logoutAdmin = logoutUser;
 
 /**
  * Muestra el modal de login
@@ -82,9 +89,8 @@ function hideLoginModal() {
  * Toggle para mostrar/ocultar contraseña
  */
 function togglePasswordVisibility() {
-  const passwordInput = document.getElementById('adminPassword');
+  const passwordInput = document.getElementById('loginPassword') || document.getElementById('adminPassword');
   const toggleBtn = document.querySelector('.password-toggle');
-
   if (passwordInput) {
     if (passwordInput.type === 'password') {
       passwordInput.type = 'text';
@@ -98,7 +104,6 @@ function togglePasswordVisibility() {
 
 /**
  * Muestra un mensaje de error en el formulario de login
- * @param {string} message - Mensaje de error
  */
 function showLoginError(message) {
   const errorDiv = document.getElementById('loginError');
@@ -121,10 +126,6 @@ function clearLoginError() {
 
 // Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', async () => {
-  // Verificar si estamos en admin.html
-  // (la lógica de mostrar/ocultar modal se maneja en admin.js)
-
-  // Configurar event listener del formulario de login
   const loginForm = document.getElementById('loginForm');
   if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
@@ -134,27 +135,20 @@ document.addEventListener('DOMContentLoaded', async () => {
       const email = (document.getElementById('loginEmail') || document.getElementById('adminEmail'))?.value;
       const password = (document.getElementById('loginPassword') || document.getElementById('adminPassword'))?.value;
 
-      // Validaciones básicas
       if (!email || !password) {
         showLoginError('Por favor ingresa email y contraseña');
         return;
       }
 
-      if (email !== ADMIN_EMAIL) {
-        showLoginError('Email de administrador inválido');
-        return;
-      }
-
-      // Intentar login
-      const result = await loginAdmin(email, password);
+      const result = await loginUser(email, password);
 
       if (result.success) {
         hideLoginModal();
-        // Redirigir a admin.html si existe
-        if (!window.location.pathname.includes('admin.html')) {
+        const role = getUserRole(result.data.session);
+        if (role === 'admin') {
           window.location.href = 'admin.html';
         } else {
-          window.location.reload();
+          window.location.href = 'portal.html';
         }
       } else {
         showLoginError(result.error || 'Error al iniciar sesión');
