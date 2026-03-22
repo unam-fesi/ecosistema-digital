@@ -1972,7 +1972,7 @@ Asegúrate de que tu respuesta sea práctica, accionable y esté fundamentada en
 }
 
 /**
- * Parses and displays sentiment analysis results
+ * Parses and displays sentiment analysis results with visual cards and gauge
  * @param {string} responseText - Raw response text from the API
  */
 function displaySentimentResults(responseText) {
@@ -1985,63 +1985,114 @@ function displaySentimentResults(responseText) {
   const improvementsMatch = txt.match(/#{1,3}\s*[ÁA]REAS DE MEJORA\s*\n([\s\S]*?)(?=#{1,3}\s*ACCIONES RECOMENDADAS|$)/i);
   const actionsMatch = txt.match(/#{1,3}\s*ACCIONES RECOMENDADAS\s*\n([\s\S]*?)$/i);
 
-  // Function to convert markdown-like formatting to HTML
-  function formatContent(text) {
-    if (!text) return '';
-
-    // Escape HTML first
-    text = escapeHTML(text);
-
-    // Convert markdown-style lists to HTML
-    text = text.replace(/^\s*[-•*]\s+/gm, '<li>');
-    text = text.replace(/\n(?=\s*[-•*])/g, '</li>\n');
-    text = text.replace(/^(?!<li>)/gm, (match, offset, string) => {
-      const beforeChar = offset > 0 ? string[offset - 1] : '';
-      if (beforeChar === '\n' && string[offset] !== '<') return '';
-      return match;
-    });
-
-    // If there are list items, wrap them in a ul
-    if (text.includes('<li>')) {
-      text = '<ul style="margin: 10px 0; padding-left: 20px;">' + text.trim() + '</li></ul>';
-    }
-
-    // Convert line breaks to paragraphs for regular text
-    if (!text.includes('<ul>')) {
-      text = text.split('\n\n').map(para => {
-        para = para.trim();
-        if (para && !para.startsWith('<')) {
-          return '<p style="margin: 10px 0;">' + para + '</p>';
-        }
-        return para;
-      }).join('');
-    }
-
-    return text;
+  // Extract sentiment score from the text (look for percentages)
+  let sentimentScore = 70; // default
+  const scoreMatch = txt.match(/(\d{1,3})%/);
+  if (scoreMatch) {
+    sentimentScore = Math.min(Math.max(parseInt(scoreMatch[1]), 0), 100);
   }
 
-  // If no sections found at all, put ALL text in summary and show friendly messages in others
+  // Function to parse bullet points and create visual cards
+  function parseItems(text) {
+    if (!text) return [];
+    // Split by bullet points
+    const lines = text.split(/^\s*[-•*]\s+/m).filter(line => line.trim());
+    return lines.map(line => line.trim()).filter(line => line.length > 0);
+  }
+
+  // Function to create HTML for bullet list with icons
+  function createItemsHTML(items, iconClass = '') {
+    if (items.length === 0) {
+      return '<p style="color:#64748B;font-style:italic">No se pudieron extraer elementos.</p>';
+    }
+    return '<ul style="margin:0;padding-left:0;list-style:none">' +
+      items.map(item => `
+        <li style="margin-bottom:12px;padding-left:24px;position:relative;line-height:1.5">
+          <span style="position:absolute;left:0;top:2px">${iconClass}</span>
+          ${escapeHTML(item)}
+        </li>
+      `).join('') +
+      '</ul>';
+  }
+
+  // Create gauge SVG
+  function createSentimentGauge(score) {
+    const percentage = Math.min(Math.max(score, 0), 100);
+    const radius = 45;
+    const circumference = 2 * Math.PI * radius;
+    const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
+    // Determine color based on score
+    let gaugeColor = '#ef4444'; // red for low
+    if (percentage >= 70) gaugeColor = '#22c55e'; // green
+    else if (percentage >= 50) gaugeColor = '#f59e0b'; // orange
+
+    return `
+      <div>
+        <svg width="160" height="160" style="transform:rotate(-90deg)">
+          <circle cx="80" cy="80" r="${radius}" fill="none" stroke="#e5e7eb" stroke-width="8"/>
+          <circle cx="80" cy="80" r="${radius}" fill="none" stroke="${gaugeColor}" stroke-width="8"
+                  stroke-dasharray="${circumference}" stroke-dashoffset="${strokeDashoffset}"
+                  style="transition: stroke-dashoffset 0.5s ease"/>
+        </svg>
+        <div style="text-align:center;margin-top:-120px;position:relative;z-index:10">
+          <div style="font-size:36px;font-weight:bold;color:#0C2340">${percentage}%</div>
+          <div style="font-size:12px;color:#64748B;margin-top:4px">Sentimiento Positivo</div>
+        </div>
+      </div>
+    `;
+  }
+
+  // If no sections found at all, put ALL text in summary
   const noSections = !summaryMatch && !strengthsMatch && !improvementsMatch && !actionsMatch;
 
   if (noSections) {
-    // Display full response in the summary area
-    document.getElementById('sentimentSummary').innerHTML = formatContent(txt);
-    document.getElementById('sentimentStrengths').innerHTML = '<p style="color:#64748B;font-style:italic">El análisis completo se muestra arriba.</p>';
-    document.getElementById('sentimentImprovements').innerHTML = '<p style="color:#64748B;font-style:italic">El análisis completo se muestra arriba.</p>';
-    document.getElementById('sentimentActions').innerHTML = '<p style="color:#64748B;font-style:italic">El análisis completo se muestra arriba.</p>';
+    // Display full response formatted nicely
+    const lines = txt.split('\n').filter(line => line.trim());
+    const content = lines.map(line => `<p style="margin:8px 0;line-height:1.6">${escapeHTML(line)}</p>`).join('');
+
+    document.getElementById('sentimentGauge').innerHTML = createSentimentGauge(sentimentScore);
+    document.getElementById('sentimentSummary').innerHTML = content;
+    document.getElementById('sentimentStrengths').innerHTML = '<p style="color:#64748B;font-style:italic">El análisis completo se muestra en el resumen.</p>';
+    document.getElementById('sentimentImprovements').innerHTML = '<p style="color:#64748B;font-style:italic">El análisis completo se muestra en el resumen.</p>';
+    document.getElementById('sentimentActions').innerHTML = '<p style="color:#64748B;font-style:italic">El análisis completo se muestra en el resumen.</p>';
     return;
   }
 
-  // Display each section - use fallback if parsing fails for individual sections
+  // Parse text sections
   const summaryText = summaryMatch ? summaryMatch[1].trim() : 'No se pudo extraer el resumen.';
   const strengthsText = strengthsMatch ? strengthsMatch[1].trim() : 'No se pudieron extraer los puntos fuertes.';
   const improvementsText = improvementsMatch ? improvementsMatch[1].trim() : 'No se pudieron extraer las áreas de mejora.';
   const actionsText = actionsMatch ? actionsMatch[1].trim() : 'No se pudieron extraer las acciones recomendadas.';
 
-  document.getElementById('sentimentSummary').innerHTML = formatContent(summaryText);
-  document.getElementById('sentimentStrengths').innerHTML = formatContent(strengthsText);
-  document.getElementById('sentimentImprovements').innerHTML = formatContent(improvementsText);
-  document.getElementById('sentimentActions').innerHTML = formatContent(actionsText);
+  // Parse items from each section
+  const strengthsItems = parseItems(strengthsText);
+  const improvementsItems = parseItems(improvementsText);
+  const actionsItems = parseItems(actionsText);
+
+  // Display gauge
+  document.getElementById('sentimentGauge').innerHTML = createSentimentGauge(sentimentScore);
+
+  // Display summary
+  const summaryLines = summaryText.split('\n').filter(line => line.trim());
+  document.getElementById('sentimentSummary').innerHTML = summaryLines
+    .map(line => `<p style="margin:8px 0;line-height:1.6">${escapeHTML(line)}</p>`)
+    .join('');
+
+  // Display strengths with green checkmark
+  document.getElementById('sentimentStrengths').innerHTML = createItemsHTML(strengthsItems, '✅');
+
+  // Display improvements with orange warning
+  document.getElementById('sentimentImprovements').innerHTML = createItemsHTML(improvementsItems, '⚠️');
+
+  // Display actions with numbered steps
+  const actionsHTML = actionsItems.length > 0
+    ? '<ol style="margin:0;padding-left:24px;line-height:1.8">' +
+      actionsItems.map(item => `<li style="margin-bottom:12px">${escapeHTML(item)}</li>`).join('') +
+      '</ol>'
+    : '<p style="color:#64748B;font-style:italic">No se pudieron extraer acciones.</p>';
+
+  document.getElementById('sentimentActions').innerHTML = actionsHTML;
 }
 
 // ============= HELPER FUNCTIONS PARA MOSTRAR/OCULTAR FORMULARIOS =============
@@ -2209,10 +2260,13 @@ function selectCursoForInscripciones(cursoId) {
   if (!tableBody) return;
 
   tableBody.innerHTML = '';
+
+  // Parse cursoId as a number to match the curso_id column type
+  cursoId = Number(cursoId);
   const inscripcionesCurso = allInscripciones.filter(i => i.curso_id === cursoId);
 
   if (inscripcionesCurso.length === 0) {
-    tableBody.innerHTML = '<tr><td colspan="7" class="empty-state"><p>No hay inscripciones para este curso.</p></td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="6" class="empty-state"><p>No hay inscripciones para este curso.</p></td></tr>';
     return;
   }
 
@@ -2220,14 +2274,11 @@ function selectCursoForInscripciones(cursoId) {
     const row = document.createElement('tr');
     row.innerHTML = `
       <td>${index + 1}</td>
-      <td>${escapeHTML(item.nombre_estudiante || 'N/A')}</td>
-      <td>${escapeHTML(item.correo_estudiante || 'N/A')}</td>
+      <td>${escapeHTML(item.nombre || 'N/A')}</td>
+      <td>${escapeHTML(item.correo || 'N/A')}</td>
       <td>${escapeHTML(item.carrera || 'N/A')}</td>
+      <td>${escapeHTML(item.telefono || 'N/A')}</td>
       <td>${formatDate(item.created_at)}</td>
-      <td><span class="badge" style="background-color: ${item.estado === 'activo' ? '#4CAF50' : '#FF9800'}">${escapeHTML(item.estado || 'N/A')}</span></td>
-      <td>
-        <button class="btn-small" onclick="alert('Funcionalidad de edición para inscritos en desarrollo')">Editar</button>
-      </td>
     `;
     tableBody.appendChild(row);
   });
