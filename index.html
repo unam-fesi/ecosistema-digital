@@ -785,7 +785,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   <div class="container" style="position:relative;z-index:1">
     <div class="sec-header reveal">
       <div class="sec-tag"><span class="dot"></span> Quiénes somos</div>
-      <div class="sep"></div>
+      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
       <h2 class="serif">Sobre el Ecosistema Digital</h2>
       <p>Una iniciativa interdisciplinaria que articula saberes y capacidades para el desarrollo tecnológico universitario.</p>
     </div>
@@ -839,7 +839,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   <div class="container-md">
     <div class="sec-header reveal">
       <div class="sec-tag"><span class="dot"></span> Nuestros servicios</div>
-      <div class="sep"></div>
+      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
       <h2 class="serif">Servicios del ecosistema</h2>
       <p>Soluciones tecnológicas para fortalecer la formación, la investigación y la atención.</p>
     </div>
@@ -852,7 +852,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   <div class="container-sm">
     <div class="sec-header reveal">
       <div class="sec-tag"><span class="dot"></span> Solicitar servicio</div>
-      <div class="sep"></div>
+      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
       <h2 class="serif">Solicitud de servicios</h2>
       <p>Complete el formulario y nos pondremos en contacto a la brevedad.</p>
     </div>
@@ -892,7 +892,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   <div class="container-sm">
     <div class="sec-header reveal">
       <div class="sec-tag"><span class="dot"></span> Reservar espacio</div>
-      <div class="sep"></div>
+      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
       <h2 class="serif">Solicitud de uso del espacio</h2>
       <p>Reserve el espacio físico del Ecosistema Digital.</p>
     </div>
@@ -931,7 +931,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   <div class="container" style="position:relative;z-index:1">
     <div class="sec-header reveal">
       <div class="sec-tag"><span class="dot"></span> Salud digital</div>
-      <div class="sep"></div>
+      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
       <h2 class="serif">Telemedicina</h2>
       <p>Orientación, acompañamiento y asesoría remota en procesos vinculados con salud digital.</p>
     </div>
@@ -976,7 +976,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   <div class="container" style="position:relative;z-index:2">
     <div class="sec-header light reveal">
       <div class="sec-tag"><span class="dot"></span> Impacto</div>
-      <div class="sep"></div>
+      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
       <h2 class="serif">Impacto y beneficios</h2>
       <p>Un ecosistema que transforma la interacción con la tecnología y el conocimiento.</p>
     </div>
@@ -990,7 +990,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   <div class="container">
     <div class="sec-header reveal">
       <div class="sec-tag"><span class="dot"></span> Tecnología</div>
-      <div class="sep"></div>
+      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
       <h2 class="serif">Entorno tecnológico</h2>
       <p>Las áreas de innovación que convergen en nuestro ecosistema digital.</p>
     </div>
@@ -1003,7 +1003,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   <div class="container-md">
     <div class="sec-header reveal">
       <div class="sec-tag"><span class="dot"></span> Contáctenos</div>
-      <div class="sep"></div>
+      <img src="assets/logo-ecosistema-digital.png" alt="ED" class="section-logo" style="height:48px;width:auto;margin:10px auto;display:block;filter:drop-shadow(0 0 8px rgba(196,162,78,0.35));opacity:0.85">
       <h2 class="serif">Contacto</h2>
       <p>Estamos a su disposición para resolver cualquier duda.</p>
     </div>
@@ -1534,8 +1534,8 @@ async function handleLogin(){
   err.textContent='';
   btn.textContent='Ingresando...';btn.disabled=true;
   try{
-    if(typeof supabase!=='undefined'){
-      const{data,error}=await supabase.auth.signInWithPassword({email,password:pass});
+    if(typeof supabaseClient!=='undefined'){
+      const{data,error}=await supabaseClient.auth.signInWithPassword({email,password:pass});
       if(error)throw error;
       window.location.href='admin.html';
     } else { err.textContent='Sistema de autenticación no disponible. Configure Supabase.'; }
@@ -1577,10 +1577,10 @@ async function sendChatMessage(){
   chatHistory.push({role:'user',parts:[{text}]});
   showTyping();
   try{
-    if(typeof supabase!=='undefined' && SUPABASE_URL && SUPABASE_URL!=='https://PLACEHOLDER.supabase.co'){
+    if(typeof supabaseClient!=='undefined' && SUPABASE_URL && SUPABASE_URL!=='https://PLACEHOLDER.supabase.co'){
       const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-chat',{
         method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPABASE_ANON_KEY},
-        body:JSON.stringify({messages:chatHistory,systemPrompt:PUMAI_SYSTEM})
+        body:JSON.stringify({messages:chatHistory})
       });
       const data=await res.json();
       hideTyping();
