@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mi Ecosistema Digital - FES Iztacala UNAM</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
-
     <style>
         * {
             margin: 0;
@@ -13,22 +12,39 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --navy: #0C2340;
+            --gold: #C4A24E;
+            --cream: #FAF8F4;
+            --light-gray: #F3F1ED;
+            --text-dark: #2C2C2C;
+            --text-light: #666;
+            --blue: #1E3A8A;
+            --green: #15803D;
+            --purple: #7C3AED;
+            --red: #DC2626;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #FAF8F4;
-            color: #333;
+            background-color: var(--cream);
+            color: var(--text-dark);
             line-height: 1.6;
         }
 
-        /* Top Navigation Bar */
+        /* ===== NAVBAR ===== */
         .navbar {
-            background-color: #0C2340;
+            background: linear-gradient(135deg, var(--navy) 0%, #1a3a5c 100%);
             color: white;
             padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(12, 35, 64, 0.15);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -37,27 +53,29 @@
         .navbar-left {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 1.5rem;
         }
 
         .logo {
             width: 45px;
             height: 45px;
-            background-color: #C4A24E;
+            background-color: var(--gold);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            color: #0C2340;
-            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--navy);
+            font-size: 1.8rem;
+            flex-shrink: 0;
         }
 
         .navbar-title {
             font-family: 'Playfair Display', serif;
             font-size: 1.8rem;
             font-weight: 700;
-            color: #C4A24E;
+            color: var(--gold);
+            letter-spacing: -0.5px;
         }
 
         .navbar-right {
@@ -66,641 +84,657 @@
             gap: 2rem;
         }
 
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .user-email {
-            font-size: 0.9rem;
-            color: #E8E8E8;
-        }
-
-        .notification-icon {
+        .notification-bell {
             position: relative;
             cursor: pointer;
             font-size: 1.5rem;
+            transition: transform 0.2s;
+        }
+
+        .notification-bell:hover {
+            transform: scale(1.1);
         }
 
         .notification-badge {
             position: absolute;
             top: -8px;
             right: -8px;
-            background-color: #DC2626;
+            background-color: var(--red);
             color: white;
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 700;
         }
 
-        .logout-btn {
-            background-color: #C4A24E;
-            color: #0C2340;
-            border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 6px;
-            cursor: pointer;
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background-color: var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: 600;
-            transition: all 0.3s ease;
+            color: var(--navy);
+            font-size: 1.2rem;
+            border: 2px solid rgba(255, 255, 255, 0.2);
         }
 
-        .logout-btn:hover {
-            background-color: #B89A45;
-            transform: translateY(-2px);
+        .logout-link {
+            color: white;
+            text-decoration: none;
+            font-size: 0.95rem;
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
         }
 
-        /* Main Container */
+        .logout-link:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* ===== MAIN CONTAINER ===== */
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 2rem;
         }
 
-        /* Welcome Section */
-        .welcome-section {
+        /* ===== HERO WELCOME SECTION ===== */
+        .hero {
             margin-bottom: 3rem;
+            animation: fadeIn 0.6s ease-in;
         }
 
-        .welcome-heading {
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .hero-greeting {
             font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
-            color: #0C2340;
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-light);
             margin-bottom: 2rem;
         }
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1.5rem;
-            margin-bottom: 2rem;
+            margin-top: 2rem;
         }
 
         .stat-card {
-            background: linear-gradient(135deg, #0C2340 0%, #1a3f5f 100%);
-            color: white;
+            background: white;
+            border-radius: 8px;
             padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(12, 35, 64, 0.15);
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-left: 5px solid var(--navy);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(12, 35, 64, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .stat-card.blue {
+            border-left-color: var(--blue);
+        }
+
+        .stat-card.gold {
+            border-left-color: var(--gold);
+        }
+
+        .stat-card.green {
+            border-left-color: var(--green);
+        }
+
+        .stat-card.purple {
+            border-left-color: var(--purple);
         }
 
         .stat-number {
             font-size: 2.5rem;
             font-weight: 700;
-            color: #C4A24E;
+            color: var(--navy);
+            line-height: 1;
             margin-bottom: 0.5rem;
         }
 
         .stat-label {
             font-size: 0.95rem;
-            color: #E8E8E8;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            color: var(--text-light);
+            font-weight: 500;
         }
 
-        /* Section Headers */
-        .section-header {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
-            color: #0C2340;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 3px solid #C4A24E;
-            display: inline-block;
-        }
-
-        /* Notifications Section */
+        /* ===== SECTION HEADERS ===== */
         .section {
             margin-bottom: 3rem;
+            animation: fadeIn 0.6s ease-in;
         }
 
-        .notifications-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .section-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--navy);
+            font-weight: 700;
+        }
+
+        .section-icon {
+            font-size: 2rem;
+        }
+
+        /* ===== NOTIFICACIONES SECTION ===== */
+        .notifications-banner {
+            background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .notifications-scroll {
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            padding: 0.5rem 0;
+        }
+
+        .notifications-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .notifications-scroll::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+        }
+
+        .notifications-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 3px;
         }
 
         .notification-card {
             background: white;
+            border-radius: 6px;
             padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            border-left: 5px solid #C4A24E;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            min-width: 300px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
         }
 
-        .notification-card:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
-        }
-
-        .notification-icon-small {
+        .notification-icon {
             font-size: 2rem;
             margin-bottom: 0.5rem;
         }
 
         .notification-title {
             font-weight: 600;
-            color: #0C2340;
+            color: var(--navy);
             margin-bottom: 0.5rem;
         }
 
-        .notification-text {
-            font-size: 0.9rem;
-            color: #666;
-            line-height: 1.5;
+        .notification-message {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            line-height: 1.4;
         }
 
-        .empty-message {
-            text-align: center;
-            padding: 2rem;
-            color: #999;
-            font-style: italic;
-        }
-
-        /* Courses Section */
-        .courses-grid {
+        /* ===== CURSOS SECTION ===== */
+        .courses-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
         }
 
         .course-card {
             background: white;
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
             display: flex;
             flex-direction: column;
         }
 
         .course-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
         }
 
         .course-header {
-            background: linear-gradient(135deg, #0C2340 0%, #1a3f5f 100%);
+            background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%);
             color: white;
             padding: 1.5rem;
         }
 
-        .course-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.3rem;
-            font-weight: 700;
+        .course-category {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
             margin-bottom: 0.5rem;
-            color: #C4A24E;
+        }
+
+        .course-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
         }
 
         .course-instructor {
             font-size: 0.9rem;
-            color: #E8E8E8;
-            margin-bottom: 0.5rem;
+            opacity: 0.95;
         }
 
         .course-body {
             padding: 1.5rem;
-            flex: 1;
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
+        }
+
+        .course-description {
+            font-size: 0.95rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            flex-grow: 1;
         }
 
         .course-meta {
-            font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 1rem;
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: var(--text-light);
         }
 
-        .badge {
-            display: inline-block;
-            background-color: #E0E7FF;
-            color: #0C2340;
-            padding: 0.35rem 0.75rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            width: fit-content;
-            margin-bottom: 0.5rem;
-        }
-
-        .badge-online {
-            background-color: #D1FAE5;
-            color: #065F46;
-        }
-
-        .badge-presencial {
-            background-color: #FEF3C7;
-            color: #92400E;
-        }
-
-        .badge-hibrida {
-            background-color: #E0E7FF;
-            color: #3730A3;
-        }
-
-        .badge-enrolled {
-            background-color: #DCFCE7;
-            color: #166534;
-        }
-
-        .progress-wrapper {
-            margin: 1rem 0;
-        }
-
-        .progress-label {
-            font-size: 0.8rem;
-            color: #666;
-            margin-bottom: 0.5rem;
+        .course-meta-item {
             display: flex;
-            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .progress-bar {
             width: 100%;
-            height: 8px;
-            background-color: #E5E7EB;
-            border-radius: 10px;
+            height: 6px;
+            background-color: var(--light-gray);
+            border-radius: 3px;
             overflow: hidden;
+            margin-bottom: 0.5rem;
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, #C4A24E 0%, #B89A45 100%);
-            border-radius: 10px;
+            background: linear-gradient(90deg, var(--gold) 0%, #E5B657 100%);
+            border-radius: 3px;
             transition: width 0.3s ease;
         }
 
-        .course-footer {
-            margin-top: auto;
-            display: flex;
-            gap: 1rem;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 0.75rem 1rem;
+        .course-button {
+            padding: 0.75rem 1.5rem;
             border: none;
             border-radius: 6px;
-            cursor: pointer;
             font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
             text-align: center;
         }
 
         .btn-primary {
-            background-color: #C4A24E;
-            color: #0C2340;
+            background-color: var(--navy);
+            color: white;
         }
 
         .btn-primary:hover {
-            background-color: #B89A45;
-            transform: translateY(-2px);
+            background-color: #0d2d52;
         }
 
         .btn-secondary {
-            background-color: #E5E7EB;
-            color: #0C2340;
+            background-color: var(--gold);
+            color: var(--navy);
         }
 
         .btn-secondary:hover {
-            background-color: #D1D5DB;
+            background-color: #b39144;
         }
 
-        .btn-enrolled {
-            background-color: #86EFAC;
-            color: #15803D;
-            cursor: default;
-        }
-
-        .btn-enrolled:hover {
-            background-color: #86EFAC;
-        }
-
-        /* Badges Section */
-        .badges-grid {
+        /* ===== BADGES SECTION ===== */
+        .badges-container {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
 
         .badge-card {
             background: white;
-            border-radius: 12px;
+            border-radius: 8px;
             padding: 1.5rem;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
             position: relative;
         }
 
         .badge-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
         }
 
-        .badge-card.locked {
-            opacity: 0.6;
-            background-color: #F9FAFB;
+        .badge-card.earned {
+            background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%);
+            box-shadow: 0 2px 8px rgba(196, 162, 78, 0.2);
+        }
+
+        .badge-card.earned::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 30%, rgba(196, 162, 78, 0.1), transparent);
+            border-radius: 8px;
+            pointer-events: none;
         }
 
         .badge-icon {
             font-size: 3rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .badge-card.locked .badge-icon {
+            filter: grayscale(100%);
+            opacity: 0.5;
+            position: relative;
+        }
+
+        .badge-card.locked::after {
+            content: '🔒';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2rem;
         }
 
         .badge-name {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #0C2340;
+            font-weight: 700;
+            color: var(--navy);
             margin-bottom: 0.5rem;
+            font-size: 0.95rem;
         }
 
         .badge-points {
-            font-size: 0.8rem;
-            color: #666;
+            font-size: 0.85rem;
+            color: var(--gold);
+            font-weight: 600;
         }
 
-        .lock-icon {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            font-size: 1.2rem;
-            opacity: 0.7;
-        }
-
-        .points-summary {
-            background: linear-gradient(135deg, #C4A24E 0%, #B89A45 100%);
-            color: white;
+        .points-counter {
+            background: linear-gradient(135deg, var(--gold) 0%, #E5B657 100%);
+            border-radius: 8px;
             padding: 2rem;
-            border-radius: 12px;
             text-align: center;
+            color: white;
             margin-bottom: 2rem;
-            box-shadow: 0 4px 15px rgba(196, 162, 78, 0.2);
-        }
-
-        .points-number {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
         }
 
         .points-label {
             font-size: 1.1rem;
-            opacity: 0.95;
+            margin-bottom: 0.5rem;
         }
 
-        /* Prizes Section */
-        .prizes-grid {
+        .points-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        /* ===== PREMIOS SECTION ===== */
+        .premios-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 1.5rem;
         }
 
-        .prize-card {
+        .premio-card {
             background: white;
+            border-radius: 8px;
             padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            border-top: 3px solid #C4A24E;
-            transition: transform 0.3s ease;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border-top: 4px solid var(--gold);
+            transition: transform 0.2s;
         }
 
-        .prize-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+        .premio-card:hover {
+            transform: translateY(-2px);
         }
 
-        .prize-name {
+        .premio-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .premio-name {
             font-weight: 700;
-            color: #0C2340;
-            margin-bottom: 0.5rem;
-            font-size: 1.1rem;
-        }
-
-        .prize-points-needed {
-            font-size: 0.9rem;
-            color: #C4A24E;
-            font-weight: 600;
-            margin-bottom: 1rem;
-        }
-
-        .prize-description {
-            font-size: 0.9rem;
-            color: #666;
-            margin-bottom: 1rem;
-            line-height: 1.5;
-        }
-
-        /* Community Wall Section */
-        .publish-form-container {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-            margin-bottom: 2rem;
-            display: none;
-        }
-
-        .publish-form-container.active {
-            display: block;
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            color: #0C2340;
+            color: var(--navy);
             margin-bottom: 0.5rem;
         }
 
-        .form-group input,
-        .form-group textarea,
-        .form-group select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #D1D5DB;
+        .premio-points {
+            background-color: var(--light-gray);
+            color: var(--navy);
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .premio-description {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .premio-button {
+            background-color: var(--navy);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
             border-radius: 6px;
-            font-family: inherit;
-            font-size: 0.95rem;
-            transition: border-color 0.3s ease;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            transition: background-color 0.2s;
         }
 
-        .form-group input:focus,
-        .form-group textarea:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: #C4A24E;
-            box-shadow: 0 0 0 3px rgba(196, 162, 78, 0.1);
+        .premio-button:hover:not(:disabled) {
+            background-color: #0d2d52;
         }
 
-        .form-group textarea {
-            resize: vertical;
-            min-height: 120px;
+        .premio-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
-        .form-buttons {
-            display: flex;
-            gap: 1rem;
+        /* ===== MURO DE COMUNIDAD ===== */
+        .community-toolbar {
+            margin-bottom: 2rem;
+            text-align: right;
         }
 
         .btn-publish {
-            background-color: #C4A24E;
-            color: #0C2340;
+            background-color: var(--navy);
+            color: white;
             padding: 0.75rem 1.5rem;
             border: none;
             border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: background-color 0.2s;
         }
 
         .btn-publish:hover {
-            background-color: #B89A45;
-            transform: translateY(-2px);
+            background-color: #0d2d52;
         }
 
-        .btn-cancel {
-            background-color: #E5E7EB;
-            color: #0C2340;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-cancel:hover {
-            background-color: #D1D5DB;
-        }
-
-        .btn-publish-new {
-            background-color: #C4A24E;
-            color: #0C2340;
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-bottom: 1.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .btn-publish-new:hover {
-            background-color: #B89A45;
-            transform: translateY(-2px);
-        }
-
-        /* Projects Section */
         .projects-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
         }
 
         .project-card {
             background: white;
-            border-radius: 12px;
+            border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
             display: flex;
             flex-direction: column;
         }
 
         .project-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
         }
 
         .project-header {
-            background: linear-gradient(135deg, #0C2340 0%, #1a3f5f 100%);
+            background: linear-gradient(135deg, var(--purple) 0%, #a855f7 100%);
             color: white;
             padding: 1.5rem;
         }
 
+        .project-badges {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .project-category-badge {
+            background-color: rgba(255, 255, 255, 0.3);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
         .project-title {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
-            color: #C4A24E;
         }
 
         .project-author {
             font-size: 0.9rem;
-            color: #E8E8E8;
-            margin-bottom: 0.5rem;
+            opacity: 0.95;
         }
 
         .project-body {
             padding: 1.5rem;
-            flex: 1;
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
         }
 
         .project-description {
-            color: #666;
-            margin-bottom: 1rem;
             font-size: 0.95rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            flex-grow: 1;
             line-height: 1.5;
         }
 
-        .project-meta {
+        .project-tags {
             display: flex;
-            gap: 0.75rem;
             flex-wrap: wrap;
+            gap: 0.5rem;
             margin-bottom: 1rem;
         }
 
         .project-tag {
-            background-color: #E0E7FF;
-            color: #3730A3;
-            padding: 0.25rem 0.75rem;
+            background-color: var(--light-gray);
+            color: var(--text-dark);
+            padding: 0.3rem 0.75rem;
             border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
+            font-size: 0.8rem;
         }
 
         .project-footer {
-            margin-top: auto;
-            padding-top: 1rem;
-            border-top: 1px solid #E5E7EB;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid var(--light-gray);
         }
 
-        .likes-count {
-            color: #666;
-            font-size: 0.9rem;
+        .project-carrera {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .project-likes {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
             font-weight: 600;
+            color: var(--navy);
+            transition: color 0.2s;
         }
 
-        /* Modal for enrollment */
+        .project-likes:hover {
+            color: var(--gold);
+        }
+
+        /* ===== MODAL ===== */
         .modal {
             display: none;
             position: fixed;
@@ -710,7 +744,7 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.4);
-            animation: fadeIn 0.3s ease;
+            animation: fadeIn 0.3s;
         }
 
         .modal.active {
@@ -719,392 +753,548 @@
             justify-content: center;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
         .modal-content {
             background-color: white;
             padding: 2rem;
-            border-radius: 12px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
             max-width: 500px;
             width: 90%;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-            animation: slideIn 0.3s ease;
-            position: relative;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateY(-50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         .modal-header {
             font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            color: #0C2340;
-            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
             font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .close-modal {
-            position: absolute;
-            right: 1.5rem;
-            top: 1.5rem;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #999;
+        .modal-close {
             background: none;
             border: none;
-            transition: color 0.3s ease;
+            font-size: 2rem;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: color 0.2s;
         }
 
-        .close-modal:hover {
-            color: #0C2340;
+        .modal-close:hover {
+            color: var(--navy);
         }
 
-        .modal-body {
-            position: relative;
+        .form-group {
+            margin-bottom: 1.5rem;
         }
 
-        .loading {
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: var(--navy);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(196, 162, 78, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-tags-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.5rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background-color: white;
+        }
+
+        .form-tag {
+            background-color: var(--navy);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .form-tag-remove {
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        .form-tag-remove:hover {
+            opacity: 0.7;
+        }
+
+        .form-tag-input {
+            border: none;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            flex-grow: 1;
+            padding: 0.25rem;
+        }
+
+        .form-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .btn-cancel {
+            background-color: var(--light-gray);
+            color: var(--text-dark);
+        }
+
+        .btn-cancel:hover {
+            background-color: #e0ddd8;
+        }
+
+        .btn-submit {
+            background-color: var(--navy);
+            color: white;
+        }
+
+        .btn-submit:hover {
+            background-color: #0d2d52;
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ===== EMPTY STATES ===== */
+        .empty-state {
             text-align: center;
-            padding: 2rem;
-            color: #999;
+            padding: 3rem 1rem;
+            color: var(--text-light);
         }
 
-        .spinner {
-            border: 4px solid #E5E7EB;
-            border-top: 4px solid #C4A24E;
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state-text {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ===== LOADING ===== */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--light-gray);
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
+            border-top-color: var(--gold);
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            to { transform: rotate(360deg); }
         }
 
-        .error-message {
-            background-color: #FEE2E2;
-            color: #991B1B;
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-            border-left: 4px solid #DC2626;
-        }
-
-        .success-message {
-            background-color: #DCFCE7;
-            color: #166534;
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-            border-left: 4px solid #16A34A;
-        }
-
-        /* Responsive */
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .navbar {
                 flex-direction: column;
                 gap: 1rem;
             }
 
-            .navbar-right {
+            .navbar-left, .navbar-right {
                 width: 100%;
-                justify-content: space-between;
+                justify-content: center;
             }
 
             .navbar-title {
                 font-size: 1.4rem;
             }
 
-            .stats-grid {
-                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-                gap: 1rem;
-            }
-
-            .welcome-heading {
-                font-size: 1.8rem;
-            }
-
-            .section-header {
-                font-size: 1.4rem;
-            }
-
-            .courses-grid,
-            .projects-grid,
-            .prizes-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .badges-grid {
-                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-            }
-
-            .form-buttons {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-            }
-
             .container {
                 padding: 1rem;
             }
+
+            .hero-greeting {
+                font-size: 2rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .section-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .courses-container,
+            .projects-grid,
+            .premios-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .badges-container {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+
+            .modal-content {
+                width: 95%;
+                padding: 1.5rem;
+            }
+
+            .notifications-scroll {
+                flex-wrap: wrap;
+            }
+
+            .notification-card {
+                min-width: unset;
+            }
+        }
+
+        /* ===== UTILITY ===== */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
         }
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
+    <!-- NAVBAR -->
     <nav class="navbar">
         <div class="navbar-left">
-            <div class="logo">✨</div>
+            <div class="logo">🌟</div>
             <div class="navbar-title">Mi Ecosistema Digital</div>
         </div>
         <div class="navbar-right">
-            <div class="user-info">
-                <div class="user-email" id="userEmail">usuario@unam.mx</div>
-                <div class="notification-icon" id="notificationIcon" onclick="toggleNotifications()">
-                    🔔
-                    <div class="notification-badge" id="notificationCount">0</div>
-                </div>
+            <div class="notification-bell" id="notificationBell">
+                🔔
+                <span class="notification-badge" id="notificationBadge" style="display: none;">0</span>
             </div>
-            <button class="logout-btn" onclick="handleLogout()">Cerrar Sesión</button>
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">U</div>
+            </div>
+            <a class="logout-link" id="logoutBtn">Cerrar Sesión</a>
         </div>
     </nav>
 
-    <!-- Main Container -->
+    <!-- MAIN CONTAINER -->
     <div class="container">
-        <!-- Welcome Section -->
-        <div class="welcome-section">
-            <h1 class="welcome-heading" id="welcomeGreeting">Hola</h1>
+        <!-- HERO SECTION -->
+        <section class="hero">
+            <h1 class="hero-greeting" id="heroGreeting">¡Hola!</h1>
+            <p class="hero-subtitle">Bienvenido a tu portal del Ecosistema Digital</p>
 
             <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number" id="courseCount">0</div>
-                    <div class="stat-label">Mis Cursos Inscritos</div>
+                <div class="stat-card blue">
+                    <div class="stat-number" id="statCourses">0</div>
+                    <div class="stat-label">Cursos Inscritos</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="badgeCount">0</div>
-                    <div class="stat-label">Insignias Obtenidas</div>
+                <div class="stat-card gold">
+                    <div class="stat-number" id="statBadges">0</div>
+                    <div class="stat-label">Insignias Ganadas</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="pointsCount">0</div>
-                    <div class="stat-label">Mis Puntos</div>
+                <div class="stat-card green">
+                    <div class="stat-number" id="statPoints">0</div>
+                    <div class="stat-label">Puntos Totales</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="projectCount">0</div>
-                    <div class="stat-label">Mis Proyectos</div>
+                <div class="stat-card purple">
+                    <div class="stat-number" id="statProjects">0</div>
+                    <div class="stat-label">Proyectos Publicados</div>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Mis Notificaciones Section -->
-        <div class="section" id="notificationsSection">
-            <h2 class="section-header">📢 Mis Notificaciones</h2>
-            <div class="notifications-container" id="notificationsContainer">
-                <div class="loading"><div class="spinner"></div>Cargando notificaciones...</div>
+        <!-- NOTIFICACIONES SECTION -->
+        <section class="section" id="notificacionesSection">
+            <div class="notifications-banner" id="notificationsContainer">
+                <div class="notifications-scroll" id="notificationsScroll">
+                    <div class="empty-state">
+                        <div class="empty-state-text">No hay notificaciones activas</div>
+                    </div>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Mis Cursos Section -->
-        <div class="section" id="coursesSection">
-            <h2 class="section-header">📚 Mis Cursos</h2>
-            <div class="courses-grid" id="myCoursesGrid">
-                <div class="loading"><div class="spinner"></div>Cargando cursos...</div>
+        <!-- CURSOS SECTION -->
+        <section class="section" id="cursosSection">
+            <div class="section-header">
+                <span class="section-icon">📚</span>
+                <h2>Mis Cursos</h2>
             </div>
-        </div>
-
-        <!-- Catálogo de Cursos Section -->
-        <div class="section" id="catalogSection">
-            <h2 class="section-header">🎓 Catálogo de Cursos Disponibles</h2>
-            <div class="courses-grid" id="catalogCoursesGrid">
-                <div class="loading"><div class="spinner"></div>Cargando catálogo...</div>
+            <div class="courses-container" id="cursosContainer">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📚</div>
+                    <div class="empty-state-text">Cargando cursos...</div>
+                </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Insignias y Puntos Section -->
-        <div class="section" id="badgesSection">
-            <h2 class="section-header">🏆 Insignias y Puntos</h2>
-            <div class="points-summary">
+        <!-- INSIGNIAS SECTION -->
+        <section class="section" id="insigniasSection">
+            <div class="section-header">
+                <span class="section-icon">🏆</span>
+                <h2>Mis Insignias y Puntos</h2>
+            </div>
+
+            <div class="points-counter">
+                <div class="points-label">Puntos Acumulados</div>
                 <div class="points-number" id="totalPoints">0</div>
-                <div class="points-label">Puntos Totales</div>
-            </div>
-            <h3 style="font-family: 'Playfair Display', serif; font-size: 1.3rem; color: #0C2340; margin-bottom: 1rem;">Mis Insignias</h3>
-            <div class="badges-grid" id="badgesGrid">
-                <div class="loading"><div class="spinner"></div>Cargando insignias...</div>
             </div>
 
-            <h3 style="font-family: 'Playfair Display', serif; font-size: 1.3rem; color: #0C2340; margin-bottom: 1rem; margin-top: 2rem;">Premios Disponibles</h3>
-            <div class="prizes-grid" id="prizesGrid">
-                <div class="loading"><div class="spinner"></div>Cargando premios...</div>
-            </div>
-        </div>
-
-        <!-- Muro de la Comunidad Section -->
-        <div class="section" id="communitySection">
-            <h2 class="section-header">🌍 Muro de la Comunidad</h2>
-            <button class="btn-publish-new" onclick="togglePublishForm()">+ Publicar Nuevo Proyecto</button>
-
-            <div class="publish-form-container" id="publishFormContainer">
-                <div style="position: relative;">
-                    <button class="close-modal" onclick="togglePublishForm()" style="position: relative; top: 0; right: 0; margin-bottom: 1rem;">✕</button>
-                    <h3 class="modal-header" style="margin-top: 0;">Publicar Nuevo Proyecto</h3>
-                    <form onsubmit="handlePublishProject(event)">
-                        <div class="form-group">
-                            <label for="projectTitle">Título del Proyecto</label>
-                            <input type="text" id="projectTitle" name="projectTitle" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="projectDescription">Descripción</label>
-                            <textarea id="projectDescription" name="projectDescription" required></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="projectCarrera">Carrera</label>
-                            <input type="text" id="projectCarrera" name="projectCarrera" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="projectCategoria">Categoría</label>
-                            <select id="projectCategoria" name="projectCategoria" required>
-                                <option value="">Selecciona una categoría</option>
-                                <option value="Tecnología">Tecnología</option>
-                                <option value="Ciencia">Ciencia</option>
-                                <option value="Arte">Arte</option>
-                                <option value="Educación">Educación</option>
-                                <option value="Sostenibilidad">Sostenibilidad</option>
-                                <option value="Otro">Otro</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="projectTags">Etiquetas (separadas por comas)</label>
-                            <input type="text" id="projectTags" name="projectTags" placeholder="Ej: innovación, investigación, colaborativo">
-                        </div>
-                        <div class="form-buttons">
-                            <button type="submit" class="btn-publish">Publicar</button>
-                            <button type="button" class="btn-cancel" onclick="togglePublishForm()">Cancelar</button>
-                        </div>
-                        <div id="publishMessage"></div>
-                    </form>
+            <div class="badges-container" id="badgesContainer">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🏆</div>
+                    <div class="empty-state-text">Cargando insignias...</div>
                 </div>
             </div>
+        </section>
 
-            <div class="projects-grid" id="projectsGrid">
-                <div class="loading"><div class="spinner"></div>Cargando proyectos...</div>
+        <!-- PREMIOS SECTION -->
+        <section class="section" id="premiosSection">
+            <div class="section-header">
+                <span class="section-icon">🎁</span>
+                <h2>Premios Disponibles</h2>
             </div>
-        </div>
+            <div class="premios-grid" id="premiosContainer">
+                <div class="empty-state">
+                    <div class="empty-state-icon">🎁</div>
+                    <div class="empty-state-text">Cargando premios...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MURO DE COMUNIDAD SECTION -->
+        <section class="section" id="comunidadSection">
+            <div class="section-header">
+                <span class="section-icon">💡</span>
+                <h2>Muro de la Comunidad</h2>
+            </div>
+            <div class="community-toolbar">
+                <button class="btn-publish" id="publishProjectBtn">+ Publicar Proyecto</button>
+            </div>
+            <div class="projects-grid" id="projectsContainer">
+                <div class="empty-state">
+                    <div class="empty-state-icon">💡</div>
+                    <div class="empty-state-text">Cargando proyectos...</div>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <!-- Enrollment Modal -->
+    <!-- MODALS -->
+    <!-- ENROLLMENT MODAL -->
     <div class="modal" id="enrollmentModal">
         <div class="modal-content">
-            <button class="close-modal" onclick="closeEnrollmentModal()">✕</button>
-            <div class="modal-header">Inscripción a Curso</div>
-            <div class="modal-body">
-                <form onsubmit="handleEnrollment(event)">
-                    <div class="form-group">
-                        <label for="enrollName">Nombre</label>
-                        <input type="text" id="enrollName" name="enrollName" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="enrollEmail">Correo Electrónico</label>
-                        <input type="email" id="enrollEmail" name="enrollEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="enrollCarrera">Carrera</label>
-                        <input type="text" id="enrollCarrera" name="enrollCarrera" required>
-                    </div>
-                    <div id="enrollMessage"></div>
-                    <div class="form-buttons">
-                        <button type="submit" class="btn-publish">Confirmar Inscripción</button>
-                        <button type="button" class="btn-cancel" onclick="closeEnrollmentModal()">Cancelar</button>
-                    </div>
-                </form>
+            <div class="modal-header">
+                <span>Inscribirse al Curso</span>
+                <button class="modal-close" id="enrollmentClose">&times;</button>
             </div>
+            <form id="enrollmentForm">
+                <input type="hidden" id="enrollmentCourseId">
+                <div class="form-group">
+                    <label class="form-label">Nombre Completo</label>
+                    <input type="text" class="form-input" id="enrollmentName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Correo Electrónico</label>
+                    <input type="email" class="form-input" id="enrollmentEmail" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Carrera</label>
+                    <input type="text" class="form-input" id="enrollmentCarrera" required>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-cancel" id="enrollmentCancel">Cancelar</button>
+                    <button type="submit" class="btn btn-submit">Inscribirse</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- Supabase SDK and Config -->
+    <!-- PUBLISH PROJECT MODAL -->
+    <div class="modal" id="publishModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Publicar Proyecto</span>
+                <button class="modal-close" id="publishClose">&times;</button>
+            </div>
+            <form id="publishForm">
+                <div class="form-group">
+                    <label class="form-label">Título del Proyecto</label>
+                    <input type="text" class="form-input" id="projectTitle" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Descripción</label>
+                    <textarea class="form-textarea" id="projectDescription" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Carrera</label>
+                    <input type="text" class="form-input" id="projectCarrera" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Categoría</label>
+                    <select class="form-select" id="projectCategory" required>
+                        <option value="">Selecciona una categoría</option>
+                        <option value="💡 Idea">💡 Idea</option>
+                        <option value="👥 Busco equipo">👥 Busco equipo</option>
+                        <option value="🔧 En desarrollo">🔧 En desarrollo</option>
+                        <option value="✅ Completado">✅ Completado</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Etiquetas</label>
+                    <div class="form-tags-input" id="tagsContainer">
+                        <input type="text" class="form-tag-input" id="tagInput" placeholder="Escribe y presiona Enter para agregar etiquetas">
+                    </div>
+                </div>
+                <div class="form-buttons">
+                    <button type="button" class="btn btn-cancel" id="publishCancel">Cancelar</button>
+                    <button type="submit" class="btn btn-submit">Publicar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/config.js"></script>
 
     <script>
-        // Global variables
-        let supabaseClient = null;
-        let currentUser = null;
-        let currentCourseId = null;
-        let myEnrolledCourses = [];
-        let myEarnedBadges = [];
-        let myProjects = [];
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', async () => {
-            await initializeApp();
-        });
-
-        async function initializeApp() {
-            // Wait for supabaseClient to be available
-            let retries = 0;
-            while (!window.supabaseClient && retries < 20) {
-                await new Promise(r => setTimeout(r, 100));
-                retries++;
-            }
-
-            if (!window.supabaseClient) {
-                console.error('Supabase client not available');
-                document.body.innerHTML = '<div style="padding: 2rem; color: red;">Error de conexión. Por favor recarga la página.</div>';
-                return;
-            }
-
-            supabaseClient = window.supabaseClient;
-
-            // Check authentication
-            try {
-                const { data: { session } } = await supabaseClient.auth.getSession();
-
-                if (!session) {
-                    window.location.href = 'index.html';
-                    return;
-                }
-
-                currentUser = session.user;
-                document.getElementById('userEmail').textContent = currentUser.email;
-                document.getElementById('welcomeGreeting').textContent = 'Hola, ' + escapeHTML(currentUser.email.split('@')[0]);
-
-                // Check if admin
-                if (currentUser.email === 'admin@ecosistemadigital.unam.mx') {
-                    window.location.href = 'admin.html';
-                    return;
-                }
-
-                // Load all data
-                await loadNotifications();
-                await loadMyEnrolledCourses();
-                await loadAllCourses();
-                await loadBadges();
-                await loadMyProjects();
-            } catch (error) {
-                console.error('Auth error:', error);
-                window.location.href = 'index.html';
-            }
-        }
-
-        // Utility function to escape HTML
+        // ===== UTILITY FUNCTIONS =====
         function escapeHTML(text) {
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
 
-        // Load Notifications
+        function waitForSupabase(attempts = 0) {
+            return new Promise((resolve) => {
+                if (window.supabaseClient) {
+                    resolve();
+                } else if (attempts < 30) {
+                    setTimeout(() => {
+                        resolve(waitForSupabase(attempts + 1));
+                    }, 100);
+                }
+            });
+        }
+
+        // ===== AUTH CHECK =====
+        async function checkAuth() {
+            await waitForSupabase();
+            const { data } = await window.supabaseClient.auth.getSession();
+            const session = data.session;
+
+            if (!session) {
+                window.location.href = 'index.html';
+                return null;
+            }
+
+            // Check if admin
+            const email = session.user.email;
+            if (email.includes('admin')) {
+                window.location.href = 'admin.html';
+                return null;
+            }
+
+            return session;
+        }
+
+        // ===== GLOBALS =====
+        let currentSession = null;
+        let currentUserEmail = null;
+        let currentUserName = null;
+        let projectTags = [];
+
+        // ===== INITIALIZATION =====
+        async function init() {
+            currentSession = await checkAuth();
+            if (!currentSession) return;
+
+            currentUserEmail = currentSession.user.email;
+            currentUserName = currentUserEmail.split('@')[0];
+
+            // Update UI with user info
+            updateUserUI();
+
+            // Load all data
+            await loadNotifications();
+            await loadCourses();
+            await loadBadges();
+            await loadPoints();
+            await loadPremios();
+            await loadProjects();
+
+            // Setup event listeners
+            setupEventListeners();
+        }
+
+        function updateUserUI() {
+            document.getElementById('heroGreeting').textContent = `¡Hola, ${escapeHTML(currentUserName)}!`;
+            const avatarLetter = currentUserName.charAt(0).toUpperCase();
+            document.getElementById('userAvatar').textContent = avatarLetter;
+        }
+
+        // ===== LOGOUT =====
+        document.addEventListener('DOMContentLoaded', async () => {
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', async () => {
+                    await waitForSupabase();
+                    await window.supabaseClient.auth.signOut();
+                    window.location.href = 'index.html';
+                });
+            }
+        });
+
+        // ===== NOTIFICATIONS =====
         async function loadNotifications() {
+            await waitForSupabase();
             try {
-                const { data, error } = await supabaseClient
+                const { data: notifications, error } = await window.supabaseClient
                     .from('notificaciones')
                     .select('*')
                     .eq('activa', true)
@@ -1112,283 +1302,198 @@
 
                 if (error) throw error;
 
-                const container = document.getElementById('notificationsContainer');
-                if (data && data.length > 0) {
-                    document.getElementById('notificationCount').textContent = data.length;
-                    container.innerHTML = data.map(notif => `
+                const container = document.getElementById('notificationsScroll');
+                const badge = document.getElementById('notificationBadge');
+
+                if (notifications && notifications.length > 0) {
+                    badge.textContent = notifications.length;
+                    badge.style.display = 'flex';
+
+                    container.innerHTML = notifications.map(notif => `
                         <div class="notification-card">
-                            <div class="notification-icon-small">${escapeHTML(notif.icono || '📢')}</div>
+                            <div class="notification-icon">${escapeHTML(notif.icono)}</div>
                             <div class="notification-title">${escapeHTML(notif.titulo)}</div>
-                            <div class="notification-text">${escapeHTML(notif.descripcion)}</div>
+                            <div class="notification-message">${escapeHTML(notif.mensaje)}</div>
                         </div>
                     `).join('');
                 } else {
-                    document.getElementById('notificationCount').textContent = '0';
-                    container.innerHTML = '<div class="empty-message">No tienes notificaciones activas en este momento.</div>';
+                    container.innerHTML = '<div class="empty-state"><div class="empty-state-text">No hay notificaciones activas</div></div>';
                 }
             } catch (error) {
                 console.error('Error loading notifications:', error);
-                document.getElementById('notificationsContainer').innerHTML = '<div class="error-message">Error al cargar notificaciones</div>';
             }
         }
 
-        // Load My Enrolled Courses
-        async function loadMyEnrolledCourses() {
+        // ===== COURSES =====
+        async function loadCourses() {
+            await waitForSupabase();
             try {
-                const { data: enrollments, error } = await supabaseClient
-                    .from('inscripciones_cursos')
-                    .select('curso_id')
-                    .eq('correo_usuario', currentUser.email);
-
-                if (error) throw error;
-
-                if (enrollments && enrollments.length > 0) {
-                    const courseIds = enrollments.map(e => e.curso_id);
-                    myEnrolledCourses = courseIds;
-
-                    const { data: courses } = await supabaseClient
-                        .from('cursos')
-                        .select('*')
-                        .in('id', courseIds);
-
-                    document.getElementById('courseCount').textContent = courses ? courses.length : 0;
-                } else {
-                    document.getElementById('courseCount').textContent = '0';
-                    myEnrolledCourses = [];
-                }
-            } catch (error) {
-                console.error('Error loading enrolled courses:', error);
-                document.getElementById('courseCount').textContent = '0';
-            }
-        }
-
-        // Load All Courses
-        async function loadAllCourses() {
-            try {
-                const { data: courses, error } = await supabaseClient
+                const { data: allCourses, error: coursesError } = await window.supabaseClient
                     .from('cursos')
                     .select('*')
-                    .order('created_at', { ascending: false });
+                    .eq('activo', true);
 
-                if (error) throw error;
-
-                if (courses && courses.length > 0) {
-                    // My Courses (enrolled)
-                    const myCourses = courses.filter(c => myEnrolledCourses.includes(c.id));
-                    renderCourses(myCourses, 'myCoursesGrid', true);
-
-                    // Catalog (available spots)
-                    const availableCourses = courses.filter(c => (c.inscritos || 0) < c.cupo_maximo);
-                    renderCourses(availableCourses, 'catalogCoursesGrid', false);
-                } else {
-                    document.getElementById('myCoursesGrid').innerHTML = '<div class="empty-message">Aún no te has inscrito en ningún curso.</div>';
-                    document.getElementById('catalogCoursesGrid').innerHTML = '<div class="empty-message">No hay cursos disponibles en este momento.</div>';
-                }
-            } catch (error) {
-                console.error('Error loading courses:', error);
-                document.getElementById('myCoursesGrid').innerHTML = '<div class="error-message">Error al cargar cursos</div>';
-                document.getElementById('catalogCoursesGrid').innerHTML = '<div class="error-message">Error al cargar catálogo</div>';
-            }
-        }
-
-        function renderCourses(courses, containerId, isMyCoursesSection) {
-            const container = document.getElementById(containerId);
-
-            if (courses.length === 0) {
-                container.innerHTML = '<div class="empty-message">' +
-                    (isMyCoursesSection ? 'Aún no te has inscrito en ningún curso.' : 'No hay cursos disponibles en este momento.') +
-                    '</div>';
-                return;
-            }
-
-            container.innerHTML = courses.map(course => {
-                const isEnrolled = myEnrolledCourses.includes(course.id);
-                const enrollmentPercent = course.cupo_maximo > 0 ? Math.round((course.inscritos / course.cupo_maximo) * 100) : 0;
-                const modalityClass = course.modalidad === 'En línea' ? 'badge-online' :
-                                     course.modalidad === 'Presencial' ? 'badge-presencial' : 'badge-hibrida';
-
-                return `
-                    <div class="course-card">
-                        <div class="course-header">
-                            <div class="course-title">${escapeHTML(course.titulo)}</div>
-                            <div class="course-instructor">Instructor: ${escapeHTML(course.instructor || 'No especificado')}</div>
-                        </div>
-                        <div class="course-body">
-                            <div class="badge badge ${modalityClass}">${escapeHTML(course.modalidad)}</div>
-                            ${isEnrolled ? '<div class="badge badge-enrolled">✓ Ya inscrito</div>' : ''}
-
-                            <div class="course-meta">
-                                <span>📅 ${escapeHTML(course.fecha_inicio || 'Fecha no especificada')} - ${escapeHTML(course.fecha_fin || 'Fecha no especificada')}</span>
-                                <span>🕐 ${escapeHTML(course.horario || 'Horario no especificado')}</span>
-                            </div>
-
-                            <div class="progress-wrapper">
-                                <div class="progress-label">
-                                    <span>Inscritos</span>
-                                    <span>${course.inscritos || 0}/${course.cupo_maximo}</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: ${enrollmentPercent}%"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="course-footer">
-                            ${isEnrolled ?
-                                '<button class="btn btn-enrolled">Ya inscrito</button>' :
-                                `<button class="btn btn-primary" onclick="openEnrollmentModal(${course.id}, '${escapeHTML(course.titulo)}')">Inscribirme</button>`
-                            }
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        // Enrollment Modal Functions
-        function openEnrollmentModal(courseId, courseTitle) {
-            currentCourseId = courseId;
-            document.getElementById('enrollmentModal').classList.add('active');
-            document.getElementById('enrollEmail').value = currentUser.email;
-            document.getElementById('enrollMessage').innerHTML = '';
-        }
-
-        function closeEnrollmentModal() {
-            document.getElementById('enrollmentModal').classList.remove('active');
-            currentCourseId = null;
-            document.getElementById('enrollName').value = '';
-            document.getElementById('enrollEmail').value = '';
-            document.getElementById('enrollCarrera').value = '';
-            document.getElementById('enrollMessage').innerHTML = '';
-        }
-
-        async function handleEnrollment(event) {
-            event.preventDefault();
-            const messageDiv = document.getElementById('enrollMessage');
-
-            try {
-                const name = document.getElementById('enrollName').value;
-                const email = document.getElementById('enrollEmail').value;
-                const carrera = document.getElementById('enrollCarrera').value;
-
-                const { data, error } = await supabaseClient
+                const { data: enrollments, error: enrollmentsError } = await window.supabaseClient
                     .from('inscripciones_cursos')
-                    .insert([{
-                        curso_id: currentCourseId,
-                        nombre_usuario: name,
-                        correo_usuario: email,
-                        carrera: carrera
-                    }]);
+                    .select('curso_id')
+                    .eq('correo', currentUserEmail);
 
-                if (error) throw error;
+                if (coursesError || enrollmentsError) throw coursesError || enrollmentsError;
 
-                messageDiv.innerHTML = '<div class="success-message">¡Inscripción exitosa! Bienvenido al curso.</div>';
-                setTimeout(() => {
-                    closeEnrollmentModal();
-                    loadMyEnrolledCourses();
-                    loadAllCourses();
-                }, 2000);
-            } catch (error) {
-                console.error('Enrollment error:', error);
-                messageDiv.innerHTML = '<div class="error-message">Error al inscribirse. Por favor intenta de nuevo.</div>';
-            }
-        }
+                const enrolledCourseIds = new Set((enrollments || []).map(e => e.curso_id));
 
-        // Load Badges
-        async function loadBadges() {
-            try {
-                const { data: allBadges, error: badgesError } = await supabaseClient
-                    .from('badges')
-                    .select('*')
-                    .order('created_at', { ascending: false });
+                const container = document.getElementById('cursosContainer');
+                document.getElementById('statCourses').textContent = enrolledCourseIds.size;
 
-                if (badgesError) throw badgesError;
+                if (allCourses && allCourses.length > 0) {
+                    container.innerHTML = allCourses.map(course => {
+                        const isEnrolled = enrolledCourseIds.has(course.id);
+                        const progress = course.inscritos ? Math.min((course.inscritos / course.cupo_maximo) * 100, 100) : 0;
 
-                const { data: userBadges, error: userBadgesError } = await supabaseClient
-                    .from('badges_usuarios')
-                    .select('id_badge')
-                    .eq('correo_usuario', currentUser.email);
-
-                if (userBadgesError) throw userBadgesError;
-
-                myEarnedBadges = (userBadges || []).map(b => b.id_badge);
-                document.getElementById('badgeCount').textContent = myEarnedBadges.length;
-
-                if (allBadges && allBadges.length > 0) {
-                    const badgesContainer = document.getElementById('badgesGrid');
-                    badgesContainer.innerHTML = allBadges.map(badge => {
-                        const isEarned = myEarnedBadges.includes(badge.id);
                         return `
-                            <div class="badge-card ${isEarned ? '' : 'locked'}">
-                                ${!isEarned ? '<div class="lock-icon">🔒</div>' : ''}
-                                <div class="badge-icon">${escapeHTML(badge.icono)}</div>
-                                <div class="badge-name">${escapeHTML(badge.nombre)}</div>
-                                <div class="badge-points">${badge.puntos} puntos</div>
+                            <div class="course-card">
+                                <div class="course-header">
+                                    <div class="course-category">${escapeHTML(course.categoria)}</div>
+                                    <div class="course-title">${escapeHTML(course.titulo)}</div>
+                                    <div class="course-instructor">👨‍🏫 ${escapeHTML(course.instructor)}</div>
+                                </div>
+                                <div class="course-body">
+                                    <div class="course-description">${escapeHTML(course.descripcion)}</div>
+                                    <div class="course-meta">
+                                        <div class="course-meta-item">📅 ${escapeHTML(course.fecha_inicio)} a ${escapeHTML(course.fecha_fin)}</div>
+                                        <div class="course-meta-item">🕐 ${escapeHTML(course.horario)}</div>
+                                        <div class="course-meta-item">💻 ${escapeHTML(course.modalidad)}</div>
+                                        <div class="course-meta-item">👥 ${course.inscritos}/${course.cupo_maximo}</div>
+                                    </div>
+                                    ${isEnrolled ? `
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: ${progress}%"></div>
+                                        </div>
+                                        <button class="course-button btn-primary" disabled>✓ Inscrito</button>
+                                    ` : `
+                                        <button class="course-button btn-secondary" onclick="openEnrollmentModal(${course.id}, '${escapeHTML(course.titulo)}')">Inscribirse</button>
+                                    `}
+                                </div>
                             </div>
                         `;
                     }).join('');
                 } else {
-                    document.getElementById('badgesGrid').innerHTML = '<div class="empty-message">No hay insignias disponibles.</div>';
+                    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📚</div><div class="empty-state-text">No hay cursos disponibles</div></div>';
                 }
-
-                // Load user points
-                const { data: points } = await supabaseClient
-                    .from('badges_usuarios')
-                    .select('*')
-                    .eq('correo_usuario', currentUser.email);
-
-                let totalPoints = 0;
-                if (points && points.length > 0) {
-                    const badgeIds = points.map(p => p.id_badge);
-                    const { data: badgeDetails } = await supabaseClient
-                        .from('badges')
-                        .select('puntos')
-                        .in('id', badgeIds);
-
-                    if (badgeDetails) {
-                        totalPoints = badgeDetails.reduce((sum, b) => sum + (b.puntos || 0), 0);
-                    }
-                }
-
-                document.getElementById('totalPoints').textContent = totalPoints;
-                document.getElementById('pointsCount').textContent = totalPoints;
-
             } catch (error) {
-                console.error('Error loading badges:', error);
-                document.getElementById('badgesGrid').innerHTML = '<div class="error-message">Error al cargar insignias</div>';
+                console.error('Error loading courses:', error);
             }
         }
 
-        // Load Prizes
-        async function loadPrizes() {
+        function openEnrollmentModal(courseId, courseTitle) {
+            document.getElementById('enrollmentCourseId').value = courseId;
+            document.getElementById('enrollmentModal').classList.add('active');
+        }
+
+        // ===== BADGES =====
+        async function loadBadges() {
+            await waitForSupabase();
             try {
-                const { data: prizes, error } = await supabaseClient
-                    .from('premios')
+                const { data: allBadges, error: badgesError } = await window.supabaseClient
+                    .from('badges')
                     .select('*')
-                    .order('puntos_requeridos', { ascending: true });
+                    .eq('activo', true);
+
+                const { data: userBadges, error: userBadgesError } = await window.supabaseClient
+                    .from('badges_usuarios')
+                    .select('badge_id')
+                    .eq('correo_usuario', currentUserEmail);
+
+                if (badgesError || userBadgesError) throw badgesError || userBadgesError;
+
+                const earnedBadgeIds = new Set((userBadges || []).map(b => b.badge_id));
+                document.getElementById('statBadges').textContent = earnedBadgeIds.size;
+
+                const container = document.getElementById('badgesContainer');
+
+                if (allBadges && allBadges.length > 0) {
+                    container.innerHTML = allBadges.map(badge => {
+                        const isEarned = earnedBadgeIds.has(badge.id);
+                        return `
+                            <div class="badge-card ${isEarned ? 'earned' : 'locked'}">
+                                <span class="badge-icon">${escapeHTML(badge.icono)}</span>
+                                <div class="badge-name">${escapeHTML(badge.nombre)}</div>
+                                <div class="badge-points">${badge.puntos} pts</div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🏆</div><div class="empty-state-text">No hay insignias disponibles</div></div>';
+                }
+            } catch (error) {
+                console.error('Error loading badges:', error);
+            }
+        }
+
+        // ===== POINTS =====
+        async function loadPoints() {
+            await waitForSupabase();
+            try {
+                const { data: userBadges, error } = await window.supabaseClient
+                    .from('badges_usuarios')
+                    .select('badges(puntos)')
+                    .eq('correo_usuario', currentUserEmail);
 
                 if (error) throw error;
 
-                if (prizes && prizes.length > 0) {
-                    const prizesContainer = document.getElementById('prizesGrid');
-                    prizesContainer.innerHTML = prizes.map(prize => `
-                        <div class="prize-card">
-                            <div class="prize-name">${escapeHTML(prize.nombre)}</div>
-                            <div class="prize-points-needed">💰 ${prize.puntos_requeridos} puntos</div>
-                            <div class="prize-description">${escapeHTML(prize.descripcion)}</div>
-                        </div>
-                    `).join('');
-                } else {
-                    document.getElementById('prizesGrid').innerHTML = '<div class="empty-message">No hay premios disponibles en este momento.</div>';
-                }
+                const totalPoints = (userBadges || []).reduce((sum, ub) => {
+                    return sum + (ub.badges?.puntos || 0);
+                }, 0);
+
+                document.getElementById('statPoints').textContent = totalPoints;
+                document.getElementById('totalPoints').textContent = totalPoints;
             } catch (error) {
-                console.error('Error loading prizes:', error);
-                document.getElementById('prizesGrid').innerHTML = '<div class="error-message">Error al cargar premios</div>';
+                console.error('Error loading points:', error);
             }
         }
 
-        // Load My Projects
-        async function loadMyProjects() {
+        // ===== PREMIOS =====
+        async function loadPremios() {
+            await waitForSupabase();
             try {
-                const { data: projects, error } = await supabaseClient
+                const { data: allPremios, error } = await window.supabaseClient
+                    .from('premios')
+                    .select('*')
+                    .eq('activo', true)
+                    .order('puntos_requeridos', { ascending: true });
+
+                const userPoints = parseInt(document.getElementById('totalPoints').textContent) || 0;
+
+                const container = document.getElementById('premiosContainer');
+
+                if (allPremios && allPremios.length > 0) {
+                    container.innerHTML = allPremios.map(premio => {
+                        const canRedeem = userPoints >= premio.puntos_requeridos && premio.stock > 0;
+                        return `
+                            <div class="premio-card">
+                                <div class="premio-icon">${escapeHTML(premio.icono)}</div>
+                                <div class="premio-name">${escapeHTML(premio.nombre)}</div>
+                                <div class="premio-points">${premio.puntos_requeridos} pts</div>
+                                <div class="premio-description">${escapeHTML(premio.descripcion)}</div>
+                                <button class="premio-button" ${canRedeem ? '' : 'disabled'}>
+                                    ${canRedeem ? 'Canjear' : 'Sin puntos'}
+                                </button>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🎁</div><div class="empty-state-text">No hay premios disponibles</div></div>';
+                }
+            } catch (error) {
+                console.error('Error loading premios:', error);
+            }
+        }
+
+        // ===== PROJECTS =====
+        async function loadProjects() {
+            await waitForSupabase();
+            try {
+                const { data: projects, error } = await window.supabaseClient
                     .from('proyectos_comunidad')
                     .select('*')
                     .eq('activo', true)
@@ -1396,126 +1501,184 @@
 
                 if (error) throw error;
 
+                const userProjects = projects?.filter(p => p.correo_autor === currentUserEmail) || [];
+                document.getElementById('statProjects').textContent = userProjects.length;
+
+                const container = document.getElementById('projectsContainer');
+
                 if (projects && projects.length > 0) {
-                    myProjects = projects.filter(p => p.autor === currentUser.email);
-                    document.getElementById('projectCount').textContent = myProjects.length;
+                    container.innerHTML = projects.map(project => {
+                        const tagsHtml = (project.tags || []).map(tag =>
+                            `<span class="project-tag">${escapeHTML(tag)}</span>`
+                        ).join('');
 
-                    renderProjects(projects);
+                        return `
+                            <div class="project-card">
+                                <div class="project-header">
+                                    <div class="project-badges">
+                                        <span class="project-category-badge">${escapeHTML(project.categoria)}</span>
+                                    </div>
+                                    <div class="project-title">${escapeHTML(project.titulo)}</div>
+                                    <div class="project-author">✍️ ${escapeHTML(project.autor)}</div>
+                                </div>
+                                <div class="project-body">
+                                    <div class="project-description">${escapeHTML(project.descripcion)}</div>
+                                    <div class="project-tags">${tagsHtml}</div>
+                                    <div class="project-footer">
+                                        <span class="project-carrera">${escapeHTML(project.carrera)}</span>
+                                        <span class="project-likes">👍 ${project.likes || 0}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
                 } else {
-                    document.getElementById('projectCount').textContent = '0';
-                    document.getElementById('projectsGrid').innerHTML = '<div class="empty-message">No hay proyectos publicados en la comunidad.</div>';
+                    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💡</div><div class="empty-state-text">No hay proyectos publicados aún</div></div>';
                 }
-
-                // Load prizes after projects
-                await loadPrizes();
             } catch (error) {
                 console.error('Error loading projects:', error);
-                document.getElementById('projectsGrid').innerHTML = '<div class="error-message">Error al cargar proyectos</div>';
             }
         }
 
-        function renderProjects(projects) {
-            const container = document.getElementById('projectsGrid');
+        // ===== EVENT LISTENERS =====
+        function setupEventListeners() {
+            // Enrollment Modal
+            document.getElementById('enrollmentClose').addEventListener('click', () => {
+                document.getElementById('enrollmentModal').classList.remove('active');
+            });
 
-            if (projects.length === 0) {
-                container.innerHTML = '<div class="empty-message">No hay proyectos publicados en la comunidad.</div>';
-                return;
-            }
+            document.getElementById('enrollmentCancel').addEventListener('click', () => {
+                document.getElementById('enrollmentModal').classList.remove('active');
+            });
 
-            container.innerHTML = projects.map(project => {
-                const tags = project.tags ? (typeof project.tags === 'string' ? project.tags.split(',') : project.tags) : [];
-                return `
-                    <div class="project-card">
-                        <div class="project-header">
-                            <div class="project-title">${escapeHTML(project.titulo)}</div>
-                            <div class="project-author">Por: ${escapeHTML(project.autor)}</div>
-                        </div>
-                        <div class="project-body">
-                            <div class="project-description">${escapeHTML(project.descripcion)}</div>
+            document.getElementById('enrollmentForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const courseId = document.getElementById('enrollmentCourseId').value;
+                const nombre = document.getElementById('enrollmentName').value;
+                const correo = document.getElementById('enrollmentEmail').value;
+                const carrera = document.getElementById('enrollmentCarrera').value;
 
-                            <div class="project-meta">
-                                <span class="badge badge">${escapeHTML(project.categoria)}</span>
-                                <span class="badge badge">${escapeHTML(project.carrera)}</span>
-                                ${tags.map(tag => `<span class="project-tag">${escapeHTML(tag.trim())}</span>`).join('')}
-                            </div>
-                        </div>
-                        <div class="project-footer">
-                            <div class="likes-count">❤️ ${project.likes || 0}</div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
+                try {
+                    const { error } = await window.supabaseClient
+                        .from('inscripciones_cursos')
+                        .insert([{ curso_id: courseId, nombre, correo, carrera }]);
 
-        // Toggle Publish Form
-        function togglePublishForm() {
-            const form = document.getElementById('publishFormContainer');
-            form.classList.toggle('active');
-            if (form.classList.contains('active')) {
-                document.getElementById('projectTitle').focus();
-            } else {
-                document.getElementById('projectTitle').value = '';
-                document.getElementById('projectDescription').value = '';
-                document.getElementById('projectCarrera').value = '';
-                document.getElementById('projectCategoria').value = '';
-                document.getElementById('projectTags').value = '';
-                document.getElementById('publishMessage').innerHTML = '';
-            }
-        }
+                    if (error) throw error;
 
-        // Handle Publish Project
-        async function handlePublishProject(event) {
-            event.preventDefault();
-            const messageDiv = document.getElementById('publishMessage');
+                    document.getElementById('enrollmentModal').classList.remove('active');
+                    document.getElementById('enrollmentForm').reset();
+                    await loadCourses();
+                } catch (error) {
+                    console.error('Error enrolling:', error);
+                    alert('Error al inscribirse');
+                }
+            });
 
-            try {
-                const title = document.getElementById('projectTitle').value;
-                const description = document.getElementById('projectDescription').value;
+            // Publish Modal
+            document.getElementById('publishProjectBtn').addEventListener('click', () => {
+                document.getElementById('publishModal').classList.add('active');
+            });
+
+            document.getElementById('publishClose').addEventListener('click', () => {
+                document.getElementById('publishModal').classList.remove('active');
+            });
+
+            document.getElementById('publishCancel').addEventListener('click', () => {
+                document.getElementById('publishModal').classList.remove('active');
+            });
+
+            // Tags input
+            document.getElementById('tagInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const value = e.target.value.trim();
+                    if (value) {
+                        projectTags.push(value);
+                        e.target.value = '';
+                        renderTags();
+                    }
+                }
+            });
+
+            // Publish form
+            document.getElementById('publishForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const titulo = document.getElementById('projectTitle').value;
+                const descripcion = document.getElementById('projectDescription').value;
                 const carrera = document.getElementById('projectCarrera').value;
-                const categoria = document.getElementById('projectCategoria').value;
-                const tags = document.getElementById('projectTags').value;
+                const categoria = document.getElementById('projectCategory').value;
 
-                const { data, error } = await supabaseClient
-                    .from('proyectos_comunidad')
-                    .insert([{
-                        titulo: title,
-                        descripcion: description,
-                        carrera: carrera,
-                        categoria: categoria,
-                        tags: tags,
-                        autor: currentUser.email,
-                        activo: true,
-                        likes: 0
-                    }]);
+                try {
+                    const { error } = await window.supabaseClient
+                        .from('proyectos_comunidad')
+                        .insert([{
+                            titulo,
+                            descripcion,
+                            autor: currentUserName,
+                            correo_autor: currentUserEmail,
+                            carrera,
+                            categoria,
+                            tags: projectTags,
+                            likes: 0,
+                            activo: true
+                        }]);
 
-                if (error) throw error;
+                    if (error) throw error;
 
-                messageDiv.innerHTML = '<div class="success-message">¡Proyecto publicado exitosamente!</div>';
-                setTimeout(() => {
-                    togglePublishForm();
-                    loadMyProjects();
-                }, 2000);
-            } catch (error) {
-                console.error('Publish error:', error);
-                messageDiv.innerHTML = '<div class="error-message">Error al publicar proyecto. Por favor intenta de nuevo.</div>';
-            }
+                    document.getElementById('publishModal').classList.remove('active');
+                    document.getElementById('publishForm').reset();
+                    projectTags = [];
+                    renderTags();
+                    await loadProjects();
+                } catch (error) {
+                    console.error('Error publishing:', error);
+                    alert('Error al publicar proyecto');
+                }
+            });
+
+            // Close modals on outside click
+            window.addEventListener('click', (e) => {
+                const enrollmentModal = document.getElementById('enrollmentModal');
+                const publishModal = document.getElementById('publishModal');
+                if (e.target === enrollmentModal) enrollmentModal.classList.remove('active');
+                if (e.target === publishModal) publishModal.classList.remove('active');
+            });
         }
 
-        // Toggle Notifications (mobile)
-        function toggleNotifications() {
-            const notifSection = document.getElementById('notificationsSection');
-            notifSection.scrollIntoView({ behavior: 'smooth' });
+        function renderTags() {
+            const container = document.getElementById('tagsContainer');
+            const input = document.getElementById('tagInput');
+
+            const tagsHTML = projectTags.map((tag, idx) => `
+                <div class="form-tag">
+                    ${escapeHTML(tag)}
+                    <span class="form-tag-remove" onclick="removeTag(${idx})">×</span>
+                </div>
+            `).join('');
+
+            container.innerHTML = tagsHTML + `
+                <input type="text" class="form-tag-input" id="tagInput" placeholder="Escribe y presiona Enter para agregar etiquetas">
+            `;
+
+            document.getElementById('tagInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const value = e.target.value.trim();
+                    if (value) {
+                        projectTags.push(value);
+                        renderTags();
+                    }
+                }
+            });
         }
 
-        // Handle Logout
-        async function handleLogout() {
-            try {
-                await supabaseClient.auth.signOut();
-                window.location.href = 'index.html';
-            } catch (error) {
-                console.error('Logout error:', error);
-            }
+        function removeTag(idx) {
+            projectTags.splice(idx, 1);
+            renderTags();
         }
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
