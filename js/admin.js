@@ -1045,9 +1045,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   // Verificar autenticación
   const session = await checkAuth();
   if (!session) {
-    window.location.href = 'index.html';
+    // Mostrar modal de login en lugar de redirigir
+    const loginModal = document.getElementById('loginModal');
+    if (loginModal) {
+      loginModal.style.display = 'flex';
+    } else {
+      window.location.href = 'index.html';
+    }
     return;
   }
+
+  // Ocultar modal de login si hay sesión
+  const loginModal = document.getElementById('loginModal');
+  if (loginModal) loginModal.style.display = 'none';
 
   // Cargar todos los datos
   await loadAllData();
