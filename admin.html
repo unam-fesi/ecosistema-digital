@@ -117,6 +117,22 @@
             box-shadow: 0 0 0 3px rgba(196, 162, 78, 0.1);
         }
 
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-gray);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(196, 162, 78, 0.1);
+        }
+
         .password-toggle {
             position: absolute;
             right: 12px;
@@ -1167,6 +1183,30 @@
                     Análisis IA
                 </button>
             </li>
+            <li class="nav-item">
+                <button class="nav-link" data-tab="tabCursos" onclick="switchTab('tabCursos', this)">
+                    <span style="display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; font-size: 18px;">📚</span>
+                    Cursos
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-tab="tabNotificaciones" onclick="switchTab('tabNotificaciones', this)">
+                    <span style="display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; font-size: 18px;">🔔</span>
+                    Notificaciones
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-tab="tabComunidad" onclick="switchTab('tabComunidad', this)">
+                    <span style="display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; font-size: 18px;">💬</span>
+                    Comunidad
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link" data-tab="tabBadges" onclick="switchTab('tabBadges', this)">
+                    <span style="display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; font-size: 18px;">🏅</span>
+                    Badges
+                </button>
+            </li>
         </ul>
 
         <div class="sidebar-footer">
@@ -1200,6 +1240,10 @@
             <button class="tab-btn" data-tab="tabContactos" onclick="switchTab('tabContactos', this)">Contactos</button>
             <button class="tab-btn" data-tab="tabReportes" onclick="switchTab('tabReportes', this)">Reportes</button>
             <button class="tab-btn" data-tab="tabAnalisisIA" onclick="switchTab('tabAnalisisIA', this)">Análisis IA</button>
+            <button class="tab-btn" data-tab="tabCursos" onclick="switchTab('tabCursos', this)">Cursos</button>
+            <button class="tab-btn" data-tab="tabNotificaciones" onclick="switchTab('tabNotificaciones', this)">Notificaciones</button>
+            <button class="tab-btn" data-tab="tabComunidad" onclick="switchTab('tabComunidad', this)">Comunidad</button>
+            <button class="tab-btn" data-tab="tabBadges" onclick="switchTab('tabBadges', this)">Badges</button>
         </div>
 
         <!-- Dashboard Tab -->
@@ -1630,6 +1674,400 @@
                 <div id="sentimentErrorArea" style="display: none; background-color: #FFEBEE; padding: 20px; border-left: 4px solid #F44336; border-radius: 4px; color: #C62828;">
                     <h3 style="margin-top: 0; font-size: 16px;">Error al ejecutar análisis</h3>
                     <p id="sentimentErrorMessage" style="margin-bottom: 0; font-size: 15px;"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cursos Tab -->
+        <div id="tabCursos" class="tab-content">
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="summary-card-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-4.6 9L8 13.14V9l5.4 2z" fill="white"/>
+                        </svg>
+                    </div>
+                    <div class="summary-card-content">
+                        <h3>Total Cursos</h3>
+                        <div class="number" id="totalCursos">0</div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-card-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="white"/>
+                        </svg>
+                    </div>
+                    <div class="summary-card-content">
+                        <h3>Total Inscritos</h3>
+                        <div class="number" id="totalInscritos">0</div>
+                    </div>
+                </div>
+
+                <div class="summary-card">
+                    <div class="summary-card-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="white"/>
+                        </svg>
+                    </div>
+                    <div class="summary-card-content">
+                        <h3>Cursos Activos</h3>
+                        <div class="number" id="cursosActivos">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-header" style="margin-top: 30px;">
+                <div class="table-search">
+                    <input type="text" id="searchCursos" placeholder="Buscar por título, instructor o categoría...">
+                </div>
+                <div class="table-filters">
+                    <button class="btn-primary" onclick="showAddCursoForm()">+ Agregar Curso</button>
+                </div>
+            </div>
+
+            <div id="addCursoForm" style="display: none; background-color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
+                <h3 style="margin-top: 0; color: #0C2340;">Nuevo Curso</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <input type="text" id="cursoTitulo" placeholder="Título del curso" class="form-input">
+                    <input type="text" id="cursoInstructor" placeholder="Instructor" class="form-input">
+                    <input type="text" id="cursoCategoria" placeholder="Categoría" class="form-input">
+                    <input type="date" id="cursoFechaInicio" class="form-input">
+                    <input type="date" id="cursoFechaFin" class="form-input">
+                    <input type="number" id="cursoCupo" placeholder="Cupo máximo" class="form-input">
+                    <select id="cursoModalidad" class="form-input">
+                        <option value="">Seleccionar modalidad</option>
+                        <option value="presencial">Presencial</option>
+                        <option value="virtual">Virtual</option>
+                        <option value="hibrido">Híbrido</option>
+                    </select>
+                </div>
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button class="btn-primary" onclick="saveCurso()" style="background-color: #0C2340;">Guardar Curso</button>
+                    <button class="btn-secondary" onclick="hideAddCursoForm()">Cancelar</button>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="tablaCursos">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Título</th>
+                            <th>Instructor</th>
+                            <th>Categoría</th>
+                            <th>Fechas</th>
+                            <th>Inscritos/Cupo</th>
+                            <th>Modalidad</th>
+                            <th>Activo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyCursos">
+                        <tr>
+                            <td colspan="9" class="empty-state">
+                                <p>No hay cursos. Cuando se agreguen, aparecerán aquí.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <h3 style="color: #0C2340; margin-bottom: 15px;">Inscripciones del Curso Seleccionado</h3>
+                <div class="table-wrapper">
+                    <table id="tablaInscripciones">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nombre Estudiante</th>
+                                <th>Correo</th>
+                                <th>Carrera</th>
+                                <th>Fecha Inscripción</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyInscripciones">
+                            <tr>
+                                <td colspan="7" class="empty-state">
+                                    <p>Selecciona un curso para ver sus inscripciones.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notificaciones Tab -->
+        <div id="tabNotificaciones" class="tab-content">
+            <div class="table-header">
+                <div class="table-search">
+                    <input type="text" id="searchNotificaciones" placeholder="Buscar por título...">
+                </div>
+                <div class="table-filters">
+                    <button class="btn-primary" onclick="showAddNotificacionForm()">+ Nueva Notificación</button>
+                </div>
+            </div>
+
+            <div id="addNotificacionForm" style="display: none; background-color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
+                <h3 style="margin-top: 0; color: #0C2340;">Nueva Notificación</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <input type="text" id="notifTitulo" placeholder="Título" class="form-input">
+                    <textarea id="notifMensaje" placeholder="Mensaje" class="form-input" style="grid-column: 1 / -1; min-height: 100px;"></textarea>
+                    <select id="notifTipo" class="form-input">
+                        <option value="">Seleccionar tipo</option>
+                        <option value="info">Info</option>
+                        <option value="alerta">Alerta</option>
+                        <option value="evento">Evento</option>
+                        <option value="logro">Logro</option>
+                    </select>
+                    <input type="text" id="notifIcono" placeholder="Emoji o icono" class="form-input">
+                    <input type="datetime-local" id="notifFechaInicio" class="form-input">
+                    <input type="datetime-local" id="notifFechaFin" class="form-input">
+                    <input type="url" id="notifEnlace" placeholder="URL de enlace (opcional)" class="form-input" style="grid-column: 1 / -1;">
+                </div>
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button class="btn-primary" onclick="saveNotificacion()" style="background-color: #0C2340;">Guardar</button>
+                    <button class="btn-secondary" onclick="hideAddNotificacionForm()">Cancelar</button>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="tablaNotificaciones">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Título</th>
+                            <th>Tipo</th>
+                            <th>Activa</th>
+                            <th>Fecha Inicio</th>
+                            <th>Fecha Fin</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyNotificaciones">
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <p>No hay notificaciones. Cuando se agreguen, aparecerán aquí.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Comunidad Tab -->
+        <div id="tabComunidad" class="tab-content">
+            <div class="table-header">
+                <div class="table-search">
+                    <input type="text" id="searchComunidad" placeholder="Buscar por título o autor...">
+                </div>
+                <div class="table-filters">
+                    <select id="filterComunidadCategoria" class="filter-select">
+                        <option value="">Todas las categorías</option>
+                        <option value="proyecto">Proyecto</option>
+                        <option value="investigacion">Investigación</option>
+                        <option value="recurso">Recurso</option>
+                        <option value="otra">Otra</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="tablaComunidad">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Título</th>
+                            <th>Autor</th>
+                            <th>Carrera</th>
+                            <th>Categoría</th>
+                            <th>Likes</th>
+                            <th>Activo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bodyComunidad">
+                        <tr>
+                            <td colspan="8" class="empty-state">
+                                <p>No hay proyectos comunitarios. Cuando se agreguen, aparecerán aquí.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <h3 style="color: #0C2340; margin-bottom: 15px;">Comentarios del Proyecto Seleccionado</h3>
+                <div class="table-wrapper">
+                    <table id="tablaComentarios">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Usuario</th>
+                                <th>Comentario</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyComentarios">
+                            <tr>
+                                <td colspan="5" class="empty-state">
+                                    <p>Selecciona un proyecto para ver sus comentarios.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Badges Tab -->
+        <div id="tabBadges" class="tab-content">
+            <div style="margin-bottom: 20px;">
+                <div style="background-color: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); margin-bottom: 20px;">
+                    <h3 style="margin-top: 0; color: #0C2340;">Estadísticas de Badges</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <div style="padding: 15px; background-color: #FAF8F4; border-radius: 6px;">
+                            <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Total Badges Otorgados</div>
+                            <div style="font-size: 28px; font-weight: 700; color: #0C2340;" id="totalBadgesAwarded">0</div>
+                        </div>
+                        <div style="padding: 15px; background-color: #FAF8F4; border-radius: 6px;">
+                            <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Badge Más Popular</div>
+                            <div style="font-size: 18px; font-weight: 600; color: #0C2340;" id="mostPopularBadge">N/A</div>
+                        </div>
+                        <div style="padding: 15px; background-color: #FAF8F4; border-radius: 6px;">
+                            <div style="font-size: 12px; color: #666; margin-bottom: 5px;">Top Usuario</div>
+                            <div style="font-size: 18px; font-weight: 600; color: #0C2340;" id="topUser">N/A</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Badges Management -->
+                <div>
+                    <div class="table-header">
+                        <h3 style="margin: 0; color: #0C2340;">Gestión de Badges</h3>
+                        <button class="btn-primary" onclick="showAddBadgeForm()" style="margin-top: 10px;">+ Nuevo Badge</button>
+                    </div>
+
+                    <div id="addBadgeForm" style="display: none; background-color: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
+                        <input type="text" id="badgeNombre" placeholder="Nombre del badge" class="form-input">
+                        <textarea id="badgeDescripcion" placeholder="Descripción" class="form-input" style="min-height: 80px; margin-top: 10px;"></textarea>
+                        <input type="text" id="badgeIcono" placeholder="Emoji" class="form-input" style="margin-top: 10px;">
+                        <div style="margin-top: 10px; display: flex; gap: 10px;">
+                            <button class="btn-primary" onclick="saveBadge()" style="background-color: #0C2340;">Guardar</button>
+                            <button class="btn-secondary" onclick="hideAddBadgeForm()">Cancelar</button>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table id="tablaBadges">
+                            <thead>
+                                <tr>
+                                    <th>Icono</th>
+                                    <th>Nombre</th>
+                                    <th>Descripción</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bodyBadges">
+                                <tr>
+                                    <td colspan="4" class="empty-state">
+                                        <p>No hay badges. Crea uno para comenzar.</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Awarded Badges -->
+                <div>
+                    <div class="table-header">
+                        <h3 style="margin: 0; color: #0C2340;">Badges Otorgados</h3>
+                        <button class="btn-primary" onclick="showAwardBadgeForm()" style="margin-top: 10px;">+ Otorgar Badge</button>
+                    </div>
+
+                    <div id="awardBadgeForm" style="display: none; background-color: white; padding: 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
+                        <select id="awardBadgeSelect" class="form-input" placeholder="Seleccionar badge">
+                            <option value="">Seleccionar badge</option>
+                        </select>
+                        <input type="text" id="awardNombre" placeholder="Nombre del usuario" class="form-input" style="margin-top: 10px;">
+                        <input type="email" id="awardCorreo" placeholder="Correo del usuario" class="form-input" style="margin-top: 10px;">
+                        <div style="margin-top: 10px; display: flex; gap: 10px;">
+                            <button class="btn-primary" onclick="saveAwardBadge()" style="background-color: #0C2340;">Otorgar</button>
+                            <button class="btn-secondary" onclick="hideAwardBadgeForm()">Cancelar</button>
+                        </div>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table id="tablaBadgesUsuarios">
+                            <thead>
+                                <tr>
+                                    <th>Usuario</th>
+                                    <th>Badge</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bodyBadgesUsuarios">
+                                <tr>
+                                    <td colspan="4" class="empty-state">
+                                        <p>No hay badges otorgados aún.</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Premios Section -->
+            <div style="margin-top: 30px;">
+                <div class="table-header">
+                    <h3 style="margin: 0; color: #0C2340;">Gestión de Premios</h3>
+                    <button class="btn-primary" onclick="showAddPremioForm()">+ Nuevo Premio</button>
+                </div>
+
+                <div id="addPremioForm" style="display: none; background-color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);">
+                    <h4 style="margin-top: 0; color: #0C2340;">Nuevo Premio</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                        <input type="text" id="premioNombre" placeholder="Nombre del premio" class="form-input">
+                        <input type="text" id="premioCategoria" placeholder="Categoría" class="form-input">
+                        <input type="number" id="premioStock" placeholder="Stock disponible" class="form-input">
+                        <input type="text" id="premioValor" placeholder="Valor/Descripción" class="form-input">
+                    </div>
+                    <div style="margin-top: 15px; display: flex; gap: 10px;">
+                        <button class="btn-primary" onclick="savePremio()" style="background-color: #0C2340;">Guardar</button>
+                        <button class="btn-secondary" onclick="hideAddPremioForm()">Cancelar</button>
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="tablaPremios">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Stock</th>
+                                <th>Valor</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bodyPremios">
+                            <tr>
+                                <td colspan="6" class="empty-state">
+                                    <p>No hay premios configurados.</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
