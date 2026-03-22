@@ -2399,23 +2399,22 @@ function calculateDepreciation(cost, vidaUtil, fechaAdquisicion) {
 async function loadInventarioHardware() {
   try {
     await fetchInventarioHardware();
-    const tableBody = document.getElementById('hardwareTableBody');
+    const tableBody = document.getElementById('bodyHardware');
     if (!tableBody) return;
 
     tableBody.innerHTML = '';
 
-    // Get filter values
     const searchValue = document.getElementById('searchHardware')?.value.toLowerCase() || '';
     const filterServicio = document.getElementById('filterServicio')?.value || '';
 
-    // Filter data
     let filteredData = allInventarioHardware;
 
     if (searchValue) {
       filteredData = filteredData.filter(item =>
         (item.nombre || '').toLowerCase().includes(searchValue) ||
-        (item.descripcion || '').toLowerCase().includes(searchValue) ||
-        (item.serial || '').toLowerCase().includes(searchValue)
+        (item.marca || '').toLowerCase().includes(searchValue) ||
+        (item.modelo || '').toLowerCase().includes(searchValue) ||
+        (item.numero_serie || '').toLowerCase().includes(searchValue)
       );
     }
 
@@ -2424,29 +2423,30 @@ async function loadInventarioHardware() {
     }
 
     if (filteredData.length === 0) {
-      tableBody.innerHTML = '<tr><td colspan="8" class="empty-state"><p>No hay elementos en el inventario de hardware.</p></td></tr>';
+      tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#94A3B8">No hay elementos en el inventario de hardware.</td></tr>';
     } else {
       filteredData.forEach((item, index) => {
-        const currentValue = calculateDepreciation(item.costo, item.vida_util_anios, item.fecha_adquisicion);
+        const currentValue = calculateDepreciation(item.costo_adquisicion, item.vida_util_anios, item.fecha_adquisicion);
+        const estadoColors = {operativo:'#059669',mantenimiento:'#F59E0B',baja:'#EF4444',en_reparacion:'#3B82F6'};
+        const estadoColor = estadoColors[item.estado] || '#94A3B8';
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${index + 1}</td>
-          <td>${escapeHTML(item.nombre || 'N/A')}</td>
-          <td>${escapeHTML(item.serial || 'N/A')}</td>
-          <td>${escapeHTML(item.servicio || 'N/A')}</td>
-          <td>${item.estado || 'N/A'}</td>
-          <td>$${currentValue.toFixed(2)}</td>
-          <td>${formatDate(item.fecha_adquisicion)}</td>
+          <td><strong>${escapeHTML(item.nombre || '')}</strong></td>
+          <td>${escapeHTML(item.servicio || '')}</td>
+          <td>${escapeHTML((item.marca||'')+' '+(item.modelo||''))}</td>
+          <td><code style="font-size:11px">${escapeHTML(item.numero_serie || '')}</code></td>
+          <td><span style="color:${estadoColor};font-weight:600;font-size:12px">${escapeHTML(item.estado || '')}</span></td>
+          <td>$${currentValue.toLocaleString('es-MX',{minimumFractionDigits:2})}</td>
           <td>
-            <button class="btn-small" onclick="editHardwareItem('${escapeHTML(item.id)}')">Editar</button>
-            <button class="btn-small btn-danger" onclick="deleteHardwareItem('${escapeHTML(item.id)}')">Eliminar</button>
+            <button class="btn-small" onclick="editHardwareItem('${item.id}')">Editar</button>
+            <button class="btn-small btn-danger" onclick="deleteHardwareItem('${item.id}')">Eliminar</button>
           </td>
         `;
         tableBody.appendChild(row);
       });
     }
 
-    // Update summary cards
     updateInventoryHardwareSummary();
   } catch (error) {
     console.error('Error loading inventario_hardware:', error);
@@ -2459,40 +2459,56 @@ async function loadInventarioHardware() {
 async function loadInventarioSoftware() {
   try {
     await fetchInventarioSoftware();
-    const tableBody = document.getElementById('softwareTableBody');
+    const tableBody = document.getElementById('bodySoftware');
     if (!tableBody) return;
 
     tableBody.innerHTML = '';
 
-    if (allInventarioSoftware.length === 0) {
-      tableBody.innerHTML = '<tr><td colspan="7" class="empty-state"><p>No hay elementos en el inventario de software.</p></td></tr>';
+    const searchValue = document.getElementById('searchSoftware')?.value.toLowerCase() || '';
+    const filterServicio = document.getElementById('filterServicioSoftware')?.value || '';
+
+    let filteredData = allInventarioSoftware;
+    if (searchValue) {
+      filteredData = filteredData.filter(item =>
+        (item.nombre || '').toLowerCase().includes(searchValue) ||
+        (item.proveedor || '').toLowerCase().includes(searchValue)
+      );
+    }
+    if (filterServicio) {
+      filteredData = filteredData.filter(item => item.servicio === filterServicio);
+    }
+
+    if (filteredData.length === 0) {
+      tableBody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:#94A3B8">No hay elementos en el inventario de software.</td></tr>';
     } else {
-      allInventarioSoftware.forEach((item, index) => {
-        const licenseExpiresDate = new Date(item.fecha_vencimiento);
-        const today = new Date();
-        const daysUntilExpiry = Math.ceil((licenseExpiresDate - today) / (1000 * 60 * 60 * 24));
-        const isExpiringSoon = daysUntilExpiry <= 90 && daysUntilExpiry > 0;
-        const isExpired = daysUntilExpiry <= 0;
+      const today = new Date();
+      filteredData.forEach((item, index) => {
+        const expDate = item.fecha_vencimiento_licencia ? new Date(item.fecha_vencimiento_licencia) : null;
+        const daysLeft = expDate ? Math.ceil((expDate - today) / (1000*60*60*24)) : null;
+        const isExpiringSoon = daysLeft !== null && daysLeft <= 90 && daysLeft > 0;
+        const isExpired = daysLeft !== null && daysLeft <= 0;
+        const licenseLabels = {perpetua:'Perpetua',suscripcion:'Suscripción',open_source:'Open Source',educativa:'Educativa'};
 
         const row = document.createElement('tr');
-        row.className = isExpired ? 'row-danger' : isExpiringSoon ? 'row-warning' : '';
+        if (isExpired) row.style.background = 'rgba(239,68,68,0.06)';
+        else if (isExpiringSoon) row.style.background = 'rgba(245,158,11,0.06)';
         row.innerHTML = `
           <td>${index + 1}</td>
-          <td>${escapeHTML(item.nombre || 'N/A')}</td>
-          <td>${escapeHTML(item.tipo_licencia || 'N/A')}</td>
-          <td>${item.cantidad || '0'}</td>
-          <td>${formatDate(item.fecha_vencimiento)}</td>
-          <td>${item.tipo === 'open_source' ? 'Sí' : 'No'}</td>
+          <td><strong>${escapeHTML(item.nombre || '')}</strong></td>
+          <td>${escapeHTML(item.servicio || '')}</td>
+          <td>${escapeHTML(item.version || '')}</td>
+          <td>${licenseLabels[item.tipo_licencia] || item.tipo_licencia || ''}</td>
+          <td>${expDate ? (isExpired ? '<span style="color:#EF4444;font-weight:600">Vencida</span>' : isExpiringSoon ? '<span style="color:#F59E0B;font-weight:600">'+daysLeft+' días</span>' : formatDate(item.fecha_vencimiento_licencia)) : 'N/A'}</td>
+          <td>$${(item.costo_licencia||0).toLocaleString('es-MX',{minimumFractionDigits:2})}</td>
           <td>
-            <button class="btn-small" onclick="editSoftwareItem('${escapeHTML(item.id)}')">Editar</button>
-            <button class="btn-small btn-danger" onclick="deleteSoftwareItem('${escapeHTML(item.id)}')">Eliminar</button>
+            <button class="btn-small" onclick="editSoftwareItem('${item.id}')">Editar</button>
+            <button class="btn-small btn-danger" onclick="deleteSoftwareItem('${item.id}')">Eliminar</button>
           </td>
         `;
         tableBody.appendChild(row);
       });
     }
 
-    // Update summary cards
     updateInventorySoftwareSummary();
   } catch (error) {
     console.error('Error loading inventario_software:', error);
@@ -2508,10 +2524,10 @@ function updateInventoryHardwareSummary() {
   const mantenimiento = allInventarioHardware.filter(item => item.estado === 'mantenimiento').length;
   const bajas = allInventarioHardware.filter(item => item.estado === 'baja').length;
 
-  document.getElementById('hwTotal')?.textContent || (document.getElementById('hwTotal').textContent = total);
-  document.getElementById('hwOperativos')?.textContent || (document.getElementById('hwOperativos').textContent = operativos);
-  document.getElementById('hwMantenimiento')?.textContent || (document.getElementById('hwMantenimiento').textContent = mantenimiento);
-  document.getElementById('hwBajas')?.textContent || (document.getElementById('hwBajas').textContent = bajas);
+  const el1 = document.getElementById('totalHardware'); if(el1) el1.textContent = total;
+  const el2 = document.getElementById('operativosHardware'); if(el2) el2.textContent = operativos;
+  const el3 = document.getElementById('mantenimientoHardware'); if(el3) el3.textContent = mantenimiento;
+  const el4 = document.getElementById('bajasHardware'); if(el4) el4.textContent = bajas;
 }
 
 /**
@@ -2521,20 +2537,21 @@ function updateInventorySoftwareSummary() {
   const total = allInventarioSoftware.length;
   const today = new Date();
   const expiringSoon = allInventarioSoftware.filter(item => {
-    const expiryDate = new Date(item.fecha_vencimiento);
+    if (!item.fecha_vencimiento_licencia) return false;
+    const expiryDate = new Date(item.fecha_vencimiento_licencia);
     const daysUntilExpiry = Math.ceil((expiryDate - today) / (1000 * 60 * 60 * 24));
     return daysUntilExpiry <= 90 && daysUntilExpiry > 0;
   }).length;
-  const openSource = allInventarioSoftware.filter(item => item.tipo === 'open_source').length;
+  const openSource = allInventarioSoftware.filter(item => item.tipo_licencia === 'open_source').length;
   const activeSubscriptions = allInventarioSoftware.filter(item => {
-    const expiryDate = new Date(item.fecha_vencimiento);
-    return expiryDate > today;
+    if (!item.fecha_vencimiento_licencia) return item.tipo_licencia === 'perpetua' || item.tipo_licencia === 'open_source';
+    return new Date(item.fecha_vencimiento_licencia) > today;
   }).length;
 
-  document.getElementById('swTotal')?.textContent || (document.getElementById('swTotal').textContent = total);
-  document.getElementById('swExpiringSoon')?.textContent || (document.getElementById('swExpiringSoon').textContent = expiringSoon);
-  document.getElementById('swOpenSource')?.textContent || (document.getElementById('swOpenSource').textContent = openSource);
-  document.getElementById('swActiveSubscriptions')?.textContent || (document.getElementById('swActiveSubscriptions').textContent = activeSubscriptions);
+  const el1 = document.getElementById('totalSoftware'); if(el1) el1.textContent = total;
+  const el2 = document.getElementById('vencenProntoSoftware'); if(el2) el2.textContent = expiringSoon;
+  const el3 = document.getElementById('openSourceSoftware'); if(el3) el3.textContent = openSource;
+  const el4 = document.getElementById('activeSoftware'); if(el4) el4.textContent = activeSubscriptions;
 }
 
 /**
@@ -2591,19 +2608,29 @@ function editHardwareItem(id) {
   currentInventoryEditId = id;
   currentInventoryEditType = 'hardware';
 
-  // Populate form fields
-  document.getElementById('invNombre').value = item.nombre || '';
-  document.getElementById('invDescripcion').value = item.descripcion || '';
-  document.getElementById('invSerial').value = item.serial || '';
-  document.getElementById('invServicio').value = item.servicio || '';
-  document.getElementById('invEstado').value = item.estado || '';
-  document.getElementById('invCosto').value = item.costo || '';
-  document.getElementById('invVidaUtil').value = item.vida_util_anios || '';
-  document.getElementById('invFechaAdquisicion').value = item.fecha_adquisicion || '';
+  // Set type and title
+  document.getElementById('inventarioType').value = 'hardware';
+  document.getElementById('inventarioModalTitle').textContent = 'Editar Hardware';
+
+  // Show hardware fields, hide software fields
+  document.getElementById('hardwareMarkField').style.display = 'block';
+  document.getElementById('hardwareSerieField').style.display = 'block';
+  document.getElementById('softwareVersionField').style.display = 'none';
+  document.getElementById('softwareLicenseField').style.display = 'none';
+  document.getElementById('softwareExpiryField').style.display = 'none';
+  document.getElementById('softwareCostField').style.display = 'none';
+
+  // Populate form fields with correct IDs matching admin.html
+  document.getElementById('inventarioNombre').value = item.nombre || '';
+  document.getElementById('inventarioServicio').value = item.servicio || '';
+  document.getElementById('inventarioMarca').value = (item.marca||'') + (item.modelo ? ' ' + item.modelo : '');
+  document.getElementById('inventarioSerie').value = item.numero_serie || '';
+  document.getElementById('inventarioEstado').value = item.estado || 'operativo';
+  document.getElementById('inventarioValor').value = item.costo_adquisicion || '';
+  document.getElementById('inventarioNotas').value = item.notas || '';
 
   // Show modal
-  const modal = document.getElementById('inventoryModal');
-  if (modal) modal.style.display = 'flex';
+  document.getElementById('modalInventario').classList.add('show');
 }
 
 /**
@@ -2616,143 +2643,121 @@ function editSoftwareItem(id) {
   currentInventoryEditId = id;
   currentInventoryEditType = 'software';
 
-  // Populate form fields
-  document.getElementById('swNombre').value = item.nombre || '';
-  document.getElementById('swTipoLicencia').value = item.tipo_licencia || '';
-  document.getElementById('swCantidad').value = item.cantidad || '';
-  document.getElementById('swFechaVencimiento').value = item.fecha_vencimiento || '';
-  document.getElementById('swTipo').value = item.tipo || '';
-  document.getElementById('swProveedor').value = item.proveedor || '';
+  // Set type and title
+  document.getElementById('inventarioType').value = 'software';
+  document.getElementById('inventarioModalTitle').textContent = 'Editar Software';
+
+  // Hide hardware fields, show software fields
+  document.getElementById('hardwareMarkField').style.display = 'none';
+  document.getElementById('hardwareSerieField').style.display = 'none';
+  document.getElementById('softwareVersionField').style.display = 'block';
+  document.getElementById('softwareLicenseField').style.display = 'block';
+  document.getElementById('softwareExpiryField').style.display = 'block';
+  document.getElementById('softwareCostField').style.display = 'block';
+
+  // Populate form fields with correct IDs matching admin.html
+  document.getElementById('inventarioNombre').value = item.nombre || '';
+  document.getElementById('inventarioServicio').value = item.servicio || '';
+  document.getElementById('inventarioEstado').value = item.estado || 'operativo';
+  document.getElementById('inventarioValor').value = '';
+  document.getElementById('inventarioVersion').value = item.version || '';
+  document.getElementById('inventarioLicencia').value = item.tipo_licencia || '';
+  document.getElementById('inventarioVencimiento').value = item.fecha_vencimiento_licencia || '';
+  document.getElementById('inventarioCosto').value = item.costo_licencia || '';
+  document.getElementById('inventarioNotas').value = item.notas || '';
 
   // Show modal
-  const modal = document.getElementById('inventoryModal');
-  if (modal) modal.style.display = 'flex';
+  document.getElementById('modalInventario').classList.add('show');
 }
 
 /**
- * Saves inventory item (insert or update)
+ * Saves inventory item (insert or update) to Supabase
  */
-async function saveInventoryItem() {
+async function saveInventoryItemToDB() {
   try {
-    if (currentInventoryEditType === 'hardware') {
-      const nombre = document.getElementById('invNombre')?.value.trim();
-      const descripcion = document.getElementById('invDescripcion')?.value.trim();
-      const serial = document.getElementById('invSerial')?.value.trim();
-      const servicio = document.getElementById('invServicio')?.value.trim();
-      const estado = document.getElementById('invEstado')?.value;
-      const costo = parseFloat(document.getElementById('invCosto')?.value);
-      const vidaUtil = parseInt(document.getElementById('invVidaUtil')?.value);
-      const fechaAdquisicion = document.getElementById('invFechaAdquisicion')?.value;
+    const type = document.getElementById('inventarioType').value;
+    const nombre = document.getElementById('inventarioNombre')?.value.trim();
+    const servicio = document.getElementById('inventarioServicio')?.value;
+    const estado = document.getElementById('inventarioEstado')?.value;
+    const notas = document.getElementById('inventarioNotas')?.value.trim();
 
-      if (!nombre || !serial || !servicio || !estado || !costo || !vidaUtil || !fechaAdquisicion) {
-        alert('Por favor completa todos los campos requeridos');
-        return;
-      }
+    if (!nombre || !servicio) {
+      alert('Por favor completa los campos requeridos (Nombre y Servicio)');
+      return;
+    }
+
+    if (type === 'hardware' || currentInventoryEditType === 'hardware') {
+      const marcaModelo = document.getElementById('inventarioMarca')?.value.trim() || '';
+      const parts = marcaModelo.split(' ');
+      const marca = parts[0] || '';
+      const modelo = parts.slice(1).join(' ') || '';
+      const numeroSerie = document.getElementById('inventarioSerie')?.value.trim() || '';
+      const costoAdquisicion = parseFloat(document.getElementById('inventarioValor')?.value) || 0;
 
       const hardwareData = {
         nombre,
-        descripcion,
-        serial,
         servicio,
+        marca,
+        modelo,
+        numero_serie: numeroSerie,
         estado,
-        costo,
-        vida_util_anios: vidaUtil,
-        fecha_adquisicion: fechaAdquisicion
+        costo_adquisicion: costoAdquisicion,
+        notas
       };
 
       if (currentInventoryEditId) {
-        // Update
-        const { error } = await supabaseClient
-          .from('inventario_hardware')
-          .update(hardwareData)
-          .eq('id', currentInventoryEditId);
-
+        const { error } = await supabaseClient.from('inventario_hardware').update(hardwareData).eq('id', currentInventoryEditId);
         if (error) throw error;
       } else {
-        // Insert
-        const { error } = await supabaseClient
-          .from('inventario_hardware')
-          .insert([hardwareData]);
-
+        const { error } = await supabaseClient.from('inventario_hardware').insert([hardwareData]);
         if (error) throw error;
       }
 
       console.log('Hardware item saved');
-      closeInventoryModal();
+      closeInventoryModalDB();
       await loadInventarioHardware();
-    } else if (currentInventoryEditType === 'software') {
-      const nombre = document.getElementById('swNombre')?.value.trim();
-      const tipoLicencia = document.getElementById('swTipoLicencia')?.value.trim();
-      const cantidad = parseInt(document.getElementById('swCantidad')?.value);
-      const fechaVencimiento = document.getElementById('swFechaVencimiento')?.value;
-      const tipo = document.getElementById('swTipo')?.value;
-      const proveedor = document.getElementById('swProveedor')?.value.trim();
 
-      if (!nombre || !tipoLicencia || !cantidad || !fechaVencimiento || !tipo) {
-        alert('Por favor completa todos los campos requeridos');
-        return;
-      }
+    } else if (type === 'software' || currentInventoryEditType === 'software') {
+      const version = document.getElementById('inventarioVersion')?.value.trim() || '';
+      const tipoLicencia = document.getElementById('inventarioLicencia')?.value || '';
+      const fechaVencimiento = document.getElementById('inventarioVencimiento')?.value || null;
+      const costoLicencia = parseFloat(document.getElementById('inventarioCosto')?.value) || 0;
 
       const softwareData = {
         nombre,
+        servicio,
+        version,
         tipo_licencia: tipoLicencia,
-        cantidad,
-        fecha_vencimiento: fechaVencimiento,
-        tipo,
-        proveedor
+        fecha_vencimiento_licencia: fechaVencimiento,
+        costo_licencia: costoLicencia,
+        notas
       };
 
       if (currentInventoryEditId) {
-        // Update
-        const { error } = await supabaseClient
-          .from('inventario_software')
-          .update(softwareData)
-          .eq('id', currentInventoryEditId);
-
+        const { error } = await supabaseClient.from('inventario_software').update(softwareData).eq('id', currentInventoryEditId);
         if (error) throw error;
       } else {
-        // Insert
-        const { error } = await supabaseClient
-          .from('inventario_software')
-          .insert([softwareData]);
-
+        const { error } = await supabaseClient.from('inventario_software').insert([softwareData]);
         if (error) throw error;
       }
 
       console.log('Software item saved');
-      closeInventoryModal();
+      closeInventoryModalDB();
       await loadInventarioSoftware();
     }
   } catch (error) {
     console.error('Error saving inventory item:', error);
-    alert('Error al guardar el elemento');
+    alert('Error al guardar: ' + error.message);
   }
 }
 
 /**
  * Closes the inventory modal and resets form
  */
-function closeInventoryModal() {
-  const modal = document.getElementById('inventoryModal');
-  if (modal) modal.style.display = 'none';
-
-  // Reset form
+function closeInventoryModalDB() {
+  document.getElementById('modalInventario').classList.remove('show');
   currentInventoryEditId = null;
   currentInventoryEditType = null;
-  document.getElementById('invNombre').value = '';
-  document.getElementById('invDescripcion').value = '';
-  document.getElementById('invSerial').value = '';
-  document.getElementById('invServicio').value = '';
-  document.getElementById('invEstado').value = '';
-  document.getElementById('invCosto').value = '';
-  document.getElementById('invVidaUtil').value = '';
-  document.getElementById('invFechaAdquisicion').value = '';
-  document.getElementById('swNombre').value = '';
-  document.getElementById('swTipoLicencia').value = '';
-  document.getElementById('swCantidad').value = '';
-  document.getElementById('swFechaVencimiento').value = '';
-  document.getElementById('swTipo').value = '';
-  document.getElementById('swProveedor').value = '';
 }
 
 /**
@@ -2766,7 +2771,7 @@ function renderDepreciationChart() {
   const serviceValues = {};
   allInventarioHardware.forEach(item => {
     const service = item.servicio || 'Sin asignar';
-    const currentValue = calculateDepreciation(item.costo, item.vida_util_anios, item.fecha_adquisicion);
+    const currentValue = calculateDepreciation(item.costo_adquisicion, item.vida_util_anios, item.fecha_adquisicion);
     serviceValues[service] = (serviceValues[service] || 0) + currentValue;
   });
 
@@ -2840,20 +2845,15 @@ function setupInventoryEventListeners() {
     filterInput.addEventListener('change', loadInventarioHardware);
   }
 
-  // Close modal when clicking outside
-  const modal = document.getElementById('inventoryModal');
-  if (modal) {
-    modal.addEventListener('click', (e) => {
-      if (e.target === modal) {
-        closeInventoryModal();
-      }
-    });
+  // Software search/filter listeners
+  const searchSoftware = document.getElementById('searchSoftware');
+  if (searchSoftware) {
+    searchSoftware.addEventListener('input', loadInventarioSoftware);
   }
 
-  // Save button listener
-  const saveBtn = document.getElementById('saveInventoryBtn');
-  if (saveBtn) {
-    saveBtn.addEventListener('click', saveInventoryItem);
+  const filterSoftware = document.getElementById('filterServicioSoftware');
+  if (filterSoftware) {
+    filterSoftware.addEventListener('change', loadInventarioSoftware);
   }
 }
 
