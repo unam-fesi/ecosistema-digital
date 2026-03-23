@@ -10,13 +10,19 @@ const carreras=[
   {name:"Biología",emoji:"🧬",color:"#DC2626"},
   {name:"Div. Investigación y Posgrado",emoji:"🔬",color:"#8B5CF6"}
 ];
+
 const servicios=[
   {emoji:'🧠',title:'Inteligencia Artificial',color:'#4F46E5',desc:'Soluciones basadas en IA para el análisis de información, la automatización de procesos, la innovación educativa y el apoyo y gestión del conocimiento.',tags:['Análisis predictivo','Automatización','Innovación educativa','Gestión del conocimiento']},
   {emoji:'🥽',title:'Realidad Virtual',color:'#7C3AED',desc:'Simulación y experiencias inmersivas para apoyo a procesos de enseñanza y aprendizaje, con escenarios formativos y demostrativos.',tags:['Simulación clínica','Entornos inmersivos','Escenarios formativos','Aprendizaje experiencial']},
   {emoji:'📱',title:'Realidad Aumentada',color:'#EA580C',desc:'Visualización enriquecida e interacción con recursos digitales para apoyo a la enseñanza y comprensión de procesos complejos.',tags:['Visualización 3D','Recursos interactivos','Material didáctico','Contenido enriquecido']},
   {emoji:'🗄️',title:'Uso de Bases de Datos',color:'#0891B2',desc:'Organización, consulta, integración, análisis y aprovechamiento de información para proyectos académicos.',tags:['Organización de datos','Consultas avanzadas','Análisis estadístico','Visualización de datos']},
-  {emoji:'🏥',title:'Telemedicina',color:'#059669',desc:'Orientación, asesoría, acompañamiento e interacción remota para apoyo en procesos vinculados con salud digital.',tags:['Orientación en salud','Asesoría remota','Acompañamiento','Salud digital']}
+  {emoji:'🏥',title:'Telemedicina',color:'#059669',desc:'Orientación, asesoría, acompañamiento e interacción remota para apoyo en procesos vinculados con salud digital.',tags:['Orientación en salud','Asesoría remota','Acompañamiento','Salud digital']},
+  {emoji:'🔬',title:'Simulación',color:'#F43F5E',desc:'Simuladores de baja, media y alta fidelidad para prácticas clínicas, ambientales y de investigación en todas nuestras disciplinas.',tags:['Simuladores clínicos','Entrenamiento práctico','Ambientes seguros','Fidelidad variable']},
+  {emoji:'🌱',title:'Centro Inteligente de Sustentabilidad',color:'#16A34A',desc:'Centro innovador dedicado a proyectos de sustentabilidad integral con seguimiento digital y tecnologías IoT. Combina monitoreo ambiental en tiempo real, economía circular, análisis de huella ecológica digital y rastreo por plataforma. Incluye el emblemático proyecto del 475 aniversario de la FES Iztacala: plantación masiva de árboles con seguimiento digitalizado para medir impacto ambiental, captura de carbono y regeneración ecosistémica. Somos pioneros en integrar tecnología de vanguardia con compromiso ambiental para formar profesionales conscientes de la crisis climática.',tags:['Monitoreo ambiental IoT','Economía circular','Huella ecológica digital','Rastreo de proyectos']},
+  {emoji:'🎓',title:'Aula Inmersiva',color:'#059669',desc:'Espacio interprofesional de aprendizaje equipado con tecnología de punta que combina realidad virtual, aumentada y simulación para experiencias educativas colaborativas.',tags:['Aprendizaje inmersivo','RV + RA + Simulación','Colaboración interprofesional','Tecnología de vanguardia']},
+  {emoji:'🧪',title:'Laboratorio de Proyectos',color:'#8B5CF6',desc:'Espacio dedicado a la materialización de ideas innovadoras y prototipos tecnológicos, desde la conceptualización inicial hasta la implementación final.',tags:['Prototipado','Innovación tecnológica','Materialización de ideas','Implementación']},
 ];
+
 const objetivos=[
   "Articular las capacidades de las carreras en torno a proyectos de tecnología digital.",
   "Facilitar el acceso a tecnologías emergentes como IA, realidad virtual y aumentada.",
@@ -25,6 +31,7 @@ const objetivos=[
   "Fortalecer la vinculación entre la academia, la tecnología y la sociedad.",
   "Ofrecer servicios de acompañamiento y asesoría en telemedicina."
 ];
+
 const impactoItems=[
   {emoji:'⭐',title:'Fortalecimiento académico',desc:'Formación universitaria enriquecida con tecnologías de vanguardia.'},
   {emoji:'💡',title:'Innovación interdisciplinaria',desc:'Colaboración creativa entre carreras para soluciones integrales.'},
@@ -33,6 +40,7 @@ const impactoItems=[
   {emoji:'🔗',title:'Vinculación entre carreras',desc:'Trabajo colaborativo y visión compartida interdisciplinaria.'},
   {emoji:'🌐',title:'Impacto social',desc:'Mejora en análisis, simulación y atención con impacto en la comunidad.'}
 ];
+
 const galeriaItems=[
   {l:'Inteligencia Artificial',e:'🧠',g:'linear-gradient(135deg,#2563EB,#06B6D4)',img:'assets/ED-IA.png',
    desc:'Soluciones basadas en inteligencia artificial para análisis predictivo, automatización de procesos, innovación educativa y gestión del conocimiento. Incluye machine learning, procesamiento de lenguaje natural y visión computacional aplicados a las ciencias de la salud y la educación.'},
@@ -96,3 +104,27 @@ const vrCatalog={
     {name:'Human Anatomy VR for Institutions',desc:'Anatomía general con módulos de cabeza y cuello relevantes para odontología.',ventajas:'Módulos de cabeza/cuello, calidad institucional, detallado',desventajas:'No específico dental, requiere filtrar contenido relevante'}
   ]
 };
+
+const puntosDesglose = {
+  actividades: [
+    { accion: 'Completar un curso', puntos: 50, icono: '📚' },
+    { accion: 'Asistir a taller presencial', puntos: 30, icono: '🏫' },
+    { accion: 'Publicar proyecto en comunidad', puntos: 40, icono: '💡' },
+    { accion: 'Recibir like en proyecto', puntos: 5, icono: '❤️' },
+    { accion: 'Comentar en proyecto ajeno', puntos: 10, icono: '💬' },
+    { accion: 'Solicitar y completar servicio', puntos: 20, icono: '🛠️' },
+    { accion: 'Usar el espacio del ecosistema', puntos: 15, icono: '📍' },
+    { accion: 'Participar en evento especial', puntos: 60, icono: '🎉' },
+    { accion: 'Obtener certificación de curso', puntos: 100, icono: '🏆' },
+    { accion: 'Colaborar en proyecto interdisciplinario', puntos: 75, icono: '🤝' }
+  ]
+};
+
+const seccionesNav = [
+  { id: 'inicio', label: 'Inicio', emoji: '🏠' },
+  { id: 'quienes', label: '¿Quiénes Somos?', emoji: '👥' },
+  { id: 'servicios', label: 'Servicios', emoji: '⚡' },
+  { id: 'cursos', label: 'Cursos', emoji: '📚' },
+  { id: 'logros', label: 'Logros', emoji: '🏅' },
+  { id: 'contacto', label: 'Contacto', emoji: '📬' }
+];
