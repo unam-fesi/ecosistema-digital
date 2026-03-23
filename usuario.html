@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Mi Panel - Ecosistema Digital</title>
+    <link rel="icon" href="assets/logo-ecosistema-digital.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --navy: #0C2340;
+            --gold: #C4A24E;
+            --cream: #FAF8F4;
+            --light-gray: #F5F5F5;
+            --border: #E2E8F0;
+            --text: #1E293B;
+            --text-light: #64748B;
+            --success: #059669;
+            --warning: #D97706;
+            --danger: #DC2626;
+            --info: #2563EB;
+        }
+        body { font-family:'Inter',sans-serif; background:var(--cream); color:var(--text); line-height:1.6; }
+
+        /* ─── TOPBAR ─── */
+        .topbar {
+            background:var(--navy); color:#fff; padding:0 32px; height:64px;
+            display:flex; align-items:center; justify-content:space-between;
+            position:sticky; top:0; z-index:100; box-shadow:0 2px 12px rgba(0,0,0,0.1);
+        }
+        .topbar-brand { display:flex; align-items:center; gap:12px; }
+        .topbar-brand img { height:36px; border-radius:8px; }
+        .topbar-brand h1 { font-size:16px; font-weight:600; }
+        .topbar-brand span { font-size:12px; color:var(--gold); display:block; margin-top:-2px; }
+        .topbar-right { display:flex; align-items:center; gap:16px; }
+        .topbar-user { font-size:13px; color:rgba(255,255,255,0.7); }
+        .topbar-user strong { color:#fff; }
+        .btn-logout {
+            background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+            color:#fff; padding:8px 18px; border-radius:8px; font-size:13px;
+            cursor:pointer; transition:all 0.2s;
+        }
+        .btn-logout:hover { background:rgba(255,255,255,0.2); }
+        .btn-home {
+            background:var(--gold); border:none; color:var(--navy); padding:8px 18px;
+            border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;
+            text-decoration:none; transition:all 0.2s;
+        }
+        .btn-home:hover { opacity:0.9; }
+
+        /* ─── MAIN ─── */
+        .main { max-width:1100px; margin:0 auto; padding:32px 24px 60px; }
+
+        /* ─── WELCOME ─── */
+        .welcome-card {
+            background:linear-gradient(135deg, var(--navy) 0%, #1a3a5c 100%);
+            border-radius:20px; padding:36px 40px; color:#fff; margin-bottom:32px;
+            display:flex; align-items:center; justify-content:space-between; gap:24px;
+        }
+        .welcome-card h2 { font-family:'Playfair Display',serif; font-size:26px; margin-bottom:4px; }
+        .welcome-card p { color:rgba(255,255,255,0.7); font-size:14px; }
+        .welcome-stats { display:flex; gap:20px; }
+        .welcome-stat {
+            background:rgba(255,255,255,0.1); border-radius:12px; padding:14px 20px;
+            text-align:center; min-width:90px;
+        }
+        .welcome-stat .num { font-size:28px; font-weight:700; color:var(--gold); display:block; }
+        .welcome-stat .label { font-size:11px; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:0.5px; }
+
+        /* ─── SECTION ─── */
+        .section { margin-bottom:32px; }
+        .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+        .section-title { font-size:18px; font-weight:700; color:var(--navy); }
+        .section-tag { font-size:11px; color:var(--gold); font-weight:600; text-transform:uppercase; letter-spacing:1px; }
+
+        /* ─── CARDS GRID ─── */
+        .cards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
+
+        /* ─── REQUEST CARD ─── */
+        .req-card {
+            background:#fff; border-radius:16px; padding:24px; border:1px solid var(--border);
+            transition:transform 0.2s, box-shadow 0.2s;
+        }
+        .req-card:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.06); }
+        .req-card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+        .req-card-service { font-size:14px; font-weight:600; color:var(--navy); }
+        .req-card-date { font-size:11px; color:var(--text-light); }
+        .req-card-desc { font-size:13px; color:var(--text-light); line-height:1.7; margin-bottom:14px;
+            display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+        .req-card-footer { display:flex; align-items:center; justify-content:space-between; }
+        .req-card-type { font-size:11px; color:var(--text-light); background:var(--light-gray); padding:4px 10px; border-radius:6px; }
+
+        /* ─── STATUS BADGE ─── */
+        .status {
+            display:inline-flex; align-items:center; gap:5px;
+            font-size:12px; font-weight:600; padding:4px 12px; border-radius:20px;
+        }
+        .status-pendiente { background:#FEF3C7; color:#92400E; }
+        .status-en_proceso { background:#DBEAFE; color:#1E40AF; }
+        .status-completado { background:#D1FAE5; color:#065F46; }
+        .status-cancelado { background:#FEE2E2; color:#991B1B; }
+        .status::before { content:''; width:6px; height:6px; border-radius:50%; }
+        .status-pendiente::before { background:#D97706; }
+        .status-en_proceso::before { background:#2563EB; }
+        .status-completado::before { background:#059669; }
+        .status-cancelado::before { background:#DC2626; }
+
+        /* ─── BADGES ─── */
+        .badges-grid { display:flex; flex-wrap:wrap; gap:12px; }
+        .badge-item {
+            background:#fff; border:1px solid var(--border); border-radius:14px;
+            padding:18px 22px; display:flex; align-items:center; gap:14px;
+            min-width:220px; transition:transform 0.2s;
+        }
+        .badge-item:hover { transform:translateY(-2px); box-shadow:0 6px 16px rgba(0,0,0,0.05); }
+        .badge-icon { font-size:32px; }
+        .badge-info h4 { font-size:14px; font-weight:600; color:var(--navy); }
+        .badge-info p { font-size:11px; color:var(--text-light); }
+        .badge-info .badge-date { font-size:10px; color:var(--gold); margin-top:2px; }
+
+        /* ─── EMPTY STATE ─── */
+        .empty { text-align:center; padding:48px 20px; color:var(--text-light); grid-column:1/-1; }
+        .empty-icon { font-size:48px; margin-bottom:12px; opacity:0.4; }
+        .empty p { font-size:14px; }
+
+        /* ─── LOADING ─── */
+        .loading { text-align:center; padding:40px; color:var(--text-light); font-size:14px; grid-column:1/-1; }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width:768px) {
+            .topbar { padding:0 16px; }
+            .topbar-user { display:none; }
+            .main { padding:20px 16px 40px; }
+            .welcome-card { flex-direction:column; text-align:center; padding:28px 24px; }
+            .welcome-stats { justify-content:center; }
+            .cards-grid { grid-template-columns:1fr; }
+        }
+        @media (max-width:480px) {
+            .welcome-stats { flex-wrap:wrap; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div class="topbar-brand">
+        <img src="assets/logo-ecosistema-digital.png" alt="Logo" onerror="this.style.display='none'">
+        <div>
+            <h1>Mi Panel</h1>
+            <span>Ecosistema Digital — FES Iztacala</span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <div class="topbar-user">Hola, <strong id="userName">Usuario</strong></div>
+        <a href="index.html" class="btn-home">Ir al sitio</a>
+        <button class="btn-logout" onclick="doLogout()">Cerrar sesión</button>
+    </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <!-- Welcome -->
+    <div class="welcome-card">
+        <div>
+            <h2 id="welcomeTitle">Bienvenido</h2>
+            <p>Aquí puedes ver el estatus de tus solicitudes y tus logros en el Ecosistema Digital.</p>
+        </div>
+        <div class="welcome-stats">
+            <div class="welcome-stat"><span class="num" id="statServicios">-</span><span class="label">Servicios</span></div>
+            <div class="welcome-stat"><span class="num" id="statEspacios">-</span><span class="label">Espacios</span></div>
+            <div class="welcome-stat"><span class="num" id="statBadges">-</span><span class="label">Badges</span></div>
+        </div>
+    </div>
+
+    <!-- Solicitudes de Servicios -->
+    <div class="section">
+        <div class="section-header">
+            <h3 class="section-title">Mis Solicitudes de Servicio</h3>
+            <span class="section-tag">Servicios tecnológicos</span>
+        </div>
+        <div id="serviciosContainer" class="cards-grid">
+            <div class="loading">Cargando solicitudes...</div>
+        </div>
+    </div>
+
+    <!-- Solicitudes de Espacios -->
+    <div class="section">
+        <div class="section-header">
+            <h3 class="section-title">Mis Reservaciones de Espacio</h3>
+            <span class="section-tag">Espacios del ecosistema</span>
+        </div>
+        <div id="espaciosContainer" class="cards-grid">
+            <div class="loading">Cargando reservaciones...</div>
+        </div>
+    </div>
+
+    <!-- Badges -->
+    <div class="section">
+        <div class="section-header">
+            <h3 class="section-title">Mis Insignias</h3>
+            <span class="section-tag">Logros obtenidos</span>
+        </div>
+        <div id="badgesContainer" class="badges-grid">
+            <div class="loading">Cargando insignias...</div>
+        </div>
+    </div>
+
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/config.js"></script>
+<script>
+// ─── AUTH CHECK ───
+let currentUserEmail = null;
+
+async function initDashboard() {
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) { window.location.href = 'index.html'; return; }
+
+        const email = session.user.email;
+        currentUserEmail = email;
+
+        // Check if admin — redirect to admin panel
+        if (email === 'admin@ecosistemadigital.unam.mx') {
+            window.location.href = 'admin.html';
+            return;
+        }
+
+        // Set user name from email
+        const name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        document.getElementById('userName').textContent = name;
+        document.getElementById('welcomeTitle').textContent = 'Hola, ' + name;
+
+        // Load all data
+        await Promise.all([loadServicios(email), loadEspacios(email), loadBadges(email)]);
+    } catch (err) {
+        console.error('Error initializing dashboard:', err);
+        window.location.href = 'index.html';
+    }
+}
+
+// ─── FORMAT HELPERS ───
+function formatDate(d) {
+    if (!d) return '';
+    return new Date(d).toLocaleDateString('es-MX', { day:'numeric', month:'short', year:'numeric' });
+}
+
+function statusLabel(s) {
+    const map = { pendiente:'Pendiente', en_proceso:'En proceso', completado:'Completado', cancelado:'Cancelado' };
+    return map[s] || s;
+}
+
+function escapeHTML(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── LOAD SERVICIOS ───
+async function loadServicios(email) {
+    const container = document.getElementById('serviciosContainer');
+    try {
+        const { data, error } = await supabaseClient
+            .from('solicitudes_servicios')
+            .select('*')
+            .eq('correo', email)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        document.getElementById('statServicios').textContent = (data || []).length;
+
+        if (!data || data.length === 0) {
+            container.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>Aún no tienes solicitudes de servicio.</p></div>';
+            return;
+        }
+
+        container.innerHTML = data.map(item => `
+            <div class="req-card">
+                <div class="req-card-header">
+                    <span class="req-card-service">${escapeHTML(item.servicio)}</span>
+                    <span class="req-card-date">${formatDate(item.created_at)}</span>
+                </div>
+                <p class="req-card-desc">${escapeHTML(item.descripcion)}</p>
+                <div class="req-card-footer">
+                    <span class="req-card-type">${escapeHTML(item.modalidad)}</span>
+                    <span class="status status-${item.estado}">${statusLabel(item.estado)}</span>
+                </div>
+            </div>
+        `).join('');
+    } catch (err) {
+        console.error('Error loading servicios:', err);
+        container.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><p>Error cargando solicitudes.</p></div>';
+        document.getElementById('statServicios').textContent = '0';
+    }
+}
+
+// ─── LOAD ESPACIOS ───
+async function loadEspacios(email) {
+    const container = document.getElementById('espaciosContainer');
+    try {
+        const { data, error } = await supabaseClient
+            .from('solicitudes_espacios')
+            .select('*')
+            .eq('correo', email)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        document.getElementById('statEspacios').textContent = (data || []).length;
+
+        if (!data || data.length === 0) {
+            container.innerHTML = '<div class="empty"><div class="empty-icon">🏢</div><p>Aún no tienes reservaciones de espacio.</p></div>';
+            return;
+        }
+
+        container.innerHTML = data.map(item => `
+            <div class="req-card">
+                <div class="req-card-header">
+                    <span class="req-card-service">${escapeHTML(item.motivo)}</span>
+                    <span class="req-card-date">${formatDate(item.fecha)}</span>
+                </div>
+                <p class="req-card-desc">${escapeHTML(item.actividad || item.motivo)}</p>
+                <div class="req-card-footer">
+                    <span class="req-card-type">${escapeHTML(item.tipo_solicitud)} · ${item.hora_inicio ? item.hora_inicio.substring(0,5) : ''} - ${item.hora_termino ? item.hora_termino.substring(0,5) : ''}</span>
+                    <span class="status status-${item.estado}">${statusLabel(item.estado)}</span>
+                </div>
+            </div>
+        `).join('');
+    } catch (err) {
+        console.error('Error loading espacios:', err);
+        container.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><p>Error cargando reservaciones.</p></div>';
+        document.getElementById('statEspacios').textContent = '0';
+    }
+}
+
+// ─── LOAD BADGES ───
+async function loadBadges(email) {
+    const container = document.getElementById('badgesContainer');
+    try {
+        const { data, error } = await supabaseClient
+            .from('badges_usuarios')
+            .select('*, badges(*)')
+            .eq('correo_usuario', email)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        document.getElementById('statBadges').textContent = (data || []).length;
+
+        if (!data || data.length === 0) {
+            container.innerHTML = '<div class="empty"><div class="empty-icon">🏅</div><p>Aún no tienes insignias. ¡Sigue participando!</p></div>';
+            return;
+        }
+
+        container.innerHTML = data.map(item => {
+            const b = item.badges || {};
+            return `
+                <div class="badge-item">
+                    <div class="badge-icon">${b.icono || '🏅'}</div>
+                    <div class="badge-info">
+                        <h4>${escapeHTML(b.nombre || 'Insignia')}</h4>
+                        <p>${escapeHTML(b.descripcion || '')}</p>
+                        <div class="badge-date">Obtenida: ${formatDate(item.created_at)}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (err) {
+        console.error('Error loading badges:', err);
+        container.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><p>Error cargando insignias.</p></div>';
+        document.getElementById('statBadges').textContent = '0';
+    }
+}
+
+// ─── LOGOUT ───
+async function doLogout() {
+    await supabaseClient.auth.signOut();
+    window.location.href = 'index.html';
+}
+
+// ─── INIT ───
+document.addEventListener('DOMContentLoaded', initDashboard);
+</script>
+</body>
+</html>
