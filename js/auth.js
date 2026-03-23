@@ -157,27 +157,34 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const email = (document.getElementById('loginEmail') || document.getElementById('adminEmail'))?.value;
       const password = (document.getElementById('loginPassword') || document.getElementById('adminPassword'))?.value;
+      const btn = document.getElementById('btnLogin');
 
       if (!email || !password) {
         showLoginError('Por favor ingresa email y contraseña');
         return;
       }
 
-      const result = await loginUser(email, password);
+      if (btn) { btn.textContent = 'Ingresando...'; btn.disabled = true; }
 
-      if (result.success) {
-        hideLoginModal();
-        const role = getUserRole(result.data.session);
-        if (role === 'admin') {
-          window.location.href = 'admin.html';
-        } else {
-          // Stay on main page, show welcome toast
-          if (typeof showToast === 'function') {
-            showToast('¡Bienvenido al Ecosistema Digital!');
+      try {
+        const result = await loginUser(email, password);
+
+        if (result.success) {
+          hideLoginModal();
+          const role = getUserRole(result.data.session);
+          if (role === 'admin') {
+            window.location.href = 'admin.html';
+          } else {
+            // Stay on main page, show welcome toast
+            if (typeof showToast === 'function') {
+              showToast('¡Bienvenido al Ecosistema Digital!');
+            }
           }
+        } else {
+          showLoginError(result.error || 'Error al iniciar sesión');
         }
-      } else {
-        showLoginError(result.error || 'Error al iniciar sesión');
+      } finally {
+        if (btn) { btn.textContent = 'Iniciar sesión'; btn.disabled = false; }
       }
     });
   }
