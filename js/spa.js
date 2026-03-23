@@ -191,13 +191,15 @@ const SPA = {
     // Prepare section (start from small, scaled position)
     section.classList.add('active');
     section.style.opacity = '0';
-    section.style.transform = 'scale(0.85) translateY(30px)';
+    section.style.transform = 'scale(0.88)';
 
-    // Trigger reflow and animate section in
+    // Force reflow then animate section in (double-rAF for reliability)
     requestAnimationFrame(() => {
-      section.style.transition = `all ${this.ANIM_DURATION}ms ${this.EASING}`;
-      section.style.opacity = '1';
-      section.style.transform = 'scale(1) translateY(0)';
+      requestAnimationFrame(() => {
+        section.style.transition = `opacity ${this.ANIM_DURATION}ms ${this.EASING}, transform ${this.ANIM_DURATION}ms ${this.EASING}`;
+        section.style.opacity = '1';
+        section.style.transform = 'scale(1)';
+      });
     });
 
     // Update navigation highlights
@@ -318,9 +320,9 @@ const SPA = {
 
       // Zoom out and fade section
       if (section) {
-        section.style.transition = `all ${this.ANIM_DURATION}ms ${this.EASING}`;
+        section.style.transition = `opacity ${this.ANIM_DURATION}ms ${this.EASING}, transform ${this.ANIM_DURATION}ms ${this.EASING}`;
         section.style.opacity = '0';
-        section.style.transform = 'scale(1.1) translateY(-20px)';
+        section.style.transform = 'scale(0.92)';
 
         // Clean up after animation
         setTimeout(() => {
