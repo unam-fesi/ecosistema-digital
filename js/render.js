@@ -66,7 +66,7 @@ if(gg){
     const shortDesc=g.desc?g.desc.substring(0,120)+'...':'';
     gg.innerHTML+=`<div class="entorno-card reveal d${(i%4)+1}" onclick="openEntornoModal(${i})">
       <div style="overflow:hidden;height:200px;background:${g.g}">
-        ${imgSrc?`<img class="entorno-card-img" src="${imgSrc}" alt="${g.l}" onerror="this.style.display='none'">`:''}
+        ${imgSrc?`<img class="entorno-card-img" src="${imgSrc}" alt="${g.l}" loading="lazy" onerror="this.style.display='none'">`:''}
       </div>
       <div class="entorno-card-body">
         <h3 class="entorno-card-title"><span>${g.e}</span> ${g.l}</h3>
@@ -85,7 +85,7 @@ if(gg2){
     const shortDesc=g.desc?g.desc.substring(0,120)+'...':'';
     gg2.innerHTML+=`<div class="entorno-card reveal d${(i%4)+1}" onclick="openEntornoModal(${i})">
       <div style="overflow:hidden;height:200px;background:${g.g}">
-        ${imgSrc?`<img class="entorno-card-img" src="${imgSrc}" alt="${g.l}" onerror="this.style.display='none'">`:''}
+        ${imgSrc?`<img class="entorno-card-img" src="${imgSrc}" alt="${g.l}" loading="lazy" onerror="this.style.display='none'">`:''}
       </div>
       <div class="entorno-card-body">
         <h3 class="entorno-card-title"><span>${g.e}</span> ${g.l}</h3>
