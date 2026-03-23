@@ -205,8 +205,12 @@ const SPA = {
     // Update navigation highlights
     this.updateNav(sectionId);
 
-    // Smooth scroll to top
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Hide PUM-AI when inside a panel
+    const pumai = document.getElementById('pumaiBtn');
+    if (pumai) pumai.style.display = 'none';
+
+    // Smooth scroll overlay to top
+    section.scrollTop = 0;
 
     // Complete animation and re-run observers
     setTimeout(() => {
@@ -350,6 +354,10 @@ const SPA = {
 
       // Update nav to show home
       this.updateNav('inicio');
+
+      // Show PUM-AI when back on main page
+      const pumai = document.getElementById('pumaiBtn');
+      if (pumai) pumai.style.display = '';
 
       // Unlock scroll only when fully back at base
       this.unlockScroll();
