@@ -92,7 +92,7 @@ const logoutAdmin = logoutUser;
 function showLoginModal() {
   const modal = document.getElementById('loginModal');
   if (modal) {
-    modal.style.display = 'flex';
+    modal.classList.add('active');
     document.body.style.overflow = 'hidden';
   }
 }
@@ -103,8 +103,8 @@ function showLoginModal() {
 function hideLoginModal() {
   const modal = document.getElementById('loginModal');
   if (modal) {
-    modal.style.display = 'none';
-    document.body.style.overflow = 'auto';
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
   }
 }
 
@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (role === 'admin') {
           window.location.href = 'admin.html';
         } else {
-          window.location.href = 'portal.html';
+          window.location.href = 'usuario.html';
         }
       } else {
         showLoginError(result.error || 'Error al iniciar sesión');
