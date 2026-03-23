@@ -89,7 +89,13 @@ async function handleLogin(){
     if(typeof supabaseClient!=='undefined'){
       const{data,error}=await supabaseClient.auth.signInWithPassword({email,password:pass});
       if(error)throw error;
-      window.location.href='admin.html';
+      // Route by role
+      const ADMIN_EMAIL='admin@ecosistemadigital.unam.mx';
+      if(data.session&&data.session.user&&data.session.user.email===ADMIN_EMAIL){
+        window.location.href='admin.html';
+      } else {
+        window.location.href='usuario.html';
+      }
     } else { err.textContent='Sistema de autenticación no disponible. Configure Supabase.'; }
   }catch(e){err.textContent=e.message||'Credenciales incorrectas';}
   finally{btn.textContent='Iniciar sesión';btn.disabled=false;}
@@ -143,11 +149,7 @@ function openServicioModal(idx){
   // Also trigger VR catalog display if clicking RV
   if(idx===1){
     const vrSub=document.getElementById('vrCatalogSubsection');
-    if(vrSub){
-      vrSub.style.display='block';
-      const sectionBody=vrSub.closest('.section-body');
-      if(sectionBody) sectionBody.style.maxHeight='none';
-    }
+    if(vrSub) vrSub.style.display='block';
   }
 }
 function closeServicioModal(){
