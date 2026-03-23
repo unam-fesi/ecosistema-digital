@@ -1049,37 +1049,191 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 }
 
 </style>
+
+/* ─── SPA SYSTEM ─── */
+#spa-base {
+  min-height: 100vh; min-height: 100dvh; min-height: -webkit-fill-available;
+  position: relative;
+  transition: all 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.spa-hero {
+  text-align: center;
+  padding: 130px 24px 50px;
+  position: relative;
+  z-index: 2;
+}
+
+.spa-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px 24px 80px;
+  position: relative;
+  z-index: 2;
+}
+
+.spa-card {
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 32px 28px;
+  cursor: pointer;
+  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: float 6s ease-in-out infinite;
+  position: relative; overflow: hidden;
+}
+.spa-card:nth-child(2) { animation-delay: -1s; }
+.spa-card:nth-child(3) { animation-delay: -2s; }
+.spa-card:nth-child(4) { animation-delay: -3s; }
+.spa-card:nth-child(5) { animation-delay: -4s; }
+.spa-card:nth-child(6) { animation-delay: -5s; }
+.spa-card:nth-child(7) { animation-delay: -0.5s; }
+.spa-card::before {
+  content: ''; position: absolute; inset: 0; opacity: 0;
+  background: linear-gradient(135deg, rgba(196,162,78,0.1), transparent);
+  transition: opacity 0.4s; border-radius: 20px;
+}
+.spa-card:hover {
+  transform: translateY(-12px) scale(1.02);
+  border-color: rgba(196,162,78,0.3);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.3), 0 0 40px rgba(196,162,78,0.1);
+}
+.spa-card:hover::before { opacity: 1; }
+
+.spa-card-emoji { font-size: 40px; margin-bottom: 16px; display: block; }
+.spa-card-title { font-size: 20px; font-weight: 700; color: #fff; margin-bottom: 8px; font-family: 'Playfair Display', serif; }
+.spa-card-desc { font-size: 14px; color: rgba(255,255,255,0.55); line-height: 1.7; }
+.spa-card-arrow {
+  position: absolute; bottom: 20px; right: 20px;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(196,162,78,0.15); display: flex;
+  align-items: center; justify-content: center;
+  transition: all 0.3s;
+}
+.spa-card:hover .spa-card-arrow { background: var(--gold); transform: scale(1.1); }
+
+/* Section overlays */
+.spa-section-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: var(--cream);
+  overflow-y: auto;
+  display: none; opacity: 0;
+  transform: scale(0.85) translateY(30px);
+}
+.spa-section-overlay.active { display: block; }
+
+.spa-section-content {
+  max-width: 1200px; margin: 0 auto;
+  padding: 100px 24px 80px;
+  transition: all 500ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Sub-panels */
+.spa-sub-panel {
+  position: fixed; inset: 0; z-index: 200;
+  background: #fff; overflow-y: auto;
+  display: none; opacity: 0;
+  transform: scale(0.85) translateY(20px);
+}
+.spa-sub-panel.active { display: block; }
+
+.spa-sub-content {
+  max-width: 1000px; margin: 0 auto;
+  padding: 100px 24px 80px;
+}
+
+/* Back button */
+.spa-back-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px;
+  background: rgba(12,35,64,0.06); border: 1px solid rgba(12,35,64,0.1);
+  border-radius: 12px; cursor: pointer;
+  font-size: 14px; font-weight: 600; color: var(--navy);
+  transition: all 0.3s; margin-bottom: 32px; font-family: 'Inter', sans-serif;
+}
+.spa-back-btn:hover {
+  background: rgba(196,162,78,0.1); border-color: rgba(196,162,78,0.3);
+  transform: translateX(-4px);
+}
+
+/* Tech news card variant */
+.spa-card.tech-news-card {
+  background: linear-gradient(135deg, rgba(79,70,229,0.12), rgba(59,130,246,0.08));
+  border: 1px solid rgba(79,70,229,0.2);
+}
+.spa-card.tech-news-card:hover { border-color: rgba(79,70,229,0.4); }
+.news-item { padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.news-item:last-child { border-bottom: none; }
+.news-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 4px; line-height: 1.4; }
+.news-source { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+/* Service sub-cards grid */
+.servicios-subcards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+/* Points desglose */
+.puntos-table {
+  width: 100%; border-collapse: separate; border-spacing: 0;
+  border-radius: var(--radius); overflow: hidden;
+  border: 1px solid #E8ECF1;
+}
+.puntos-table th {
+  background: var(--navy); color: #fff; padding: 14px 20px;
+  font-size: 13px; font-weight: 600; text-align: left;
+}
+.puntos-table td {
+  padding: 14px 20px; font-size: 14px; color: #475569;
+  border-bottom: 1px solid #F1F5F9;
+}
+.puntos-table tr:last-child td { border-bottom: none; }
+.puntos-table tr:hover td { background: rgba(196,162,78,0.04); }
+.puntos-valor {
+  font-weight: 700; color: var(--gold); font-size: 16px;
+}
+
+/* Body scroll lock */
+body.spa-locked { overflow: hidden; }
+
+@media(max-width:768px) {
+  .spa-cards-grid { grid-template-columns: 1fr; padding: 20px 16px 60px; }
+  .spa-hero { padding: 120px 20px 30px; }
+  .spa-section-content { padding: 80px 16px 60px; }
+  .servicios-subcards-grid { grid-template-columns: 1fr; }
+}
+@media(max-width:480px) {
+  .spa-card { padding: 24px 20px; }
+  .spa-card-title { font-size: 18px; }
+}
+</style>
 </head>
 <body>
 
 <div class="global-watermark"></div>
-
-<!-- Cursor glow -->
 <div class="cursor-glow" id="cursorGlow"></div>
 <div class="scroll-progress" id="scrollProgress"></div>
 
 <!-- NAVBAR -->
 <nav class="navbar" id="navbar">
   <div class="nav-inner">
-    <a href="#inicio" class="nav-brand">
+    <a href="#" class="nav-brand" onclick="SPA.goToSection('inicio');return false">
       <img src="assets/logo-ecosistema-digital.png" alt="ED" style="height:36px;width:auto;border-radius:8px" onerror="this.outerHTML='<div class=\'nav-logo-mini\'><span>ED</span></div>'">
       <span class="nav-name nav-name-full">Ecosistema Digital</span>
       <span class="nav-name nav-name-short">ED — FES Iztacala</span>
     </a>
     <div class="nav-links" id="navLinks">
-      <a href="#inicio" class="active" data-section="inicio">Inicio</a>
-      <a href="#quienes" data-section="quienes">Quiénes somos</a>
-      <a href="#servicios" data-section="servicios">Servicios</a>
-      <a href="#solicitud" data-section="solicitud">Solicitud</a>
-      <a href="#espacio" data-section="espacio">Espacio</a>
-      <a href="#telemedicina" data-section="telemedicina">Telemedicina</a>
-      <a href="#galeria" data-section="galeria">Entorno</a>
-      <a href="#cursos" data-section="cursos">Cursos</a>
-      <a href="#comunidad" data-section="comunidad">Comunidad</a>
-      <a href="#badges" data-section="badges">Logros</a>
-      <a href="#aula-inmersiva" data-section="aula-inmersiva">Aula</a>
-      <a href="#laboratorio" data-section="laboratorio">Lab</a>
-      <a href="#contacto" data-section="contacto">Contacto</a>
+      <a href="#" data-section="inicio" class="active" onclick="SPA.goToSection('inicio');return false">Inicio</a>
+      <a href="#" data-section="quienes" onclick="SPA.goToSection('quienes');return false">¿Quiénes Somos?</a>
+      <a href="#" data-section="servicios" onclick="SPA.goToSection('servicios');return false">Servicios</a>
+      <a href="#" data-section="cursos" onclick="SPA.goToSection('cursos');return false">Cursos</a>
+      <a href="#" data-section="logros" onclick="SPA.goToSection('logros');return false">Logros</a>
+      <a href="#" data-section="contacto" onclick="SPA.goToSection('contacto');return false">Contacto</a>
       <a href="#" onclick="showLoginModal();return false" class="nav-login-btn" style="background:rgba(196,162,78,0.12);color:var(--gold);border:1px solid rgba(196,162,78,0.25);margin-left:8px;font-weight:600">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
         Acceso
@@ -1092,10 +1246,12 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
     </button>
   </div>
   <div class="mobile-menu" id="mobileMenu">
-    <a href="#inicio">Inicio</a><a href="#quienes">Quiénes somos</a>
-    <a href="#servicios">Servicios</a><a href="#solicitud">Solicitud de servicios</a>
-    <a href="#espacio">Uso del espacio</a><a href="#telemedicina">Telemedicina</a>
-    <a href="#galeria">Entorno Tecnológico</a><a href="#cursos">Cursos</a><a href="#comunidad">Comunidad</a><a href="#badges">Logros</a><a href="#aula-inmersiva">Aula Inmersiva</a><a href="#laboratorio">Laboratorio</a><a href="#contacto">Contacto</a>
+    <a href="#" onclick="SPA.goToSection('inicio');document.getElementById('mobileMenu').classList.remove('open');return false">Inicio</a>
+    <a href="#" onclick="SPA.goToSection('quienes');document.getElementById('mobileMenu').classList.remove('open');return false">¿Quiénes Somos?</a>
+    <a href="#" onclick="SPA.goToSection('servicios');document.getElementById('mobileMenu').classList.remove('open');return false">Servicios</a>
+    <a href="#" onclick="SPA.goToSection('cursos');document.getElementById('mobileMenu').classList.remove('open');return false">Cursos</a>
+    <a href="#" onclick="SPA.goToSection('logros');document.getElementById('mobileMenu').classList.remove('open');return false">Logros</a>
+    <a href="#" onclick="SPA.goToSection('contacto');document.getElementById('mobileMenu').classList.remove('open');return false">Contacto</a>
     <a href="#" onclick="showLoginModal();document.getElementById('mobileMenu').classList.remove('open');return false" style="color:var(--gold);border-top:1px solid rgba(196,162,78,0.15);margin-top:8px;padding-top:14px">🔐 Acceso</a>
   </div>
 </nav>
@@ -1109,8 +1265,11 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   <button class="notification-dismiss" onclick="document.getElementById('notificationsBanner').classList.add('hidden')">✕</button>
 </div>
 
-<!-- HERO -->
-<section class="hero" id="inicio">
+<!-- ═══════════════════════════════════════════════════════════════════
+     SPA BASE — Navy background with floating cards
+     ═══════════════════════════════════════════════════════════════════ -->
+<div id="spa-base">
+  <!-- Background effects -->
   <div class="hero-blob hero-blob-1"></div>
   <div class="hero-blob hero-blob-2"></div>
   <div class="hero-blob hero-blob-3"></div>
@@ -1121,677 +1280,353 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   <div class="hero-orb hero-orb-2"></div>
   <div class="hero-orb hero-orb-3"></div>
 
-  <div class="hero-content parallax-layer" id="heroContent">
-    <div class="hero-logo-wrap" style="display:flex;justify-content:center;width:100%">
-      <img src="assets/logo-ecosistema-digital.png" alt="Ecosistema Digital" style="height:260px;width:auto;filter:drop-shadow(0 0 40px rgba(196,162,78,0.6))" onerror="this.parentElement.innerHTML='<div style=\'width:140px;height:140px;border:2.5px solid var(--gold);border-radius:28px;display:flex;align-items:center;justify-content:center;background:rgba(196,162,78,0.1)\'><span style=\'color:var(--gold);font-size:48px;font-weight:700\'>ED</span></div>'">
-    </div>
-    <div class="hero-badge">
-      <span class="pulse-dot"></span>
-      FES Iztacala · UNAM
-    </div>
-    <h1 class="serif">Ecosistema <span class="gold">Digital</span></h1>
-    <p class="tagline">Facultad de Estudios Superiores Iztacala, UNAM</p>
-    <p class="desc">Integración académica y tecnológica para desarrollar proyectos, servicios, innovación y análisis que transforman la formación universitaria.</p>
-    <div class="hero-buttons">
-      <a href="#servicios" class="btn btn-gold">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L2 7l10 5 10-5-10-5M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-        Nuestros servicios
-      </a>
-      <button class="btn-new-projects" onclick="openProyecto()">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
-        Nuevos proyectos
-        <span class="new-badge">nuevo</span>
-      </button>
-      <a href="#solicitud" class="btn btn-glass">
-        Solicitar servicio
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </a>
-    </div>
-  </div>
-
-
-  <div class="scroll-hint">
-    <div class="scroll-wheel"></div>
-    <span>Scroll</span>
-  </div>
-</section>
-
-<!-- QUIÉNES SOMOS -->
-<section class="section section-cream section-collapsed" id="quienes" style="position:relative;overflow:hidden">
-  <div class="section-collapse-header" onclick="toggleSection('quienes')">
-    <div class="section-collapse-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3" stroke="var(--gold)" stroke-width="2"/><path d="M6 20c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/></svg>
-    </div>
-    <span class="section-collapse-title">Sobre el Ecosistema Digital</span>
-    <div class="section-collapse-chevron">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
-    </div>
-  </div>
-  <div class="section-body" style="max-height:0">
-    <div class="floating-shapes">
-      <div class="shape shape-1"></div>
-      <div class="shape shape-2"></div>
-      <div class="shape shape-3"></div>
-    </div>
-    <div class="container" style="position:relative;z-index:1">
-      <div class="sec-header reveal">
-        <div class="sec-tag"><span class="dot"></span> Quiénes somos</div>
-        <h2 class="serif">Sobre el Ecosistema Digital</h2>
-        <p>Una iniciativa interdisciplinaria que articula saberes y capacidades para el desarrollo tecnológico universitario.</p>
+  <!-- Hero Content -->
+  <div class="spa-hero">
+    <div class="hero-content parallax-layer" id="heroContent" style="position:relative;max-width:900px;margin:0 auto">
+      <div class="hero-logo-wrap" style="display:flex;justify-content:center;width:100%">
+        <img src="assets/logo-ecosistema-digital.png" alt="Ecosistema Digital" style="height:220px;width:auto;filter:drop-shadow(0 0 40px rgba(196,162,78,0.6))" onerror="this.parentElement.innerHTML='<div style=\'width:120px;height:120px;border:2.5px solid var(--gold);border-radius:28px;display:flex;align-items:center;justify-content:center;background:rgba(196,162,78,0.1)\'><span style=\'color:var(--gold);font-size:42px;font-weight:700\'>ED</span></div>'">
       </div>
-
-      <!-- Tabs -->
-      <div class="reveal d1">
-      <div class="tabs-nav">
-        <button class="tab-btn active" onclick="switchTab('about','desc',this)">Descripción</button>
-        <button class="tab-btn" onclick="switchTab('about','mission',this)">Misión y Visión</button>
-        <button class="tab-btn" onclick="switchTab('about','objetivos',this)">Objetivos</button>
-        <button class="tab-btn" onclick="switchTab('about','carreras',this)">Carreras participantes</button>
+      <div class="hero-badge" style="display:inline-flex;margin:0 auto">
+        <span class="pulse-dot"></span>
+        FES Iztacala · UNAM
       </div>
+      <h1 class="serif" style="font-size:clamp(34px,6.5vw,64px);color:#fff;font-weight:700;line-height:1.12;margin-bottom:18px;animation:fadeUp 0.9s ease both 0.3s">Ecosistema <span class="gold" style="color:var(--gold);text-shadow:0 0 40px rgba(196,162,78,0.4)">Digital</span></h1>
+      <p style="font-size:clamp(15px,2.2vw,21px);color:rgba(255,255,255,0.72);margin-bottom:10px;animation:fadeUp 0.9s ease both 0.5s">Facultad de Estudios Superiores Iztacala, UNAM</p>
+      <p style="font-size:clamp(13px,1.6vw,16px);color:rgba(255,255,255,0.42);max-width:620px;margin:0 auto 32px;line-height:1.85;animation:fadeUp 0.9s ease both 0.65s">Integración académica y tecnológica para desarrollar proyectos, servicios, innovación y análisis que transforman la formación universitaria.</p>
+    </div>
+  </div>
 
-      <div id="about-desc" class="tab-content active">
-        <div style="max-width:800px;margin:0 auto">
-          <p style="font-size:16px;color:#475569;line-height:1.95;margin-bottom:18px">
-            El <strong style="color:var(--navy)">Ecosistema Digital</strong> es un espacio de integración académica y tecnológica de la Facultad de Estudios Superiores Iztacala, UNAM. Surge como respuesta a la necesidad de articular los saberes y capacidades de las carreras que conforman la Facultad, con el fin de desarrollar proyectos, servicios, acompañamiento, innovación, simulación, análisis de información y apoyo en procesos vinculados con la salud.
-          </p>
-          <p style="font-size:16px;color:#475569;line-height:1.95">
-            Este ecosistema representa la convergencia entre la formación universitaria y las tecnologías emergentes, abriendo oportunidades de colaboración, investigación, docencia y extensión que benefician a estudiantes, profesores, investigadores y a la comunidad en general.
-          </p>
+  <!-- Floating Section Cards -->
+  <div class="spa-cards-grid">
+    <!-- Card: ¿Quiénes Somos? -->
+    <div class="spa-card" data-section="quienes">
+      <div class="spa-card-emoji">👥</div>
+      <div class="spa-card-title">¿Quiénes Somos?</div>
+      <div class="spa-card-desc">Conoce las carreras participantes, nuestro entorno tecnológico y los proyectos de la comunidad.</div>
+      <div class="spa-card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+    </div>
+
+    <!-- Card: Servicios -->
+    <div class="spa-card" data-section="servicios">
+      <div class="spa-card-emoji">⚡</div>
+      <div class="spa-card-title">Servicios</div>
+      <div class="spa-card-desc">8 servicios tecnológicos: IA, Realidad Virtual, Aumentada, Simulación, Telemedicina y más.</div>
+      <div class="spa-card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+    </div>
+
+    <!-- Card: Cursos -->
+    <div class="spa-card" data-section="cursos">
+      <div class="spa-card-emoji">📚</div>
+      <div class="spa-card-title">Cursos</div>
+      <div class="spa-card-desc">Formación continua, insignias, premios y un sistema de puntos para tu desarrollo profesional.</div>
+      <div class="spa-card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+    </div>
+
+    <!-- Card: Logros -->
+    <div class="spa-card" data-section="logros">
+      <div class="spa-card-emoji">🏅</div>
+      <div class="spa-card-title">Logros</div>
+      <div class="spa-card-desc">Nuestro impacto en la comunidad universitaria y los beneficios del ecosistema digital.</div>
+      <div class="spa-card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+    </div>
+
+    <!-- Card: Contacto -->
+    <div class="spa-card" data-section="contacto">
+      <div class="spa-card-emoji">📬</div>
+      <div class="spa-card-title">Contacto</div>
+      <div class="spa-card-desc">Contáctanos para resolver dudas, solicitar información o proponer colaboraciones.</div>
+      <div class="spa-card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+    </div>
+
+    <!-- Card: Tech News -->
+    <div class="spa-card tech-news-card" id="techNewsCard" onclick="SPA.navigateTo('tech-news')">
+      <div class="spa-card-emoji">📡</div>
+      <div class="spa-card-title">Noticias Tecnológicas</div>
+      <div class="spa-card-desc">Información relevante del mundo de la tecnología aplicada a la salud y educación.</div>
+      <div id="techNewsPreview" style="margin-top:16px">
+        <div style="color:rgba(255,255,255,0.3);font-size:12px">Cargando noticias...</div>
+      </div>
+    </div>
+
+    <!-- Card: Nuevos Proyectos -->
+    <div class="spa-card" style="background:linear-gradient(135deg,rgba(45,106,45,0.2),rgba(26,74,26,0.15));border-color:rgba(100,200,80,0.2)" onclick="openProyecto()">
+      <div class="spa-card-emoji">🌳</div>
+      <div class="spa-card-title">Nuevos Proyectos</div>
+      <div class="spa-card-desc">475 Aniversario UNAM — Proyecto de sustentabilidad y plantación digital.</div>
+      <div style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 12px;border-radius:8px;background:linear-gradient(135deg,#f4d03f,#C4A24E);color:#000;letter-spacing:0.5px;text-transform:uppercase">nuevo</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SPA SECTION: ¿Quiénes Somos?
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="spa-section-overlay" id="spa-section-quienes">
+  <div class="spa-section-content">
+    <button class="spa-back-btn" onclick="SPA.navigateBack()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Volver al inicio
+    </button>
+
+    <div class="sec-header">
+      <div class="sec-tag"><span class="dot"></span> Quiénes somos</div>
+      <h2 class="serif">Sobre el Ecosistema Digital</h2>
+      <p>Una iniciativa interdisciplinaria que articula saberes y capacidades para el desarrollo tecnológico universitario.</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs-nav" style="margin-bottom:32px">
+      <button class="tab-btn active" onclick="switchTab('about','desc',this)">Descripción</button>
+      <button class="tab-btn" onclick="switchTab('about','mission',this)">Misión y Visión</button>
+      <button class="tab-btn" onclick="switchTab('about','objetivos',this)">Objetivos</button>
+      <button class="tab-btn" onclick="switchTab('about','carreras',this)">Carreras</button>
+    </div>
+
+    <div id="about-desc" class="tab-content active">
+      <div style="max-width:800px;margin:0 auto">
+        <p style="font-size:16px;color:#475569;line-height:1.95;margin-bottom:18px">El <strong style="color:var(--navy)">Ecosistema Digital</strong> es un espacio de integración académica y tecnológica de la Facultad de Estudios Superiores Iztacala, UNAM. Surge como respuesta a la necesidad de articular los saberes y capacidades de las carreras que conforman la Facultad, con el fin de desarrollar proyectos, servicios, acompañamiento, innovación, simulación, análisis de información y apoyo en procesos vinculados con la salud.</p>
+        <p style="font-size:16px;color:#475569;line-height:1.95">Este ecosistema representa la convergencia entre la formación universitaria y las tecnologías emergentes, abriendo oportunidades de colaboración, investigación, docencia y extensión que benefician a estudiantes, profesores, investigadores y a la comunidad en general.</p>
+      </div>
+    </div>
+
+    <div id="about-mission" class="tab-content">
+      <div class="card-grid card-grid-2">
+        <div class="card">
+          <h3 class="serif" style="font-size:24px;color:var(--navy);margin-bottom:16px">Misión</h3>
+          <p style="font-size:15px;color:#64748B;line-height:1.85">Promover la integración de tecnologías digitales en los procesos de formación, investigación y atención, fomentando la colaboración interdisciplinaria entre las carreras de la FES Iztacala para generar soluciones innovadoras al servicio de la comunidad universitaria y la sociedad.</p>
+        </div>
+        <div class="card">
+          <h3 class="serif" style="font-size:24px;color:var(--navy);margin-bottom:16px">Visión</h3>
+          <p style="font-size:15px;color:#64748B;line-height:1.85">Consolidarse como un referente nacional en la integración de tecnologías digitales para la formación universitaria, impulsando la innovación educativa y el desarrollo de soluciones con impacto social a través de la colaboración interdisciplinaria.</p>
         </div>
       </div>
-
-      <div id="about-mission" class="tab-content">
-        <div class="card-grid card-grid-2">
-          <div class="card">
-            <h3 class="serif" style="font-size:24px;color:var(--navy);margin-bottom:16px">Misión</h3>
-            <p style="font-size:15px;color:#64748B;line-height:1.85">Promover la integración de tecnologías digitales en los procesos de formación, investigación y atención, fomentando la colaboración interdisciplinaria entre las carreras de la FES Iztacala para generar soluciones innovadoras al servicio de la comunidad universitaria y la sociedad.</p>
-          </div>
-          <div class="card">
-            <h3 class="serif" style="font-size:24px;color:var(--navy);margin-bottom:16px">Visión</h3>
-            <p style="font-size:15px;color:#64748B;line-height:1.85">Consolidarse como un referente nacional en la integración de tecnologías digitales para la formación universitaria, impulsando la innovación educativa y el desarrollo de soluciones con impacto social a través de la colaboración interdisciplinaria.</p>
-          </div>
-        </div>
-      </div>
-
-      <div id="about-objetivos" class="tab-content">
-        <div class="card-grid card-grid-2" id="objGrid"></div>
-      </div>
-
-      <div id="about-carreras" class="tab-content">
-        <div class="carreras-grid" id="carrerasGrid"></div>
-      </div>
-    </div>
-    </div>
-  </div>
-</section>
-
-<!-- SERVICIOS -->
-<section class="section section-white section-collapsed" id="servicios">
-  <div class="section-collapse-header" onclick="toggleSection('servicios')">
-    <div class="section-collapse-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" stroke="var(--gold)" stroke-width="2"/><rect x="14" y="3" width="7" height="7" stroke="var(--gold)" stroke-width="2"/><rect x="3" y="14" width="7" height="7" stroke="var(--gold)" stroke-width="2"/><rect x="14" y="14" width="7" height="7" stroke="var(--gold)" stroke-width="2"/></svg>
-    </div>
-    <span class="section-collapse-title">Servicios del ecosistema</span>
-    <div class="section-collapse-chevron">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
-    </div>
-  </div>
-  <div class="section-body" style="max-height:0">
-    <div class="container-md">
-      <div class="sec-header reveal">
-        <div class="sec-tag"><span class="dot"></span> Nuestros servicios</div>
-        <h2 class="serif">Servicios del ecosistema</h2>
-        <p>Soluciones tecnológicas para fortalecer la formación, la investigación y la atención.</p>
-      </div>
-      <p class="reveal" style="text-align:center;color:#64748B;font-size:14px;margin-bottom:10px">Los servicios estarán disponibles en la <strong>Unidad de Tecnologías de la Información y Comunicación</strong>, próximamente.</p>
-      <div class="servicios-cards-grid reveal d1" id="serviciosCardsGrid"></div>
-
-      <!-- VR CATALOG SUBSECTION -->
-      <div id="vrCatalogSubsection" style="display:none;margin-top:40px;padding-top:30px;border-top:2px solid rgba(196,162,78,0.15)">
-        <div class="sec-header" style="margin-bottom:30px">
-          <div class="sec-tag"><span class="dot"></span> Catálogo de Software</div>
-          <h2 class="serif" style="font-size:clamp(22px,3vw,32px)">Software de Realidad Virtual</h2>
-          <p>Explora las aplicaciones VR disponibles para tu carrera.</p>
-        </div>
-        <div class="vr-tabs-nav">
-          <button class="vr-tab-btn active" onclick="switchVRTab('Médico Cirujano',this)">🏥 Médico Cirujano</button>
-          <button class="vr-tab-btn" onclick="switchVRTab('Enfermería',this)">⚕️ Enfermería</button>
-          <button class="vr-tab-btn" onclick="switchVRTab('Biología',this)">🧬 Biología</button>
-          <button class="vr-tab-btn" onclick="switchVRTab('Psicología',this)">🧠 Psicología</button>
-          <button class="vr-tab-btn" onclick="switchVRTab('Cirujano Dentista',this)">🦷 Cirujano Dentista</button>
-        </div>
-        <div id="vr-Médico Cirujano" class="vr-tab-content active" style="margin-top:30px"></div>
-        <div id="vr-Enfermería" class="vr-tab-content" style="margin-top:30px"></div>
-        <div id="vr-Biología" class="vr-tab-content" style="margin-top:30px"></div>
-        <div id="vr-Psicología" class="vr-tab-content" style="margin-top:30px"></div>
-        <div id="vr-Cirujano Dentista" class="vr-tab-content" style="margin-top:30px"></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- SOLICITUD -->
-<section class="section section-cream section-collapsed" id="solicitud">
-  <div class="section-collapse-header" onclick="toggleSection('solicitud')">
-    <div class="section-collapse-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/><polyline points="13 2 13 9 20 9" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/></svg>
-    </div>
-    <span class="section-collapse-title">Solicitud de servicios</span>
-    <div class="section-collapse-chevron">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
-    </div>
-  </div>
-  <div class="section-body" style="max-height:0">
-    <div class="container-sm">
-      <div class="sec-header reveal">
-        <div class="sec-tag"><span class="dot"></span> Solicitar servicio</div>
-        <h2 class="serif">Solicitud de servicios</h2>
-        <p>Complete el formulario y nos pondremos en contacto a la brevedad.</p>
-      </div>
-      <div class="form-card reveal d1">
-      <form onsubmit="event.preventDefault();showToast('Solicitud enviada exitosamente')">
-        <div class="form-grid">
-          <div class="form-group"><label class="form-label">Nombre completo <span class="req">*</span></label><input class="input" placeholder="Nombre y apellidos" required></div>
-          <div class="form-group"><label class="form-label">Correo electrónico <span class="req">*</span></label><input class="input" type="email" placeholder="correo@ejemplo.com" required></div>
-          <div class="form-group"><label class="form-label">Teléfono</label><input class="input" type="tel" placeholder="55 1234 5678"></div>
-          <div class="form-group"><label class="form-label">Carrera, área o dependencia</label><input class="input" placeholder="Ej. Psicología"></div>
-          <div class="form-group"><label class="form-label">Tipo de usuario <span class="req">*</span></label><select class="input" required><option value="">Seleccionar...</option><option>Estudiante</option><option>Profesor</option><option>Investigador</option><option>Área académica</option><option>Grupo de trabajo</option><option>Otro</option></select></div>
-          <div class="form-group"><label class="form-label">Servicio solicitado <span class="req">*</span></label><select class="input" required><option value="">Seleccionar...</option><option>Inteligencia Artificial</option><option>Realidad Virtual</option><option>Realidad Aumentada</option><option>Uso de Bases de Datos</option><option>Telemedicina</option></select></div>
-          <div class="form-group"><label class="form-label">Modalidad <span class="req">*</span></label><select class="input" id="modalidadSol" onchange="toggleGroup('grupalSol',this.value==='Grupal')" required><option value="">Seleccionar...</option><option>Individual</option><option>Grupal</option></select></div>
-        </div>
-        <div class="form-group"><label class="form-label">Fecha deseada</label></div>
-        <div class="calendar-widget" style="margin-bottom:24px;background:#f9fafb;border:1px solid #E8ECF1">
-          <div class="calendar-header">
-            <h4>📅 Selecciona fecha</h4>
-            <div class="calendar-nav">
-              <button type="button" class="calendar-nav-btn" onclick="prevCalendarMonth('servicios')">← Anterior</button>
-              <span style="padding:6px 12px;font-weight:600;color:var(--navy);min-width:120px;text-align:center" id="calendarTitle_servicios">Marzo 2026</span>
-              <button type="button" class="calendar-nav-btn" onclick="nextCalendarMonth('servicios')">Siguiente →</button>
-            </div>
-          </div>
-          <div class="calendar-grid" id="calendarGrid_servicios"></div>
-          <p style="font-size:12px;color:#94A3B8;margin-top:12px;text-align:center">• = Solicitud existente | Selecciona una fecha disponible</p>
-        </div>
-        <input type="hidden" id="serviciosDateInput" name="servicios_fecha" value="">
-        <div class="group-box" id="grupalSol" style="display:none">
-          <div class="group-box-title">⬢ Información del grupo</div>
-          <div class="form-grid">
-            <div class="form-group"><label class="form-label">Número de participantes</label><input class="input" type="number" placeholder="Ej. 15"></div>
-            <div class="form-group"><label class="form-label">Nombre del grupo</label><input class="input" placeholder="Ej. Grupo 2401"></div>
-          </div>
-          <div class="form-group"><label class="form-label">Objetivo de la actividad</label><textarea class="input" rows="3" placeholder="Describa brevemente el objetivo..."></textarea></div>
-        </div>
-        <div class="form-group"><label class="form-label">Descripción de la necesidad <span class="req">*</span></label><textarea class="input" required placeholder="Describa detalladamente el servicio que requiere..."></textarea></div>
-        <div class="form-grid">
-          <div class="form-group"><label class="form-label">Horario deseado</label><input class="input" placeholder="Ej. 10:00 a 12:00"></div>
-          <div class="form-group"><label class="form-label">Requerimientos adicionales</label><input class="input" placeholder="Software, equipos..."></div>
-        </div>
-        <div style="text-align:right;margin-top:8px"><button type="submit" class="btn btn-gold" style="padding:14px 52px">Enviar solicitud</button></div>
-      </form>
-    </div>
-    </div>
-  </div>
-</section>
-
-<!-- USO DEL ESPACIO -->
-<section class="section section-white section-collapsed" id="espacio">
-  <div class="section-collapse-header" onclick="toggleSection('espacio')">
-    <div class="section-collapse-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/><polyline points="9 22 9 12 15 12 15 22" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/></svg>
-    </div>
-    <span class="section-collapse-title">Solicitud de uso del espacio</span>
-    <div class="section-collapse-chevron">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
-    </div>
-  </div>
-  <div class="section-body" style="max-height:0">
-    <div class="container-sm">
-      <div class="sec-header reveal">
-        <div class="sec-tag"><span class="dot"></span> Reservar espacio</div>
-        <h2 class="serif">Solicitud de uso del espacio</h2>
-        <p>Reserve el espacio físico del Ecosistema Digital.</p>
-      </div>
-      <div class="notice reveal">
-      <div class="notice-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
-      <p>La disponibilidad del espacio estará sujeta a revisión y confirmación por parte de la coordinación del Ecosistema Digital.</p>
-    </div>
-    <!-- MINI CALENDAR -->
-    <div class="calendar-widget reveal">
-      <div class="calendar-header">
-        <h4>📅 Disponibilidad del espacio</h4>
-        <div class="calendar-nav">
-          <button class="calendar-nav-btn" onclick="prevCalendarMonth()">← Anterior</button>
-          <span style="padding:6px 12px;font-weight:600;color:var(--navy);min-width:120px;text-align:center" id="calendarTitle">Marzo 2026</span>
-          <button class="calendar-nav-btn" onclick="nextCalendarMonth()">Siguiente →</button>
-        </div>
-      </div>
-      <div class="calendar-grid" id="calendarGrid"></div>
-      <p style="font-size:12px;color:#94A3B8;margin-top:12px;text-align:center">• = Fecha con reserva | Selecciona una fecha disponible</p>
     </div>
 
-    <div class="form-card reveal d1">
-      <form onsubmit="event.preventDefault();showToast('Solicitud de espacio registrada')">
-        <input type="hidden" id="espacioDateInput" name="espacio_fecha" value="">
-        <div class="form-grid">
-          <div class="form-group"><label class="form-label">Nombre <span class="req">*</span></label><input class="input" placeholder="Nombre completo" required></div>
-          <div class="form-group"><label class="form-label">Correo <span class="req">*</span></label><input class="input" type="email" placeholder="correo@ejemplo.com" required></div>
-          <div class="form-group"><label class="form-label">Teléfono</label><input class="input" type="tel" placeholder="55 1234 5678"></div>
-          <div class="form-group"><label class="form-label">Carrera o dependencia</label><input class="input" placeholder="Ej. Enfermería"></div>
-          <div class="form-group"><label class="form-label">Tipo de solicitud <span class="req">*</span></label><select class="input" required><option value="">Seleccionar...</option><option>Individual</option><option>Grupal</option></select></div>
-          <div class="form-group"><label class="form-label">Número de asistentes</label><input class="input" type="number" placeholder="Ej. 20"></div>
-        </div>
-        <div class="form-group"><label class="form-label">Motivo <span class="req">*</span></label><input class="input" placeholder="Ej. Práctica de simulación clínica" required></div>
-        <div class="form-group"><label class="form-label">Actividad a realizar</label><textarea class="input" rows="3" placeholder="Describa la actividad..."></textarea></div>
-        <div class="form-group"><label class="form-label">Tecnología requerida</label><select class="input"><option value="">Seleccionar...</option><option>Inteligencia Artificial</option><option>Realidad Virtual</option><option>Realidad Aumentada</option><option>Bases de Datos</option><option>Telemedicina</option><option>Otro</option><option>Ninguno</option></select></div>
-        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0 20px">
-          <div class="form-group"><label class="form-label">Hora inicio <span class="req">*</span></label><input class="input" type="time" required></div>
-          <div class="form-group"><label class="form-label">Hora término <span class="req">*</span></label><input class="input" type="time" required></div>
-        </div>
-        <div class="form-group"><label class="form-label">Observaciones</label><textarea class="input" rows="3" placeholder="Información adicional..."></textarea></div>
-        <div style="text-align:right;margin-top:8px"><button type="submit" class="btn btn-gold" style="padding:14px 52px">Solicitar espacio</button></div>
-      </form>
+    <div id="about-objetivos" class="tab-content">
+      <div class="card-grid card-grid-2" id="objGrid"></div>
     </div>
-    </div>
-  </div>
-</section>
 
-<!-- TELEMEDICINA -->
-<section class="section section-collapsed" id="telemedicina" style="background:linear-gradient(180deg,#FAF8F4 0%,#fff 100%);position:relative;overflow:hidden">
-  <div class="section-collapse-header" onclick="toggleSection('telemedicina')">
-    <div class="section-collapse-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/></svg>
+    <div id="about-carreras" class="tab-content">
+      <div class="carreras-grid" id="carrerasGrid"></div>
     </div>
-    <span class="section-collapse-title">Telemedicina</span>
-    <div class="section-collapse-chevron">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
-    </div>
-  </div>
-  <div class="section-body" style="max-height:0">
-    <div class="floating-shapes"><div class="shape shape-2" style="opacity:0.03"></div></div>
-    <div class="container" style="position:relative;z-index:1">
-      <div class="sec-header reveal">
-        <div class="sec-tag"><span class="dot"></span> Salud digital</div>
-        <h2 class="serif">Telemedicina</h2>
-        <p>Orientación, acompañamiento y asesoría remota en procesos vinculados con salud digital.</p>
-      </div>
-      <div class="card-grid card-grid-2" style="align-items:start">
-      <div class="reveal from-right d1">
-        <h3 class="serif" style="font-size:24px;color:var(--navy);margin-bottom:18px">Acerca del servicio</h3>
-        <p style="font-size:15px;color:#64748B;line-height:1.95;margin-bottom:30px">El servicio de telemedicina ofrece un canal de comunicación profesional para brindar orientación, asesoría y acompañamiento en procesos relacionados con la salud, facilitando la interacción remota entre profesionales, estudiantes e interesados.</p>
-        <div style="display:flex;flex-direction:column;gap:4px">
-          <div class="tele-benefit"><div class="tele-icon">❤️</div><div><p style="font-weight:600;color:var(--navy);font-size:14px;margin-bottom:3px">Enfoque humano</p><p style="font-size:13px;color:#64748B;line-height:1.6">Orientación con cercanía y profesionalismo.</p></div></div>
-          <div class="tele-benefit"><div class="tele-icon">🌍</div><div><p style="font-weight:600;color:var(--navy);font-size:14px;margin-bottom:3px">Sin barreras</p><p style="font-size:13px;color:#64748B;line-height:1.6">Asesoría que trasciende limitaciones geográficas.</p></div></div>
-          <div class="tele-benefit"><div class="tele-icon">🛡️</div><div><p style="font-weight:600;color:var(--navy);font-size:14px;margin-bottom:3px">Respaldo institucional</p><p style="font-size:13px;color:#64748B;line-height:1.6">Experiencia de la FES Iztacala.</p></div></div>
-          <div class="tele-benefit"><div class="tele-icon">👥</div><div><p style="font-weight:600;color:var(--navy);font-size:14px;margin-bottom:3px">Atención flexible</p><p style="font-size:13px;color:#64748B;line-height:1.6">Modalidad individual o grupal.</p></div></div>
-        </div>
-        <div style="margin-top:26px;display:flex;flex-wrap:wrap;gap:8px">
-          <span class="acc-tag">Orientación general</span><span class="acc-tag">Asesoría especializada</span>
-          <span class="acc-tag">Acompañamiento remoto</span><span class="acc-tag">Consulta interdisciplinaria</span>
-        </div>
-      </div>
-      <div class="form-card reveal from-left d2" style="position:sticky;top:110px">
-        <h3 style="font-size:19px;font-weight:700;color:var(--navy);margin-bottom:26px;text-align:center">Solicitar asesoría</h3>
-        <form onsubmit="event.preventDefault();showToast('Solicitud de asesoría registrada')">
-          <div class="form-group"><label class="form-label">Nombre <span class="req">*</span></label><input class="input" placeholder="Nombre y apellidos" required></div>
-          <div class="form-group"><label class="form-label">Correo <span class="req">*</span></label><input class="input" type="email" placeholder="correo@ejemplo.com" required></div>
-          <div class="form-group"><label class="form-label">Teléfono</label><input class="input" type="tel" placeholder="55 1234 5678"></div>
-          <div class="form-group"><label class="form-label">Carrera o área</label><input class="input" placeholder="Ej. Médico Cirujano"></div>
-          <div class="form-group"><label class="form-label">Tipo de asesoría <span class="req">*</span></label><select class="input" required><option value="">Seleccionar...</option><option>Orientación general</option><option>Asesoría especializada</option><option>Acompañamiento remoto</option><option>Consulta interdisciplinaria</option><option>Segunda opinión académica</option></select></div>
-          <div class="form-group"><label class="form-label">Motivo <span class="req">*</span></label><textarea class="input" rows="3" placeholder="Describa el motivo..." required></textarea></div>
-          <div class="form-group"><label class="form-label">Modalidad <span class="req">*</span></label><select class="input" required><option value="">Seleccionar...</option><option>Individual</option><option>Grupal</option></select></div>
-          <div class="form-group"><label class="form-label">Fecha estimada</label></div>
-          <div class="calendar-widget" style="margin-bottom:24px;background:#f9fafb;border:1px solid #E8ECF1">
-            <div class="calendar-header">
-              <h4>📅 Selecciona fecha</h4>
-              <div class="calendar-nav">
-                <button type="button" class="calendar-nav-btn" onclick="prevCalendarMonth('telemedicina')">← Anterior</button>
-                <span style="padding:6px 12px;font-weight:600;color:var(--navy);min-width:120px;text-align:center" id="calendarTitle_telemedicina">Marzo 2026</span>
-                <button type="button" class="calendar-nav-btn" onclick="nextCalendarMonth('telemedicina')">Siguiente →</button>
-              </div>
-            </div>
-            <div class="calendar-grid" id="calendarGrid_telemedicina"></div>
-            <p style="font-size:12px;color:#94A3B8;margin-top:12px;text-align:center">• = Asesoría programada | Selecciona una fecha disponible</p>
-          </div>
-          <input type="hidden" id="telemedicinaDateInput" name="telemedicina_fecha" value="">
-          <div class="form-group"><label class="form-label">Comentarios</label><textarea class="input" rows="2" placeholder="Información adicional..."></textarea></div>
-          <button type="submit" class="btn btn-gold btn-full" style="padding:15px">Solicitar asesoría</button>
-        </form>
-      </div>
-    </div>
-    </div>
-  </div>
-</section>
 
-<!-- IMPACTO -->
-<section class="section section-gradient section-collapsed" id="impacto">
-  <div class="section-collapse-header" onclick="toggleSection('impacto')">
-    <div class="section-collapse-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><polyline points="17 6 23 6 23 12" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
-    <span class="section-collapse-title">Impacto y beneficios</span>
-    <div class="section-collapse-chevron">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
-    </div>
-  </div>
-  <div class="section-body" style="max-height:0">
-    <div class="container" style="position:relative;z-index:2">
-      <div class="sec-header light reveal">
-        <div class="sec-tag"><span class="dot"></span> Impacto</div>
-        <h2 class="serif">Impacto y beneficios</h2>
-        <p>Un ecosistema que transforma la interacción con la tecnología y el conocimiento.</p>
-      </div>
-      <div class="counter-grid reveal d1" id="counterGrid"></div>
-      <div class="card-grid card-grid-3 reveal d2" id="impactoGrid"></div>
-    </div>
-  </div>
-</section>
-
-<!-- GALERÍA -->
-<section class="section section-cream section-collapsed" id="galeria">
-  <div class="section-collapse-header" onclick="toggleSection('galeria')">
-    <div class="section-collapse-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="var(--gold)" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.5" fill="var(--gold)"/><path d="M21 15l-5-5-6 6-3-3" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
-    <span class="section-collapse-title">Entorno tecnológico</span>
-    <div class="section-collapse-chevron">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
-    </div>
-  </div>
-  <div class="section-body" style="max-height:0">
-    <div class="container">
-      <div class="sec-header reveal">
+    <!-- Entorno Tecnológico -->
+    <div style="margin-top:60px">
+      <div class="sec-header">
         <div class="sec-tag"><span class="dot"></span> Tecnología</div>
-        <h2 class="serif">Entorno tecnológico</h2>
+        <h2 class="serif">Entorno Tecnológico</h2>
         <p>Las áreas de innovación que convergen en nuestro ecosistema digital.</p>
       </div>
       <div class="entorno-grid" id="galeriaGrid"></div>
     </div>
-  </div>
-</section>
 
-<!-- CURSOS -->
-<section class="section section-white section-collapsed" id="cursos">
-  <div class="section-collapse-header" onclick="toggleSection('cursos')">
-    <div class="section-collapse-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/></svg>
-    </div>
-    <span class="section-collapse-title">Cursos y Talleres</span>
-    <div class="section-collapse-chevron">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
-    </div>
-  </div>
-  <div class="section-body" style="max-height:0">
-    <div class="container">
-      <div class="sec-header reveal">
-        <div class="sec-tag"><span class="dot"></span> Formación continua</div>
-        <h2 class="serif">Cursos y Talleres</h2>
-        <p>Amplía tus conocimientos con nuestros programas de formación continua en tecnología e innovación.</p>
-      </div>
-      <div class="card-grid card-grid-3 reveal d1" id="cursosGrid" style="min-height:300px;align-items:center;justify-content:center">
-        <div style="grid-column:1/-1;text-align:center;color:#94A3B8;font-size:14px">Cargando cursos disponibles...</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- MODAL: INSCRIPCIÓN CURSOS -->
-<div class="login-overlay" id="inscripcionCursoModal" onclick="if(event.target===this)closeInscripcionCurso()">
-  <div class="login-card" style="max-width:480px">
-    <h2 style="color:var(--navy);margin-bottom:6px" id="cursoTituloModal">Inscripción al curso</h2>
-    <p class="sub" id="cursoInstructorModal">Instructor</p>
-    <form id="inscripcionCursoForm" onsubmit="event.preventDefault();submitInscripcionCurso()">
-      <div class="form-group">
-        <label class="form-label">Nombre completo <span class="req">*</span></label>
-        <input class="input" id="insNombre" placeholder="Tu nombre" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Correo electrónico <span class="req">*</span></label>
-        <input class="input" type="email" id="insCorreo" placeholder="correo@iztacala.unam.mx" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Carrera <span class="req">*</span></label>
-        <input class="input" id="insCarrera" placeholder="Tu carrera" required>
-      </div>
-      <div class="login-error" id="cursoFormError"></div>
-      <button type="submit" class="btn-login" style="background:linear-gradient(135deg,var(--gold),var(--gold-light))">Inscribirme</button>
-    </form>
-    <a href="#" class="back-link" onclick="closeInscripcionCurso();return false">← Cancelar</a>
-  </div>
-</div>
-
-<!-- COMUNIDAD -->
-<section class="section section-white section-collapsed" id="comunidad">
-  <div class="section-collapse-header" onclick="toggleSection('comunidad')">
-    <div class="section-collapse-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="9" cy="7" r="4" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
-    <span class="section-collapse-title">Muro de Proyectos</span>
-    <div class="section-collapse-chevron">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
-    </div>
-  </div>
-  <div class="section-body" style="max-height:0">
-    <div class="container">
-      <div class="sec-header reveal">
+    <!-- Muro de Proyectos -->
+    <div style="margin-top:60px">
+      <div class="sec-header">
         <div class="sec-tag"><span class="dot"></span> Colaboración</div>
         <h2 class="serif">Muro de Proyectos</h2>
         <p>Conecta con otros estudiantes y colabora en proyectos interdisciplinarios innovadores.</p>
       </div>
-      <div style="margin-bottom:40px;text-align:center;reveal">
+      <div style="margin-bottom:30px;text-align:center">
         <button class="btn btn-gold" onclick="openPublicarProyecto()">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
           Publicar proyecto
         </button>
       </div>
-      <div class="card-grid card-grid-3 reveal d1" id="proyectosGrid" style="min-height:300px;align-items:center;justify-content:center">
+      <div class="card-grid card-grid-3" id="proyectosGrid" style="min-height:200px">
         <div style="grid-column:1/-1;text-align:center;color:#94A3B8;font-size:14px">Cargando proyectos...</div>
       </div>
     </div>
   </div>
-</section>
-
-<!-- MODAL: PUBLICAR PROYECTO -->
-<div class="login-overlay" id="publicarProyectoModal" onclick="if(event.target===this)closePublicarProyecto()">
-  <div class="login-card" style="max-width:540px;max-height:90vh;overflow-y:auto">
-    <h2 style="color:var(--navy);margin-bottom:6px">Publicar Proyecto</h2>
-    <p class="sub">Comparte tu idea con la comunidad</p>
-    <form id="publicarProyectoForm" onsubmit="event.preventDefault();submitPublicarProyecto()">
-      <div class="form-group">
-        <label class="form-label">Título <span class="req">*</span></label>
-        <input class="input" id="proyTitulo" placeholder="Nombre de tu proyecto" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Descripción <span class="req">*</span></label>
-        <textarea class="input" id="proyDescripcion" placeholder="Describe tu proyecto..." rows="4" required></textarea>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Tu nombre <span class="req">*</span></label>
-        <input class="input" id="proyAutor" placeholder="Nombre completo" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Correo electrónico <span class="req">*</span></label>
-        <input class="input" type="email" id="proyCorreo" placeholder="correo@iztacala.unam.mx" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Carrera <span class="req">*</span></label>
-        <input class="input" id="proyCarrera" placeholder="Tu carrera" required>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Categoría <span class="req">*</span></label>
-        <select class="input" id="proyCategoria" required>
-          <option value="">Seleccionar categoría...</option>
-          <option value="idea">💡 Idea</option>
-          <option value="busco_equipo">👥 Busco equipo</option>
-          <option value="en_desarrollo">🔨 En desarrollo</option>
-          <option value="completado">✅ Completado</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Etiquetas (separadas por comas)</label>
-        <input class="input" id="proyTags" placeholder="ej: web, mobile, AI">
-      </div>
-      <div class="login-error" id="proyFormError"></div>
-      <button type="submit" class="btn-login" style="background:linear-gradient(135deg,var(--gold),var(--gold-light))">Publicar</button>
-    </form>
-    <a href="#" class="back-link" onclick="closePublicarProyecto();return false">← Cancelar</a>
-  </div>
 </div>
 
-<!-- BADGES/LOGROS -->
-<section class="section section-white section-collapsed" id="badges">
-  <div class="section-collapse-header" onclick="toggleSection('badges')">
-    <div class="section-collapse-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 9L12 5l6 4v7a6 6 0 0 1-6 6 6 6 0 0 1-6-6V9z" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
-    <span class="section-collapse-title">Insignias y Premios</span>
-    <div class="section-collapse-chevron">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
-    </div>
-  </div>
-  <div class="section-body" style="max-height:0">
-    <div class="container">
-      <div class="sec-header reveal">
-        <div class="sec-tag"><span class="dot"></span> Gamificación</div>
-        <h2 class="serif">Insignias y Premios</h2>
-        <p>Gana insignias participando y accede a premios exclusivos por tu desempeño.</p>
-      </div>
+<!-- ═══════════════════════════════════════════════════════════════════
+     SPA SECTION: Servicios
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="spa-section-overlay" id="spa-section-servicios">
+  <div class="spa-section-content">
+    <button class="spa-back-btn" onclick="SPA.navigateBack()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Volver al inicio
+    </button>
 
-      <!-- Insignias -->
-      <div style="margin-bottom:60px">
-      <h3 class="serif" style="text-align:center;color:var(--navy);margin-bottom:8px;font-size:24px">Insignias disponibles</h3>
-      <div class="card-grid card-grid-4 reveal d1" id="badgesGrid" style="min-height:200px;align-items:center;justify-content:center">
-        <div style="grid-column:1/-1;text-align:center;color:#94A3B8;font-size:14px">Cargando insignias...</div>
-      </div>
+    <div class="sec-header">
+      <div class="sec-tag"><span class="dot"></span> Nuestros servicios</div>
+      <h2 class="serif">Servicios del Ecosistema</h2>
+      <p>Soluciones tecnológicas para fortalecer la formación, la investigación y la atención.</p>
     </div>
 
-    <!-- Premios -->
-    <div style="margin-bottom:60px">
-      <h3 class="serif" style="text-align:center;color:var(--navy);margin-bottom:8px;font-size:24px">Premios canjeables</h3>
-      <div class="card-grid card-grid-3 reveal d2" id="premiosGrid" style="min-height:200px;align-items:center;justify-content:center">
-        <div style="grid-column:1/-1;text-align:center;color:#94A3B8;font-size:14px">Cargando premios...</div>
+    <p style="text-align:center;color:#64748B;font-size:14px;margin-bottom:30px">Los servicios estarán disponibles en la <strong>Unidad de Tecnologías de la Información y Comunicación</strong>, próximamente.</p>
+
+    <!-- Service Cards Grid -->
+    <div class="servicios-cards-grid" id="serviciosCardsGrid"></div>
+
+    <!-- VR Catalog -->
+    <div id="vrCatalogSubsection" style="display:none;margin-top:40px;padding-top:30px;border-top:2px solid rgba(196,162,78,0.15)">
+      <div class="sec-header" style="margin-bottom:30px">
+        <div class="sec-tag"><span class="dot"></span> Catálogo de Software</div>
+        <h2 class="serif" style="font-size:clamp(22px,3vw,32px)">Software de Realidad Virtual</h2>
+        <p>Explora las aplicaciones VR disponibles para tu carrera.</p>
       </div>
+      <div class="vr-tabs-nav">
+        <button class="vr-tab-btn active" onclick="switchVRTab('Médico Cirujano',this)">🏥 Médico Cirujano</button>
+        <button class="vr-tab-btn" onclick="switchVRTab('Enfermería',this)">⚕️ Enfermería</button>
+        <button class="vr-tab-btn" onclick="switchVRTab('Biología',this)">🧬 Biología</button>
+        <button class="vr-tab-btn" onclick="switchVRTab('Psicología',this)">🧠 Psicología</button>
+        <button class="vr-tab-btn" onclick="switchVRTab('Cirujano Dentista',this)">🦷 Cirujano Dentista</button>
+      </div>
+      <div id="vr-Médico Cirujano" class="vr-tab-content active" style="margin-top:30px"></div>
+      <div id="vr-Enfermería" class="vr-tab-content" style="margin-top:30px"></div>
+      <div id="vr-Biología" class="vr-tab-content" style="margin-top:30px"></div>
+      <div id="vr-Psicología" class="vr-tab-content" style="margin-top:30px"></div>
+      <div id="vr-Cirujano Dentista" class="vr-tab-content" style="margin-top:30px"></div>
     </div>
 
-    <!-- Leaderboard -->
-    <div style="background:#F8FAFC;border-radius:var(--radius);padding:40px;border:1px solid #E8ECF1">
-      <h3 class="serif" style="text-align:center;color:var(--navy);margin-bottom:24px;font-size:24px">🏆 Top 5 Logros</h3>
-      <div id="leaderboardList" style="display:flex;flex-direction:column;gap:12px">
-        <div style="text-align:center;color:#94A3B8;font-size:14px;padding:20px">Cargando leaderboard...</div>
-      </div>
-    </div>
-    </div>
-  </div>
-</section>
-
-<!-- AULA INMERSIVA -->
-<section class="section section-cream section-collapsed" id="aula-inmersiva">
-  <div class="section-collapse-header" onclick="toggleSection('aula-inmersiva')">
-    <div class="section-collapse-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 10h16M4 14h16M4 18h16" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/><circle cx="19" cy="6" r="2" fill="var(--gold)"/><circle cx="14" cy="10" r="2" fill="var(--gold)"/><circle cx="17" cy="14" r="2" fill="var(--gold)"/><circle cx="12" cy="18" r="2" fill="var(--gold)"/></svg>
-    </div>
-    <span class="section-collapse-title">Aula Inmersiva Interprofesional</span>
-    <div class="section-collapse-chevron">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
-    </div>
-  </div>
-  <div class="section-body" style="max-height:0">
-    <div class="container">
-      <div class="sec-header reveal">
+    <!-- Aula Inmersiva Card -->
+    <div style="margin-top:50px">
+      <div class="sec-header">
         <div class="sec-tag"><span class="dot"></span> Innovación educativa</div>
-        <h2 class="serif">Aula Inmersiva Interprofesional (AII)</h2>
-        <p>Un entorno donde los estudiantes de salud practican lo que no se puede enseñar en el aula tradicional: la incertidumbre, la presión, el trabajo en equipo y la empatía clínica — sin riesgo real para nadie.</p>
+        <h2 class="serif">Aula Inmersiva Interprofesional</h2>
+        <p>Un entorno donde los estudiantes de salud practican la incertidumbre, la presión y el trabajo en equipo — sin riesgo real para nadie.</p>
       </div>
-
-      <!-- Service Card Grid -->
-      <div class="card-grid reveal d1" style="grid-template-columns:1fr 1fr;gap:24px;margin-bottom:50px">
-        <!-- Main AII Card (spans 2 columns) -->
-        <div class="card" style="grid-column:1/-1;position:relative;border:2px solid rgba(196,162,78,0.3);cursor:pointer" onclick="openAIIModal()">
-          <div style="position:absolute;top:16px;right:16px;background:linear-gradient(135deg,#EF4444,#F97316);color:#fff;font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;box-shadow:0 4px 12px rgba(239,68,68,0.3)">Nuevo</div>
-          <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
-            <div style="min-width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,#7C3AED,#2563EB);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0">🏥</div>
-            <div style="flex:1;min-width:280px">
-              <h3 class="serif" style="font-size:24px;color:var(--navy);margin-bottom:10px">Aula Inmersiva Interprofesional</h3>
-              <p style="font-size:15px;color:#64748B;line-height:1.85;margin-bottom:18px">Entorno seguro de simulación clínica donde estudiantes de distintas carreras de salud desarrollan habilidades blandas esenciales mediante escenarios inmersivos con tecnología de vanguardia.</p>
-              <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:4px">
-                <div style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:12px;padding:14px 12px;text-align:center">
-                  <div style="font-size:24px;margin-bottom:6px">🤝</div>
-                  <div style="font-size:12px;font-weight:700;color:#7C3AED">Trabajo en equipo</div>
-                </div>
-                <div style="background:rgba(37,99,235,0.06);border:1px solid rgba(37,99,235,0.15);border-radius:12px;padding:14px 12px;text-align:center">
-                  <div style="font-size:24px;margin-bottom:6px">💬</div>
-                  <div style="font-size:12px;font-weight:700;color:#2563EB">Comunicación efectiva</div>
-                </div>
-                <div style="background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.15);border-radius:12px;padding:14px 12px;text-align:center">
-                  <div style="font-size:24px;margin-bottom:6px">🧠</div>
-                  <div style="font-size:12px;font-weight:700;color:#059669">Análisis crítico</div>
-                </div>
-                <div style="background:rgba(234,88,12,0.06);border:1px solid rgba(234,88,12,0.15);border-radius:12px;padding:14px 12px;text-align:center">
-                  <div style="font-size:24px;margin-bottom:6px">💪</div>
-                  <div style="font-size:12px;font-weight:700;color:#EA580C">Manejo de frustración</div>
-                </div>
-                <div style="background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.15);border-radius:12px;padding:14px 12px;text-align:center">
-                  <div style="font-size:24px;margin-bottom:6px">🛡️</div>
-                  <div style="font-size:12px;font-weight:700;color:#DC2626">Seguridad del paciente</div>
-                </div>
+      <div class="card" style="position:relative;border:2px solid rgba(196,162,78,0.3);cursor:pointer;max-width:900px;margin:0 auto" onclick="openAIIModal()">
+        <div style="position:absolute;top:16px;right:16px;background:linear-gradient(135deg,#EF4444,#F97316);color:#fff;font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;box-shadow:0 4px 12px rgba(239,68,68,0.3)">Nuevo</div>
+        <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
+          <div style="min-width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,#7C3AED,#2563EB);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0">🏥</div>
+          <div style="flex:1;min-width:280px">
+            <h3 class="serif" style="font-size:24px;color:var(--navy);margin-bottom:10px">Aula Inmersiva Interprofesional</h3>
+            <p style="font-size:15px;color:#64748B;line-height:1.85;margin-bottom:18px">Entorno seguro de simulación clínica donde estudiantes de distintas carreras de salud desarrollan habilidades blandas esenciales mediante escenarios inmersivos con tecnología de vanguardia.</p>
+            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px">
+              <div style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:12px;padding:14px 12px;text-align:center">
+                <div style="font-size:24px;margin-bottom:6px">🤝</div>
+                <div style="font-size:12px;font-weight:700;color:#7C3AED">Trabajo en equipo</div>
               </div>
-              <p style="margin-top:16px;font-size:13px;color:var(--gold);font-weight:600;display:flex;align-items:center;gap:6px">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-                Haz clic para conocer más detalles
-              </p>
+              <div style="background:rgba(37,99,235,0.06);border:1px solid rgba(37,99,235,0.15);border-radius:12px;padding:14px 12px;text-align:center">
+                <div style="font-size:24px;margin-bottom:6px">💬</div>
+                <div style="font-size:12px;font-weight:700;color:#2563EB">Comunicación efectiva</div>
+              </div>
+              <div style="background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.15);border-radius:12px;padding:14px 12px;text-align:center">
+                <div style="font-size:24px;margin-bottom:6px">🧠</div>
+                <div style="font-size:12px;font-weight:700;color:#059669">Análisis crítico</div>
+              </div>
+              <div style="background:rgba(234,88,12,0.06);border:1px solid rgba(234,88,12,0.15);border-radius:12px;padding:14px 12px;text-align:center">
+                <div style="font-size:24px;margin-bottom:6px">💪</div>
+                <div style="font-size:12px;font-weight:700;color:#EA580C">Manejo de frustración</div>
+              </div>
+              <div style="background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.15);border-radius:12px;padding:14px 12px;text-align:center">
+                <div style="font-size:24px;margin-bottom:6px">🛡️</div>
+                <div style="font-size:12px;font-weight:700;color:#DC2626">Seguridad del paciente</div>
+              </div>
             </div>
+            <p style="margin-top:16px;font-size:13px;color:var(--gold);font-weight:600;display:flex;align-items:center;gap:6px">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              Haz clic para conocer más detalles
+            </p>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
 
-<!-- LABORATORIO DE APLICACIONES -->
-<section class="section section-white section-collapsed" id="laboratorio">
-  <div class="section-collapse-header" onclick="toggleSection('laboratorio')">
-    <div class="section-collapse-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M9 3h6v2H9V3z" stroke="var(--gold)" stroke-width="2"/><path d="M8 5V3m8 2V3M5 8h14v13H5V8z" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/><path d="M9 12h6m-3-3v6" stroke="var(--gold)" stroke-width="2" stroke-linecap="round"/></svg>
+    <!-- Solicitud de Servicio -->
+    <div style="margin-top:60px">
+      <div class="sec-header">
+        <div class="sec-tag"><span class="dot"></span> Solicitar servicio</div>
+        <h2 class="serif">Solicitud de Servicios</h2>
+        <p>Complete el formulario y nos pondremos en contacto a la brevedad.</p>
+      </div>
+      <div class="form-card" style="max-width:900px;margin:0 auto">
+        <form id="formSolicitudServicio" onsubmit="event.preventDefault();submitSolicitudServicio()">
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">Nombre completo <span class="req">*</span></label><input class="input" id="solNombre" placeholder="Nombre y apellidos" required></div>
+            <div class="form-group"><label class="form-label">Correo electrónico <span class="req">*</span></label><input class="input" type="email" id="solCorreo" placeholder="correo@ejemplo.com" required></div>
+            <div class="form-group"><label class="form-label">Teléfono</label><input class="input" type="tel" id="solTelefono" placeholder="55 1234 5678"></div>
+            <div class="form-group"><label class="form-label">Carrera, área o dependencia</label><input class="input" id="solCarrera" placeholder="Ej. Psicología"></div>
+            <div class="form-group"><label class="form-label">Tipo de usuario <span class="req">*</span></label><select class="input" id="solTipoUsuario" required><option value="">Seleccionar...</option><option>Estudiante</option><option>Profesor</option><option>Investigador</option><option>Área académica</option><option>Grupo de trabajo</option><option>Otro</option></select></div>
+            <div class="form-group"><label class="form-label">Servicio solicitado <span class="req">*</span></label><select class="input" id="solServicio" required><option value="">Seleccionar...</option><option>Inteligencia Artificial</option><option>Realidad Virtual</option><option>Realidad Aumentada</option><option>Uso de Bases de Datos</option><option>Telemedicina</option><option>Simulación</option><option>Centro Inteligente de Sustentabilidad</option><option>Aula Inmersiva</option><option>Laboratorio de Proyectos</option></select></div>
+            <div class="form-group"><label class="form-label">Modalidad <span class="req">*</span></label><select class="input" id="solModalidad" onchange="toggleGroup('grupalSol',this.value==='Grupal')" required><option value="">Seleccionar...</option><option>Individual</option><option>Grupal</option></select></div>
+            <div class="form-group"><label class="form-label">Fecha deseada</label><input class="input" type="date" id="solFecha"></div>
+          </div>
+          <div class="group-box" id="grupalSol" style="display:none">
+            <div class="group-box-title">⬢ Información del grupo</div>
+            <div class="form-grid">
+              <div class="form-group"><label class="form-label">Número de participantes</label><input class="input" type="number" id="solParticipantes" placeholder="Ej. 15"></div>
+              <div class="form-group"><label class="form-label">Nombre del grupo</label><input class="input" id="solGrupo" placeholder="Ej. Grupo 2401"></div>
+            </div>
+            <div class="form-group"><label class="form-label">Objetivo de la actividad</label><textarea class="input" id="solObjetivo" rows="3" placeholder="Describa brevemente el objetivo..."></textarea></div>
+          </div>
+          <div class="form-group"><label class="form-label">Descripción de la necesidad <span class="req">*</span></label><textarea class="input" id="solDescripcion" required placeholder="Describa detalladamente el servicio que requiere..."></textarea></div>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">Horario deseado</label><input class="input" id="solHorario" placeholder="Ej. 10:00 a 12:00"></div>
+            <div class="form-group"><label class="form-label">Requerimientos adicionales</label><input class="input" id="solRequerimientos" placeholder="Software, equipos..."></div>
+          </div>
+          <div style="text-align:right;margin-top:8px"><button type="submit" class="btn btn-gold" style="padding:14px 52px">Enviar solicitud</button></div>
+        </form>
+      </div>
     </div>
-    <span class="section-collapse-title">Laboratorio de Aplicaciones</span>
-    <div class="section-collapse-chevron">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
+
+    <!-- Solicitud de Espacio -->
+    <div style="margin-top:60px">
+      <div class="sec-header">
+        <div class="sec-tag"><span class="dot"></span> Reservar espacio</div>
+        <h2 class="serif">Solicitud de Uso del Espacio</h2>
+        <p>Reserve el espacio físico del Ecosistema Digital.</p>
+      </div>
+      <div class="notice" style="max-width:900px;margin:0 auto 24px">
+        <div class="notice-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg></div>
+        <p>La disponibilidad del espacio estará sujeta a revisión y confirmación por parte de la coordinación del Ecosistema Digital.</p>
+      </div>
+      <div class="form-card" style="max-width:900px;margin:0 auto">
+        <form id="formSolicitudEspacio" onsubmit="event.preventDefault();submitSolicitudEspacio()">
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">Nombre <span class="req">*</span></label><input class="input" id="espNombre" placeholder="Nombre completo" required></div>
+            <div class="form-group"><label class="form-label">Correo <span class="req">*</span></label><input class="input" type="email" id="espCorreo" placeholder="correo@ejemplo.com" required></div>
+            <div class="form-group"><label class="form-label">Teléfono</label><input class="input" type="tel" id="espTelefono" placeholder="55 1234 5678"></div>
+            <div class="form-group"><label class="form-label">Carrera o dependencia</label><input class="input" id="espCarrera" placeholder="Ej. Enfermería"></div>
+            <div class="form-group"><label class="form-label">Tipo de solicitud <span class="req">*</span></label><select class="input" id="espTipo" required><option value="">Seleccionar...</option><option>Individual</option><option>Grupal</option></select></div>
+            <div class="form-group"><label class="form-label">Número de asistentes</label><input class="input" type="number" id="espAsistentes" placeholder="Ej. 20"></div>
+            <div class="form-group"><label class="form-label">Fecha <span class="req">*</span></label><input class="input" type="date" id="espFecha" required></div>
+            <div class="form-group"><label class="form-label">Tecnología requerida</label><select class="input" id="espTecnologia"><option value="">Seleccionar...</option><option>Inteligencia Artificial</option><option>Realidad Virtual</option><option>Realidad Aumentada</option><option>Bases de Datos</option><option>Telemedicina</option><option>Simulación</option><option>Otro</option><option>Ninguno</option></select></div>
+          </div>
+          <div class="form-group"><label class="form-label">Motivo <span class="req">*</span></label><input class="input" id="espMotivo" placeholder="Ej. Práctica de simulación clínica" required></div>
+          <div class="form-group"><label class="form-label">Actividad a realizar</label><textarea class="input" id="espActividad" rows="3" placeholder="Describa la actividad..."></textarea></div>
+          <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:0 20px">
+            <div class="form-group"><label class="form-label">Hora inicio <span class="req">*</span></label><input class="input" type="time" id="espHoraInicio" required></div>
+            <div class="form-group"><label class="form-label">Hora término <span class="req">*</span></label><input class="input" type="time" id="espHoraFin" required></div>
+          </div>
+          <div class="form-group"><label class="form-label">Observaciones</label><textarea class="input" id="espObservaciones" rows="3" placeholder="Información adicional..."></textarea></div>
+          <div style="text-align:right;margin-top:8px"><button type="submit" class="btn btn-gold" style="padding:14px 52px">Solicitar espacio</button></div>
+        </form>
+      </div>
     </div>
-  </div>
-  <div class="section-body" style="max-height:0">
-    <div class="container-md">
-      <div class="sec-header reveal">
+
+    <!-- Laboratorio de Proyectos -->
+    <div style="margin-top:60px">
+      <div class="sec-header">
         <div class="sec-tag"><span class="dot"></span> Nuevo espacio</div>
-        <h2 class="serif">Laboratorio de Aplicaciones</h2>
+        <h2 class="serif">Laboratorio de Proyectos</h2>
         <p>Un espacio para la creación, innovación y colaboración tecnológica.</p>
       </div>
-
-      <div class="lab-proximamente reveal d1">
-        <div class="lab-proximamente-text">PRÓXIMAMENTE</div>
+      <div class="lab-proximamente"><div class="lab-proximamente-text">PRÓXIMAMENTE</div></div>
+      <div style="text-align:center;max-width:700px;margin:0 auto 40px">
+        <p style="font-size:15px;color:#475569;line-height:1.85">El <strong>Laboratorio de Proyectos</strong> será un espacio ubicado en el edificio de tecnología, dedicado a la creación de material multitecnológico. Nace como una <strong>iniciativa estudiantil</strong> para fomentar la innovación, la colaboración interescolar y la investigación aplicada.</p>
       </div>
-
-      <div class="lab-description reveal d2" style="text-align:center;max-width:700px;margin:0 auto 40px">
-        <p style="font-size:15px;color:#475569;line-height:1.85">
-          El <strong>Laboratorio de Aplicaciones</strong> será un espacio ubicado en el edificio de tecnología, dedicado a la creación de material multitecnológico. Nace como una <strong>iniciativa estudiantil</strong> para fomentar la innovación, la colaboración interescolar y la investigación aplicada.
-        </p>
-      </div>
-
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;margin-bottom:40px">
-        <div class="card reveal d1" style="padding:28px;text-align:center">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px">
+        <div class="card" style="padding:28px;text-align:center">
           <div style="font-size:40px;margin-bottom:12px">🏗️</div>
           <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Creación Multitecnológica</h3>
           <p style="font-size:13px;color:#64748B;line-height:1.7">Espacio equipado para la creación de material que integre múltiples tecnologías: IA, RV, RA, bases de datos y más.</p>
         </div>
-        <div class="card reveal d2" style="padding:28px;text-align:center">
+        <div class="card" style="padding:28px;text-align:center">
           <div style="font-size:40px;margin-bottom:12px">🎓</div>
           <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Iniciativa Estudiantil</h3>
           <p style="font-size:13px;color:#64748B;line-height:1.7">Proyecto impulsado por estudiantes para estudiantes. Un espacio donde tus ideas cobran vida con el apoyo del Ecosistema Digital.</p>
         </div>
-        <div class="card reveal d3" style="padding:28px;text-align:center">
+        <div class="card" style="padding:28px;text-align:center">
           <div style="font-size:40px;margin-bottom:12px">🤝</div>
           <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Colaboración Interescolar</h3>
           <p style="font-size:13px;color:#64748B;line-height:1.7">Colaboración entre carreras de ingeniería y FES Iztacala para proyectos de investigación y desarrollo tecnológico conjunto.</p>
         </div>
-        <div class="card reveal d1" style="padding:28px;text-align:center">
+        <div class="card" style="padding:28px;text-align:center">
           <div style="font-size:40px;margin-bottom:12px">🔬</div>
           <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Investigación Aplicada</h3>
           <p style="font-size:13px;color:#64748B;line-height:1.7">Espacio para la investigación interdisciplinaria y la formación continua de docentes en tecnologías emergentes.</p>
@@ -1799,28 +1634,140 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
       </div>
     </div>
   </div>
-</section>
+</div>
 
-<!-- CONTACTO -->
-<section class="section section-cream section-collapsed" id="contacto">
-  <div class="section-collapse-header" onclick="toggleSection('contacto')">
-    <div class="section-collapse-icon">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="2" stroke="var(--gold)" stroke-width="2"/><path d="M2 4l10 8 10-8" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<!-- ═══════════════════════════════════════════════════════════════════
+     SPA SECTION: Cursos
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="spa-section-overlay" id="spa-section-cursos">
+  <div class="spa-section-content">
+    <button class="spa-back-btn" onclick="SPA.navigateBack()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Volver al inicio
+    </button>
+
+    <div class="sec-header">
+      <div class="sec-tag"><span class="dot"></span> Formación continua</div>
+      <h2 class="serif">Cursos y Talleres</h2>
+      <p>Amplía tus conocimientos con nuestros programas de formación continua en tecnología e innovación.</p>
     </div>
-    <span class="section-collapse-title">Contacto</span>
-    <div class="section-collapse-chevron">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round"/></svg>
+
+    <div class="card-grid card-grid-3" id="cursosGrid" style="min-height:200px">
+      <div style="grid-column:1/-1;text-align:center;color:#94A3B8;font-size:14px">Cargando cursos disponibles...</div>
+    </div>
+
+    <!-- Course Request Form -->
+    <div style="margin-top:60px">
+      <div class="sec-header">
+        <div class="sec-tag"><span class="dot"></span> Sugiere un curso</div>
+        <h2 class="serif">Solicitar un Curso</h2>
+        <p>¿No encuentras lo que buscas? Sugiere un curso o taller que te gustaría que impartiéramos.</p>
+      </div>
+      <div class="form-card" style="max-width:700px;margin:0 auto">
+        <form id="formSolicitarCurso" onsubmit="event.preventDefault();submitSolicitarCurso()">
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">Tu nombre <span class="req">*</span></label><input class="input" id="cursoSolNombre" placeholder="Nombre completo" required></div>
+            <div class="form-group"><label class="form-label">Correo <span class="req">*</span></label><input class="input" type="email" id="cursoSolCorreo" placeholder="correo@iztacala.unam.mx" required></div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">Carrera</label><input class="input" id="cursoSolCarrera" placeholder="Tu carrera"></div>
+            <div class="form-group"><label class="form-label">Modalidad preferida</label><select class="input" id="cursoSolModalidad"><option value="">Seleccionar...</option><option>Presencial</option><option>En línea</option><option>Híbrido</option></select></div>
+          </div>
+          <div class="form-group"><label class="form-label">Tema sugerido <span class="req">*</span></label><input class="input" id="cursoSolTema" placeholder="Ej. Introducción a Machine Learning" required></div>
+          <div class="form-group"><label class="form-label">Descripción</label><textarea class="input" id="cursoSolDescripcion" rows="3" placeholder="Describe qué te gustaría aprender y por qué sería útil..."></textarea></div>
+          <div style="text-align:right;margin-top:8px"><button type="submit" class="btn btn-gold" style="padding:14px 40px">Enviar sugerencia</button></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Badges & Premios -->
+    <div style="margin-top:60px">
+      <div class="sec-header">
+        <div class="sec-tag"><span class="dot"></span> Gamificación</div>
+        <h2 class="serif">Insignias y Premios</h2>
+        <p>Gana insignias participando y accede a premios exclusivos por tu desempeño.</p>
+      </div>
+
+      <div style="margin-bottom:50px">
+        <h3 class="serif" style="text-align:center;color:var(--navy);margin-bottom:24px;font-size:24px">Insignias disponibles</h3>
+        <div class="card-grid card-grid-4" id="badgesGrid" style="min-height:200px">
+          <div style="grid-column:1/-1;text-align:center;color:#94A3B8;font-size:14px">Cargando insignias...</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:50px">
+        <h3 class="serif" style="text-align:center;color:var(--navy);margin-bottom:24px;font-size:24px">Premios canjeables</h3>
+        <div class="card-grid card-grid-3" id="premiosGrid" style="min-height:200px">
+          <div style="grid-column:1/-1;text-align:center;color:#94A3B8;font-size:14px">Cargando premios...</div>
+        </div>
+      </div>
+
+      <!-- Points Desglose -->
+      <div style="margin-bottom:50px;max-width:800px;margin-left:auto;margin-right:auto">
+        <h3 class="serif" style="text-align:center;color:var(--navy);margin-bottom:24px;font-size:24px">¿Cómo se obtienen puntos?</h3>
+        <table class="puntos-table" id="puntosTable">
+          <thead>
+            <tr>
+              <th style="width:50px"></th>
+              <th>Actividad</th>
+              <th style="text-align:center;width:100px">Puntos</th>
+            </tr>
+          </thead>
+          <tbody id="puntosTableBody">
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Leaderboard -->
+      <div style="background:#F8FAFC;border-radius:var(--radius);padding:40px;border:1px solid #E8ECF1;max-width:700px;margin:0 auto">
+        <h3 class="serif" style="text-align:center;color:var(--navy);margin-bottom:24px;font-size:24px">🏆 Top 5 Logros</h3>
+        <div id="leaderboardList" style="display:flex;flex-direction:column;gap:12px">
+          <div style="text-align:center;color:#94A3B8;font-size:14px;padding:20px">Cargando leaderboard...</div>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="section-body" style="max-height:0">
-    <div class="container-md">
-      <div class="sec-header reveal">
-        <div class="sec-tag"><span class="dot"></span> Contáctenos</div>
-        <h2 class="serif">Contacto</h2>
-        <p>Estamos a su disposición para resolver cualquier duda.</p>
-      </div>
-      <div class="card-grid card-grid-2" style="align-items:start">
-      <div class="reveal from-right d1">
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SPA SECTION: Logros
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="spa-section-overlay" id="spa-section-logros" style="background:linear-gradient(180deg,var(--navy) 0%,#06101E 100%)">
+  <div class="spa-section-content">
+    <button class="spa-back-btn" onclick="SPA.navigateBack()" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:#fff">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Volver al inicio
+    </button>
+
+    <div class="sec-header light">
+      <div class="sec-tag"><span class="dot"></span> Impacto</div>
+      <h2 class="serif">Impacto y Beneficios</h2>
+      <p>Un ecosistema que transforma la interacción con la tecnología y el conocimiento.</p>
+    </div>
+
+    <div class="counter-grid" id="counterGrid"></div>
+    <div class="card-grid card-grid-3" id="impactoGrid"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SPA SECTION: Contacto
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="spa-section-overlay" id="spa-section-contacto">
+  <div class="spa-section-content">
+    <button class="spa-back-btn" onclick="SPA.navigateBack()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Volver al inicio
+    </button>
+
+    <div class="sec-header">
+      <div class="sec-tag"><span class="dot"></span> Contáctenos</div>
+      <h2 class="serif">Contacto</h2>
+      <p>Estamos a su disposición para resolver cualquier duda.</p>
+    </div>
+
+    <div class="card-grid card-grid-2" style="align-items:start">
+      <div>
         <div style="display:flex;flex-direction:column;gap:8px">
           <div class="contact-card">
             <div class="contact-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--navy)" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 4l10 8 10-8"/></svg></div>
@@ -1840,60 +1787,40 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
           <p style="font-size:14px;color:#64748B;margin:0;line-height:1.65">Lunes a viernes de 9:00 a 17:00 horas.</p>
         </div>
       </div>
-      <div class="form-card reveal from-left d2">
-        <form onsubmit="event.preventDefault();showToast('Mensaje enviado')">
-          <div class="form-group"><label class="form-label">Nombre <span class="req">*</span></label><input class="input" placeholder="Su nombre" required></div>
-          <div class="form-group"><label class="form-label">Correo <span class="req">*</span></label><input class="input" type="email" placeholder="correo@ejemplo.com" required></div>
-          <div class="form-group"><label class="form-label">Asunto</label><input class="input" placeholder="Motivo de su mensaje"></div>
-          <div class="form-group"><label class="form-label">Mensaje <span class="req">*</span></label><textarea class="input" rows="5" placeholder="Escriba su mensaje..." required></textarea></div>
+      <div class="form-card">
+        <form id="formContacto" onsubmit="event.preventDefault();submitContacto()">
+          <div class="form-group"><label class="form-label">Nombre <span class="req">*</span></label><input class="input" id="contNombre" placeholder="Su nombre" required></div>
+          <div class="form-group"><label class="form-label">Correo <span class="req">*</span></label><input class="input" type="email" id="contCorreo" placeholder="correo@ejemplo.com" required></div>
+          <div class="form-group"><label class="form-label">Asunto</label><input class="input" id="contAsunto" placeholder="Motivo de su mensaje"></div>
+          <div class="form-group"><label class="form-label">Mensaje <span class="req">*</span></label><textarea class="input" id="contMensaje" rows="5" placeholder="Escriba su mensaje..." required></textarea></div>
           <button type="submit" class="btn btn-gold btn-full" style="padding:15px">Enviar mensaje</button>
         </form>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- SPA SECTION: Tech News (hidden overlay for expanded view) -->
+<div class="spa-section-overlay" id="spa-section-tech-news">
+  <div class="spa-section-content">
+    <button class="spa-back-btn" onclick="SPA.navigateBack()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Volver al inicio
+    </button>
+    <div class="sec-header">
+      <div class="sec-tag"><span class="dot"></span> RSS Feed</div>
+      <h2 class="serif">Noticias Tecnológicas</h2>
+      <p>Información relevante del mundo de la tecnología aplicada a la salud y educación, curada por PUM-AI.</p>
+    </div>
+    <div id="techNewsFullList" style="max-width:800px;margin:0 auto">
+      <div style="text-align:center;color:#94A3B8;font-size:14px;padding:40px">Cargando noticias...</div>
     </div>
   </div>
-</section>
+</div>
 
-<!-- FOOTER -->
-<footer>
-  <div class="footer-inner">
-    <div class="footer-grid">
-      <div class="footer-brand">
-        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
-          <div style="width:42px;height:42px;border-radius:12px;border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;background:rgba(196,162,78,0.1)"><span style="color:var(--gold);font-weight:700;font-size:16px">ED</span></div>
-          <span style="color:#fff;font-size:17px;font-weight:700">Ecosistema Digital</span>
-        </div>
-        <p>Iniciativa interdisciplinaria de la Facultad de Estudios Superiores Iztacala, UNAM. Participan: Médico Cirujano, Enfermería, Cirujano Dentista, Psicología, Psicología SUAyED, Optometría, Ecología, Biología y la División de Investigación y Posgrado.</p>
-      </div>
-      <div>
-        <p class="footer-title">Navegación</p>
-        <a href="#inicio" class="footer-link">Inicio</a>
-        <a href="#quienes" class="footer-link">Quiénes somos</a>
-        <a href="#servicios" class="footer-link">Servicios</a>
-        <a href="#solicitud" class="footer-link">Solicitud</a>
-        <a href="#espacio" class="footer-link">Uso del espacio</a>
-        <a href="#telemedicina" class="footer-link">Telemedicina</a>
-        <a href="#cursos" class="footer-link">Cursos</a>
-        <a href="#comunidad" class="footer-link">Comunidad</a>
-        <a href="#badges" class="footer-link">Logros</a>
-        <a href="#aula-inmersiva" class="footer-link">Aula Inmersiva</a>
-        <a href="#contacto" class="footer-link">Contacto</a>
-      </div>
-      <div>
-        <p class="footer-title">Contacto</p>
-        <p class="footer-info">ecosistemadigital@iztacala.unam.mx</p>
-        <p class="footer-info">55 5623 1100</p>
-        <p class="footer-info">FES Iztacala, UNAM</p>
-        <p class="footer-info" style="margin-top:14px">Tlalnepantla, Estado de México</p>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; 2026 Ecosistema Digital — Facultad de Estudios Superiores Iztacala, UNAM. Todos los derechos reservados.</p>
-    </div>
-  </div>
-</footer>
-
-<!-- ═══ MODAL: NUEVO PROYECTO 475 ANIVERSARIO UNAM ═══ -->
+<!-- ═══════════════════════════════════════════════════════════════════
+     MODAL: NUEVO PROYECTO 475 ANIVERSARIO UNAM
+     ═══════════════════════════════════════════════════════════════════ -->
 <div class="proyecto-overlay" id="proyectoOverlay" onclick="handleOverlayClick(event)">
   <div class="proyecto-card" id="proyectoCard">
     <div class="proyecto-card-bg"></div>
@@ -1970,7 +1897,9 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   </div>
 </div>
 
-<!-- ═══ LOGIN MODAL ═══ -->
+<!-- ═══════════════════════════════════════════════════════════════════
+     MODAL: LOGIN
+     ═══════════════════════════════════════════════════════════════════ -->
 <div class="login-overlay" id="loginModal">
   <div class="login-card">
     <img src="assets/logo-ecosistema-digital.png" alt="Ecosistema Digital" onerror="this.style.display='none'">
@@ -1992,7 +1921,9 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   </div>
 </div>
 
-<!-- ═══ AULA INMERSIVA MODAL ═══ -->
+<!-- ═══════════════════════════════════════════════════════════════════
+     MODAL: AULA INMERSIVA INTERPROFESIONAL
+     ═══════════════════════════════════════════════════════════════════ -->
 <div class="aii-overlay" id="aiiModal" role="dialog" aria-modal="true" onclick="if(event.target===this)closeAIIModal()">
   <div class="aii-modal">
     <button class="aii-close" onclick="closeAIIModal()" aria-label="Cerrar modal">✕</button>
@@ -2198,14 +2129,18 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   </div>
 </div>
 
-<!-- ═══ PUM-AI FLOATING BUTTON ═══ -->
+<!-- ═══════════════════════════════════════════════════════════════════
+     FLOATING BUTTON: PUM-AI
+     ═══════════════════════════════════════════════════════════════════ -->
 <div class="pumai-fab" id="pumaiBtn" onclick="toggleChat()">
   <img src="assets/PUM-AI.gif" alt="PUM-AI" class="robot-icon" style="width:38px;height:38px;border-radius:10px">
   PUM-AI
   <span class="fab-pulse"></span>
 </div>
 
-<!-- ═══ PUM-AI CHAT PANEL ═══ -->
+<!-- ═══════════════════════════════════════════════════════════════════
+     PANEL: PUM-AI CHAT
+     ═══════════════════════════════════════════════════════════════════ -->
 <div class="pumai-panel" id="pumaiPanel">
   <div class="pumai-panel-header">
     <img src="assets/PUM-AI.gif" alt="PUM-AI" class="robot-sm" style="width:36px;height:36px;border-radius:8px">
@@ -2236,7 +2171,9 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   </div>
 </div>
 
-<!-- ═══ ENTORNO TECNOLÓGICO DETAIL MODAL ═══ -->
+<!-- ═══════════════════════════════════════════════════════════════════
+     MODAL: ENTORNO TECNOLÓGICO DETAIL
+     ═══════════════════════════════════════════════════════════════════ -->
 <div class="servicio-modal-overlay" id="entornoModalOverlay" onclick="if(event.target===this)closeEntornoModal()">
   <div class="servicio-modal-card" id="entornoModalCard">
     <button class="servicio-modal-close" onclick="closeEntornoModal()">✕</button>
@@ -2253,7 +2190,9 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   </div>
 </div>
 
-<!-- ═══ SERVICIO DETAIL MODAL ═══ -->
+<!-- ═══════════════════════════════════════════════════════════════════
+     MODAL: SERVICIO DETAIL
+     ═══════════════════════════════════════════════════════════════════ -->
 <div class="servicio-modal-overlay" id="servicioModalOverlay" onclick="if(event.target===this)closeServicioModal()">
   <div class="servicio-modal-card" id="servicioModalCard">
     <button class="servicio-modal-close" onclick="closeServicioModal()">✕</button>
@@ -2272,20 +2211,127 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   </div>
 </div>
 
-<!-- TOAST -->
+<!-- ═══════════════════════════════════════════════════════════════════
+     MODAL: INSCRIPCIÓN A CURSO
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="inscripcionCursoModal" onclick="if(event.target===this)closeInscripcionModal()">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeInscripcionModal()">✕</button>
+    <h2>Inscripción a Curso</h2>
+    <form id="inscripcionForm" onsubmit="event.preventDefault();submitInscripcion()">
+      <div class="form-group">
+        <label class="form-label">Nombre completo <span class="req">*</span></label>
+        <input class="input" type="text" id="inscNombre" placeholder="Tu nombre" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Correo electrónico <span class="req">*</span></label>
+        <input class="input" type="email" id="inscCorreo" placeholder="correo@ejemplo.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Carrera/Programa <span class="req">*</span></label>
+        <input class="input" type="text" id="inscCarrera" placeholder="Tu carrera" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Semestre/Año</label>
+        <input class="input" type="text" id="inscSemestre" placeholder="Ej: 3er semestre">
+      </div>
+      <button type="submit" class="btn btn-gold btn-full">Enviar inscripción</button>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     MODAL: PUBLICAR PROYECTO
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="modal-overlay" id="publicarProyectoModal" onclick="if(event.target===this)closePublicarProyectoModal()">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closePublicarProyectoModal()">✕</button>
+    <h2>Publicar tu Proyecto</h2>
+    <form id="publicarProyectoForm" onsubmit="event.preventDefault();submitPublicarProyecto()">
+      <div class="form-group">
+        <label class="form-label">Nombre del proyecto <span class="req">*</span></label>
+        <input class="input" type="text" id="proyNombre" placeholder="Nombre del proyecto" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Descripción <span class="req">*</span></label>
+        <textarea class="input" id="proyDesc" rows="4" placeholder="Describe tu proyecto..." required></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Categoría <span class="req">*</span></label>
+        <select class="input" id="proyCategoria" required>
+          <option value="">Selecciona una categoría</option>
+          <option value="software">Software</option>
+          <option value="hardware">Hardware</option>
+          <option value="investigacion">Investigación</option>
+          <option value="educativo">Educativo</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">URL del proyecto</label>
+        <input class="input" type="url" id="proyUrl" placeholder="https://ejemplo.com">
+      </div>
+      <button type="submit" class="btn btn-gold btn-full">Publicar proyecto</button>
+    </form>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     COMPONENT: TOAST NOTIFICATION
+     ═══════════════════════════════════════════════════════════════════ -->
 <div id="toast">
   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/></svg>
   <span id="toastMsg"></span>
 </div>
 
-<!-- JS Modules (order matters: data first, then UI/render, then features) -->
+<!-- ═══════════════════════════════════════════════════════════════════
+     FOOTER
+     ═══════════════════════════════════════════════════════════════════ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+          <div style="width:42px;height:42px;border-radius:12px;border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;background:rgba(196,162,78,0.1)"><span style="color:var(--gold);font-weight:700;font-size:16px">ED</span></div>
+          <span style="color:#fff;font-size:17px;font-weight:700">Ecosistema Digital</span>
+        </div>
+        <p>Iniciativa interdisciplinaria de la Facultad de Estudios Superiores Iztacala, UNAM. Participan: Médico Cirujano, Enfermería, Cirujano Dentista, Psicología, Psicología SUAyED, Optometría, Ecología, Biología y la División de Investigación y Posgrado.</p>
+      </div>
+      <div>
+        <p class="footer-title">Navegación</p>
+        <a href="#" class="footer-link" onclick="SPA.goToSection('inicio');return false">Inicio</a>
+        <a href="#" class="footer-link" onclick="SPA.goToSection('quienes');return false">¿Quiénes Somos?</a>
+        <a href="#" class="footer-link" onclick="SPA.goToSection('servicios');return false">Servicios</a>
+        <a href="#" class="footer-link" onclick="SPA.goToSection('cursos');return false">Cursos</a>
+        <a href="#" class="footer-link" onclick="SPA.goToSection('logros');return false">Logros</a>
+        <a href="#" class="footer-link" onclick="SPA.goToSection('contacto');return false">Contacto</a>
+      </div>
+      <div>
+        <p class="footer-title">Contacto</p>
+        <p class="footer-info">ecosistemadigital@iztacala.unam.mx</p>
+        <p class="footer-info">55 5623 1100</p>
+        <p class="footer-info">FES Iztacala, UNAM</p>
+        <p class="footer-info" style="margin-top:14px">Tlalnepantla, Estado de México</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Ecosistema Digital — Facultad de Estudios Superiores Iztacala, UNAM. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SCRIPTS: JS MODULES
+     ═══════════════════════════════════════════════════════════════════ -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script src="js/config.js" defer></script>
 <script src="js/data.js" defer></script>
 <script src="js/ui.js" defer></script>
 <script src="js/render.js" defer></script>
+<script src="js/spa.js" defer></script>
 <script src="js/interactions.js" defer></script>
 <script src="js/modals.js" defer></script>
+<script src="js/auth.js" defer></script>
 <script src="js/pumai.js" defer></script>
 <script src="js/supabase-features.js" defer></script>
 
