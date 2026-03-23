@@ -171,7 +171,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (role === 'admin') {
           window.location.href = 'admin.html';
         } else {
-          window.location.href = 'usuario.html';
+          // Stay on main page, show welcome toast
+          if (typeof showToast === 'function') {
+            showToast('¡Bienvenido al Ecosistema Digital!');
+          }
         }
       } else {
         showLoginError(result.error || 'Error al iniciar sesión');
