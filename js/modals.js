@@ -1,4 +1,3 @@
-
 /* ─── AULA INMERSIVA MODAL ─── */
 function openAIIModal(){
   const modal=document.getElementById('aiiModal');
@@ -21,6 +20,19 @@ function openLabProyectos(){
 }
 function closeLabProyectos(){
   const overlay=document.getElementById('labProyectosOverlay');
+  overlay.classList.remove('active');
+  setTimeout(()=>{overlay.style.display='none';document.body.style.overflow='';},300);
+}
+
+/* ─── COLABORACIÓN INTERESCOLAR OVERLAY ─── */
+function openColabInterescolar(){
+  const overlay=document.getElementById('colabInterescolarOverlay');
+  overlay.style.display='block';
+  requestAnimationFrame(()=>overlay.classList.add('active'));
+  document.body.style.overflow='hidden';
+}
+function closeColabInterescolar(){
+  const overlay=document.getElementById('colabInterescolarOverlay');
   overlay.classList.remove('active');
   setTimeout(()=>{overlay.style.display='none';document.body.style.overflow='';},300);
 }
@@ -170,5 +182,5 @@ function closeServicioModal(){
 
 /* ─── CLOSE ON ESCAPE KEY ─── */
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeProyecto();hideLoginModal();closeAIIModal();closeServicioModal();closeEntornoModal();closeLabProyectos();closeVRCatalog();if(typeof chatOpen!=='undefined'&&chatOpen)toggleChat();}
+  if(e.key==='Escape'){closeProyecto();hideLoginModal();closeAIIModal();closeServicioModal();closeEntornoModal();closeLabProyectos();closeColabInterescolar();closeVRCatalog();if(typeof chatOpen!=='undefined'&&chatOpen)toggleChat();}
 });
