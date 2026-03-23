@@ -1038,11 +1038,12 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 .aii-modal-header { padding:28px 28px 0; }
 .aii-tabs {
   display:flex; gap:4px; border-bottom:2px solid #E8ECF1; padding-bottom:0;
+  overflow-x:auto; -webkit-overflow-scrolling:touch;
 }
 .aii-tab {
-  padding:10px 20px; background:none; border:none; border-bottom:2px solid transparent;
-  margin-bottom:-2px; cursor:pointer; font-weight:600; font-size:14px;
-  color:#94A3B8; transition:all 0.3s; border-radius:8px 8px 0 0;
+  padding:10px 16px; background:none; border:none; border-bottom:2px solid transparent;
+  margin-bottom:-2px; cursor:pointer; font-weight:600; font-size:13px;
+  color:#94A3B8; transition:all 0.3s; border-radius:8px 8px 0 0; white-space:nowrap; flex-shrink:0;
 }
 .aii-tab:hover { color:var(--navy); background:rgba(196,162,78,0.05); }
 .aii-tab.active { color:var(--gold); border-bottom-color:var(--gold); }
@@ -2272,6 +2273,9 @@ body.spa-locked { overflow: hidden; }
       <div class="aii-tabs">
         <button class="aii-tab active" onclick="switchAIITab('proposito',this)">Propósito</button>
         <button class="aii-tab" onclick="switchAIITab('tecnologia',this)">Tecnología</button>
+        <button class="aii-tab" onclick="switchAIITab('escenarios',this)">Escenarios</button>
+        <button class="aii-tab" onclick="switchAIITab('sesiones',this)">Agenda</button>
+        <button class="aii-tab" onclick="switchAIITab('metricas',this)">Métricas</button>
         <button class="aii-tab" onclick="switchAIITab('seguridad',this)">Seguridad</button>
         <button class="aii-tab" onclick="switchAIITab('casos',this)">Casos de éxito</button>
       </div>
@@ -2361,6 +2365,283 @@ body.spa-locked { overflow: hidden; }
               <p style="color:#64748B;font-size:13px;line-height:1.65;margin:0">Panel de métricas en vivo que evalúa comunicación, liderazgo, empatía y toma de decisiones con indicadores objetivos.</p>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Tab: Escenarios -->
+      <div id="aii-escenarios" class="aii-tab-content">
+        <p style="color:#64748B;font-size:14px;text-align:center;margin-bottom:24px">Catálogo de escenarios de simulación disponibles para práctica interprofesional</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
+
+          <div class="card" style="padding:0;overflow:hidden">
+            <div style="background:linear-gradient(135deg,#7C3AED,#4F46E5);padding:16px 20px;color:#fff;display:flex;align-items:center;justify-content:space-between">
+              <div><h4 style="font-size:15px;margin:0 0 2px">Crisis Hipertensiva</h4><p style="font-size:11px;margin:0;opacity:.7">Médico Cirujano · Enfermería</p></div>
+              <span style="font-size:10px;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:10px;font-weight:600">Alta fidelidad</span>
+            </div>
+            <div style="padding:16px 20px">
+              <p style="font-size:13px;color:#64748B;line-height:1.65;margin-bottom:10px">Paciente de 58 años ingresa con presión 220/130, cefalea intensa y visión borrosa. El equipo debe estabilizar, diagnosticar y derivar en 15 min.</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px">
+                <span style="background:#EFF6FF;color:#1E40AF;padding:2px 8px;border-radius:6px">⏱ 20 min</span>
+                <span style="background:#FEF2F2;color:#DC2626;padding:2px 8px;border-radius:6px">Dificultad: Alta</span>
+                <span style="background:#F0FDF4;color:#166534;padding:2px 8px;border-radius:6px">👥 4-6 alumnos</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:0;overflow:hidden">
+            <div style="background:linear-gradient(135deg,#0891B2,#06B6D4);padding:16px 20px;color:#fff;display:flex;align-items:center;justify-content:space-between">
+              <div><h4 style="font-size:15px;margin:0 0 2px">Crisis de Ansiedad Aguda</h4><p style="font-size:11px;margin:0;opacity:.7">Psicología · Médico Cirujano</p></div>
+              <span style="font-size:10px;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:10px;font-weight:600">Media fidelidad</span>
+            </div>
+            <div style="padding:16px 20px">
+              <p style="font-size:13px;color:#64748B;line-height:1.65;margin-bottom:10px">Estudiante de 21 años presenta taquicardia, hiperventilación y sensación de muerte inminente. Intervención psicológica y médica coordinada.</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px">
+                <span style="background:#EFF6FF;color:#1E40AF;padding:2px 8px;border-radius:6px">⏱ 15 min</span>
+                <span style="background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:6px">Dificultad: Media</span>
+                <span style="background:#F0FDF4;color:#166534;padding:2px 8px;border-radius:6px">👥 3-4 alumnos</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:0;overflow:hidden">
+            <div style="background:linear-gradient(135deg,#DC2626,#F97316);padding:16px 20px;color:#fff;display:flex;align-items:center;justify-content:space-between">
+              <div><h4 style="font-size:15px;margin:0 0 2px">Reanimación Neonatal</h4><p style="font-size:11px;margin:0;opacity:.7">Enfermería · Médico Cirujano</p></div>
+              <span style="font-size:10px;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:10px;font-weight:600">Alta fidelidad</span>
+            </div>
+            <div style="padding:16px 20px">
+              <p style="font-size:13px;color:#64748B;line-height:1.65;margin-bottom:10px">Recién nacido prematuro con dificultad respiratoria. El equipo debe aplicar protocolo NRP: ventilación, monitoreo y decisión de intubación.</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px">
+                <span style="background:#EFF6FF;color:#1E40AF;padding:2px 8px;border-radius:6px">⏱ 25 min</span>
+                <span style="background:#FEF2F2;color:#DC2626;padding:2px 8px;border-radius:6px">Dificultad: Alta</span>
+                <span style="background:#F0FDF4;color:#166534;padding:2px 8px;border-radius:6px">👥 5-8 alumnos</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:0;overflow:hidden">
+            <div style="background:linear-gradient(135deg,#2563EB,#7C3AED);padding:16px 20px;color:#fff;display:flex;align-items:center;justify-content:space-between">
+              <div><h4 style="font-size:15px;margin:0 0 2px">Emergencia en Consultorio Dental</h4><p style="font-size:11px;margin:0;opacity:.7">Cirujano Dentista · Enfermería</p></div>
+              <span style="font-size:10px;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:10px;font-weight:600">Media fidelidad</span>
+            </div>
+            <div style="padding:16px 20px">
+              <p style="font-size:13px;color:#64748B;line-height:1.65;margin-bottom:10px">Paciente sufre reacción anafiláctica a anestésico durante procedimiento dental. Manejo de vía aérea y administración de epinefrina.</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px">
+                <span style="background:#EFF6FF;color:#1E40AF;padding:2px 8px;border-radius:6px">⏱ 18 min</span>
+                <span style="background:#FEF2F2;color:#DC2626;padding:2px 8px;border-radius:6px">Dificultad: Alta</span>
+                <span style="background:#F0FDF4;color:#166534;padding:2px 8px;border-radius:6px">👥 3-5 alumnos</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:0;overflow:hidden">
+            <div style="background:linear-gradient(135deg,#EA580C,#FACC15);padding:16px 20px;color:#fff;display:flex;align-items:center;justify-content:space-between">
+              <div><h4 style="font-size:15px;margin:0 0 2px">Trauma Ocular por Químicos</h4><p style="font-size:11px;margin:0;opacity:.7">Optometría · Médico Cirujano</p></div>
+              <span style="font-size:10px;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:10px;font-weight:600">Baja fidelidad</span>
+            </div>
+            <div style="padding:16px 20px">
+              <p style="font-size:13px;color:#64748B;line-height:1.65;margin-bottom:10px">Trabajador de laboratorio con exposición a álcali en ambos ojos. Irrigación de emergencia, evaluación de daño corneal y referencia oftalmológica.</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px">
+                <span style="background:#EFF6FF;color:#1E40AF;padding:2px 8px;border-radius:6px">⏱ 12 min</span>
+                <span style="background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:6px">Dificultad: Media</span>
+                <span style="background:#F0FDF4;color:#166534;padding:2px 8px;border-radius:6px">👥 2-3 alumnos</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" style="padding:0;overflow:hidden">
+            <div style="background:linear-gradient(135deg,#059669,#14B8A6);padding:16px 20px;color:#fff;display:flex;align-items:center;justify-content:space-between">
+              <div><h4 style="font-size:15px;margin:0 0 2px">Brote Epidemiológico en Campo</h4><p style="font-size:11px;margin:0;opacity:.7">Biología · Ecología · Enfermería</p></div>
+              <span style="font-size:10px;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:10px;font-weight:600">RV inmersiva</span>
+            </div>
+            <div style="padding:16px 20px">
+              <p style="font-size:13px;color:#64748B;line-height:1.65;margin-bottom:10px">Comunidad rural reporta casos de enfermedad gastrointestinal. Investigación epidemiológica, muestreo ambiental y plan de intervención comunitaria.</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px">
+                <span style="background:#EFF6FF;color:#1E40AF;padding:2px 8px;border-radius:6px">⏱ 30 min</span>
+                <span style="background:#FEF3C7;color:#92400E;padding:2px 8px;border-radius:6px">Dificultad: Media</span>
+                <span style="background:#F0FDF4;color:#166534;padding:2px 8px;border-radius:6px">👥 6-10 alumnos</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div style="margin-top:24px;padding:16px 20px;background:rgba(196,162,78,0.08);border:1px solid rgba(196,162,78,0.2);border-radius:12px;text-align:center">
+          <p style="color:#64748B;font-size:13px;margin:0">📋 Se planean incorporar <strong>12 escenarios adicionales</strong> durante el semestre 2026-2 incluyendo escenarios de salud mental comunitaria y telemedicina rural.</p>
+        </div>
+      </div>
+
+      <!-- Tab: Agenda / Próximas Sesiones -->
+      <div id="aii-sesiones" class="aii-tab-content">
+        <p style="color:#64748B;font-size:14px;text-align:center;margin-bottom:24px">Sesiones de simulación programadas para el semestre 2026-1</p>
+        <div style="display:flex;flex-direction:column;gap:12px">
+
+          <div style="display:flex;gap:16px;align-items:stretch;padding:18px 20px;background:#F8FAFC;border-radius:14px;border:1px solid #E8ECF1;flex-wrap:wrap">
+            <div style="min-width:70px;text-align:center;padding:10px 0;border-right:2px solid var(--gold);padding-right:16px;flex-shrink:0">
+              <div style="font-size:28px;font-weight:800;color:var(--navy);line-height:1">28</div>
+              <div style="font-size:12px;color:#64748B;font-weight:600">MAR</div>
+              <div style="font-size:11px;color:#94A3B8">9:00 AM</div>
+            </div>
+            <div style="flex:1;min-width:200px">
+              <h4 style="color:var(--navy);font-size:15px;margin:0 0 4px">Crisis Hipertensiva — Grupo A</h4>
+              <p style="font-size:13px;color:#64748B;margin:0 0 8px">Médico Cirujano 5° semestre + Enfermería 6° semestre</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px">
+                <span style="background:#EFF6FF;color:#1E40AF;padding:2px 8px;border-radius:6px">Sala A — SimMan</span>
+                <span style="background:#F0FDF4;color:#166534;padding:2px 8px;border-radius:6px">Dra. Martínez</span>
+                <span style="background:rgba(196,162,78,0.15);color:#92400E;padding:2px 8px;border-radius:6px">6 lugares disponibles</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:16px;align-items:stretch;padding:18px 20px;background:#F8FAFC;border-radius:14px;border:1px solid #E8ECF1;flex-wrap:wrap">
+            <div style="min-width:70px;text-align:center;padding:10px 0;border-right:2px solid var(--gold);padding-right:16px;flex-shrink:0">
+              <div style="font-size:28px;font-weight:800;color:var(--navy);line-height:1">02</div>
+              <div style="font-size:12px;color:#64748B;font-weight:600">ABR</div>
+              <div style="font-size:11px;color:#94A3B8">11:00 AM</div>
+            </div>
+            <div style="flex:1;min-width:200px">
+              <h4 style="color:var(--navy);font-size:15px;margin:0 0 4px">Reanimación Neonatal — Grupo Interprofesional</h4>
+              <p style="font-size:13px;color:#64748B;margin:0 0 8px">Enfermería 7° sem. + Médico Cirujano 7° sem.</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px">
+                <span style="background:#EFF6FF;color:#1E40AF;padding:2px 8px;border-radius:6px">Sala B — SimBaby</span>
+                <span style="background:#F0FDF4;color:#166534;padding:2px 8px;border-radius:6px">Dr. Ramírez</span>
+                <span style="background:rgba(196,162,78,0.15);color:#92400E;padding:2px 8px;border-radius:6px">2 lugares disponibles</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:16px;align-items:stretch;padding:18px 20px;background:#F8FAFC;border-radius:14px;border:1px solid #E8ECF1;flex-wrap:wrap">
+            <div style="min-width:70px;text-align:center;padding:10px 0;border-right:2px solid var(--gold);padding-right:16px;flex-shrink:0">
+              <div style="font-size:28px;font-weight:800;color:var(--navy);line-height:1">07</div>
+              <div style="font-size:12px;color:#64748B;font-weight:600">ABR</div>
+              <div style="font-size:11px;color:#94A3B8">2:00 PM</div>
+            </div>
+            <div style="flex:1;min-width:200px">
+              <h4 style="color:var(--navy);font-size:15px;margin:0 0 4px">Crisis de Ansiedad — Sesión VR</h4>
+              <p style="font-size:13px;color:#64748B;margin:0 0 8px">Psicología 6° sem. + Médico Cirujano 5° sem.</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px">
+                <span style="background:#F5F3FF;color:#7C3AED;padding:2px 8px;border-radius:6px">Sala VR — Meta Quest 3</span>
+                <span style="background:#F0FDF4;color:#166534;padding:2px 8px;border-radius:6px">Mtra. López</span>
+                <span style="background:rgba(196,162,78,0.15);color:#92400E;padding:2px 8px;border-radius:6px">4 lugares disponibles</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:16px;align-items:stretch;padding:18px 20px;background:#F8FAFC;border-radius:14px;border:1px solid #E8ECF1;flex-wrap:wrap">
+            <div style="min-width:70px;text-align:center;padding:10px 0;border-right:2px solid var(--gold);padding-right:16px;flex-shrink:0">
+              <div style="font-size:28px;font-weight:800;color:var(--navy);line-height:1">14</div>
+              <div style="font-size:12px;color:#64748B;font-weight:600">ABR</div>
+              <div style="font-size:11px;color:#94A3B8">10:00 AM</div>
+            </div>
+            <div style="flex:1;min-width:200px">
+              <h4 style="color:var(--navy);font-size:15px;margin:0 0 4px">Emergencia Dental + Anafilaxia — Interprofesional</h4>
+              <p style="font-size:13px;color:#64748B;margin:0 0 8px">Cirujano Dentista 8° sem. + Enfermería 6° sem.</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px">
+                <span style="background:#EFF6FF;color:#1E40AF;padding:2px 8px;border-radius:6px">Sala A — Paciente estandarizado</span>
+                <span style="background:#F0FDF4;color:#166534;padding:2px 8px;border-radius:6px">Dr. Hernández</span>
+                <span style="background:#FEF2F2;color:#DC2626;padding:2px 8px;border-radius:6px">Cupo lleno</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:16px;align-items:stretch;padding:18px 20px;background:#F8FAFC;border-radius:14px;border:1px solid #E8ECF1;flex-wrap:wrap">
+            <div style="min-width:70px;text-align:center;padding:10px 0;border-right:2px solid var(--gold);padding-right:16px;flex-shrink:0">
+              <div style="font-size:28px;font-weight:800;color:var(--navy);line-height:1">21</div>
+              <div style="font-size:12px;color:#64748B;font-weight:600">ABR</div>
+              <div style="font-size:11px;color:#94A3B8">9:00 AM</div>
+            </div>
+            <div style="flex:1;min-width:200px">
+              <h4 style="color:var(--navy);font-size:15px;margin:0 0 4px">Brote Epidemiológico — Simulación en Campo VR</h4>
+              <p style="font-size:13px;color:#64748B;margin:0 0 8px">Biología 5° sem. + Ecología 5° sem. + Enfermería 4° sem.</p>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px">
+                <span style="background:#F5F3FF;color:#7C3AED;padding:2px 8px;border-radius:6px">Sala VR — Escenario inmersivo</span>
+                <span style="background:#F0FDF4;color:#166534;padding:2px 8px;border-radius:6px">Dr. Vargas</span>
+                <span style="background:rgba(196,162,78,0.15);color:#92400E;padding:2px 8px;border-radius:6px">8 lugares disponibles</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <div style="margin-top:24px;text-align:center">
+          <p style="color:#94A3B8;font-size:12px;margin:0">Las inscripciones se realizan a través del sistema de solicitudes del Ecosistema Digital</p>
+        </div>
+      </div>
+
+      <!-- Tab: Métricas -->
+      <div id="aii-metricas" class="aii-tab-content">
+        <p style="color:#64748B;font-size:14px;text-align:center;margin-bottom:24px">Indicadores del Aula Inmersiva — Semestre 2026-1</p>
+
+        <!-- KPIs principales -->
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-bottom:28px">
+          <div style="background:linear-gradient(135deg,var(--navy),#1a3a5c);border-radius:16px;padding:20px;text-align:center;color:#fff">
+            <div style="font-size:32px;font-weight:800;line-height:1">47</div>
+            <div style="font-size:11px;opacity:.7;margin-top:4px">Sesiones realizadas</div>
+          </div>
+          <div style="background:linear-gradient(135deg,var(--navy),#1a3a5c);border-radius:16px;padding:20px;text-align:center;color:#fff">
+            <div style="font-size:32px;font-weight:800;line-height:1">312</div>
+            <div style="font-size:11px;opacity:.7;margin-top:4px">Estudiantes capacitados</div>
+          </div>
+          <div style="background:linear-gradient(135deg,var(--navy),#1a3a5c);border-radius:16px;padding:20px;text-align:center;color:#fff">
+            <div style="font-size:32px;font-weight:800;line-height:1">94<span style="font-size:18px">%</span></div>
+            <div style="font-size:11px;opacity:.7;margin-top:4px">Satisfacción promedio</div>
+          </div>
+          <div style="background:linear-gradient(135deg,var(--navy),#1a3a5c);border-radius:16px;padding:20px;text-align:center;color:#fff">
+            <div style="font-size:32px;font-weight:800;line-height:1">78<span style="font-size:18px">h</span></div>
+            <div style="font-size:11px;opacity:.7;margin-top:4px">Horas de simulación</div>
+          </div>
+        </div>
+
+        <!-- Distribución por carrera -->
+        <h4 style="color:var(--navy);font-size:15px;margin-bottom:16px">Participación por carrera</h4>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:var(--navy);font-weight:600">Médico Cirujano</span><span style="color:#64748B">28%</span></div>
+            <div style="height:8px;background:#E8ECF1;border-radius:4px;overflow:hidden"><div style="height:100%;width:28%;background:linear-gradient(90deg,#7C3AED,#A855F7);border-radius:4px"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:var(--navy);font-weight:600">Enfermería</span><span style="color:#64748B">24%</span></div>
+            <div style="height:8px;background:#E8ECF1;border-radius:4px;overflow:hidden"><div style="height:100%;width:24%;background:linear-gradient(90deg,#059669,#14B8A6);border-radius:4px"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:var(--navy);font-weight:600">Psicología</span><span style="color:#64748B">18%</span></div>
+            <div style="height:8px;background:#E8ECF1;border-radius:4px;overflow:hidden"><div style="height:100%;width:18%;background:linear-gradient(90deg,#0891B2,#06B6D4);border-radius:4px"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:var(--navy);font-weight:600">Cirujano Dentista</span><span style="color:#64748B">14%</span></div>
+            <div style="height:8px;background:#E8ECF1;border-radius:4px;overflow:hidden"><div style="height:100%;width:14%;background:linear-gradient(90deg,#2563EB,#3B82F6);border-radius:4px"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:var(--navy);font-weight:600">Optometría</span><span style="color:#64748B">8%</span></div>
+            <div style="height:8px;background:#E8ECF1;border-radius:4px;overflow:hidden"><div style="height:100%;width:8%;background:linear-gradient(90deg,#EA580C,#F97316);border-radius:4px"></div></div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span style="color:var(--navy);font-weight:600">Biología + Ecología</span><span style="color:#64748B">8%</span></div>
+            <div style="height:8px;background:#E8ECF1;border-radius:4px;overflow:hidden"><div style="height:100%;width:8%;background:linear-gradient(90deg,#16A34A,#4ADE80);border-radius:4px"></div></div>
+          </div>
+        </div>
+
+        <!-- Evaluación de competencias -->
+        <h4 style="color:var(--navy);font-size:15px;margin-bottom:16px">Competencias evaluadas — Promedio general</h4>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:24px">
+          <div style="padding:16px;background:#F8FAFC;border-radius:12px;border:1px solid #E8ECF1;text-align:center">
+            <div style="font-size:28px;font-weight:800;color:#059669">8.7<span style="font-size:14px;color:#94A3B8">/10</span></div>
+            <div style="font-size:12px;color:#64748B;margin-top:4px">Comunicación interprofesional</div>
+          </div>
+          <div style="padding:16px;background:#F8FAFC;border-radius:12px;border:1px solid #E8ECF1;text-align:center">
+            <div style="font-size:28px;font-weight:800;color:#2563EB">9.1<span style="font-size:14px;color:#94A3B8">/10</span></div>
+            <div style="font-size:12px;color:#64748B;margin-top:4px">Toma de decisiones clínicas</div>
+          </div>
+          <div style="padding:16px;background:#F8FAFC;border-radius:12px;border:1px solid #E8ECF1;text-align:center">
+            <div style="font-size:28px;font-weight:800;color:#7C3AED">8.3<span style="font-size:14px;color:#94A3B8">/10</span></div>
+            <div style="font-size:12px;color:#64748B;margin-top:4px">Liderazgo y trabajo en equipo</div>
+          </div>
+          <div style="padding:16px;background:#F8FAFC;border-radius:12px;border:1px solid #E8ECF1;text-align:center">
+            <div style="font-size:28px;font-weight:800;color:#EA580C">8.9<span style="font-size:14px;color:#94A3B8">/10</span></div>
+            <div style="font-size:12px;color:#64748B;margin-top:4px">Manejo emocional bajo presión</div>
+          </div>
+        </div>
+
+        <div style="padding:16px 20px;background:rgba(196,162,78,0.08);border:1px solid rgba(196,162,78,0.2);border-radius:12px;display:flex;gap:12px;align-items:center">
+          <span style="font-size:20px">📈</span>
+          <p style="color:#64748B;font-size:13px;line-height:1.65;margin:0">Los estudiantes que completaron al menos <strong>3 sesiones de simulación</strong> mostraron un incremento promedio de <strong>42%</strong> en sus evaluaciones prácticas finales comparado con el grupo de control.</p>
         </div>
       </div>
 
