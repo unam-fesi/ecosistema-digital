@@ -37,21 +37,8 @@ if(scg){
   });
 }
 
-// Servicios accordion (legacy - kept for VR catalog toggle)
-const sa=document.getElementById('serviciosAccordion');
-if(sa){
-  // Hidden accordion items for VR catalog toggle logic
-  servicios.forEach((s,i)=>{
-    const div=document.createElement('div');
-    div.className='accordion-item';
-    div.id='acc-'+i;
-    div.style.display='none';
-    sa.appendChild(div);
-  });
-}
-
 // Counters (with animation)
-const counters=[{n:'9',target:9,l:'Carreras participantes'},{n:'5',target:5,l:'Servicios tecnológicos'},{n:'3',target:3,l:'Modalidades de atención'},{n:'∞',target:null,l:'Posibilidades'}];
+const counters=[{n:'9',target:9,l:'Carreras participantes'},{n:'8',target:8,l:'Servicios tecnológicos'},{n:'3',target:3,l:'Modalidades de atención'},{n:'∞',target:null,l:'Posibilidades'}];
 const cnt=document.getElementById('counterGrid');
 if(cnt){
   counters.forEach(c=>{
@@ -131,3 +118,66 @@ Object.keys(vrCatalog).forEach(carrera=>{
     tab.innerHTML=renderVRCatalog(carrera);
   }
 });
+
+// Points desglose table
+const puntosBody = document.getElementById('puntosTableBody');
+if (puntosBody && typeof puntosDesglose !== 'undefined') {
+  puntosDesglose.actividades.forEach(a => {
+    puntosBody.innerHTML += `<tr>
+      <td>${a.icono}</td>
+      <td>${a.accion}</td>
+      <td style="font-weight:700;color:var(--gold)">+${a.puntos}</td>
+    </tr>`;
+  });
+}
+
+// Tech News
+async function loadTechNews() {
+  const preview = document.getElementById('techNewsPreview');
+  const fullList = document.getElementById('techNewsFullList');
+  try {
+    const res = await fetch(SUPABASE_URL + '/functions/v1/tech-news');
+    if (!res.ok) throw new Error('Edge Function no disponible');
+    const data = await res.json();
+    const articles = data.articles || [];
+    if (articles.length === 0) {
+      if (preview) preview.innerHTML = '<p style="color:#94A3B8;font-size:13px">No hay noticias disponibles.</p>';
+      if (fullList) fullList.innerHTML = '<p style="color:#94A3B8;text-align:center;padding:40px">No hay noticias disponibles en este momento.</p>';
+      return;
+    }
+    // Preview: show first 3 in the base card tooltip area
+    if (preview) {
+      preview.innerHTML = articles.slice(0, 3).map(a => `
+        <div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+          <a href="${escapeHTML(a.url)}" target="_blank" rel="noopener noreferrer" style="color:#A5B4FC;font-size:13px;text-decoration:none;font-weight:600">${escapeHTML(a.title)}</a>
+          <p style="font-size:11px;color:#94A3B8;margin:4px 0 0">${escapeHTML(a.source)} · Relevancia: ${a.relevance_score || 'N/A'}/10</p>
+        </div>
+      `).join('');
+    }
+    // Full list in the tech news overlay
+    if (fullList) {
+      fullList.innerHTML = articles.map(a => `
+        <div class="card" style="padding:20px;margin-bottom:16px">
+          <h4 style="font-size:16px;font-weight:700;margin-bottom:8px">
+            <a href="${escapeHTML(a.url)}" target="_blank" rel="noopener noreferrer" style="color:var(--gold);text-decoration:none">${escapeHTML(a.title)}</a>
+          </h4>
+          <p style="font-size:13px;color:#64748B;line-height:1.7;margin-bottom:8px">${escapeHTML(a.summary || '')}</p>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:#94A3B8">
+            <span>${escapeHTML(a.source)}</span>
+            <span>Relevancia: <strong style="color:var(--gold)">${a.relevance_score || 'N/A'}/10</strong></span>
+          </div>
+        </div>
+      `).join('');
+    }
+  } catch (e) {
+    console.log('Tech news error:', e.message);
+    if (preview) preview.innerHTML = '<p style="color:#94A3B8;font-size:12px">Noticias no disponibles.</p>';
+    if (fullList) fullList.innerHTML = '<p style="color:#94A3B8;text-align:center;padding:40px">El servicio de noticias no está disponible. Intenta más tarde.</p>';
+  }
+}
+// Init tech news after supabase loads
+if (typeof SUPABASE_URL !== 'undefined') {
+  setTimeout(loadTechNews, 1500);
+} else {
+  document.addEventListener('DOMContentLoaded', () => setTimeout(loadTechNews, 2000));
+}
