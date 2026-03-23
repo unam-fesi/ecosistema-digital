@@ -21,18 +21,6 @@ window.addEventListener('scroll',()=>{
         document.getElementById('scrollProgress').style.width=pct+'%';
       }
       document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>60);
-      // Active nav
-      const y=window.scrollY+260;
-      const secs=['inicio','quienes','servicios','solicitud','espacio','telemedicina','impacto','galeria','cursos','comunidad','badges','aula-inmersiva','laboratorio','contacto'];
-      for(let i=secs.length-1;i>=0;i--){
-        const el=document.getElementById(secs[i]);
-        if(el&&el.offsetTop<=y){
-          document.querySelectorAll('.nav-links a').forEach(a=>a.classList.remove('active'));
-          const a=document.querySelector('.nav-links a[data-section="'+secs[i]+'"]');
-          if(a)a.classList.add('active');
-          break;
-        }
-      }
       // Parallax hero (skip on touch for performance)
       if(!isTouchDevice && window.scrollY<window.innerHeight){
         const p=window.scrollY*0.35;
