@@ -146,10 +146,26 @@ function openServicioModal(idx){
   requestAnimationFrame(()=>overlay.classList.add('active'));
   document.body.style.overflow='hidden';
 
-  // Also trigger VR catalog display if clicking RV
-  if(idx===1){
+  // Show relevant sub-sections based on service clicked
+  // Hide all sub-sections first
+  ['vrCatalogSubsection','aulaInmersivaSubsection','labProyectosSubsection'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.style.display='none';
+  });
+  if(idx===1){ // Realidad Virtual
     const vrSub=document.getElementById('vrCatalogSubsection');
     if(vrSub) vrSub.style.display='block';
+  }
+  if(idx===7){ // Aula Inmersiva
+    const aiSub=document.getElementById('aulaInmersivaSubsection');
+    if(aiSub) aiSub.style.display='block';
+    // Also scroll to it
+    setTimeout(()=>{ if(aiSub) aiSub.scrollIntoView({behavior:'smooth',block:'start'}); },400);
+  }
+  if(idx===8){ // Laboratorio de Proyectos
+    const lpSub=document.getElementById('labProyectosSubsection');
+    if(lpSub) lpSub.style.display='block';
+    setTimeout(()=>{ if(lpSub) lpSub.scrollIntoView({behavior:'smooth',block:'start'}); },400);
   }
 }
 function closeServicioModal(){
