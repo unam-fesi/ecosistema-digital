@@ -880,6 +880,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   background:#fff; border-radius:24px; padding:44px 40px; max-width:400px; width:100%;
   box-shadow:0 30px 80px rgba(0,0,0,0.3); text-align:center;
   animation:fadeUp 0.4s ease both;
+  margin:auto; flex-shrink:0;
 }
 .login-card img { height:70px; margin-bottom:20px; display:block; margin-left:auto; margin-right:auto; }
 .login-card h2 { font-family:'Playfair Display',Georgia,serif; font-size:24px; color:var(--navy); margin-bottom:6px; }
@@ -1359,6 +1360,7 @@ body.spa-locked { overflow: hidden; }
       <a href="#" data-section="cursos" onclick="SPA.goToSection('cursos');return false">Cursos</a>
       <a href="#" data-section="logros" onclick="SPA.goToSection('logros');return false">Logros</a>
       <a href="#" data-section="contacto" onclick="SPA.goToSection('contacto');return false">Contacto</a>
+      <a href="#" onclick="showLoginModal();document.getElementById('mobileMenu').classList.remove('open');return false" style="color:var(--gold)">Acceso</a>
     </div>
     <button class="hamburger" id="hamburgerBtn">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
@@ -1373,6 +1375,7 @@ body.spa-locked { overflow: hidden; }
     <a href="#" onclick="SPA.goToSection('cursos');document.getElementById('mobileMenu').classList.remove('open');return false">Cursos</a>
     <a href="#" onclick="SPA.goToSection('logros');document.getElementById('mobileMenu').classList.remove('open');return false">Logros</a>
     <a href="#" onclick="SPA.goToSection('contacto');document.getElementById('mobileMenu').classList.remove('open');return false">Contacto</a>
+    <a href="#" onclick="showLoginModal();document.getElementById('mobileMenu').classList.remove('open');return false" style="color:var(--gold)">Acceso</a>
   </div>
 </nav>
 
@@ -1931,27 +1934,6 @@ body.spa-locked { overflow: hidden; }
     </div>
     <div class="entorno-grid" id="entornoGrid2"></div>
 
-    <!-- PUM-AI Section -->
-    <div style="margin-top:50px">
-      <div class="sec-header">
-        <div class="sec-tag"><span class="dot"></span> Asistente IA</div>
-        <h2 class="serif">PUM-AI</h2>
-        <p>Tu asistente inteligente del Ecosistema Digital, impulsado por inteligencia artificial.</p>
-      </div>
-      <div class="card" style="max-width:700px;margin:0 auto;border:2px solid rgba(196,162,78,0.2);text-align:center;padding:40px">
-        <div style="font-size:48px;margin-bottom:16px">🤖</div>
-        <h3 class="serif" style="font-size:22px;color:var(--navy);margin-bottom:12px">PUM-AI — Asistente del Ecosistema</h3>
-        <p style="font-size:15px;color:#64748B;line-height:1.85;margin-bottom:20px">PUM-AI es un chatbot inteligente que te ayuda a resolver dudas sobre los servicios del Ecosistema Digital, te orienta sobre proyectos y te conecta con los recursos disponibles.</p>
-        <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center">
-          <span style="background:rgba(37,99,235,0.08);color:#2563EB;font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px">Orientación</span>
-          <span style="background:rgba(5,150,105,0.08);color:#059669;font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px">Servicios</span>
-          <span style="background:rgba(196,162,78,0.12);color:var(--gold);font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px">Proyectos</span>
-          <span style="background:rgba(124,58,237,0.08);color:#7C3AED;font-size:12px;font-weight:600;padding:6px 14px;border-radius:20px">Gemini AI</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
      MODAL: NUEVO PROYECTO 475 ANIVERSARIO UNAM
@@ -2455,6 +2437,7 @@ body.spa-locked { overflow: hidden; }
         <a href="#" class="footer-link" onclick="SPA.goToSection('cursos');return false">Cursos</a>
         <a href="#" class="footer-link" onclick="SPA.goToSection('logros');return false">Logros</a>
         <a href="#" class="footer-link" onclick="SPA.goToSection('contacto');return false">Contacto</a>
+        <a href="#" onclick="showLoginModal();return false" style="color:var(--gold)">Acceso</a>
       </div>
       <div>
         <p class="footer-title">Contacto</p>
