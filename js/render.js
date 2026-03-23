@@ -77,6 +77,25 @@ if(gg){
   });
 }
 
+// Entorno Grid 2 (standalone panel)
+const gg2=document.getElementById('entornoGrid2');
+if(gg2){
+  galeriaItems.forEach((g,i)=>{
+    const imgSrc=g.img||'';
+    const shortDesc=g.desc?g.desc.substring(0,120)+'...':'';
+    gg2.innerHTML+=`<div class="entorno-card reveal d${(i%4)+1}" onclick="openEntornoModal(${i})">
+      <div style="overflow:hidden;height:200px;background:${g.g}">
+        ${imgSrc?`<img class="entorno-card-img" src="${imgSrc}" alt="${g.l}" onerror="this.style.display='none'">`:''}
+      </div>
+      <div class="entorno-card-body">
+        <h3 class="entorno-card-title"><span>${g.e}</span> ${g.l}</h3>
+        <p class="entorno-card-desc">${shortDesc}</p>
+        <div class="entorno-card-cta">Ver detalle <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      </div>
+    </div>`;
+  });
+}
+
 // VR Catalog
 function renderVRCatalog(carrera){
   const softwareList=vrCatalog[carrera]||[];
@@ -149,7 +168,7 @@ async function loadTechNews() {
     if (preview) {
       preview.innerHTML = articles.slice(0, 3).map(a => `
         <div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
-          <a href="${escapeHTML(a.url)}" target="_blank" rel="noopener noreferrer" style="color:#A5B4FC;font-size:13px;text-decoration:none;font-weight:600">${escapeHTML(a.title)}</a>
+          <a href="${escapeHTML(a.url)}" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()" style="color:#A5B4FC;font-size:13px;text-decoration:none;font-weight:600">${escapeHTML(a.title)}</a>
           <p style="font-size:11px;color:#94A3B8;margin:4px 0 0">${escapeHTML(a.source)} · Relevancia: ${a.relevance_score || 'N/A'}/10</p>
         </div>
       `).join('');
