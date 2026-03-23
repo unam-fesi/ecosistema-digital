@@ -23,7 +23,7 @@
 }
 * { box-sizing:border-box; margin:0; padding:0; }
 html { scroll-behavior:smooth; }
-body { font-family:'Inter',system-ui,-apple-system,sans-serif; color:#1E293B; background:#fff; overflow-x:hidden; }
+body { font-family:'Inter',system-ui,-apple-system,sans-serif; color:#1E293B; background:#0C2340; overflow-x:hidden; }
 .serif { font-family:'Playfair Display',Georgia,serif; }
 
 /* ─── CURSOR GLOW ─── */
@@ -1052,6 +1052,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 #spa-base {
   min-height: 100vh; min-height: 100dvh; min-height: -webkit-fill-available;
   position: relative;
+  background: linear-gradient(180deg, #0C2340 0%, #081A30 50%, #06101E 100%);
   transition: all 500ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -1117,10 +1118,12 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 /* Section overlays */
 .spa-section-overlay {
   position: fixed; inset: 0; z-index: 100;
-  background: var(--cream);
+  background: rgba(250,248,244,0.97);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   overflow-y: auto;
   display: none; opacity: 0;
   transform: scale(0.85) translateY(30px);
+  cursor: pointer; /* click outside = close */
 }
 .spa-section-overlay.active { display: block; }
 
@@ -1128,6 +1131,8 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   max-width: 1200px; margin: 0 auto;
   padding: 100px 24px 80px;
   transition: all 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: default; /* content area doesn't close */
+  position: relative;
 }
 
 /* Sub-panels */
@@ -1144,14 +1149,9 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   padding: 100px 24px 80px;
 }
 
-/* Back button */
+/* Back button — hidden, click-outside closes panels */
 .spa-back-btn {
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 10px 20px;
-  background: rgba(12,35,64,0.06); border: 1px solid rgba(12,35,64,0.1);
-  border-radius: 12px; cursor: pointer;
-  font-size: 14px; font-weight: 600; color: var(--navy);
-  transition: all 0.3s; margin-bottom: 32px; font-family: 'Inter', sans-serif;
+  display: none !important;
 }
 .spa-back-btn:hover {
   background: rgba(196,162,78,0.1); border-color: rgba(196,162,78,0.3);
