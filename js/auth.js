@@ -175,10 +175,8 @@ document.addEventListener('DOMContentLoaded', async () => {
           if (role === 'admin') {
             window.location.href = 'admin.html';
           } else {
-            // Stay on main page, show welcome toast
-            if (typeof showToast === 'function') {
-              showToast('¡Bienvenido al Ecosistema Digital!');
-            }
+            // Redirect to user dashboard
+            window.location.href = 'usuario.html';
           }
         } else {
           showLoginError(result.error || 'Error al iniciar sesión');
