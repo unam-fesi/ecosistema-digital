@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://risatbuqolklefvjgngb.supabase.co wss://risatbuqolklefvjgngb.supabase.co https://fonts.googleapis.com https://fonts.gstatic.com;">
+<!-- CSP removed: GitHub Pages handles security headers; meta CSP was blocking fonts and Supabase API -->
 <title>Ecosistema Digital — FES Iztacala, UNAM</title>
 <link rel="icon" href="assets/logo-ecosistema-digital.png" type="image/png">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -876,6 +876,10 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   opacity:0; pointer-events:none; transition:opacity 0.3s;
 }
 .login-overlay.active { opacity:1; pointer-events:all; }
+/* Ensure card stays centered even on small screens */
+@supports (align-items:safe center) {
+  .login-overlay { align-items:safe center; }
+}
 .login-card {
   background:#fff; border-radius:24px; padding:44px 40px; max-width:400px; width:100%;
   box-shadow:0 30px 80px rgba(0,0,0,0.3); text-align:center;
@@ -1360,7 +1364,7 @@ body.spa-locked { overflow: hidden; }
       <a href="#" data-section="cursos" onclick="SPA.goToSection('cursos');return false">Cursos</a>
       <a href="#" data-section="logros" onclick="SPA.goToSection('logros');return false">Logros</a>
       <a href="#" data-section="contacto" onclick="SPA.goToSection('contacto');return false">Contacto</a>
-      <a href="#" onclick="showLoginModal();document.getElementById('mobileMenu').classList.remove('open');return false" style="color:var(--gold)">Acceso</a>
+      <a href="#" onclick="showLoginModal();return false" style="color:var(--gold)">Acceso</a>
     </div>
     <button class="hamburger" id="hamburgerBtn">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
@@ -1934,6 +1938,9 @@ body.spa-locked { overflow: hidden; }
     </div>
     <div class="entorno-grid" id="entornoGrid2"></div>
 
+    <!-- PUM-AI section removed: already shown as card in entornoGrid2 -->
+  </div>
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════════════
      MODAL: NUEVO PROYECTO 475 ANIVERSARIO UNAM
@@ -2437,7 +2444,6 @@ body.spa-locked { overflow: hidden; }
         <a href="#" class="footer-link" onclick="SPA.goToSection('cursos');return false">Cursos</a>
         <a href="#" class="footer-link" onclick="SPA.goToSection('logros');return false">Logros</a>
         <a href="#" class="footer-link" onclick="SPA.goToSection('contacto');return false">Contacto</a>
-        <a href="#" onclick="showLoginModal();return false" style="color:var(--gold)">Acceso</a>
       </div>
       <div>
         <p class="footer-title">Contacto</p>
