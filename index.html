@@ -1116,47 +1116,116 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 .spa-card:hover .spa-card-arrow { background: var(--gold); transform: scale(1.1); }
 
 /* Section overlays */
+/* ─── OVERLAY: dark backdrop with floating panel ─── */
 .spa-section-overlay {
   position: fixed; inset: 0; z-index: 100;
-  background: rgba(250,248,244,0.97);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  background: rgba(6,16,30,0.82);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
   overflow-y: auto;
   display: none; opacity: 0;
-  transform: scale(0.85) translateY(30px);
-  cursor: pointer; /* click outside = close */
+  transform: scale(0.92);
+  cursor: pointer; /* click backdrop = close */
+  padding: 60px 20px 40px;
 }
-.spa-section-overlay.active { display: block; }
+.spa-section-overlay.active { display: flex; align-items: flex-start; justify-content: center; }
 
+/* ─── PANEL: white card floating over dark backdrop ─── */
 .spa-section-content {
-  max-width: 1200px; margin: 0 auto;
-  padding: 100px 24px 80px;
-  transition: all 500ms cubic-bezier(0.22, 1, 0.36, 1);
+  width: 100%; max-width: 1100px;
+  background: #fff;
+  border-radius: 28px;
+  padding: 52px 40px 60px;
+  box-shadow: 0 32px 100px rgba(0,0,0,0.45), 0 0 0 1px rgba(196,162,78,0.12);
   cursor: default; /* content area doesn't close */
   position: relative;
+  margin: 0 auto;
+}
+
+/* Dark-theme panel variant (Logros) */
+.spa-section-overlay[data-dark="true"] .spa-section-content {
+  background: linear-gradient(180deg, var(--navy) 0%, #06101E 100%);
+  border: 1px solid rgba(196,162,78,0.15);
+}
+
+/* Close hint at top-right of panel */
+.spa-panel-close-hint {
+  position: absolute; top: 18px; right: 22px;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(0,0,0,0.06); border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.2s; color: #94A3B8; font-size: 18px;
+}
+.spa-panel-close-hint:hover { background: rgba(0,0,0,0.1); color: #475569; }
+.spa-section-overlay[data-dark="true"] .spa-panel-close-hint {
+  background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.5);
+}
+.spa-section-overlay[data-dark="true"] .spa-panel-close-hint:hover {
+  background: rgba(255,255,255,0.15); color: #fff;
 }
 
 /* Sub-panels */
 .spa-sub-panel {
   position: fixed; inset: 0; z-index: 200;
-  background: #fff; overflow-y: auto;
+  background: rgba(6,16,30,0.82);
+  backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+  overflow-y: auto;
   display: none; opacity: 0;
   transform: scale(0.85) translateY(20px);
+  padding: 60px 20px 40px;
 }
-.spa-sub-panel.active { display: block; }
+.spa-sub-panel.active { display: flex; align-items: flex-start; justify-content: center; }
 
 .spa-sub-content {
-  max-width: 1000px; margin: 0 auto;
-  padding: 100px 24px 80px;
+  width: 100%; max-width: 1000px;
+  background: #fff; border-radius: 28px;
+  padding: 52px 40px 60px;
+  box-shadow: 0 32px 100px rgba(0,0,0,0.45);
+  margin: 0 auto;
 }
 
 /* Back button — hidden, click-outside closes panels */
 .spa-back-btn {
   display: none !important;
 }
-.spa-back-btn:hover {
-  background: rgba(196,162,78,0.1); border-color: rgba(196,162,78,0.3);
-  transform: translateX(-4px);
+
+/* ─── LANDING SCREEN ─── */
+#landing-screen {
+  min-height: 100vh; min-height: 100dvh; min-height: -webkit-fill-available;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: linear-gradient(135deg,#050D18 0%,#0C2340 30%,#163A64 55%,#1a4a7a 75%,#0C2340 100%);
+  background-size: 400% 400%; animation: gradientShift 14s ease infinite;
+  position: relative; overflow: hidden; text-align: center; padding: 40px 24px;
+  transition: opacity 0.6s ease, transform 0.6s ease;
 }
+#landing-screen.hidden {
+  opacity: 0; transform: scale(1.05); pointer-events: none;
+  position: absolute; inset: 0;
+}
+.landing-logo { animation: float 6s ease-in-out infinite, glow 5s ease-in-out infinite; margin-bottom: 32px; }
+.landing-title { font-size: clamp(38px,7vw,72px); color: #fff; font-weight: 700; line-height: 1.1; margin-bottom: 10px; }
+.landing-title .gold { color: var(--gold); text-shadow: 0 0 40px rgba(196,162,78,0.4); }
+.landing-subtitle { font-size: clamp(14px,2vw,20px); color: rgba(255,255,255,0.6); margin-bottom: 48px; max-width: 600px; }
+.landing-enter-btn {
+  display: inline-flex; align-items: center; gap: 12px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  color: var(--navy); font-family: 'Inter', sans-serif; font-weight: 700; font-size: 18px;
+  padding: 18px 48px; border: none; border-radius: 16px; cursor: pointer;
+  transition: all 0.4s cubic-bezier(.22,1,.36,1); position: relative; overflow: hidden;
+}
+.landing-enter-btn:hover {
+  transform: translateY(-4px) scale(1.03);
+  box-shadow: 0 20px 60px rgba(196,162,78,0.5);
+}
+.landing-enter-btn::after {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(255,255,255,0.2);
+  transform: translateX(-100%) skewX(-15deg); transition: transform 0.5s;
+}
+.landing-enter-btn:hover::after { transform: translateX(150%) skewX(-15deg); }
+
+/* Hide main app initially */
+#main-app { display: none; }
+#main-app.visible { display: block; animation: fadeUp 0.8s ease both; }
 
 /* Tech news card variant */
 .spa-card.tech-news-card {
@@ -1201,6 +1270,8 @@ body.spa-locked { overflow: hidden; }
 
 @media(max-width:768px) {
   .spa-cards-grid { grid-template-columns: 1fr; padding: 20px 16px 60px; }
+  .spa-section-overlay { padding: 20px 8px 20px; }
+  .spa-section-content { padding: 36px 18px 40px; border-radius: 20px; }
   .spa-hero { padding: 120px 20px 30px; }
   .spa-section-content { padding: 80px 16px 60px; }
   .servicios-subcards-grid { grid-template-columns: 1fr; }
@@ -1215,6 +1286,41 @@ body.spa-locked { overflow: hidden; }
 
 <div class="global-watermark"></div>
 <div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     LANDING SCREEN — Logo + Ingresar (no menu, no footer)
+     ═══════════════════════════════════════════════════════════════════ -->
+<div id="landing-screen">
+  <div class="hero-blob hero-blob-1"></div>
+  <div class="hero-blob hero-blob-2"></div>
+  <div class="hero-blob hero-blob-3"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-particles" id="landingParticles"></div>
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="hero-orb hero-orb-3"></div>
+  <div style="position:relative;z-index:2">
+    <div class="landing-logo">
+      <img src="assets/logo-ecosistema-digital.png" alt="Ecosistema Digital" style="height:200px;width:auto;filter:drop-shadow(0 0 40px rgba(196,162,78,0.6))" onerror="this.parentElement.innerHTML='<div style=\'width:120px;height:120px;border:2.5px solid var(--gold);border-radius:28px;display:flex;align-items:center;justify-content:center;background:rgba(196,162,78,0.1)\'><span style=\'color:var(--gold);font-size:42px;font-weight:700\'>ED</span></div>'">
+    </div>
+    <div class="hero-badge" style="display:inline-flex;margin:0 auto 20px">
+      <span class="pulse-dot"></span>
+      FES Iztacala · UNAM
+    </div>
+    <h1 class="serif landing-title">Ecosistema <span class="gold">Digital</span></h1>
+    <p class="landing-subtitle">Facultad de Estudios Superiores Iztacala, UNAM</p>
+    <button class="landing-enter-btn" onclick="enterMainApp()">
+      Ingresar
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     MAIN APP — Shown after clicking Ingresar
+     ═══════════════════════════════════════════════════════════════════ -->
+<div id="main-app">
+
 <div class="scroll-progress" id="scrollProgress"></div>
 
 <!-- NAVBAR -->
@@ -1278,20 +1384,10 @@ body.spa-locked { overflow: hidden; }
   <div class="hero-orb hero-orb-2"></div>
   <div class="hero-orb hero-orb-3"></div>
 
-  <!-- Hero Content -->
-  <div class="spa-hero">
-    <div class="hero-content parallax-layer" id="heroContent" style="position:relative;max-width:900px;margin:0 auto">
-      <div class="hero-logo-wrap" style="display:flex;justify-content:center;width:100%">
-        <img src="assets/logo-ecosistema-digital.png" alt="Ecosistema Digital" style="height:220px;width:auto;filter:drop-shadow(0 0 40px rgba(196,162,78,0.6))" onerror="this.parentElement.innerHTML='<div style=\'width:120px;height:120px;border:2.5px solid var(--gold);border-radius:28px;display:flex;align-items:center;justify-content:center;background:rgba(196,162,78,0.1)\'><span style=\'color:var(--gold);font-size:42px;font-weight:700\'>ED</span></div>'">
-      </div>
-      <div class="hero-badge" style="display:inline-flex;margin:0 auto">
-        <span class="pulse-dot"></span>
-        FES Iztacala · UNAM
-      </div>
-      <h1 class="serif" style="font-size:clamp(34px,6.5vw,64px);color:#fff;font-weight:700;line-height:1.12;margin-bottom:18px;animation:fadeUp 0.9s ease both 0.3s">Ecosistema <span class="gold" style="color:var(--gold);text-shadow:0 0 40px rgba(196,162,78,0.4)">Digital</span></h1>
-      <p style="font-size:clamp(15px,2.2vw,21px);color:rgba(255,255,255,0.72);margin-bottom:10px;animation:fadeUp 0.9s ease both 0.5s">Facultad de Estudios Superiores Iztacala, UNAM</p>
-      <p style="font-size:clamp(13px,1.6vw,16px);color:rgba(255,255,255,0.42);max-width:620px;margin:0 auto 32px;line-height:1.85;animation:fadeUp 0.9s ease both 0.65s">Integración académica y tecnológica para desarrollar proyectos, servicios, innovación y análisis que transforman la formación universitaria.</p>
-    </div>
+  <!-- Section title inside spa-base -->
+  <div class="spa-hero" style="padding:100px 24px 30px">
+    <h2 class="serif" style="font-size:clamp(24px,4vw,38px);color:#fff;font-weight:700;text-align:center;margin-bottom:8px">Explora el Ecosistema</h2>
+    <p style="font-size:clamp(13px,1.6vw,16px);color:rgba(255,255,255,0.45);text-align:center;max-width:500px;margin:0 auto">Selecciona una sección para conocer más</p>
   </div>
 
   <!-- Floating Section Cards -->
@@ -1361,10 +1457,7 @@ body.spa-locked { overflow: hidden; }
      ═══════════════════════════════════════════════════════════════════ -->
 <div class="spa-section-overlay" id="spa-section-quienes">
   <div class="spa-section-content">
-    <button class="spa-back-btn" onclick="SPA.navigateBack()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      Volver al inicio
-    </button>
+    <button class="spa-panel-close-hint" onclick="SPA.navigateBack()" title="Cerrar">✕</button>
 
     <div class="sec-header">
       <div class="sec-tag"><span class="dot"></span> Quiénes somos</div>
@@ -1443,10 +1536,7 @@ body.spa-locked { overflow: hidden; }
      ═══════════════════════════════════════════════════════════════════ -->
 <div class="spa-section-overlay" id="spa-section-servicios">
   <div class="spa-section-content">
-    <button class="spa-back-btn" onclick="SPA.navigateBack()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      Volver al inicio
-    </button>
+    <button class="spa-panel-close-hint" onclick="SPA.navigateBack()" title="Cerrar">✕</button>
 
     <div class="sec-header">
       <div class="sec-tag"><span class="dot"></span> Nuestros servicios</div>
@@ -1639,10 +1729,7 @@ body.spa-locked { overflow: hidden; }
      ═══════════════════════════════════════════════════════════════════ -->
 <div class="spa-section-overlay" id="spa-section-cursos">
   <div class="spa-section-content">
-    <button class="spa-back-btn" onclick="SPA.navigateBack()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      Volver al inicio
-    </button>
+    <button class="spa-panel-close-hint" onclick="SPA.navigateBack()" title="Cerrar">✕</button>
 
     <div class="sec-header">
       <div class="sec-tag"><span class="dot"></span> Formación continua</div>
@@ -1730,12 +1817,9 @@ body.spa-locked { overflow: hidden; }
 <!-- ═══════════════════════════════════════════════════════════════════
      SPA SECTION: Logros
      ═══════════════════════════════════════════════════════════════════ -->
-<div class="spa-section-overlay" id="spa-section-logros" style="background:linear-gradient(180deg,var(--navy) 0%,#06101E 100%)">
+<div class="spa-section-overlay" id="spa-section-logros" data-dark="true">
   <div class="spa-section-content">
-    <button class="spa-back-btn" onclick="SPA.navigateBack()" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:#fff">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      Volver al inicio
-    </button>
+    <button class="spa-panel-close-hint" onclick="SPA.navigateBack()" title="Cerrar">✕</button>
 
     <div class="sec-header light">
       <div class="sec-tag"><span class="dot"></span> Impacto</div>
@@ -1753,10 +1837,7 @@ body.spa-locked { overflow: hidden; }
      ═══════════════════════════════════════════════════════════════════ -->
 <div class="spa-section-overlay" id="spa-section-contacto">
   <div class="spa-section-content">
-    <button class="spa-back-btn" onclick="SPA.navigateBack()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      Volver al inicio
-    </button>
+    <button class="spa-panel-close-hint" onclick="SPA.navigateBack()" title="Cerrar">✕</button>
 
     <div class="sec-header">
       <div class="sec-tag"><span class="dot"></span> Contáctenos</div>
@@ -1801,10 +1882,7 @@ body.spa-locked { overflow: hidden; }
 <!-- SPA SECTION: Tech News (hidden overlay for expanded view) -->
 <div class="spa-section-overlay" id="spa-section-tech-news">
   <div class="spa-section-content">
-    <button class="spa-back-btn" onclick="SPA.navigateBack()">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-      Volver al inicio
-    </button>
+    <button class="spa-panel-close-hint" onclick="SPA.navigateBack()" title="Cerrar">✕</button>
     <div class="sec-header">
       <div class="sec-tag"><span class="dot"></span> RSS Feed</div>
       <h2 class="serif">Noticias Tecnológicas</h2>
@@ -2318,6 +2396,8 @@ body.spa-locked { overflow: hidden; }
   </div>
 </footer>
 
+</div><!-- END #main-app -->
+
 <!-- ═══════════════════════════════════════════════════════════════════
      SCRIPTS: JS MODULES
      ═══════════════════════════════════════════════════════════════════ -->
@@ -2332,6 +2412,47 @@ body.spa-locked { overflow: hidden; }
 <script src="js/auth.js" defer></script>
 <script src="js/pumai.js" defer></script>
 <script src="js/supabase-features.js" defer></script>
+
+<script>
+/* ─── Landing → Main App transition ─── */
+function enterMainApp(instant) {
+  const landing = document.getElementById('landing-screen');
+  const app = document.getElementById('main-app');
+  if (instant) {
+    landing.style.display = 'none';
+    app.style.display = 'block';
+    app.classList.add('visible');
+  } else {
+    landing.classList.add('hidden');
+    app.classList.add('visible');
+    app.style.display = 'block';
+    setTimeout(() => { landing.style.display = 'none'; }, 700);
+  }
+}
+
+/* Auto-enter if URL has hash (deep link) */
+(function() {
+  if (window.location.hash && window.location.hash.length > 1) {
+    enterMainApp(true);
+  }
+})();
+
+/* ─── Generate landing particles ─── */
+(function() {
+  const pp = document.getElementById('landingParticles');
+  if (pp) {
+    for (let i = 0; i < 20; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = 1 + Math.random() * 4;
+      p.style.cssText = 'left:' + Math.random()*100 + '%;bottom:-10px;width:' + size + 'px;height:' + size + 'px;' +
+        'background:' + (Math.random() > 0.5 ? 'var(--gold)' : 'rgba(255,255,255,0.6)') + ';' +
+        'animation-delay:' + Math.random()*6 + 's;animation-duration:' + (3+Math.random()*4) + 's;';
+      pp.appendChild(p);
+    }
+  }
+})();
+</script>
 
 </body>
 </html>
