@@ -2485,6 +2485,8 @@
         }
 
         function switchTab(tabName, buttonElement) {
+            console.log('Switching to tab:', tabName);
+
             // Hide all tabs
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
@@ -2504,6 +2506,16 @@
             // Add active class to clicked button
             if (buttonElement) {
                 buttonElement.classList.add('active');
+            }
+
+            // Initialize inventory tab if switching to it
+            if (tabName === 'tabInventario') {
+                console.log('Initializing inventory tab...');
+                if (typeof initializeInventoryTab === 'function') {
+                    initializeInventoryTab();
+                } else {
+                    console.warn('initializeInventoryTab function not found');
+                }
             }
 
             // Close sidebar on mobile
