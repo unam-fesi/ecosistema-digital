@@ -410,6 +410,132 @@ function initCalendars(){
   },100);
 }
 
+/* ─── SOLICITUD SERVICIO FORM ─── */
+async function submitSolicitudServicio() {
+  if (!window.supabaseClient) { showToast('Cargando sistema...'); return; }
+  if (!rateLimitCheck('solicitudServicio', 10000)) return;
+  const nombre = sanitizeInput(document.getElementById('solNombre').value, 100);
+  const correo = document.getElementById('solCorreo').value.trim();
+  const telefono = sanitizeInput(document.getElementById('solTelefono').value, 20);
+  const carrera = sanitizeInput(document.getElementById('solCarrera').value, 100);
+  const tipoUsuario = document.getElementById('solTipoUsuario').value;
+  const servicio = document.getElementById('solServicio').value;
+  const modalidad = document.getElementById('solModalidad').value;
+  const fecha = document.getElementById('solFecha').value;
+  const participantes = document.getElementById('solParticipantes')?.value || '';
+  const grupo = sanitizeInput(document.getElementById('solGrupo')?.value, 100);
+  const objetivo = sanitizeInput(document.getElementById('solObjetivo').value, 1000);
+  const descripcion = sanitizeInput(document.getElementById('solDescripcion').value, 2000);
+  const horario = sanitizeInput(document.getElementById('solHorario').value, 50);
+  const requerimientos = sanitizeInput(document.getElementById('solRequerimientos').value, 500);
+
+  if (!nombre || nombre.length < 2) { showToast('Ingresa un nombre válido'); return; }
+  if (!validateEmail(correo)) { showToast('Ingresa un correo válido'); return; }
+  if (!servicio) { showToast('Selecciona un servicio'); return; }
+  if (!modalidad) { showToast('Selecciona una modalidad'); return; }
+  if (!descripcion || descripcion.length < 10) { showToast('Describe tu necesidad (mínimo 10 caracteres)'); return; }
+
+  try {
+    const { error } = await supabaseClient.from('solicitudes_servicios').insert([{
+      nombre, correo, telefono, carrera, tipo_usuario: tipoUsuario,
+      tipo_servicio: servicio, modalidad, fecha_deseada: fecha || null,
+      participantes: participantes ? parseInt(participantes) : null,
+      grupo, objetivo, descripcion, horario, requerimientos,
+      estado: 'pendiente'
+    }]);
+    if (error) throw error;
+    document.getElementById('formSolicitudServicio').reset();
+    showToast('¡Solicitud enviada! Te contactaremos pronto.');
+  } catch (e) { showToast(e.message || 'Error al enviar solicitud'); }
+}
+
+/* ─── SOLICITUD ESPACIO FORM ─── */
+async function submitSolicitudEspacio() {
+  if (!window.supabaseClient) { showToast('Cargando sistema...'); return; }
+  if (!rateLimitCheck('solicitudEspacio', 10000)) return;
+  const nombre = sanitizeInput(document.getElementById('espNombre').value, 100);
+  const correo = document.getElementById('espCorreo').value.trim();
+  const telefono = sanitizeInput(document.getElementById('espTelefono').value, 20);
+  const carrera = sanitizeInput(document.getElementById('espCarrera').value, 100);
+  const tipo = document.getElementById('espTipo').value;
+  const asistentes = document.getElementById('espAsistentes').value;
+  const fecha = document.getElementById('espFecha').value;
+  const tecnologia = document.getElementById('espTecnologia').value;
+  const motivo = sanitizeInput(document.getElementById('espMotivo').value, 200);
+  const actividad = sanitizeInput(document.getElementById('espActividad').value, 1000);
+  const horaInicio = document.getElementById('espHoraInicio').value;
+  const horaFin = document.getElementById('espHoraFin').value;
+  const observaciones = sanitizeInput(document.getElementById('espObservaciones').value, 500);
+
+  if (!nombre || nombre.length < 2) { showToast('Ingresa un nombre válido'); return; }
+  if (!validateEmail(correo)) { showToast('Ingresa un correo válido'); return; }
+  if (!fecha) { showToast('Selecciona una fecha'); return; }
+  if (!motivo) { showToast('Ingresa el motivo de la reserva'); return; }
+  if (!horaInicio || !horaFin) { showToast('Selecciona horario de inicio y fin'); return; }
+
+  try {
+    const { error } = await supabaseClient.from('solicitudes_espacios').insert([{
+      nombre, correo, telefono, carrera, tipo_solicitud: tipo,
+      asistentes: asistentes ? parseInt(asistentes) : null,
+      fecha, tecnologia, motivo, actividad,
+      hora_inicio: horaInicio, hora_fin: horaFin,
+      observaciones, estado: 'pendiente'
+    }]);
+    if (error) throw error;
+    document.getElementById('formSolicitudEspacio').reset();
+    showToast('¡Reserva solicitada! Te confirmaremos por correo.');
+  } catch (e) { showToast(e.message || 'Error al solicitar espacio'); }
+}
+
+/* ─── SOLICITAR CURSO FORM ─── */
+async function submitSolicitarCurso() {
+  if (!window.supabaseClient) { showToast('Cargando sistema...'); return; }
+  if (!rateLimitCheck('solicitarCurso', 10000)) return;
+  const nombre = sanitizeInput(document.getElementById('cursoSolNombre').value, 100);
+  const correo = document.getElementById('cursoSolCorreo').value.trim();
+  const carrera = sanitizeInput(document.getElementById('cursoSolCarrera').value, 100);
+  const modalidad = document.getElementById('cursoSolModalidad').value;
+  const tema = sanitizeInput(document.getElementById('cursoSolTema').value, 200);
+  const descripcion = sanitizeInput(document.getElementById('cursoSolDescripcion').value, 1000);
+
+  if (!nombre || nombre.length < 2) { showToast('Ingresa un nombre válido'); return; }
+  if (!validateEmail(correo)) { showToast('Ingresa un correo válido'); return; }
+  if (!tema || tema.length < 3) { showToast('Ingresa un tema para el curso'); return; }
+
+  try {
+    const { error } = await supabaseClient.from('solicitudes_cursos').insert([{
+      nombre, correo, carrera, modalidad_preferida: modalidad,
+      tema_sugerido: tema, descripcion, estado: 'pendiente'
+    }]);
+    if (error) throw error;
+    document.getElementById('formSolicitarCurso').reset();
+    showToast('¡Sugerencia enviada! Revisaremos tu propuesta.');
+  } catch (e) { showToast(e.message || 'Error al enviar sugerencia'); }
+}
+
+/* ─── CONTACTO FORM ─── */
+async function submitContacto() {
+  if (!window.supabaseClient) { showToast('Cargando sistema...'); return; }
+  if (!rateLimitCheck('contacto', 10000)) return;
+  const nombre = sanitizeInput(document.getElementById('contNombre').value, 100);
+  const correo = document.getElementById('contCorreo').value.trim();
+  const asunto = sanitizeInput(document.getElementById('contAsunto').value, 200);
+  const mensaje = sanitizeInput(document.getElementById('contMensaje').value, 2000);
+
+  if (!nombre || nombre.length < 2) { showToast('Ingresa un nombre válido'); return; }
+  if (!validateEmail(correo)) { showToast('Ingresa un correo válido'); return; }
+  if (!mensaje || mensaje.length < 10) { showToast('El mensaje debe tener al menos 10 caracteres'); return; }
+
+  try {
+    const { error } = await supabaseClient.from('mensajes_contacto').insert([{
+      nombre, correo, asunto, mensaje
+    }]);
+    if (error) throw error;
+    document.getElementById('formContacto').reset();
+    showToast('¡Mensaje enviado! Te responderemos pronto.');
+  } catch (e) { showToast(e.message || 'Error al enviar mensaje'); }
+}
+
 /* ─── INIT ALL SUPABASE FEATURES ─── */
 function initSupabaseFeatures(){
   if(!window.supabaseClient){
