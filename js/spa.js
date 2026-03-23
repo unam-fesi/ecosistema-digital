@@ -58,20 +58,18 @@ const SPA = {
   },
 
   /**
-   * Set up back button and click-outside handlers
+   * Set up click-outside handlers — clicking on the overlay
+   * background (outside .spa-section-content) closes the panel
    */
   setupBackHandlers() {
-    // Back buttons
+    // Click on overlay background (outside content) to close
     document.addEventListener('click', (e) => {
-      if (e.target.closest('.spa-back-btn')) {
+      // Check if click is directly on the overlay (not on content inside)
+      if (e.target.classList.contains('spa-section-overlay')) {
         e.stopPropagation();
         this.navigateBack();
       }
-    });
-
-    // Click on overlay background to go back
-    document.addEventListener('click', (e) => {
-      if (e.target.classList.contains('spa-level-overlay')) {
+      if (e.target.classList.contains('spa-sub-panel')) {
         e.stopPropagation();
         this.navigateBack();
       }
@@ -472,15 +470,17 @@ const SPA = {
   }
 };
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-  SPA.init();
-});
-
-// Also initialize if DOM is already loaded (for late script injection)
-if (document.readyState === 'loading') {
-  // Wait for DOMContentLoaded
-} else {
-  // DOM already loaded
-  SPA.init();
-}
+// Initialize once when DOM is ready (defer scripts run after parsing)
+(function() {
+  let initialized = false;
+  function initOnce() {
+    if (initialized) return;
+    initialized = true;
+    SPA.init();
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initOnce);
+  } else {
+    initOnce();
+  }
+})();
