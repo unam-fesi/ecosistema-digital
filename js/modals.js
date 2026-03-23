@@ -126,6 +126,8 @@ function handleOverlayClick(e){
 
 /* ─── ENTORNO TECNOLÓGICO MODAL ─── */
 function openEntornoModal(idx){
+  // Colaboración Interescolar → abrir panel dedicado con proyectos
+  if(idx===7){openColabInterescolar();return;}
   const g=galeriaItems[idx];
   document.getElementById('entornoModalEmoji').textContent=g.e;
   document.getElementById('entornoModalTitle').textContent=g.l;
