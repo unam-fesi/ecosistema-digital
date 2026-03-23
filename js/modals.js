@@ -94,7 +94,8 @@ async function handleLogin(){
       if(data.session&&data.session.user&&data.session.user.email===ADMIN_EMAIL){
         window.location.href='admin.html';
       } else {
-        window.location.href='usuario.html';
+        // Stay on main page
+        if(typeof showToast==='function') showToast('¡Bienvenido al Ecosistema Digital!');
       }
     } else { err.textContent='Sistema de autenticación no disponible. Configure Supabase.'; }
   }catch(e){err.textContent=e.message||'Credenciales incorrectas';}
@@ -129,49 +130,51 @@ function closeEntornoModal(){
 
 /* ─── SERVICIO DETAIL MODAL ─── */
 function openServicioModal(idx){
+  // Special cards: skip small modal, show sub-section directly
+  const specialMap={7:'aulaInmersivaSubsection',8:'labProyectosSubsection',9:'vrCatalogSubsection'};
+  // Also Aula Inmersiva has its own big modal
+  if(idx===7){openAIIModal();return;}
+
+  // Hide all sub-sections first
+  ['vrCatalogSubsection','aulaInmersivaSubsection','labProyectosSubsection'].forEach(id=>{
+    const el=document.getElementById(id);if(el) el.style.display='none';
+  });
+
+  // For Lab Proyectos and Catálogo VR: show sub-section, scroll to it
+  if(specialMap[idx]){
+    const sub=document.getElementById(specialMap[idx]);
+    if(sub){
+      sub.style.display='block';
+      setTimeout(()=>sub.scrollIntoView({behavior:'smooth',block:'start'}),200);
+    }
+    return;
+  }
+
+  // Normal service: show detail modal
   const s=servicios[idx];
   document.getElementById('servicioModalEmoji').textContent=s.emoji;
   document.getElementById('servicioModalTitle').textContent=s.title;
   document.getElementById('servicioModalDesc').textContent=s.desc;
   document.getElementById('servicioModalTags').innerHTML=s.tags.map(t=>
     `<span class="acc-tag">${t}</span>`).join('');
-  // Extra info for specific services
   let extra='';
   if(idx===1){
-    extra='<p style="color:#64748B;font-size:13px;margin-top:8px">Contamos con un catálogo de software VR especializado por carrera. Consulta la sección de Realidad Virtual para explorar las aplicaciones disponibles.</p>';
+    extra='<p style="color:#64748B;font-size:13px;margin-top:8px">Contamos con un catálogo de software VR especializado por carrera. Consulta la tarjeta "Catálogo de Software VR" para explorar las aplicaciones disponibles.</p>';
   }
   document.getElementById('servicioModalExtra').innerHTML=extra;
   const overlay=document.getElementById('servicioModalOverlay');
-  overlay.style.display='flex';
+  overlay.style.display='block';
   requestAnimationFrame(()=>overlay.classList.add('active'));
   document.body.style.overflow='hidden';
-
-  // Show relevant sub-sections based on service clicked
-  // Hide all sub-sections first
-  ['vrCatalogSubsection','aulaInmersivaSubsection','labProyectosSubsection'].forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) el.style.display='none';
-  });
-  if(idx===1){ // Realidad Virtual
-    const vrSub=document.getElementById('vrCatalogSubsection');
-    if(vrSub) vrSub.style.display='block';
-  }
-  if(idx===7){ // Aula Inmersiva
-    const aiSub=document.getElementById('aulaInmersivaSubsection');
-    if(aiSub) aiSub.style.display='block';
-    // Also scroll to it
-    setTimeout(()=>{ if(aiSub) aiSub.scrollIntoView({behavior:'smooth',block:'start'}); },400);
-  }
-  if(idx===8){ // Laboratorio de Proyectos
-    const lpSub=document.getElementById('labProyectosSubsection');
-    if(lpSub) lpSub.style.display='block';
-    setTimeout(()=>{ if(lpSub) lpSub.scrollIntoView({behavior:'smooth',block:'start'}); },400);
-  }
 }
 function closeServicioModal(){
   const overlay=document.getElementById('servicioModalOverlay');
   overlay.classList.remove('active');
   setTimeout(()=>{overlay.style.display='none';document.body.style.overflow='';},300);
+  // Also hide sub-sections
+  ['vrCatalogSubsection','aulaInmersivaSubsection','labProyectosSubsection'].forEach(id=>{
+    const el=document.getElementById(id);if(el) el.style.display='none';
+  });
 }
 
 /* ─── CLOSE ON ESCAPE KEY ─── */
