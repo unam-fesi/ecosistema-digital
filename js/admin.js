@@ -1570,7 +1570,7 @@ function switchTab(tabName, clickedBtn) {
   });
 
   // Initialize inventory tab on first access
-  if (tabName === 'inventario') {
+  if (tabName === 'tabInventario') {
     initializeInventoryTab();
   }
 }
@@ -1981,14 +1981,15 @@ Asegúrate de que tu respuesta sea práctica, accionable y esté fundamentada en
  * @param {string} responseText - Raw response text from the API
  */
 function displaySentimentResults(responseText) {
-  // Normalize: strip **, normalize newlines, trim
-  let txt = responseText.replace(/\*\*/g, '').replace(/\r\n/g, '\n');
+  // Normalize: normalize newlines, trim
+  let txt = responseText.replace(/\r\n/g, '\n');
 
-  // Parse sections with flexible regex (##, ###, or plain headers)
-  const summaryMatch = txt.match(/#{1,3}\s*RESUMEN GENERAL\s*\n([\s\S]*?)(?=#{1,3}\s*LO QUE HACEMOS BIEN|$)/i);
-  const strengthsMatch = txt.match(/#{1,3}\s*LO QUE HACEMOS BIEN\s*\n([\s\S]*?)(?=#{1,3}\s*[ÁA]REAS DE MEJORA|$)/i);
-  const improvementsMatch = txt.match(/#{1,3}\s*[ÁA]REAS DE MEJORA\s*\n([\s\S]*?)(?=#{1,3}\s*ACCIONES RECOMENDADAS|$)/i);
-  const actionsMatch = txt.match(/#{1,3}\s*ACCIONES RECOMENDADAS\s*\n([\s\S]*?)$/i);
+  // Parse sections with very flexible regex patterns
+  // Match: ##, ###, **text**, or plain headers followed by colon or newline
+  const summaryMatch = txt.match(/#{1,3}\s*\*{0,2}RESUMEN\s+GENERAL\*{0,2}\s*:?\n?([\s\S]*?)(?=#{1,3}\s*\*{0,2}LO\s+QUE\s+HACEMOS\s+BIEN|LO\s+QUE\s+HACEMOS\s+BIEN|$)/i);
+  const strengthsMatch = txt.match(/#{1,3}\s*\*{0,2}LO\s+QUE\s+HACEMOS\s+BIEN\*{0,2}\s*:?\n?([\s\S]*?)(?=#{1,3}\s*\*{0,2}[ÁA]REAS\s+DE\s+MEJORA|[ÁA]REAS\s+DE\s+MEJORA|$)/i);
+  const improvementsMatch = txt.match(/#{1,3}\s*\*{0,2}[ÁA]REAS\s+DE\s+MEJORA\*{0,2}\s*:?\n?([\s\S]*?)(?=#{1,3}\s*\*{0,2}ACCIONES\s+RECOMENDADAS|ACCIONES\s+RECOMENDADAS|$)/i);
+  const actionsMatch = txt.match(/#{1,3}\s*\*{0,2}ACCIONES\s+RECOMENDADAS\*{0,2}\s*:?\n?([\s\S]*?)$/i);
 
   // Extract sentiment score from the text (look for percentages)
   let sentimentScore = 70; // default
@@ -2000,8 +2001,8 @@ function displaySentimentResults(responseText) {
   // Function to parse bullet points and create visual cards
   function parseItems(text) {
     if (!text) return [];
-    // Split by bullet points
-    const lines = text.split(/^\s*[-•*]\s+/m).filter(line => line.trim());
+    // Split by bullet points (-, •, *, or numbers followed by dot/parenthesis)
+    const lines = text.split(/^\s*(?:[-•*]|\d+[.):])\s+/m).filter(line => line.trim());
     return lines.map(line => line.trim()).filter(line => line.length > 0);
   }
 
@@ -2048,23 +2049,69 @@ function displaySentimentResults(responseText) {
     `;
   }
 
-  // If no sections found at all, put ALL text in summary
+  // If no sections found at all, try secondary parse by splitting on keywords alone
   const noSections = !summaryMatch && !strengthsMatch && !improvementsMatch && !actionsMatch;
 
   if (noSections) {
-    // Display full response formatted nicely
-    const lines = txt.split('\n').filter(line => line.trim());
-    const content = lines.map(line => `<p style="margin:8px 0;line-height:1.6">${escapeHTML(line)}</p>`).join('');
+    console.warn('No sections found with primary regex. Attempting secondary parse...');
 
+    // Secondary parse: split by keywords without requiring markdown
+    let summaryText = '';
+    let strengthsText = '';
+    let improvementsText = '';
+    let actionsText = '';
+
+    const parts = txt.split(/(?:RESUMEN\s+GENERAL|LO\s+QUE\s+HACEMOS\s+BIEN|[ÁA]REAS\s+DE\s+MEJORA|ACCIONES\s+RECOMENDADAS)/i);
+    const headers = txt.match(/(?:RESUMEN\s+GENERAL|LO\s+QUE\s+HACEMOS\s+BIEN|[ÁA]REAS\s+DE\s+MEJORA|ACCIONES\s+RECOMENDADAS)/gi) || [];
+
+    if (parts.length > 1 && headers.length >= 1) {
+      // Successfully found keywords
+      summaryText = parts[1] ? parts[1].trim() : '';
+      strengthsText = parts[2] ? parts[2].trim() : '';
+      improvementsText = parts[3] ? parts[3].trim() : '';
+      actionsText = parts[4] ? parts[4].trim() : '';
+    } else {
+      // Last resort: divide text into 4 roughly equal parts
+      const lines = txt.split('\n').filter(line => line.trim());
+      const quarter = Math.ceil(lines.length / 4);
+      summaryText = lines.slice(0, quarter).join('\n');
+      strengthsText = lines.slice(quarter, quarter * 2).join('\n');
+      improvementsText = lines.slice(quarter * 2, quarter * 3).join('\n');
+      actionsText = lines.slice(quarter * 3).join('\n');
+    }
+
+    // Parse items from each section
+    const strengthsItems = parseItems(strengthsText);
+    const improvementsItems = parseItems(improvementsText);
+    const actionsItems = parseItems(actionsText);
+
+    // Display gauge
     document.getElementById('sentimentGauge').innerHTML = createSentimentGauge(sentimentScore);
-    document.getElementById('sentimentSummary').innerHTML = content;
-    document.getElementById('sentimentStrengths').innerHTML = '<p style="color:#64748B;font-style:italic">El análisis completo se muestra en el resumen.</p>';
-    document.getElementById('sentimentImprovements').innerHTML = '<p style="color:#64748B;font-style:italic">El análisis completo se muestra en el resumen.</p>';
-    document.getElementById('sentimentActions').innerHTML = '<p style="color:#64748B;font-style:italic">El análisis completo se muestra en el resumen.</p>';
+
+    // Display summary
+    const summaryLines = summaryText.split('\n').filter(line => line.trim());
+    document.getElementById('sentimentSummary').innerHTML = summaryLines
+      .map(line => `<p style="margin:8px 0;line-height:1.6">${escapeHTML(line)}</p>`)
+      .join('');
+
+    // Display strengths with green checkmark
+    document.getElementById('sentimentStrengths').innerHTML = createItemsHTML(strengthsItems, '✅');
+
+    // Display improvements with orange warning
+    document.getElementById('sentimentImprovements').innerHTML = createItemsHTML(improvementsItems, '⚠️');
+
+    // Display actions with numbered steps
+    const actionsHTML = actionsItems.length > 0
+      ? '<ol style="margin:0;padding-left:24px;line-height:1.8">' +
+        actionsItems.map(item => `<li style="margin-bottom:12px">${escapeHTML(item)}</li>`).join('') +
+        '</ol>'
+      : '<p style="color:#64748B;font-style:italic">No se pudieron extraer acciones.</p>';
+
+    document.getElementById('sentimentActions').innerHTML = actionsHTML;
     return;
   }
 
-  // Parse text sections
+  // Parse text sections from primary regex matches
   const summaryText = summaryMatch ? summaryMatch[1].trim() : 'No se pudo extraer el resumen.';
   const strengthsText = strengthsMatch ? strengthsMatch[1].trim() : 'No se pudieron extraer los puntos fuertes.';
   const improvementsText = improvementsMatch ? improvementsMatch[1].trim() : 'No se pudieron extraer las áreas de mejora.';
