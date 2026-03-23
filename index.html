@@ -1679,7 +1679,7 @@ body.spa-locked { overflow: hidden; }
     <div style="text-align:center;max-width:700px;margin:0 auto 40px">
       <p style="font-size:15px;color:#475569;line-height:1.85">El <strong>Laboratorio de Proyectos</strong> será un espacio ubicado en el edificio de tecnología, dedicado a la creación de material multitecnológico. Nace como una <strong>iniciativa estudiantil</strong> para fomentar la innovación, la colaboración interescolar y la investigación aplicada.</p>
     </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px">
       <div class="card" style="padding:28px;text-align:center">
         <div style="font-size:40px;margin-bottom:12px">🏗️</div>
         <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Creación Multitecnológica</h3>
@@ -1690,184 +1690,185 @@ body.spa-locked { overflow: hidden; }
         <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Iniciativa Estudiantil</h3>
         <p style="font-size:13px;color:#64748B;line-height:1.7">Proyecto impulsado por estudiantes para estudiantes. Un espacio donde tus ideas cobran vida con el apoyo del Ecosistema Digital.</p>
       </div>
+      <div class="card" style="padding:28px;text-align:center;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s" onclick="openColabInterescolar()">
+        <div style="font-size:40px;margin-bottom:12px">🤝</div>
+        <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Colaboración Interescolar</h3>
+        <p style="font-size:13px;color:#64748B;line-height:1.7">Colaboración entre carreras de ingeniería y FES Iztacala para proyectos de investigación y desarrollo tecnológico conjunto.</p>
+        <span style="display:inline-block;margin-top:10px;font-size:11px;color:var(--gold);font-weight:600">Ver proyectos →</span>
+      </div>
       <div class="card" style="padding:28px;text-align:center">
         <div style="font-size:40px;margin-bottom:12px">🔬</div>
         <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Investigación Aplicada</h3>
         <p style="font-size:13px;color:#64748B;line-height:1.7">Espacio para la investigación interdisciplinaria y la formación continua de docentes en tecnologías emergentes.</p>
       </div>
     </div>
+  </div>
+</div>
 
-    <!-- ── Colaboración Interescolar: Proyectos ── -->
-    <div style="margin-top:48px">
-      <div class="sec-header" style="margin-bottom:24px">
-        <div class="sec-tag"><span class="dot"></span> Colaboración interescolar</div>
-        <h2 class="serif" style="font-size:22px">Proyectos Interdisciplinarios</h2>
-        <p>Colaboración entre FES Iztacala e ingenierías para investigación y desarrollo tecnológico conjunto.</p>
+<!-- ═══════════════════════════════════════════════════════════════════
+     STANDALONE OVERLAY: Colaboración Interescolar — Proyectos
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="servicio-modal-overlay" id="colabInterescolarOverlay" onclick="if(event.target===this)closeColabInterescolar()">
+  <div class="servicio-modal-card" style="max-width:960px;padding:40px 32px">
+    <button class="servicio-modal-close" onclick="closeColabInterescolar()" aria-label="Cerrar">&times;</button>
+    <div class="sec-header" style="margin-bottom:24px">
+      <div class="sec-tag"><span class="dot"></span> Colaboración interescolar</div>
+      <h2 class="serif">Proyectos Interdisciplinarios</h2>
+      <p>Colaboración entre FES Iztacala e ingenierías para investigación y desarrollo tecnológico conjunto.</p>
+    </div>
+
+    <!-- Resumen -->
+    <div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;margin-bottom:32px">
+      <div style="background:rgba(12,35,64,0.05);border-radius:12px;padding:14px 22px;text-align:center;min-width:120px">
+        <div style="font-size:26px;font-weight:700;color:var(--navy)">6</div>
+        <div style="font-size:10px;color:#64748B;text-transform:uppercase;letter-spacing:0.5px">Proyectos</div>
       </div>
+      <div style="background:rgba(12,35,64,0.05);border-radius:12px;padding:14px 22px;text-align:center;min-width:120px">
+        <div style="font-size:26px;font-weight:700;color:var(--navy)">5</div>
+        <div style="font-size:10px;color:#64748B;text-transform:uppercase;letter-spacing:0.5px">Carreras</div>
+      </div>
+      <div style="background:rgba(12,35,64,0.05);border-radius:12px;padding:14px 22px;text-align:center;min-width:120px">
+        <div style="font-size:26px;font-weight:700;color:var(--gold)">22</div>
+        <div style="font-size:10px;color:#64748B;text-transform:uppercase;letter-spacing:0.5px">Estudiantes</div>
+      </div>
+      <div style="background:rgba(12,35,64,0.05);border-radius:12px;padding:14px 22px;text-align:center;min-width:120px">
+        <div style="font-size:26px;font-weight:700;color:var(--gold)">10</div>
+        <div style="font-size:10px;color:#64748B;text-transform:uppercase;letter-spacing:0.5px">Asesores</div>
+      </div>
+    </div>
 
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px">
-        <!-- Proyecto 1 -->
-        <div class="card" style="padding:0;overflow:hidden">
-          <div style="background:linear-gradient(135deg,#0C2340,#1a4a6c);padding:20px 24px;color:#fff">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <span style="font-size:11px;background:rgba(196,162,78,0.25);color:var(--gold);padding:3px 10px;border-radius:12px;font-weight:600">En desarrollo</span>
-              <span style="font-size:20px">🧠</span>
-            </div>
-            <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">NeuroVR: Rehabilitación Cognitiva</h3>
-            <p style="font-size:12px;color:rgba(255,255,255,0.6)">Psicología + Ing. Computación</p>
+    <!-- Proyectos Grid -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px">
+      <!-- Proyecto 1 -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="background:linear-gradient(135deg,#0C2340,#1a4a6c);padding:20px 24px;color:#fff">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:11px;background:rgba(196,162,78,0.25);color:var(--gold);padding:3px 10px;border-radius:12px;font-weight:600">En desarrollo</span>
+            <span style="font-size:20px">🧠</span>
           </div>
-          <div style="padding:20px 24px">
-            <p style="font-size:13px;color:#64748B;line-height:1.7;margin-bottom:14px">Plataforma de realidad virtual para rehabilitación neuropsicológica de pacientes con deterioro cognitivo leve. Integra evaluación automatizada con IA.</p>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
-              <span style="font-size:11px;background:#EFF6FF;color:#1E40AF;padding:3px 8px;border-radius:6px">RV</span>
-              <span style="font-size:11px;background:#F0FDF4;color:#166534;padding:3px 8px;border-radius:6px">IA</span>
-              <span style="font-size:11px;background:#FDF4FF;color:#86198F;padding:3px 8px;border-radius:6px">Neurociencias</span>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#94A3B8">
-              <span>4 estudiantes · 2 asesores</span>
-              <span>Semestre 2026-1</span>
-            </div>
-          </div>
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">NeuroVR: Rehabilitación Cognitiva</h3>
+          <p style="font-size:12px;color:rgba(255,255,255,0.6)">Psicología + Ing. Computación</p>
         </div>
-
-        <!-- Proyecto 2 -->
-        <div class="card" style="padding:0;overflow:hidden">
-          <div style="background:linear-gradient(135deg,#0C2340,#2d1a4a);padding:20px 24px;color:#fff">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <span style="font-size:11px;background:rgba(196,162,78,0.25);color:var(--gold);padding:3px 10px;border-radius:12px;font-weight:600">En desarrollo</span>
-              <span style="font-size:20px">🦷</span>
-            </div>
-            <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">DentalSim 3D</h3>
-            <p style="font-size:12px;color:rgba(255,255,255,0.6)">Odontología + Ing. Mecatrónica</p>
+        <div style="padding:20px 24px">
+          <p style="font-size:13px;color:#64748B;line-height:1.7;margin-bottom:14px">Plataforma de realidad virtual para rehabilitación neuropsicológica de pacientes con deterioro cognitivo leve. Integra evaluación automatizada con IA.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
+            <span style="font-size:11px;background:#EFF6FF;color:#1E40AF;padding:3px 8px;border-radius:6px">RV</span>
+            <span style="font-size:11px;background:#F0FDF4;color:#166534;padding:3px 8px;border-radius:6px">IA</span>
+            <span style="font-size:11px;background:#FDF4FF;color:#86198F;padding:3px 8px;border-radius:6px">Neurociencias</span>
           </div>
-          <div style="padding:20px 24px">
-            <p style="font-size:13px;color:#64748B;line-height:1.7;margin-bottom:14px">Simulador háptico para prácticas de procedimientos dentales con retroalimentación de fuerza. Reduce el uso de modelos físicos en un 60%.</p>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
-              <span style="font-size:11px;background:#EFF6FF;color:#1E40AF;padding:3px 8px;border-radius:6px">Háptica</span>
-              <span style="font-size:11px;background:#FEF3C7;color:#92400E;padding:3px 8px;border-radius:6px">Simulación</span>
-              <span style="font-size:11px;background:#F0FDF4;color:#166534;padding:3px 8px;border-radius:6px">3D</span>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#94A3B8">
-              <span>6 estudiantes · 3 asesores</span>
-              <span>Semestre 2026-1</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Proyecto 3 -->
-        <div class="card" style="padding:0;overflow:hidden">
-          <div style="background:linear-gradient(135deg,#0C2340,#1a3a2d);padding:20px 24px;color:#fff">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <span style="font-size:11px;background:rgba(5,150,105,0.25);color:#6EE7B7;padding:3px 10px;border-radius:12px;font-weight:600">Completado</span>
-              <span style="font-size:20px">🌿</span>
-            </div>
-            <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">BioMonitor IoT</h3>
-            <p style="font-size:12px;color:rgba(255,255,255,0.6)">Biología + Ing. Electrónica</p>
-          </div>
-          <div style="padding:20px 24px">
-            <p style="font-size:13px;color:#64748B;line-height:1.7;margin-bottom:14px">Sistema IoT de monitoreo ambiental para los jardines de FES Iztacala. Sensores de humedad, temperatura y calidad del aire con dashboard en tiempo real.</p>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
-              <span style="font-size:11px;background:#ECFDF5;color:#065F46;padding:3px 8px;border-radius:6px">IoT</span>
-              <span style="font-size:11px;background:#EFF6FF;color:#1E40AF;padding:3px 8px;border-radius:6px">Sensores</span>
-              <span style="font-size:11px;background:#FDF4FF;color:#86198F;padding:3px 8px;border-radius:6px">Dashboard</span>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#94A3B8">
-              <span>5 estudiantes · 2 asesores</span>
-              <span>Semestre 2025-2</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Proyecto 4 -->
-        <div class="card" style="padding:0;overflow:hidden">
-          <div style="background:linear-gradient(135deg,#0C2340,#4a1a1a);padding:20px 24px;color:#fff">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <span style="font-size:11px;background:rgba(196,162,78,0.25);color:var(--gold);padding:3px 10px;border-radius:12px;font-weight:600">En desarrollo</span>
-              <span style="font-size:20px">💉</span>
-            </div>
-            <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">EnfermeríAR</h3>
-            <p style="font-size:12px;color:rgba(255,255,255,0.6)">Enfermería + Ing. Software</p>
-          </div>
-          <div style="padding:20px 24px">
-            <p style="font-size:13px;color:#64748B;line-height:1.7;margin-bottom:14px">App de realidad aumentada que superpone guías anatómicas sobre maniquíes de práctica clínica para localización de vías intravenosas.</p>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
-              <span style="font-size:11px;background:#FEF3C7;color:#92400E;padding:3px 8px;border-radius:6px">RA</span>
-              <span style="font-size:11px;background:#F0FDF4;color:#166534;padding:3px 8px;border-radius:6px">App Móvil</span>
-              <span style="font-size:11px;background:#FEE2E2;color:#991B1B;padding:3px 8px;border-radius:6px">Anatomía</span>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#94A3B8">
-              <span>3 estudiantes · 1 asesor</span>
-              <span>Semestre 2026-1</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Proyecto 5 -->
-        <div class="card" style="padding:0;overflow:hidden">
-          <div style="background:linear-gradient(135deg,#0C2340,#1a2d4a);padding:20px 24px;color:#fff">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <span style="font-size:11px;background:rgba(59,130,246,0.25);color:#93C5FD;padding:3px 10px;border-radius:12px;font-weight:600">Propuesta</span>
-              <span style="font-size:20px">📊</span>
-            </div>
-            <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">PsicoData Analytics</h3>
-            <p style="font-size:12px;color:rgba(255,255,255,0.6)">Psicología + Ing. en Datos</p>
-          </div>
-          <div style="padding:20px 24px">
-            <p style="font-size:13px;color:#64748B;line-height:1.7;margin-bottom:14px">Pipeline de análisis de datos conductuales con machine learning para identificar patrones en evaluaciones psicométricas grupales.</p>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
-              <span style="font-size:11px;background:#F0FDF4;color:#166534;padding:3px 8px;border-radius:6px">ML</span>
-              <span style="font-size:11px;background:#EFF6FF;color:#1E40AF;padding:3px 8px;border-radius:6px">Big Data</span>
-              <span style="font-size:11px;background:#FDF4FF;color:#86198F;padding:3px 8px;border-radius:6px">Psicometría</span>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#94A3B8">
-              <span>Buscando equipo</span>
-              <span>Semestre 2026-2</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Proyecto 6 -->
-        <div class="card" style="padding:0;overflow:hidden">
-          <div style="background:linear-gradient(135deg,#0C2340,#3a2d1a);padding:20px 24px;color:#fff">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-              <span style="font-size:11px;background:rgba(5,150,105,0.25);color:#6EE7B7;padding:3px 10px;border-radius:12px;font-weight:600">Completado</span>
-              <span style="font-size:20px">👁️</span>
-            </div>
-            <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">OptoScreen AI</h3>
-            <p style="font-size:12px;color:rgba(255,255,255,0.6)">Optometría + Ing. Biomédica</p>
-          </div>
-          <div style="padding:20px 24px">
-            <p style="font-size:13px;color:#64748B;line-height:1.7;margin-bottom:14px">Herramienta de screening visual basada en IA que analiza fotografías de fondo de ojo para detección temprana de retinopatía diabética.</p>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
-              <span style="font-size:11px;background:#F0FDF4;color:#166534;padding:3px 8px;border-radius:6px">IA</span>
-              <span style="font-size:11px;background:#FEE2E2;color:#991B1B;padding:3px 8px;border-radius:6px">Visión</span>
-              <span style="font-size:11px;background:#EFF6FF;color:#1E40AF;padding:3px 8px;border-radius:6px">Diagnóstico</span>
-            </div>
-            <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#94A3B8">
-              <span>4 estudiantes · 2 asesores</span>
-              <span>Semestre 2025-2</span>
-            </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#94A3B8">
+            <span>4 estudiantes · 2 asesores</span><span>Semestre 2026-1</span>
           </div>
         </div>
       </div>
-
-      <!-- Resumen de colaboración -->
-      <div style="margin-top:32px;display:flex;flex-wrap:wrap;gap:16px;justify-content:center">
-        <div style="background:rgba(12,35,64,0.05);border-radius:12px;padding:16px 24px;text-align:center;min-width:140px">
-          <div style="font-size:28px;font-weight:700;color:var(--navy)">6</div>
-          <div style="font-size:11px;color:#64748B;text-transform:uppercase;letter-spacing:0.5px">Proyectos</div>
+      <!-- Proyecto 2 -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="background:linear-gradient(135deg,#0C2340,#2d1a4a);padding:20px 24px;color:#fff">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:11px;background:rgba(196,162,78,0.25);color:var(--gold);padding:3px 10px;border-radius:12px;font-weight:600">En desarrollo</span>
+            <span style="font-size:20px">🦷</span>
+          </div>
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">DentalSim 3D</h3>
+          <p style="font-size:12px;color:rgba(255,255,255,0.6)">Odontología + Ing. Mecatrónica</p>
         </div>
-        <div style="background:rgba(12,35,64,0.05);border-radius:12px;padding:16px 24px;text-align:center;min-width:140px">
-          <div style="font-size:28px;font-weight:700;color:var(--navy)">5</div>
-          <div style="font-size:11px;color:#64748B;text-transform:uppercase;letter-spacing:0.5px">Carreras</div>
+        <div style="padding:20px 24px">
+          <p style="font-size:13px;color:#64748B;line-height:1.7;margin-bottom:14px">Simulador háptico para prácticas de procedimientos dentales con retroalimentación de fuerza. Reduce el uso de modelos físicos en un 60%.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
+            <span style="font-size:11px;background:#EFF6FF;color:#1E40AF;padding:3px 8px;border-radius:6px">Háptica</span>
+            <span style="font-size:11px;background:#FEF3C7;color:#92400E;padding:3px 8px;border-radius:6px">Simulación</span>
+            <span style="font-size:11px;background:#F0FDF4;color:#166534;padding:3px 8px;border-radius:6px">3D</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#94A3B8">
+            <span>6 estudiantes · 3 asesores</span><span>Semestre 2026-1</span>
+          </div>
         </div>
-        <div style="background:rgba(12,35,64,0.05);border-radius:12px;padding:16px 24px;text-align:center;min-width:140px">
-          <div style="font-size:28px;font-weight:700;color:var(--gold)">22</div>
-          <div style="font-size:11px;color:#64748B;text-transform:uppercase;letter-spacing:0.5px">Estudiantes</div>
+      </div>
+      <!-- Proyecto 3 -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="background:linear-gradient(135deg,#0C2340,#1a3a2d);padding:20px 24px;color:#fff">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:11px;background:rgba(5,150,105,0.25);color:#6EE7B7;padding:3px 10px;border-radius:12px;font-weight:600">Completado</span>
+            <span style="font-size:20px">🌿</span>
+          </div>
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">BioMonitor IoT</h3>
+          <p style="font-size:12px;color:rgba(255,255,255,0.6)">Biología + Ing. Electrónica</p>
         </div>
-        <div style="background:rgba(12,35,64,0.05);border-radius:12px;padding:16px 24px;text-align:center;min-width:140px">
-          <div style="font-size:28px;font-weight:700;color:var(--gold)">10</div>
-          <div style="font-size:11px;color:#64748B;text-transform:uppercase;letter-spacing:0.5px">Asesores</div>
+        <div style="padding:20px 24px">
+          <p style="font-size:13px;color:#64748B;line-height:1.7;margin-bottom:14px">Sistema IoT de monitoreo ambiental para los jardines de FES Iztacala. Sensores de humedad, temperatura y calidad del aire con dashboard en tiempo real.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
+            <span style="font-size:11px;background:#ECFDF5;color:#065F46;padding:3px 8px;border-radius:6px">IoT</span>
+            <span style="font-size:11px;background:#EFF6FF;color:#1E40AF;padding:3px 8px;border-radius:6px">Sensores</span>
+            <span style="font-size:11px;background:#FDF4FF;color:#86198F;padding:3px 8px;border-radius:6px">Dashboard</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#94A3B8">
+            <span>5 estudiantes · 2 asesores</span><span>Semestre 2025-2</span>
+          </div>
+        </div>
+      </div>
+      <!-- Proyecto 4 -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="background:linear-gradient(135deg,#0C2340,#4a1a1a);padding:20px 24px;color:#fff">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:11px;background:rgba(196,162,78,0.25);color:var(--gold);padding:3px 10px;border-radius:12px;font-weight:600">En desarrollo</span>
+            <span style="font-size:20px">💉</span>
+          </div>
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">EnfermeríAR</h3>
+          <p style="font-size:12px;color:rgba(255,255,255,0.6)">Enfermería + Ing. Software</p>
+        </div>
+        <div style="padding:20px 24px">
+          <p style="font-size:13px;color:#64748B;line-height:1.7;margin-bottom:14px">App de realidad aumentada que superpone guías anatómicas sobre maniquíes de práctica clínica para localización de vías intravenosas.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
+            <span style="font-size:11px;background:#FEF3C7;color:#92400E;padding:3px 8px;border-radius:6px">RA</span>
+            <span style="font-size:11px;background:#F0FDF4;color:#166534;padding:3px 8px;border-radius:6px">App Móvil</span>
+            <span style="font-size:11px;background:#FEE2E2;color:#991B1B;padding:3px 8px;border-radius:6px">Anatomía</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#94A3B8">
+            <span>3 estudiantes · 1 asesor</span><span>Semestre 2026-1</span>
+          </div>
+        </div>
+      </div>
+      <!-- Proyecto 5 -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="background:linear-gradient(135deg,#0C2340,#1a2d4a);padding:20px 24px;color:#fff">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:11px;background:rgba(59,130,246,0.25);color:#93C5FD;padding:3px 10px;border-radius:12px;font-weight:600">Propuesta</span>
+            <span style="font-size:20px">📊</span>
+          </div>
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">PsicoData Analytics</h3>
+          <p style="font-size:12px;color:rgba(255,255,255,0.6)">Psicología + Ing. en Datos</p>
+        </div>
+        <div style="padding:20px 24px">
+          <p style="font-size:13px;color:#64748B;line-height:1.7;margin-bottom:14px">Pipeline de análisis de datos conductuales con machine learning para identificar patrones en evaluaciones psicométricas grupales.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
+            <span style="font-size:11px;background:#F0FDF4;color:#166534;padding:3px 8px;border-radius:6px">ML</span>
+            <span style="font-size:11px;background:#EFF6FF;color:#1E40AF;padding:3px 8px;border-radius:6px">Big Data</span>
+            <span style="font-size:11px;background:#FDF4FF;color:#86198F;padding:3px 8px;border-radius:6px">Psicometría</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#94A3B8">
+            <span>Buscando equipo</span><span>Semestre 2026-2</span>
+          </div>
+        </div>
+      </div>
+      <!-- Proyecto 6 -->
+      <div class="card" style="padding:0;overflow:hidden">
+        <div style="background:linear-gradient(135deg,#0C2340,#3a2d1a);padding:20px 24px;color:#fff">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <span style="font-size:11px;background:rgba(5,150,105,0.25);color:#6EE7B7;padding:3px 10px;border-radius:12px;font-weight:600">Completado</span>
+            <span style="font-size:20px">👁️</span>
+          </div>
+          <h3 style="font-size:16px;font-weight:700;margin-bottom:4px">OptoScreen AI</h3>
+          <p style="font-size:12px;color:rgba(255,255,255,0.6)">Optometría + Ing. Biomédica</p>
+        </div>
+        <div style="padding:20px 24px">
+          <p style="font-size:13px;color:#64748B;line-height:1.7;margin-bottom:14px">Herramienta de screening visual basada en IA que analiza fotografías de fondo de ojo para detección temprana de retinopatía diabética.</p>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">
+            <span style="font-size:11px;background:#F0FDF4;color:#166534;padding:3px 8px;border-radius:6px">IA</span>
+            <span style="font-size:11px;background:#FEE2E2;color:#991B1B;padding:3px 8px;border-radius:6px">Visión</span>
+            <span style="font-size:11px;background:#EFF6FF;color:#1E40AF;padding:3px 8px;border-radius:6px">Diagnóstico</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#94A3B8">
+            <span>4 estudiantes · 2 asesores</span><span>Semestre 2025-2</span>
+          </div>
         </div>
       </div>
     </div>
