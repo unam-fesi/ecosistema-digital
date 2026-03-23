@@ -879,7 +879,7 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 .login-overlay {
   position:fixed; inset:0; z-index:10000;
   background:rgba(2,8,20,0.8); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
-  display:block;
+  display:flex; align-items:flex-start; justify-content:center;
   padding:40px 20px;
   overflow-y:auto; -webkit-overflow-scrolling:touch;
   opacity:0; pointer-events:none; transition:opacity 0.3s;
@@ -889,7 +889,8 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   background:#fff; border-radius:24px; padding:44px 40px; max-width:400px; width:100%;
   box-shadow:0 30px 80px rgba(0,0,0,0.3); text-align:center;
   animation:fadeUp 0.4s ease both;
-  margin:0 auto;
+  margin:auto;
+  flex-shrink:0;
 }
 .login-card img { height:70px; margin-bottom:20px; display:block; margin-left:auto; margin-right:auto; }
 .login-card h2 { font-family:'Playfair Display',Georgia,serif; font-size:24px; color:var(--navy); margin-bottom:6px; }
@@ -1587,72 +1588,6 @@ body.spa-locked { overflow: hidden; }
     <!-- Service Cards Grid -->
     <div class="servicios-cards-grid" id="serviciosCardsGrid"></div>
 
-    <!-- VR Catalog -->
-    <div id="vrCatalogSubsection" style="display:none;margin-top:40px;padding-top:30px;border-top:2px solid rgba(196,162,78,0.15)">
-      <div class="sec-header" style="margin-bottom:30px">
-        <div class="sec-tag"><span class="dot"></span> Catálogo de Software</div>
-        <h2 class="serif" style="font-size:clamp(22px,3vw,32px)">Software de Realidad Virtual</h2>
-        <p>Explora las aplicaciones VR disponibles para tu carrera.</p>
-      </div>
-      <div class="vr-tabs-nav">
-        <button class="vr-tab-btn active" onclick="switchVRTab('Médico Cirujano',this)">🏥 Médico Cirujano</button>
-        <button class="vr-tab-btn" onclick="switchVRTab('Enfermería',this)">⚕️ Enfermería</button>
-        <button class="vr-tab-btn" onclick="switchVRTab('Biología',this)">🧬 Biología</button>
-        <button class="vr-tab-btn" onclick="switchVRTab('Psicología',this)">🧠 Psicología</button>
-        <button class="vr-tab-btn" onclick="switchVRTab('Cirujano Dentista',this)">🦷 Cirujano Dentista</button>
-      </div>
-      <div id="vr-Médico Cirujano" class="vr-tab-content active" style="margin-top:30px"></div>
-      <div id="vr-Enfermería" class="vr-tab-content" style="margin-top:30px"></div>
-      <div id="vr-Biología" class="vr-tab-content" style="margin-top:30px"></div>
-      <div id="vr-Psicología" class="vr-tab-content" style="margin-top:30px"></div>
-      <div id="vr-Cirujano Dentista" class="vr-tab-content" style="margin-top:30px"></div>
-    </div>
-
-    <!-- Aula Inmersiva Card -->
-    <div id="aulaInmersivaSubsection" style="display:none;margin-top:50px">
-      <div class="sec-header">
-        <div class="sec-tag"><span class="dot"></span> Innovación educativa</div>
-        <h2 class="serif">Aula Inmersiva Interprofesional</h2>
-        <p>Un entorno donde los estudiantes de salud practican la incertidumbre, la presión y el trabajo en equipo — sin riesgo real para nadie.</p>
-      </div>
-      <div class="card" style="position:relative;border:2px solid rgba(196,162,78,0.3);cursor:pointer;max-width:900px;margin:0 auto" onclick="openAIIModal()">
-        <div style="position:absolute;top:16px;right:16px;background:linear-gradient(135deg,#EF4444,#F97316);color:#fff;font-size:11px;font-weight:700;padding:5px 14px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;box-shadow:0 4px 12px rgba(239,68,68,0.3)">Nuevo</div>
-        <div style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
-          <div style="min-width:80px;height:80px;border-radius:20px;background:linear-gradient(135deg,#7C3AED,#2563EB);display:flex;align-items:center;justify-content:center;font-size:36px;flex-shrink:0">🏥</div>
-          <div style="flex:1;min-width:280px">
-            <h3 class="serif" style="font-size:24px;color:var(--navy);margin-bottom:10px">Aula Inmersiva Interprofesional</h3>
-            <p style="font-size:15px;color:#64748B;line-height:1.85;margin-bottom:18px">Entorno seguro de simulación clínica donde estudiantes de distintas carreras de salud desarrollan habilidades blandas esenciales mediante escenarios inmersivos con tecnología de vanguardia.</p>
-            <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px">
-              <div style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.15);border-radius:12px;padding:14px 12px;text-align:center">
-                <div style="font-size:24px;margin-bottom:6px">🤝</div>
-                <div style="font-size:12px;font-weight:700;color:#7C3AED">Trabajo en equipo</div>
-              </div>
-              <div style="background:rgba(37,99,235,0.06);border:1px solid rgba(37,99,235,0.15);border-radius:12px;padding:14px 12px;text-align:center">
-                <div style="font-size:24px;margin-bottom:6px">💬</div>
-                <div style="font-size:12px;font-weight:700;color:#2563EB">Comunicación efectiva</div>
-              </div>
-              <div style="background:rgba(5,150,105,0.06);border:1px solid rgba(5,150,105,0.15);border-radius:12px;padding:14px 12px;text-align:center">
-                <div style="font-size:24px;margin-bottom:6px">🧠</div>
-                <div style="font-size:12px;font-weight:700;color:#059669">Análisis crítico</div>
-              </div>
-              <div style="background:rgba(234,88,12,0.06);border:1px solid rgba(234,88,12,0.15);border-radius:12px;padding:14px 12px;text-align:center">
-                <div style="font-size:24px;margin-bottom:6px">💪</div>
-                <div style="font-size:12px;font-weight:700;color:#EA580C">Manejo de frustración</div>
-              </div>
-              <div style="background:rgba(220,38,38,0.06);border:1px solid rgba(220,38,38,0.15);border-radius:12px;padding:14px 12px;text-align:center">
-                <div style="font-size:24px;margin-bottom:6px">🛡️</div>
-                <div style="font-size:12px;font-weight:700;color:#DC2626">Seguridad del paciente</div>
-              </div>
-            </div>
-            <p style="margin-top:16px;font-size:13px;color:var(--gold);font-weight:600;display:flex;align-items:center;gap:6px">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
-              Haz clic para conocer más detalles
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Solicitud de Servicio -->
     <div style="margin-top:60px">
       <div class="sec-header">
@@ -1725,38 +1660,132 @@ body.spa-locked { overflow: hidden; }
       </div>
     </div>
 
-    <!-- Laboratorio de Proyectos -->
-    <div id="labProyectosSubsection" style="display:none;margin-top:60px">
-      <div class="sec-header">
-        <div class="sec-tag"><span class="dot"></span> Nuevo espacio</div>
-        <h2 class="serif">Laboratorio de Proyectos</h2>
-        <p>Un espacio para la creación, innovación y colaboración tecnológica.</p>
+    <!-- Lab Proyectos removido de aquí: ahora tiene su propio overlay standalone -->
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     STANDALONE OVERLAY: Laboratorio de Proyectos
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="servicio-modal-overlay" id="labProyectosOverlay" onclick="if(event.target===this)closeLabProyectos()">
+  <div class="servicio-modal-card" style="max-width:900px;padding:40px 32px">
+    <button class="servicio-modal-close" onclick="closeLabProyectos()" aria-label="Cerrar">&times;</button>
+    <div class="sec-header" style="margin-bottom:32px">
+      <div class="sec-tag"><span class="dot"></span> Nuevo espacio</div>
+      <h2 class="serif">Laboratorio de Proyectos</h2>
+      <p>Un espacio para la creación, innovación y colaboración tecnológica.</p>
+    </div>
+    <div class="lab-proximamente"><div class="lab-proximamente-text">PRÓXIMAMENTE</div></div>
+    <div style="text-align:center;max-width:700px;margin:0 auto 40px">
+      <p style="font-size:15px;color:#475569;line-height:1.85">El <strong>Laboratorio de Proyectos</strong> será un espacio ubicado en el edificio de tecnología, dedicado a la creación de material multitecnológico. Nace como una <strong>iniciativa estudiantil</strong> para fomentar la innovación, la colaboración interescolar y la investigación aplicada.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px">
+      <div class="card" style="padding:28px;text-align:center">
+        <div style="font-size:40px;margin-bottom:12px">🏗️</div>
+        <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Creación Multitecnológica</h3>
+        <p style="font-size:13px;color:#64748B;line-height:1.7">Espacio equipado para la creación de material que integre múltiples tecnologías: IA, RV, RA, bases de datos y más.</p>
       </div>
-      <div class="lab-proximamente"><div class="lab-proximamente-text">PRÓXIMAMENTE</div></div>
-      <div style="text-align:center;max-width:700px;margin:0 auto 40px">
-        <p style="font-size:15px;color:#475569;line-height:1.85">El <strong>Laboratorio de Proyectos</strong> será un espacio ubicado en el edificio de tecnología, dedicado a la creación de material multitecnológico. Nace como una <strong>iniciativa estudiantil</strong> para fomentar la innovación, la colaboración interescolar y la investigación aplicada.</p>
+      <div class="card" style="padding:28px;text-align:center">
+        <div style="font-size:40px;margin-bottom:12px">🎓</div>
+        <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Iniciativa Estudiantil</h3>
+        <p style="font-size:13px;color:#64748B;line-height:1.7">Proyecto impulsado por estudiantes para estudiantes. Un espacio donde tus ideas cobran vida con el apoyo del Ecosistema Digital.</p>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px">
-        <div class="card" style="padding:28px;text-align:center">
-          <div style="font-size:40px;margin-bottom:12px">🏗️</div>
-          <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Creación Multitecnológica</h3>
-          <p style="font-size:13px;color:#64748B;line-height:1.7">Espacio equipado para la creación de material que integre múltiples tecnologías: IA, RV, RA, bases de datos y más.</p>
-        </div>
-        <div class="card" style="padding:28px;text-align:center">
-          <div style="font-size:40px;margin-bottom:12px">🎓</div>
-          <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Iniciativa Estudiantil</h3>
-          <p style="font-size:13px;color:#64748B;line-height:1.7">Proyecto impulsado por estudiantes para estudiantes. Un espacio donde tus ideas cobran vida con el apoyo del Ecosistema Digital.</p>
-        </div>
-        <div class="card" style="padding:28px;text-align:center">
-          <div style="font-size:40px;margin-bottom:12px">🤝</div>
-          <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Colaboración Interescolar</h3>
-          <p style="font-size:13px;color:#64748B;line-height:1.7">Colaboración entre carreras de ingeniería y FES Iztacala para proyectos de investigación y desarrollo tecnológico conjunto.</p>
-        </div>
-        <div class="card" style="padding:28px;text-align:center">
-          <div style="font-size:40px;margin-bottom:12px">🔬</div>
-          <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Investigación Aplicada</h3>
-          <p style="font-size:13px;color:#64748B;line-height:1.7">Espacio para la investigación interdisciplinaria y la formación continua de docentes en tecnologías emergentes.</p>
-        </div>
+      <div class="card" style="padding:28px;text-align:center">
+        <div style="font-size:40px;margin-bottom:12px">🤝</div>
+        <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Colaboración Interescolar</h3>
+        <p style="font-size:13px;color:#64748B;line-height:1.7">Colaboración entre carreras de ingeniería y FES Iztacala para proyectos de investigación y desarrollo tecnológico conjunto.</p>
+      </div>
+      <div class="card" style="padding:28px;text-align:center">
+        <div style="font-size:40px;margin-bottom:12px">🔬</div>
+        <h3 style="font-size:16px;font-weight:700;color:var(--navy);margin-bottom:8px">Investigación Aplicada</h3>
+        <p style="font-size:13px;color:#64748B;line-height:1.7">Espacio para la investigación interdisciplinaria y la formación continua de docentes en tecnologías emergentes.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     STANDALONE OVERLAY: Catálogo de Software VR
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="servicio-modal-overlay" id="vrCatalogOverlay" onclick="if(event.target===this)closeVRCatalog()">
+  <div class="servicio-modal-card" style="max-width:960px;padding:40px 32px">
+    <button class="servicio-modal-close" onclick="closeVRCatalog()" aria-label="Cerrar">&times;</button>
+    <div class="sec-header" style="margin-bottom:32px">
+      <div class="sec-tag"><span class="dot"></span> Software especializado</div>
+      <h2 class="serif">Catálogo de Software VR</h2>
+      <p>Explora las aplicaciones de Realidad Virtual especializadas por carrera disponibles en el Ecosistema Digital.</p>
+    </div>
+    <!-- VR Tabs -->
+    <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:32px" id="vrCatTabs">
+      <button class="aii-tab active" onclick="switchVRTab('todos',this)">Todos</button>
+      <button class="aii-tab" onclick="switchVRTab('medicina',this)">Medicina</button>
+      <button class="aii-tab" onclick="switchVRTab('psicologia',this)">Psicología</button>
+      <button class="aii-tab" onclick="switchVRTab('enfermeria',this)">Enfermería</button>
+      <button class="aii-tab" onclick="switchVRTab('odontologia',this)">Odontología</button>
+      <button class="aii-tab" onclick="switchVRTab('biologia',this)">Biología</button>
+      <button class="aii-tab" onclick="switchVRTab('optometria',this)">Optometría</button>
+    </div>
+    <!-- VR Software Grid -->
+    <div id="vrCatGrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px">
+      <!-- Medicina -->
+      <div class="card vr-app" data-carrera="medicina" style="padding:24px">
+        <div style="font-size:32px;margin-bottom:8px">🫀</div>
+        <h3 style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px">3D Organon</h3>
+        <span class="acc-tag" style="margin-bottom:8px">Medicina</span>
+        <p style="font-size:13px;color:#64748B;line-height:1.6">Atlas de anatomía 3D interactivo con más de 15,000 estructuras anatómicas para exploración inmersiva.</p>
+      </div>
+      <div class="card vr-app" data-carrera="medicina" style="padding:24px">
+        <div style="font-size:32px;margin-bottom:8px">🏥</div>
+        <h3 style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px">SimLab Soft VR</h3>
+        <span class="acc-tag" style="margin-bottom:8px">Medicina</span>
+        <p style="font-size:13px;color:#64748B;line-height:1.6">Simulación de procedimientos médicos y quirúrgicos en entorno virtual controlado.</p>
+      </div>
+      <!-- Psicología -->
+      <div class="card vr-app" data-carrera="psicologia" style="padding:24px">
+        <div style="font-size:32px;margin-bottom:8px">🧠</div>
+        <h3 style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px">Amelia Virtual Care</h3>
+        <span class="acc-tag" style="margin-bottom:8px">Psicología</span>
+        <p style="font-size:13px;color:#64748B;line-height:1.6">Entornos virtuales para terapia de exposición en fobias, ansiedad y TEPT.</p>
+      </div>
+      <div class="card vr-app" data-carrera="psicologia" style="padding:24px">
+        <div style="font-size:32px;margin-bottom:8px">🧘</div>
+        <h3 style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px">TRIPP VR</h3>
+        <span class="acc-tag" style="margin-bottom:8px">Psicología</span>
+        <p style="font-size:13px;color:#64748B;line-height:1.6">Meditación y mindfulness inmersivo para investigación en bienestar emocional.</p>
+      </div>
+      <!-- Enfermería -->
+      <div class="card vr-app" data-carrera="enfermeria" style="padding:24px">
+        <div style="font-size:32px;margin-bottom:8px">💉</div>
+        <h3 style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px">UbiSim</h3>
+        <span class="acc-tag" style="margin-bottom:8px">Enfermería</span>
+        <p style="font-size:13px;color:#64748B;line-height:1.6">Simulación de escenarios clínicos de enfermería con pacientes virtuales realistas.</p>
+      </div>
+      <!-- Odontología -->
+      <div class="card vr-app" data-carrera="odontologia" style="padding:24px">
+        <div style="font-size:32px;margin-bottom:8px">🦷</div>
+        <h3 style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px">Dental Simulator VR</h3>
+        <span class="acc-tag" style="margin-bottom:8px">Odontología</span>
+        <p style="font-size:13px;color:#64748B;line-height:1.6">Práctica de procedimientos dentales en modelos 3D con retroalimentación háptica.</p>
+      </div>
+      <!-- Biología -->
+      <div class="card vr-app" data-carrera="biologia" style="padding:24px">
+        <div style="font-size:32px;margin-bottom:8px">🔬</div>
+        <h3 style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px">Nanome</h3>
+        <span class="acc-tag" style="margin-bottom:8px">Biología</span>
+        <p style="font-size:13px;color:#64748B;line-height:1.6">Visualización y manipulación de estructuras moleculares en realidad virtual colaborativa.</p>
+      </div>
+      <div class="card vr-app" data-carrera="biologia" style="padding:24px">
+        <div style="font-size:32px;margin-bottom:8px">🌿</div>
+        <h3 style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px">Ecosphere VR</h3>
+        <span class="acc-tag" style="margin-bottom:8px">Biología</span>
+        <p style="font-size:13px;color:#64748B;line-height:1.6">Exploración inmersiva de ecosistemas y biodiversidad para estudios de ecología.</p>
+      </div>
+      <!-- Optometría -->
+      <div class="card vr-app" data-carrera="optometria" style="padding:24px">
+        <div style="font-size:32px;margin-bottom:8px">👁️</div>
+        <h3 style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px">EyeSim VR</h3>
+        <span class="acc-tag" style="margin-bottom:8px">Optometría</span>
+        <p style="font-size:13px;color:#64748B;line-height:1.6">Simulación de exámenes visuales y patologías oculares en entorno virtual inmersivo.</p>
       </div>
     </div>
   </div>
@@ -2036,7 +2065,7 @@ body.spa-locked { overflow: hidden; }
     <img src="assets/logo-ecosistema-digital.png" alt="Ecosistema Digital" onerror="this.style.display='none'">
     <h2>Iniciar Sesión</h2>
     <p class="sub">Acceso al Ecosistema Digital — FES Iztacala, UNAM</p>
-    <form id="loginForm" onsubmit="event.preventDefault();handleLogin()">
+    <form id="loginForm">
       <div class="form-group">
         <label class="form-label">Correo electrónico</label>
         <input class="input" type="email" id="loginEmail" placeholder="correo@iztacala.unam.mx" required>
