@@ -442,6 +442,23 @@ body { font-family:'Inter',system-ui,-apple-system,sans-serif; color:#1E293B; ba
 .servicio-modal-header h2 { font-size:24px; font-weight:800; color:var(--navy); }
 .servicio-modal-body { padding:0 32px 32px; }
 
+/* Generic Modal Overlay (Inscripción, Publicar Proyecto) */
+.modal-overlay { position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); display:none; align-items:center; justify-content:center;
+  padding:20px; }
+.modal-overlay.active { display:flex; }
+.modal-card { background:#fff; border-radius:24px; width:90%; max-width:480px;
+  padding:40px 32px; position:relative;
+  animation:modalIn 0.5s cubic-bezier(.22,1,.36,1) both;
+  max-height:90vh; overflow-y:auto; }
+.modal-card h2 { font-family:'Playfair Display',Georgia,serif; font-size:24px; color:var(--navy); margin-bottom:24px; text-align:center; }
+.modal-close { position:absolute; top:14px; right:14px; width:36px; height:36px;
+  border-radius:10px; border:none; background:rgba(0,0,0,0.06); cursor:pointer;
+  font-size:18px; display:flex; align-items:center; justify-content:center;
+  color:#64748B; transition:all 0.2s; z-index:2; }
+.modal-close:hover { background:rgba(0,0,0,0.1); color:#1E293B; }
+@keyframes modalIn { from { opacity:0; transform:scale(0.9) translateY(20px); } to { opacity:1; transform:scale(1) translateY(0); } }
+
 /* ─── CARRERAS ─── */
 .carreras-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:16px; }
 .carrera-card { background:#fff; border:1px solid #E8ECF1; border-radius:16px;
@@ -2290,26 +2307,28 @@ body.spa-locked { overflow: hidden; }
 <!-- ═══════════════════════════════════════════════════════════════════
      MODAL: INSCRIPCIÓN A CURSO
      ═══════════════════════════════════════════════════════════════════ -->
-<div class="modal-overlay" id="inscripcionCursoModal" onclick="if(event.target===this)closeInscripcionModal()">
+<div class="modal-overlay" id="inscripcionCursoModal" onclick="if(event.target===this)closeInscripcionCurso()">
   <div class="modal-card">
-    <button class="modal-close" onclick="closeInscripcionModal()">✕</button>
-    <h2>Inscripción a Curso</h2>
-    <form id="inscripcionForm" onsubmit="event.preventDefault();submitInscripcion()">
+    <button class="modal-close" onclick="closeInscripcionCurso()">✕</button>
+    <h2 id="cursoTituloModal">Inscripción a Curso</h2>
+    <p id="cursoInstructorModal" style="text-align:center;color:#64748B;font-size:14px;margin:-16px 0 20px"></p>
+    <div id="cursoFormError" style="color:#EF4444;font-size:13px;min-height:18px;margin-bottom:8px;text-align:center"></div>
+    <form id="inscripcionCursoForm" onsubmit="event.preventDefault();submitInscripcionCurso()">
       <div class="form-group">
         <label class="form-label">Nombre completo <span class="req">*</span></label>
-        <input class="input" type="text" id="inscNombre" placeholder="Tu nombre" required>
+        <input class="input" type="text" id="insNombre" placeholder="Tu nombre" required>
       </div>
       <div class="form-group">
         <label class="form-label">Correo electrónico <span class="req">*</span></label>
-        <input class="input" type="email" id="inscCorreo" placeholder="correo@ejemplo.com" required>
+        <input class="input" type="email" id="insCorreo" placeholder="correo@ejemplo.com" required>
       </div>
       <div class="form-group">
         <label class="form-label">Carrera/Programa <span class="req">*</span></label>
-        <input class="input" type="text" id="inscCarrera" placeholder="Tu carrera" required>
+        <input class="input" type="text" id="insCarrera" placeholder="Tu carrera" required>
       </div>
       <div class="form-group">
         <label class="form-label">Semestre/Año</label>
-        <input class="input" type="text" id="inscSemestre" placeholder="Ej: 3er semestre">
+        <input class="input" type="text" id="insSemestre" placeholder="Ej: 3er semestre">
       </div>
       <button type="submit" class="btn btn-gold btn-full">Enviar inscripción</button>
     </form>
@@ -2319,18 +2338,31 @@ body.spa-locked { overflow: hidden; }
 <!-- ═══════════════════════════════════════════════════════════════════
      MODAL: PUBLICAR PROYECTO
      ═══════════════════════════════════════════════════════════════════ -->
-<div class="modal-overlay" id="publicarProyectoModal" onclick="if(event.target===this)closePublicarProyectoModal()">
+<div class="modal-overlay" id="publicarProyectoModal" onclick="if(event.target===this)closePublicarProyecto()">
   <div class="modal-card">
-    <button class="modal-close" onclick="closePublicarProyectoModal()">✕</button>
+    <button class="modal-close" onclick="closePublicarProyecto()">✕</button>
     <h2>Publicar tu Proyecto</h2>
+    <div id="proyFormError" style="color:#EF4444;font-size:13px;min-height:18px;margin-bottom:8px;text-align:center"></div>
     <form id="publicarProyectoForm" onsubmit="event.preventDefault();submitPublicarProyecto()">
       <div class="form-group">
-        <label class="form-label">Nombre del proyecto <span class="req">*</span></label>
-        <input class="input" type="text" id="proyNombre" placeholder="Nombre del proyecto" required>
+        <label class="form-label">Título del proyecto <span class="req">*</span></label>
+        <input class="input" type="text" id="proyTitulo" placeholder="Nombre del proyecto" required>
       </div>
       <div class="form-group">
         <label class="form-label">Descripción <span class="req">*</span></label>
-        <textarea class="input" id="proyDesc" rows="4" placeholder="Describe tu proyecto..." required></textarea>
+        <textarea class="input" id="proyDescripcion" rows="4" placeholder="Describe tu proyecto..." required></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tu nombre <span class="req">*</span></label>
+        <input class="input" type="text" id="proyAutor" placeholder="Tu nombre completo" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Correo <span class="req">*</span></label>
+        <input class="input" type="email" id="proyCorreo" placeholder="correo@ejemplo.com" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Carrera</label>
+        <input class="input" type="text" id="proyCarrera" placeholder="Tu carrera">
       </div>
       <div class="form-group">
         <label class="form-label">Categoría <span class="req">*</span></label>
@@ -2344,8 +2376,8 @@ body.spa-locked { overflow: hidden; }
         </select>
       </div>
       <div class="form-group">
-        <label class="form-label">URL del proyecto</label>
-        <input class="input" type="url" id="proyUrl" placeholder="https://ejemplo.com">
+        <label class="form-label">Tags (separados por coma)</label>
+        <input class="input" type="text" id="proyTags" placeholder="IA, salud, investigación">
       </div>
       <button type="submit" class="btn btn-gold btn-full">Publicar proyecto</button>
     </form>
