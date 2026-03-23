@@ -224,12 +224,16 @@ function loadLeaderboard(){
   }
   (async()=>{
     try{
-      const{data:userBadges,error}=await supabaseClient.from('badges_usuarios').select('usuario_correo').order('created_at',{ascending:false});
+      const{data:userBadges,error}=await supabaseClient.from('badges_usuarios').select('*').order('created_at',{ascending:false});
       if(error)throw error;
       const counts={};
-      if(userBadges){
+      if(userBadges&&userBadges.length>0){
+        // Detect email column name dynamically
+        const firstRow=userBadges[0];
+        const emailCol=Object.keys(firstRow).find(k=>k.includes('correo')||k.includes('email')||k.includes('usuario'))||'user_id';
         userBadges.forEach(ub=>{
-          counts[ub.usuario_correo]=(counts[ub.usuario_correo]||0)+1;
+          const key=ub[emailCol]||'Anónimo';
+          counts[key]=(counts[key]||0)+1;
         });
       }
       const sorted=Object.entries(counts)
