@@ -62,10 +62,14 @@ async function loginUser(email, password) {
       password: password
     });
     if (error) throw error;
+    // Logging event-driven (no realtime): registra intento exitoso.
+    try { supabaseClient.rpc('registrar_intento_auth', { p_email: email, p_exito: true }).then(function(){}, function(){}); } catch (_) {}
     _loginAttempts.count = 0; // Reset on success
     return { success: true, data };
   } catch (error) {
     console.error('Error en login:', error.message);
+    // Logging event-driven (no realtime): registra intento fallido.
+    try { supabaseClient.rpc('registrar_intento_auth', { p_email: email, p_exito: false }).then(function(){}, function(){}); } catch (_) {}
     return { success: false, error: error.message };
   }
 }
