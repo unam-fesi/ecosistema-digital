@@ -1,14 +1,14 @@
 /* ─── DATA ARRAYS ─── */
 const carreras=[
-  {name:"Médico Cirujano",emoji:"🏥",color:"#7C3AED"},
-  {name:"Enfermería",emoji:"⚕️",color:"#059669"},
-  {name:"Cirujano Dentista",emoji:"🦷",color:"#2563EB"},
-  {name:"Psicología",emoji:"🧠",color:"#0891B2"},
-  {name:"Psicología SUAyED",emoji:"💡",color:"#6366F1"},
-  {name:"Optometría",emoji:"👁️",color:"#EA580C"},
-  {name:"Ecología",emoji:"🌿",color:"#16A34A"},
-  {name:"Biología",emoji:"🧬",color:"#DC2626"},
-  {name:"Div. Investigación y Posgrado",emoji:"🔬",color:"#8B5CF6"}
+  {name:"Médico Cirujano",emoji:"🏥",color:"#7C3AED",desc:"Forma médicos generales con sólida base científica y humanística para la promoción de la salud y la prevención, diagnóstico y tratamiento de enfermedades, con práctica clínica desde los primeros años."},
+  {name:"Enfermería",emoji:"⚕️",color:"#059669",desc:"Profesionales del cuidado de la salud en la promoción, prevención, atención y rehabilitación, con enfoque humanista y práctica en escenarios clínicos y comunitarios."},
+  {name:"Cirujano Dentista",emoji:"🦷",color:"#2563EB",desc:"Forma odontólogos capaces de prevenir, diagnosticar y tratar enfermedades bucodentales, integrando práctica clínica y atención a la comunidad."},
+  {name:"Psicología",emoji:"🧠",color:"#0891B2",desc:"Estudia el comportamiento y los procesos mentales; forma psicólogos para la evaluación, intervención e investigación en los ámbitos clínico, educativo, social y organizacional."},
+  {name:"Psicología SUAyED",emoji:"💡",color:"#6366F1",desc:"La licenciatura en Psicología en modalidad abierta y a distancia (SUAyED), con el mismo rigor académico y flexibilidad de horarios para quienes estudian en línea."},
+  {name:"Optometría",emoji:"👁️",color:"#EA580C",desc:"Forma especialistas en salud visual para el examen, diagnóstico y corrección de los problemas de la visión, adaptación de lentes y terapia visual."},
+  {name:"Ecología",emoji:"🌿",color:"#16A34A",desc:"Licenciatura (desde 2023) enfocada en el estudio de los ecosistemas, la biodiversidad y la relación entre los seres vivos y su ambiente, con visión hacia la sustentabilidad."},
+  {name:"Biología",emoji:"🧬",color:"#DC2626",desc:"Estudia la vida en todos sus niveles —de las moléculas a los ecosistemas— formando biólogos para la investigación, la conservación y el manejo de los recursos naturales."},
+  {name:"Div. Investigación y Posgrado",emoji:"🔬",color:"#8B5CF6",desc:"Coordina los programas de especialización, maestría y doctorado, así como la investigación científica que se desarrolla en la facultad."}
 ];
 
 const servicios=[

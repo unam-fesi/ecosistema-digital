@@ -7,7 +7,24 @@ if(cg){
     const el=document.createElement('div');
     el.className='carrera-card reveal';
     el.style.cssText=`--carrera-color:${c.color};transition-delay:${i*0.05}s`;
-    el.innerHTML=`<span class="carrera-emoji">${c.emoji}</span><p class="carrera-name">${c.name}</p>`;
+    el.setAttribute('tabindex','0');
+    el.setAttribute('role','button');
+    el.setAttribute('aria-label',`${c.name}: ver descripción`);
+    el.innerHTML=`<div class="carrera-inner">
+        <div class="carrera-face carrera-front">
+          <span class="carrera-emoji">${c.emoji}</span>
+          <p class="carrera-name">${c.name}</p>
+          <span class="carrera-flip-hint">ⓘ ver más</span>
+        </div>
+        <div class="carrera-face carrera-back">
+          <p class="carrera-back-name">${c.name}</p>
+          <p class="carrera-desc">${c.desc||''}</p>
+          <span class="carrera-flip-hint carrera-flip-hint--back">↩ volver</span>
+        </div>
+      </div>`;
+    const flip=()=>el.classList.toggle('flipped');
+    el.addEventListener('click',flip);
+    el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); flip(); } });
     cg.appendChild(el);
   });
 }

@@ -67,6 +67,13 @@
       ov.addEventListener("scroll", function () {
         if (!ticking) { window.requestAnimationFrame(frame); ticking = true; }
       }, { passive: true });
+
+      // Failsafe: nunca dejar contenido oculto (revela tras 2s y al activarse el overlay)
+      function revealAll(){ ov.querySelectorAll('.cx-depth').forEach(function(n){ n.classList.add('cx-depth-in'); });
+        ov.querySelectorAll('.reveal').forEach(function(n){ n.classList.add('visible'); }); }
+      setTimeout(revealAll, 2000);
+      try{ new MutationObserver(function(){ if (ov.classList.contains('active')) setTimeout(revealAll, 900); })
+        .observe(ov, { attributes:true, attributeFilter:['class'] }); }catch(e){}
     });
   });
 })();

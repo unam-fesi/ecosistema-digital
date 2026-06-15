@@ -3,12 +3,15 @@
    + secciones Sistema / Seguridad / Usuarios. Aditivo.
    ============================================================ */
 .nav-group{margin:2px 0;}
-.nav-group-header{display:flex;align-items:center;gap:10px;width:100%;padding:10px 16px;border:none;cursor:pointer;
-  background:transparent;color:inherit;font:600 .72rem/1 inherit;letter-spacing:.10em;text-transform:uppercase;opacity:.62;
-  transition:opacity .2s;}
-.nav-group-header:hover{opacity:1;}
-.nav-group-header .nav-grp-ico{font-size:.95rem;}
-.nav-group-header .nav-grp-chev{margin-left:auto;transition:transform .25s var(--cx-ease,ease);font-size:.7rem;}
+.nav-group-header{display:flex;align-items:center;gap:10px;width:100%;padding:11px 16px;border:none;cursor:pointer;
+  background:transparent;color:#E7ECF3;font:700 .76rem/1 inherit;letter-spacing:.10em;text-transform:uppercase;opacity:.9;
+  transition:opacity .2s,color .2s;}
+.nav-group-header:hover{opacity:1;color:#fff;}
+.nav-group-header .nav-grp-ico{font-size:1.05rem;}
+.nav-group-header .nav-grp-chev{margin-left:auto;display:inline-flex;align-items:center;justify-content:center;
+  width:22px;height:22px;border-radius:7px;background:rgba(196,162,78,.16);color:#E9C766;
+  font-size:1rem;font-weight:900;line-height:1;transition:transform .25s var(--cx-ease,ease),background .2s;}
+.nav-group-header:hover .nav-grp-chev{background:rgba(196,162,78,.30);}
 .nav-group.collapsed .nav-grp-chev{transform:rotate(-90deg);}
 .nav-group-items{overflow:hidden;transition:max-height .3s var(--cx-ease,ease);}
 .nav-group.collapsed .nav-group-items{max-height:0!important;}

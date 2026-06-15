@@ -111,3 +111,6 @@
   transition:opacity .75s var(--cx-ease),transform .75s var(--cx-ease);will-change:opacity,transform;}
 .cx-js .cx-depth.cx-depth-in{opacity:1;transform:none;}
 @media (prefers-reduced-motion:reduce){.cx-js .cx-depth{opacity:1!important;transform:none!important;}}
+
+/* Failsafe: contenido ya revelado por el sistema .reveal nunca queda oculto */
+.cx-js .reveal.visible{ opacity:1 !important; transform:none !important; }

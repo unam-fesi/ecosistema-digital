@@ -42,7 +42,7 @@
     var parent = anchor.parentNode;
     [secSistema(), secSeguridad(), secUsuarios()].forEach(function (el) { parent.appendChild(el); });
   }
-  function panel(id, inner){ var d=document.createElement("div"); d.id=id; d.className="tab-content"; d.style.display="none"; d.innerHTML=inner; return d; }
+  function panel(id, inner){ var d=document.createElement("div"); d.id=id; d.className="tab-content"; d.innerHTML=inner; return d; }
 
   function secSistema(){
     return panel("tabSistema",

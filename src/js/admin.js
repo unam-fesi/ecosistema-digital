@@ -1402,6 +1402,7 @@ function updateSummaryCards() {
  */
 function renderChartServicios() {
   const ctx = document.getElementById('chartServicios');
+  if (!ctx || ctx.offsetParent === null) return; // evita error de contexto en canvas oculto
   if (!ctx) return;
 
   // Contar servicios por tipo
@@ -1446,6 +1447,7 @@ function renderChartServicios() {
  */
 function renderChartEstados() {
   const ctx = document.getElementById('chartEstados');
+  if (!ctx || ctx.offsetParent === null) return;
   if (!ctx) return;
 
   const stats = calculateStats();
@@ -1483,6 +1485,7 @@ function renderChartEstados() {
  */
 function renderChartTendencia() {
   const ctx = document.getElementById('chartTendencia');
+  if (!ctx || ctx.offsetParent === null) return;
   if (!ctx) return;
 
   const allItems = [...allServicios, ...allEspacios, ...allAsesoria, ...allContactos];
@@ -2758,6 +2761,7 @@ function closeInventoryModalDB() {
  */
 function renderDepreciationChart() {
   const chartCanvas = document.getElementById('depreciationChart');
+  if (!chartCanvas || chartCanvas.offsetParent === null) return;
   if (!chartCanvas) return;
 
   // Group by service and calculate total current values
