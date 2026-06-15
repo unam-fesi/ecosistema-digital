@@ -17,7 +17,23 @@
   ready(function () {
     injectSections();
     buildGroups();
+    addRefreshButton();
   });
+
+  /* Botón flotante Refrescar: recarga todos los datos bajo demanda
+     (reemplaza al Realtime que se desactivó para ahorrar recursos). */
+  function addRefreshButton(){
+    var b=document.createElement('button');
+    b.id='cxRefrescar'; b.className='cx-refresh-fab'; b.type='button';
+    b.innerHTML='\u21BB Refrescar';
+    b.addEventListener('click', async function(){
+      if(typeof window.loadAllData!=='function'){ return; }
+      b.disabled=true; var old=b.innerHTML; b.innerHTML='\u23F3 Actualizando\u2026';
+      try{ await window.loadAllData(); }catch(e){ console.warn('refrescar:', e); }
+      b.innerHTML='\u2713 Actualizado'; setTimeout(function(){ b.innerHTML=old; b.disabled=false; }, 1300);
+    });
+    document.body.appendChild(b);
+  }
 
   /* ---------- 1) Inyectar secciones nuevas como .tab-content ---------- */
   function injectSections() {

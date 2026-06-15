@@ -1718,64 +1718,10 @@ async function loadAllData() {
  * Configura suscripciones a cambios en tiempo real
  */
 function setupRealtimeUpdates() {
-  // Suscribirse a cambios en solicitudes_servicios
-  supabaseClient
-    .channel('servicios_changes')
-    .on('postgres_changes', {
-      event: '*',
-      schema: 'public',
-      table: 'solicitudes_servicios'
-    }, () => {
-      console.log('Cambios en solicitudes_servicios');
-      fetchSolicitudesServicios();
-      renderTableServicios();
-      updateSummaryCards();
-      renderChartServicios();
-    })
-    .subscribe();
-
-  // Similar para otras tablas
-  supabaseClient
-    .channel('espacios_changes')
-    .on('postgres_changes', {
-      event: '*',
-      schema: 'public',
-      table: 'solicitudes_espacios'
-    }, () => {
-      console.log('Cambios en solicitudes_espacios');
-      fetchSolicitudesEspacios();
-      renderTableEspacios();
-      updateSummaryCards();
-    })
-    .subscribe();
-
-  supabaseClient
-    .channel('asesoria_changes')
-    .on('postgres_changes', {
-      event: '*',
-      schema: 'public',
-      table: 'solicitudes_asesoria'
-    }, () => {
-      console.log('Cambios en solicitudes_asesoria');
-      fetchSolicitudesAsesoria();
-      renderTableAsesoria();
-      updateSummaryCards();
-    })
-    .subscribe();
-
-  supabaseClient
-    .channel('contactos_changes')
-    .on('postgres_changes', {
-      event: '*',
-      schema: 'public',
-      table: 'contactos'
-    }, () => {
-      console.log('Cambios en contactos');
-      fetchContactos();
-      renderTableContactos();
-      updateSummaryCards();
-    })
-    .subscribe();
+  // Realtime DESACTIVADO a propósito para no consumir recursos en tiempo real
+  // (no se abren websockets/canales). Los datos se actualizan con el botón
+  // "Refrescar" (ver admin-panel.js) o al recargar la página.
+  return;
 }
 
 // ============= INICIALIZACIÓN =============
