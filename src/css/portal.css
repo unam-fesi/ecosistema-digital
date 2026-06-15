@@ -1,0 +1,145 @@
+* { margin:0; padding:0; box-sizing:border-box; }
+        :root {
+            --navy:#0C2340; --gold:#C4A24E; --cream:#FAF8F4;
+            --light-gray:#F5F3F0; --dark-gray:#3A3A3A;
+            --success:#10B981; --warning:#F59E0B; --info:#3B82F6;
+        }
+        body { font-family:'Inter',sans-serif; background:var(--cream); color:var(--dark-gray); line-height:1.6; }
+
+        /* Top Bar */
+        .top-bar {
+            background:linear-gradient(135deg,var(--navy) 0%,#1a3555 100%);
+            color:#fff; padding:1rem 2rem; display:flex; justify-content:space-between; align-items:center;
+            position:sticky; top:0; z-index:100; box-shadow:0 2px 12px rgba(0,0,0,0.12);
+        }
+        .top-bar-left { display:flex; align-items:center; gap:14px; }
+        .user-avatar {
+            width:44px; height:44px; border-radius:50%; background:var(--gold); color:var(--navy);
+            display:flex; align-items:center; justify-content:center; font-weight:700; font-size:18px;
+        }
+        .user-info { display:flex; flex-direction:column; }
+        .user-name { font-weight:600; font-size:15px; }
+        .user-email { font-size:12px; opacity:0.8; }
+        .top-bar-right { display:flex; gap:12px; align-items:center; }
+        .btn-home {
+            background:transparent; border:1px solid rgba(255,255,255,0.3); color:#fff;
+            padding:8px 16px; border-radius:8px; cursor:pointer; font-size:13px; text-decoration:none;
+            transition:all 0.2s;
+        }
+        .btn-home:hover { background:rgba(255,255,255,0.1); }
+        .btn-logout {
+            background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#FCA5A5;
+            padding:8px 16px; border-radius:8px; cursor:pointer; font-size:13px; transition:all 0.2s;
+        }
+        .btn-logout:hover { background:rgba(239,68,68,0.3); }
+
+        /* Main Content */
+        .portal-container { max-width:1100px; margin:0 auto; padding:24px 20px 60px; }
+
+        /* Welcome */
+        .portal-welcome {
+            background:linear-gradient(135deg,var(--navy),#1a3555);
+            color:#fff; border-radius:16px; padding:28px 32px; margin-bottom:24px;
+            display:flex; justify-content:space-between; align-items:center;
+        }
+        .portal-welcome h1 { font-family:'Playfair Display',serif; font-size:24px; margin-bottom:4px; }
+        .portal-welcome p { opacity:0.85; font-size:14px; }
+        .portal-welcome-right { text-align:right; }
+        .portal-welcome-right span { font-size:36px; }
+
+        /* Summary Cards */
+        .summary-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+        .summary-card {
+            background:#fff; border-radius:14px; padding:20px; text-align:center;
+            box-shadow:0 2px 12px rgba(12,35,64,0.06); border:1px solid rgba(12,35,64,0.06);
+            transition:transform 0.2s;
+        }
+        .summary-card:hover { transform:translateY(-2px); }
+        .summary-card .sc-icon { font-size:28px; margin-bottom:8px; }
+        .summary-card .sc-value { font-size:28px; font-weight:700; color:var(--navy); }
+        .summary-card .sc-label { font-size:12px; color:#94A3B8; margin-top:4px; }
+
+        /* Notifications Banner */
+        .notif-banner { margin-bottom:24px; }
+        .notif-card {
+            display:flex; align-items:flex-start; gap:12px; background:#fff;
+            border-radius:12px; padding:14px 18px; margin-bottom:8px;
+            border-left:4px solid var(--gold); box-shadow:0 1px 6px rgba(0,0,0,0.04);
+        }
+        .notif-icon { font-size:20px; flex-shrink:0; margin-top:2px; }
+
+        /* Navigation Tabs */
+        .portal-nav {
+            display:flex; gap:4px; background:#fff; border-radius:14px; padding:6px;
+            margin-bottom:24px; box-shadow:0 2px 8px rgba(0,0,0,0.04);
+            overflow-x:auto;
+        }
+        .portal-nav-btn {
+            padding:10px 20px; border:none; background:transparent; border-radius:10px;
+            cursor:pointer; font-size:13px; font-weight:500; color:#64748B;
+            transition:all 0.2s; white-space:nowrap;
+        }
+        .portal-nav-btn.active { background:var(--navy); color:#fff; }
+        .portal-nav-btn:hover:not(.active) { background:var(--light-gray); }
+
+        /* Tab Content */
+        .portal-tab-content { display:none; }
+        .portal-tab-content.active-tab { display:block; }
+
+        /* Section Card */
+        .portal-section {
+            background:#fff; border-radius:14px; padding:24px;
+            box-shadow:0 2px 12px rgba(12,35,64,0.06); margin-bottom:20px;
+        }
+        .portal-section h2 {
+            font-size:18px; color:var(--navy); margin-bottom:16px;
+            padding-bottom:12px; border-bottom:2px solid var(--light-gray);
+        }
+
+        /* List Items */
+        .portal-list-item {
+            display:flex; align-items:center; gap:14px; padding:14px 0;
+            border-bottom:1px solid #F1F5F9;
+        }
+        .portal-list-item:last-child { border-bottom:none; }
+        .portal-list-icon {
+            width:42px; height:42px; border-radius:10px; display:flex; align-items:center;
+            justify-content:center; font-size:18px; color:#fff; flex-shrink:0;
+        }
+        .portal-list-info { flex:1; display:flex; flex-direction:column; gap:2px; }
+        .portal-list-info strong { font-size:14px; color:var(--navy); }
+        .portal-list-info span { font-size:12px; color:#64748B; }
+        .portal-status { font-size:12px; font-weight:600; white-space:nowrap; }
+        .portal-badge-tag {
+            padding:4px 10px; border-radius:20px; font-size:11px; font-weight:600;
+        }
+
+        /* Badges Grid */
+        .badges-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:16px; }
+        .badge-card-portal {
+            background:var(--light-gray); border-radius:14px; padding:20px; text-align:center;
+            transition:transform 0.2s;
+        }
+        .badge-card-portal:hover { transform:translateY(-3px); }
+        .badge-icon-large { font-size:40px; margin-bottom:8px; }
+        .badge-card-portal strong { font-size:14px; color:var(--navy); display:block; }
+
+        /* Empty State */
+        .empty-state { text-align:center; padding:40px 20px; color:#94A3B8; }
+        .empty-state p { font-size:14px; }
+
+        /* Responsive */
+        @media (max-width:768px) {
+            .summary-grid { grid-template-columns:repeat(2,1fr); }
+            .portal-welcome { flex-direction:column; text-align:center; gap:12px; }
+            .portal-welcome-right { text-align:center; }
+            .portal-container { padding:16px 12px 40px; }
+            .badges-grid { grid-template-columns:repeat(2,1fr); }
+        }
+        @media (max-width:480px) {
+            .summary-grid { grid-template-columns:1fr 1fr; gap:10px; }
+            .summary-card { padding:14px; }
+            .summary-card .sc-value { font-size:22px; }
+            .top-bar { padding:0.8rem 1rem; }
+            .portal-nav-btn { padding:8px 14px; font-size:12px; }
+        }
