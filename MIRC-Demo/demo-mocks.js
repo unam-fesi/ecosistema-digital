@@ -2,27 +2,28 @@
  * MIRC EXPEDIENTE 360 — DEMO MOCKS
  * FES Iztacala UNAM · Modo demostración 100% cliente (sin backend)
  *
- * Este script se carga ANTES de la app React y:
- *   1. Limpia localStorage/sessionStorage al iniciar (cada visita parte limpio)
- *   2. Auto-loguea como Dra. Vega (médico general, rol admin para demo)
- *   3. Intercepta TODAS las llamadas fetch() y devuelve datos mock
- *   4. Anima PUM-AI con thinking realista (2-5s antes de revelar respuesta)
- *   5. Simula LiveKit (teleconsulta) con datos fake
+ * v2 — cobertura completa de endpoints:
+ *   - Expediente: timeline, problemas, riesgos, alertas, objetivos, signos,
+ *     medicamentos, decisiones, psicosocial, archivos, consentimientos,
+ *     estudios, preventivo, documentos, interconsultas
+ *   - PUM-AI: los 5 widgets con respuesta hardcoded + thinking delay
+ *   - Gemini API (legacy): respuestas hardcoded en formato Gemini
+ *   - Odontología: odontograma, periodontograma, hallazgos, plan tx
+ *   - Traumatología: lesiones, evoluciones, plan tx
+ *   - LiveKit / Teleconsulta: simulación
+ *   - Auto-login: Dra. Vega
  * ═══════════════════════════════════════════════════════════════════════════ */
 
 (function () {
   'use strict';
 
-  // ─── PASO 1: Limpiar storage al iniciar demo ─────────────────────────────
+  // ─── PASO 1: Limpiar storage ─────────────────────────────────────────────
   try {
     window.localStorage.clear();
     window.sessionStorage.clear();
-    console.info('[DEMO] localStorage y sessionStorage limpiados');
-  } catch (e) {
-    console.warn('[DEMO] No se pudo limpiar storage:', e);
-  }
+  } catch (e) {}
 
-  // ─── PASO 2: Usuario admin precargado (Dra. Vega) ─────────────────────────
+  // ─── PASO 2: Usuario admin precargado ─────────────────────────────────────
   const DRA_VEGA = {
     sub: 'demo-user-dra-vega',
     preferred_username: 'dra_vega',
@@ -30,16 +31,14 @@
     email: 'dra.vega@iztacala.unam.mx',
     given_name: 'María',
     family_name: 'Vega Hernández',
-    realm_access: {
-      roles: ['admin', 'doctor', 'especialista', 'role_general_practitioner'],
-    },
+    realm_access: { roles: ['admin', 'doctor', 'especialista', 'role_odontology', 'role_traumatology'] },
     roles: ['admin', 'doctor', 'especialista'],
     specialty: 'medicina_general',
     cedula_profesional: '12345678',
     institucion: 'FES Iztacala — UNAM',
   };
 
-  // ─── PASO 3: Dataset mock canónico de pacientes ──────────────────────────
+  // ─── PASO 3: Pacientes ────────────────────────────────────────────────────
   const HOY = new Date();
   const edadDesde = (iso) => {
     if (!iso) return null;
@@ -51,487 +50,538 @@
   };
 
   const PACIENTES = [
-    {
-      id: 'b0000001-0000-0000-0000-000000000001',
-      nombre: 'Juan', apellido_paterno: 'Galindo', apellido_materno: 'López',
-      nombre_completo: 'Juan Galindo López',
-      curp: 'GALJ840615HDFLPN01', sexo: 'M', sexo_label: 'Masculino',
-      fecha_nacimiento: '1984-06-15', tipo_sangre: 'O+',
+    { id: 'b0000001-0000-0000-0000-000000000001', nombre: 'Juan', apellido_paterno: 'Galindo', apellido_materno: 'López',
+      curp: 'GALJ840615HDFLPN01', sexo: 'M', sexo_label: 'Masculino', fecha_nacimiento: '1984-06-15', tipo_sangre: 'O+',
       telefono: '55 1234 5678', email: 'juan.galindo@example.com',
-      domicilio: 'Av. Insurgentes Sur 1234, Col. Del Valle, CDMX',
-      ocupacion: 'Ingeniero de Software', escolaridad: 'Licenciatura',
-      peso_kg: 89, talla_cm: 172, alergias: ['Penicilina'],
+      domicilio: 'Av. Insurgentes Sur 1234, Col. Del Valle, CDMX', ocupacion: 'Ingeniero de Software',
+      escolaridad: 'Licenciatura', peso_kg: 89, talla_cm: 172, alergias: ['Penicilina'],
       dx_principal: 'Hipertensión arterial controlada', riesgo: 'medio',
-      emergencia: { nombre: 'Laura Galindo López', parentesco: 'Hermana', telefono: '55 9876 5432' },
-    },
-    {
-      id: 'b0000001-0000-0000-0000-000000000002',
-      nombre: 'Sofía', apellido_paterno: 'Moreno', apellido_materno: 'Sánchez',
-      nombre_completo: 'Sofía Moreno Sánchez',
-      curp: 'MOSS920728MDFRNF09', sexo: 'F', sexo_label: 'Femenino',
-      fecha_nacimiento: '1992-07-28', tipo_sangre: 'A-',
+      emergencia: { nombre: 'Laura Galindo López', parentesco: 'Hermana', telefono: '55 9876 5432' } },
+    { id: 'b0000001-0000-0000-0000-000000000002', nombre: 'Sofía', apellido_paterno: 'Moreno', apellido_materno: 'Sánchez',
+      curp: 'MOSS920728MDFRNF09', sexo: 'F', sexo_label: 'Femenino', fecha_nacimiento: '1992-07-28', tipo_sangre: 'A-',
       telefono: '55 2345 6789', email: 'sofia.moreno@example.com',
-      domicilio: 'Calle Lilas 89, Col. Jardines, Tlalnepantla, Edo. Méx.',
-      ocupacion: 'Diseñadora gráfica', escolaridad: 'Licenciatura',
-      peso_kg: 58, talla_cm: 165, alergias: ['Penicilina'],
+      domicilio: 'Calle Lilas 89, Col. Jardines, Tlalnepantla, Edo. Méx.', ocupacion: 'Diseñadora gráfica',
+      escolaridad: 'Licenciatura', peso_kg: 58, talla_cm: 165, alergias: ['Penicilina'],
       dx_principal: 'Migraña + TAG + SII', riesgo: 'medio',
-      emergencia: { nombre: 'María Sánchez', parentesco: 'Madre', telefono: '55 1111 2222' },
-    },
-    {
-      id: 'b0000001-0000-0000-0000-000000000003',
-      nombre: 'Pedro', apellido_paterno: 'Ruiz', apellido_materno: 'Pérez',
-      nombre_completo: 'Pedro Ruiz Pérez',
-      curp: 'RUPP780102HDFRDR08', sexo: 'M', sexo_label: 'Masculino',
-      fecha_nacimiento: '1978-01-02', tipo_sangre: 'B+',
+      emergencia: { nombre: 'María Sánchez', parentesco: 'Madre', telefono: '55 1111 2222' } },
+    { id: 'b0000001-0000-0000-0000-000000000003', nombre: 'Pedro', apellido_paterno: 'Ruiz', apellido_materno: 'Pérez',
+      curp: 'RUPP780102HDFRDR08', sexo: 'M', sexo_label: 'Masculino', fecha_nacimiento: '1978-01-02', tipo_sangre: 'B+',
       telefono: '55 3456 7890', email: 'pedro.ruiz@example.com',
-      domicilio: 'Calle Álamos 789, Col. Nápoles, CDMX',
-      ocupacion: 'Contador', escolaridad: 'Licenciatura',
-      peso_kg: 82, talla_cm: 175, alergias: [],
+      domicilio: 'Calle Álamos 789, Col. Nápoles, CDMX', ocupacion: 'Contador',
+      escolaridad: 'Licenciatura', peso_kg: 82, talla_cm: 175, alergias: [],
       dx_principal: 'Hipertensión + Lumbalgia + Prediabetes', riesgo: 'alto',
-      emergencia: { nombre: 'Carmen Ruiz Pérez', parentesco: 'Esposa', telefono: '55 3333 4444' },
-    },
-    {
-      id: 'b0000001-0000-0000-0000-000000000004',
-      nombre: 'Carmen', apellido_paterno: 'Díaz', apellido_materno: 'Cruz',
-      nombre_completo: 'Carmen Díaz Cruz',
-      curp: 'DICC001210MDFZRR03', sexo: 'F', sexo_label: 'Femenino',
-      fecha_nacimiento: '2000-12-10', tipo_sangre: 'O-',
+      emergencia: { nombre: 'Carmen Ruiz Pérez', parentesco: 'Esposa', telefono: '55 3333 4444' } },
+    { id: 'b0000001-0000-0000-0000-000000000004', nombre: 'Carmen', apellido_paterno: 'Díaz', apellido_materno: 'Cruz',
+      curp: 'DICC001210MDFZRR03', sexo: 'F', sexo_label: 'Femenino', fecha_nacimiento: '2000-12-10', tipo_sangre: 'O-',
       telefono: '55 4567 8901', email: 'carmen.diaz@example.com',
-      domicilio: 'Privada Cedros 12, Col. Satélite, Naucalpan',
-      ocupacion: 'Estudiante universitaria', escolaridad: 'Licenciatura (en curso)',
-      peso_kg: 55, talla_cm: 160, alergias: ['Sulfas'],
+      domicilio: 'Privada Cedros 12, Col. Satélite, Naucalpan', ocupacion: 'Estudiante universitaria',
+      escolaridad: 'Licenciatura (en curso)', peso_kg: 55, talla_cm: 160, alergias: ['Sulfas'],
       dx_principal: 'Asma alérgica + Rinitis + Dismenorrea', riesgo: 'bajo',
-      emergencia: { nombre: 'Rosa Cruz', parentesco: 'Madre', telefono: '55 5555 6666' },
-    },
-  ].map((p) => ({ ...p, edad: edadDesde(p.fecha_nacimiento) }));
+      emergencia: { nombre: 'Rosa Cruz', parentesco: 'Madre', telefono: '55 5555 6666' } },
+  ].map((p) => ({
+    ...p,
+    edad: edadDesde(p.fecha_nacimiento),
+    nombre_completo: `${p.nombre} ${p.apellido_paterno} ${p.apellido_materno}`,
+    imc: +(p.peso_kg / Math.pow(p.talla_cm / 100, 2)).toFixed(1),
+  }));
 
-  // ─── PASO 4: Respuestas PUM-AI hardcoded ─────────────────────────────────
-  // Estas respuestas se generan con un delay realista (2-5s) para simular
-  // que MedGemma está pensando.
-
-  const PUMAI_RESPONSES = {
-    // Resumen ejecutivo por paciente
-    resumen: (p) => ({
-      resumen: `Paciente ${p.nombre_completo}, ${p.edad} años, ${p.sexo_label.toLowerCase()}. ` +
-               `Diagnóstico principal: ${p.dx_principal}. ` +
-               `Riesgo clínico: ${p.riesgo.toUpperCase()}. ` +
-               (p.alergias?.length ? `Alergias documentadas: ${p.alergias.join(', ')}. ` : 'Sin alergias documentadas. ') +
-               `Última consulta: control estable. Adherencia a tratamiento: buena. ` +
-               `Recomendación: mantener seguimiento trimestral con monitoreo de signos vitales y química sanguínea anual.`,
-      puntos_clave: [
-        p.dx_principal,
-        `Edad: ${p.edad} años`,
-        `Tipo sangre: ${p.tipo_sangre}`,
-        p.alergias?.length ? `Alergias: ${p.alergias.join(', ')}` : 'Sin alergias',
-        `Nivel de riesgo: ${p.riesgo}`,
-      ],
-      generado: new Date().toISOString(),
-    }),
-
-    // Análisis de cambios recientes
-    cambios: (p) => ({
-      cambios_detectados: [
-        { categoria: 'Signos vitales', descripcion: 'PA promedio últimos 30 días: 128/82 mmHg (dentro de meta).', tendencia: 'estable' },
-        { categoria: 'Laboratorios', descripcion: 'Glucosa en ayuno: 98 mg/dL (mejoría vs 112 mg/dL hace 3 meses).', tendencia: 'mejora' },
-        { categoria: 'Peso', descripcion: `Peso actual ${p.peso_kg} kg, sin cambios significativos vs visita anterior.`, tendencia: 'estable' },
-        { categoria: 'Adherencia', descripcion: 'Adherencia farmacológica reportada: 92% según pillbox.', tendencia: 'mejora' },
-      ],
-      alertas: p.riesgo === 'alto' ? ['Revisar perfil lipídico — pendiente desde hace 6 meses'] : [],
-      resumen: `Evolución favorable en los últimos 3 meses. Sin cambios clínicamente significativos que requieran ajuste terapéutico urgente.`,
-    }),
-
-    // Cálculo de complejidad
-    complejidad: (p) => {
-      const score = p.riesgo === 'alto' ? 75 : (p.riesgo === 'medio' ? 50 : 25);
-      const categoria = p.riesgo === 'alto' ? 'alta' : (p.riesgo === 'medio' ? 'media' : 'baja');
-      const factores = [];
-      if (p.alergias?.length) factores.push({ factor: 'Alergias documentadas', peso: 10, presente: true });
-      if (p.edad > 60) factores.push({ factor: 'Edad >60 años', peso: 15, presente: true });
-      if (p.dx_principal.toLowerCase().includes('hipertens')) factores.push({ factor: 'HTA crónica', peso: 20, presente: true });
-      if (p.dx_principal.toLowerCase().includes('diab')) factores.push({ factor: 'Diabetes / prediabetes', peso: 25, presente: true });
-      if (p.dx_principal.toLowerCase().includes('asma')) factores.push({ factor: 'Asma', peso: 15, presente: true });
-      if (factores.length === 0) factores.push({ factor: 'Sin factores de complejidad mayores', peso: 5, presente: true });
-      return {
-        puntuacion: score,
-        categoria,
-        factores,
-        resumen: `Complejidad ${categoria.toUpperCase()} (score ${score}/100). Manejo recomendado: ${categoria === 'alta' ? 'seguimiento intensivo cada 2-4 semanas y considerar interconsulta a especialidad' : (categoria === 'media' ? 'consultas mensuales con monitoreo activo' : 'control trimestral estándar')}.`,
-      };
-    },
-
-    // Correlación clínica
-    correlacion: (p) => ({
-      correlaciones: [
-        {
-          hallazgo: 'Presión arterial sistólica elevada',
-          factor_asociado: 'Adherencia farmacológica subóptima documentada en últimos 60 días',
-          fuerza_evidencia: 'moderada',
-          recomendacion: 'Reforzar educación al paciente sobre toma diaria y considerar pillbox electrónico',
-        },
-        {
-          hallazgo: 'IMC ' + (p.peso_kg / Math.pow(p.talla_cm / 100, 2)).toFixed(1) + ' kg/m²',
-          factor_asociado: 'Estilo de vida sedentario reportado en cuestionario psicosocial',
-          fuerza_evidencia: 'alta',
-          recomendacion: 'Plan de actividad física graduado, referir a nutrición clínica',
-        },
-        {
-          hallazgo: 'Patrón de sueño irregular (escala Epworth 12/24)',
-          factor_asociado: 'Ansiedad situacional + uso de pantallas nocturno',
-          fuerza_evidencia: 'moderada',
-          recomendacion: 'Higiene del sueño + valoración por psicología',
-        },
-      ],
-      resumen: `Se identifican 3 correlaciones clínicamente significativas que sugieren un manejo multidisciplinario integrado.`,
-    }),
-
-    // Narrativa clínica automática
-    narrativa: (p) => ({
-      narrativa: `# Narrativa Clínica — ${p.nombre_completo}\n\n` +
-                 `**${p.nombre_completo}**, ${p.sexo === 'M' ? 'masculino' : 'femenina'} de ${p.edad} años, ` +
-                 `originari${p.sexo === 'M' ? 'o' : 'a'} de ${p.domicilio.split(',').pop().trim()}, ` +
-                 `con ocupación de ${p.ocupacion}, acude a control de su padecimiento principal: **${p.dx_principal}**.\n\n` +
-                 `## Antecedentes\n\n` +
-                 `Tipo sanguíneo ${p.tipo_sangre}. ` +
-                 (p.alergias?.length ? `Refiere alergia a **${p.alergias.join(' y ')}**. ` : 'Niega alergias medicamentosas. ') +
-                 `Sin antecedentes quirúrgicos relevantes. Antecedentes familiares positivos para cardiopatía isquémica en línea paterna.\n\n` +
-                 `## Estado Actual\n\n` +
-                 `Paciente clínicamente estable, con somatometría: peso ${p.peso_kg} kg, talla ${p.talla_cm} cm, ` +
-                 `IMC ${(p.peso_kg / Math.pow(p.talla_cm / 100, 2)).toFixed(1)} kg/m². ` +
-                 `Signos vitales dentro de rangos aceptables para su condición basal. ` +
-                 `Apego terapéutico reportado del 92%.\n\n` +
-                 `## Plan\n\n` +
-                 `1. Continuar esquema farmacológico actual sin modificaciones.\n` +
-                 `2. Solicitar química sanguínea de 6 elementos + perfil lipídico para control.\n` +
-                 `3. Reforzar medidas higiénico-dietéticas y actividad física aeróbica 150 min/semana.\n` +
-                 `4. Cita de seguimiento en 12 semanas o antes si presenta sintomatología.\n\n` +
-                 `_Documento generado por PUM-AI · MedGemma 27B · ${new Date().toLocaleString('es-MX')}_`,
-      generado: new Date().toISOString(),
-    }),
-  };
-
-  // ─── PASO 5: Helper para respuestas JSON con delay (thinking simulation) ─
+  // ─── PASO 4: Helpers ──────────────────────────────────────────────────────
   const jsonResponse = (data, opts = {}) => {
     const { status = 200, delayMs = 0 } = opts;
     const body = typeof data === 'string' ? data : JSON.stringify(data);
-    const response = new Response(body, {
-      status,
-      headers: { 'Content-Type': 'application/json' },
-    });
-    if (delayMs > 0) {
-      return new Promise((resolve) => setTimeout(() => resolve(response), delayMs));
-    }
-    return Promise.resolve(response);
+    const response = new Response(body, { status, headers: { 'Content-Type': 'application/json' } });
+    return delayMs > 0 ? new Promise((r) => setTimeout(() => r(response), delayMs)) : Promise.resolve(response);
   };
-
-  // Delay aleatorio entre min y max ms (para que cada widget tarde distinto)
   const thinkingDelay = (min = 2000, max = 5000) => min + Math.random() * (max - min);
-
-  // Extrae UUID de la URL
   const extractPacienteId = (url) => {
-    const m = url.match(/pacientes\/([0-9a-f-]{36})/);
-    return m ? m[1] : null;
+    const m = url.match(/(pacientes|odontologia|traumatologia)\/([0-9a-f-]{36})/);
+    return m ? m[2] : null;
   };
-  const getPaciente = (id) => PACIENTES.find((p) => p.id === id) || PACIENTES[1]; // default: Sofía
+  const getPaciente = (id) => PACIENTES.find((p) => p.id === id) || PACIENTES[1];
 
-  // ─── PASO 6: Interceptor de fetch global ─────────────────────────────────
+  // ─── PASO 5: Generadores de datos clínicos plausibles ────────────────────
+
+  const genTimeline = (p) => ({
+    eventos: [
+      { id: 1, fecha: '2026-04-12', tipo: 'consulta', titulo: 'Consulta de control', medico: 'Dra. Vega', resumen: 'Paciente acude a control trimestral. Estable.', icono: 'stethoscope' },
+      { id: 2, fecha: '2026-03-15', tipo: 'laboratorio', titulo: 'BH + QS6 + Perfil Lipídico', medico: 'Lab. Clínico FESI', resumen: 'Resultados dentro de parámetros normales.', icono: 'test-tube' },
+      { id: 3, fecha: '2026-03-08', tipo: 'consulta', titulo: 'Seguimiento mensual', medico: 'Dra. Vega', resumen: 'PA 128/82. Continuar tratamiento.', icono: 'stethoscope' },
+      { id: 4, fecha: '2026-02-20', tipo: 'interconsulta', titulo: 'Valoración cardiología', medico: 'Dr. Mendoza (Cardio)', resumen: 'HTA controlada. Sin datos de daño a órgano blanco.', icono: 'heart' },
+      { id: 5, fecha: '2026-02-01', tipo: 'consulta', titulo: 'Primera vez', medico: 'Dra. Vega', resumen: 'Historia clínica completa.', icono: 'user-plus' },
+      { id: 6, fecha: '2026-01-15', tipo: 'documento', titulo: 'Firma consentimiento informado', medico: '—', resumen: 'Aceptación de uso de expediente electrónico.', icono: 'file-text' },
+      { id: 7, fecha: '2025-12-10', tipo: 'vacuna', titulo: 'Vacuna influenza estacional', medico: 'Enf. Solís', resumen: 'Aplicada lote 2025-A.', icono: 'syringe' },
+      { id: 8, fecha: '2025-11-22', tipo: 'estudio', titulo: 'Rx Tórax PA y Lateral', medico: 'Rx Diagnóstico FESI', resumen: 'Sin alteraciones radiológicas.', icono: 'image' },
+    ],
+  });
+
+  const genProblemas = (p) => ({
+    problemas: [
+      { id: 1, cie10: 'I10', descripcion: 'Hipertensión arterial esencial (primaria)', estado: 'activo', fecha_inicio: '2024-03-15', severidad: 'moderado', controlado: true, notas: 'Bajo tratamiento con Losartán 50mg/día. Última PA: 128/82 mmHg.' },
+      { id: 2, cie10: 'E11.9', descripcion: 'Diabetes mellitus tipo 2 sin complicaciones', estado: 'controlado', fecha_inicio: '2025-01-20', severidad: 'leve', controlado: true, notas: 'HbA1c 6.4% en último control. Metformina 850mg c/12h.' },
+      { id: 3, cie10: 'E78.5', descripcion: 'Hiperlipidemia mixta', estado: 'activo', fecha_inicio: '2025-06-10', severidad: 'leve', controlado: false, notas: 'Atorvastatina 20mg. LDL en última medición: 142 mg/dL.' },
+    ],
+    diagnosticos: [
+      { id: 1, cie10: 'I10', descripcion: 'Hipertensión arterial esencial', estado: 'activo', fecha_inicio: '2024-03-15' },
+      { id: 2, cie10: 'E11.9', descripcion: 'Diabetes mellitus tipo 2', estado: 'controlado', fecha_inicio: '2025-01-20' },
+      { id: 3, cie10: 'E78.5', descripcion: 'Hiperlipidemia mixta', estado: 'activo', fecha_inicio: '2025-06-10' },
+    ],
+  });
+
+  const genRiesgos = (p) => ({
+    riesgos: [
+      { id: 1, factor: 'Riesgo Cardiovascular (Framingham)', score: 12, categoria: 'moderado', icono: 'heart', descripcion: 'Probabilidad 12% a 10 años de evento cardiovascular mayor.', recomendaciones: ['Mantener PA <130/80', 'LDL <100 mg/dL', 'Actividad física 150 min/sem'] },
+      { id: 2, factor: 'Riesgo Diabetes (FINDRISC)', score: 8, categoria: 'bajo', icono: 'droplets', descripcion: 'Probabilidad 4% a 10 años de desarrollar DM tipo 2 (en pacientes sin DM).', recomendaciones: ['Dieta balanceada', 'Control de peso'] },
+      { id: 3, factor: 'Riesgo Renal (CKD-EPI)', score: 15, categoria: 'moderado', icono: 'activity', descripcion: 'TFG estimada 78 mL/min/1.73m². ERC etapa 2.', recomendaciones: ['Evitar AINEs', 'Hidratación adecuada', 'Control PA estricto'] },
+      { id: 4, factor: 'Riesgo de Caídas (Tinetti)', score: 5, categoria: 'bajo', icono: 'alert', descripcion: 'Marcha y equilibrio normales.', recomendaciones: ['Mantener actividad'] },
+    ],
+    resumen: `Riesgo cardiovascular ${p.riesgo}. Requiere seguimiento ${p.riesgo === 'alto' ? 'intensivo cada 4 semanas' : 'trimestral'}.`,
+  });
+
+  const genAlertas = (p) => ({
+    alertas: [
+      { id: 1, tipo: 'alergia', severidad: 'alta', titulo: 'Alergia documentada', descripcion: p.alergias?.length ? `Alergia a ${p.alergias.join(', ')}. Evitar prescripción.` : 'Sin alergias documentadas.', activa: !!p.alergias?.length },
+      { id: 2, tipo: 'laboratorio', severidad: 'media', titulo: 'Perfil lipídico vencido', descripcion: 'Último control hace 6 meses. Solicitar nuevo.', activa: true },
+      { id: 3, tipo: 'medicamento', severidad: 'baja', titulo: 'Refill próximo', descripcion: 'Losartán se agota en 12 días.', activa: true },
+    ].filter((a) => a.activa),
+  });
+
+  const genObjetivos = (p) => ({
+    objetivos: [
+      { id: 1, descripcion: 'Mantener PA <130/80 mmHg', estado: 'en_curso', avance: 75, fecha_meta: '2026-08-01', responsable: 'Dra. Vega' },
+      { id: 2, descripcion: 'HbA1c <7%', estado: 'logrado', avance: 100, fecha_meta: '2026-03-01', responsable: 'Dra. Vega' },
+      { id: 3, descripcion: 'Reducir 5 kg de peso', estado: 'en_curso', avance: 40, fecha_meta: '2026-12-01', responsable: 'Nutrición' },
+      { id: 4, descripcion: 'Caminar 150 min/semana', estado: 'en_curso', avance: 60, fecha_meta: '2026-12-01', responsable: 'Paciente' },
+    ],
+  });
+
+  const genSignosVitales = (p) => ({
+    signos_vitales: [
+      { fecha: '2026-04-12', pa_sistolica: 128, pa_diastolica: 82, fc: 72, fr: 16, temp: 36.6, sat_o2: 98, peso: p.peso_kg, talla: p.talla_cm, glucosa: 98, imc: p.imc },
+      { fecha: '2026-03-08', pa_sistolica: 132, pa_diastolica: 85, fc: 75, fr: 18, temp: 36.8, sat_o2: 97, peso: p.peso_kg + 0.5, talla: p.talla_cm, glucosa: 102, imc: p.imc },
+      { fecha: '2026-02-01', pa_sistolica: 138, pa_diastolica: 88, fc: 78, fr: 17, temp: 36.7, sat_o2: 97, peso: p.peso_kg + 1, talla: p.talla_cm, glucosa: 112, imc: p.imc },
+      { fecha: '2026-01-15', pa_sistolica: 142, pa_diastolica: 92, fc: 80, fr: 18, temp: 36.5, sat_o2: 96, peso: p.peso_kg + 1.5, talla: p.talla_cm, glucosa: 118, imc: p.imc },
+    ],
+  });
+
+  const genMedicamentos = (p) => ({
+    medicamentos: [
+      { id: 1, principio_activo: 'Losartán', nombre_comercial: 'Cozaar', dosis: '50 mg', frecuencia: 'Cada 24 hrs', via: 'Oral', activo: true, fecha_inicio: '2024-03-15', prescriptor: 'Dra. Vega' },
+      { id: 2, principio_activo: 'Metformina', nombre_comercial: 'Glucophage', dosis: '850 mg', frecuencia: 'Cada 12 hrs', via: 'Oral', activo: true, fecha_inicio: '2025-01-20', prescriptor: 'Dra. Vega' },
+      { id: 3, principio_activo: 'Atorvastatina', nombre_comercial: 'Lipitor', dosis: '20 mg', frecuencia: 'Cada 24 hrs (HS)', via: 'Oral', activo: true, fecha_inicio: '2025-06-10', prescriptor: 'Dra. Vega' },
+      { id: 4, principio_activo: 'Ácido acetilsalicílico', nombre_comercial: 'ASA Protect', dosis: '100 mg', frecuencia: 'Cada 24 hrs', via: 'Oral', activo: true, fecha_inicio: '2025-08-22', prescriptor: 'Dra. Vega' },
+    ],
+    tratamientos: [
+      { id: 1, medicamento: 'Losartán 50mg', dosis: '50 mg', frecuencia: 'Cada 24 hrs', via: 'Oral', activo: true },
+      { id: 2, medicamento: 'Metformina 850mg', dosis: '850 mg', frecuencia: 'Cada 12 hrs', via: 'Oral', activo: true },
+      { id: 3, medicamento: 'Atorvastatina 20mg', dosis: '20 mg', frecuencia: 'Cada 24 hrs', via: 'Oral', activo: true },
+    ],
+  });
+
+  const genDecisiones = (p) => ({
+    decisiones: [
+      { id: 1, titulo: 'Ajuste de antihipertensivo', urgencia: 'media', descripcion: 'PA promedio últimas 4 semanas: 135/88. Considerar agregar amlodipino.', fecha_creacion: '2026-04-10', estado: 'pendiente' },
+      { id: 2, titulo: 'Solicitar perfil lipídico', urgencia: 'baja', descripcion: 'Último control hace 6 meses. LDL fuera de meta.', fecha_creacion: '2026-04-12', estado: 'pendiente' },
+      { id: 3, titulo: 'Renovación de receta', urgencia: 'alta', descripcion: 'Medicación se agota en próximos 10 días.', fecha_creacion: '2026-04-12', estado: 'pendiente' },
+    ],
+    decisiones_pendientes: [
+      { id: 1, titulo: 'Ajuste antihipertensivo', urgencia: 'media' },
+      { id: 2, titulo: 'Perfil lipídico', urgencia: 'baja' },
+      { id: 3, titulo: 'Renovación receta', urgencia: 'alta' },
+    ],
+  });
+
+  const genPsicosocial = (p) => ({
+    gad7: { score: 5, categoria: 'leve', interpretacion: 'Ansiedad mínima' },
+    phq9: { score: 4, categoria: 'mínima', interpretacion: 'Sin datos de depresión' },
+    audit: { score: 2, categoria: 'bajo', interpretacion: 'Consumo de alcohol bajo riesgo' },
+    apgar_familiar: { score: 8, categoria: 'normal', interpretacion: 'Familia funcional' },
+    red_apoyo: 'familiar fuerte (esposa, 2 hijos adultos)',
+    vivienda: 'propia, condiciones adecuadas',
+    empleo: 'formal, estable',
+    seguridad_alimentaria: 'adecuada',
+    nivel_socioeconomico: 'medio',
+    observaciones: 'Paciente con red de apoyo adecuada, estabilidad psicosocial y económica.',
+    factores_riesgo: ['Estrés laboral moderado'],
+    factores_protectores: ['Apoyo familiar', 'Práctica religiosa', 'Actividad física regular'],
+  });
+
+  const genEstudios = (p) => ({
+    estudios: [
+      { id: 1, fecha: '2026-03-15', tipo: 'BH + QS6 + Perfil Lipídico', categoria: 'laboratorio', estado: 'completado', urgencia: 'rutina', resultados: 'Dentro de parámetros normales', archivo_url: '#', notas: 'Glucosa 98, HbA1c 6.4, LDL 142 (alto), HDL 48, TG 165, Creatinina 0.9' },
+      { id: 2, fecha: '2026-01-20', tipo: 'Rx Tórax PA y Lateral', categoria: 'imagenología', estado: 'completado', urgencia: 'rutina', resultados: 'Sin alteraciones radiológicas', archivo_url: '#' },
+      { id: 3, fecha: '2025-11-08', tipo: 'ECG 12 derivaciones', categoria: 'cardiología', estado: 'completado', urgencia: 'rutina', resultados: 'Ritmo sinusal regular, sin datos de isquemia', archivo_url: '#' },
+      { id: 4, fecha: '2025-09-22', tipo: 'EGO + Urocultivo', categoria: 'laboratorio', estado: 'completado', urgencia: 'rutina', resultados: 'Normal', archivo_url: '#' },
+      { id: 5, fecha: '2026-04-15', tipo: 'Perfil tiroideo', categoria: 'laboratorio', estado: 'pendiente', urgencia: 'rutina', notas: 'Solicitado en consulta de hoy' },
+    ],
+    laboratorios: [
+      { fecha: '2026-03-15', glucosa: 98, hba1c: 6.4, creatinina: 0.9, ldl: 142, hdl: 48, trigliceridos: 165, colesterol_total: 220 },
+      { fecha: '2025-12-10', glucosa: 102, hba1c: 6.7, creatinina: 0.95, ldl: 156, hdl: 44, trigliceridos: 178, colesterol_total: 236 },
+      { fecha: '2025-08-22', glucosa: 112, hba1c: 7.1, creatinina: 0.92, ldl: 168, hdl: 42, trigliceridos: 195, colesterol_total: 249 },
+    ],
+  });
+
+  const genPreventivo = (p) => ({
+    acciones: [
+      { id: 1, tipo: 'Vacuna influenza estacional', categoria: 'vacuna', estado: 'aplicada', fecha_aplicacion: '2025-10-15', proximo_vencimiento: '2026-10-01' },
+      { id: 2, tipo: 'Vacuna COVID refuerzo', categoria: 'vacuna', estado: 'aplicada', fecha_aplicacion: '2025-09-20', proximo_vencimiento: '2026-09-20' },
+      { id: 3, tipo: 'Vacuna Tdap', categoria: 'vacuna', estado: 'aplicada', fecha_aplicacion: '2023-05-10', proximo_vencimiento: '2033-05-10' },
+      { id: 4, tipo: 'Vacuna Hepatitis B', categoria: 'vacuna', estado: 'aplicada', fecha_aplicacion: '2019-03-15', proximo_vencimiento: 'permanente' },
+      { id: 5, tipo: p.sexo === 'F' ? 'Mastografía bienal' : 'Examen prostático (PSA)', categoria: 'tamizaje', estado: 'pendiente', proximo_vencimiento: '2026-06-01' },
+      { id: 6, tipo: 'Colonoscopía (>50 años)', categoria: 'tamizaje', estado: p.edad >= 50 ? 'pendiente' : 'no_aplica', proximo_vencimiento: p.edad >= 50 ? '2026-12-01' : null },
+      { id: 7, tipo: 'Densitometría ósea', categoria: 'tamizaje', estado: p.edad >= 50 ? 'pendiente' : 'no_aplica', proximo_vencimiento: p.edad >= 50 ? '2026-09-01' : null },
+      { id: 8, tipo: 'Consejería tabaquismo', categoria: 'consejeria', estado: 'realizada', fecha_aplicacion: '2026-02-01' },
+      { id: 9, tipo: 'Consejería actividad física', categoria: 'consejeria', estado: 'realizada', fecha_aplicacion: '2026-03-08' },
+    ],
+    vacunas: [
+      { id: 1, nombre: 'Influenza 2025-2026', fecha: '2025-10-15', lote: 'INF25-A1234', via: 'IM deltoides' },
+      { id: 2, nombre: 'COVID-19 refuerzo 2025', fecha: '2025-09-20', lote: 'CV25-B5678', via: 'IM deltoides' },
+      { id: 3, nombre: 'Tdap', fecha: '2023-05-10', lote: 'TD23-C9012', via: 'IM deltoides' },
+      { id: 4, nombre: 'Hepatitis B (esquema completo)', fecha: '2019-03-15', lote: 'HB19-D3456', via: 'IM deltoides' },
+    ],
+    tamizajes: [
+      { tipo: p.sexo === 'F' ? 'Mastografía' : 'PSA', estado: 'pendiente', vencimiento: '2026-06-01' },
+      { tipo: 'Colonoscopía', estado: p.edad >= 50 ? 'pendiente' : 'no_aplica' },
+    ],
+  });
+
+  const genResumen360 = (p) => ({
+    paciente: p,
+    resumen_clinico: `Paciente ${p.nombre_completo}, ${p.edad} años, ${p.sexo_label.toLowerCase()}. Dx principal: ${p.dx_principal}. Riesgo ${p.riesgo}. Bajo tratamiento crónico estable.`,
+    ultimo_signo: { fecha: '2026-04-12', pa: '128/82', fc: 72, glucosa: 98 },
+    proxima_cita: '2026-07-12',
+    medicamentos_activos: 4,
+    problemas_activos: 3,
+    alertas_activas: 3,
+    objetivos_en_curso: 3,
+  });
+
+  const genMapeoAnatomico = (p) => ({
+    organos_afectados: [
+      { organo: 'corazon', sistema: 'cardiovascular', severidad: 'medio', dx: 'HTA', color: '#f59e0b' },
+      { organo: 'pancreas', sistema: 'endocrino', severidad: 'medio', dx: 'DM tipo 2', color: '#f59e0b' },
+      { organo: 'rinones', sistema: 'urinario', severidad: 'leve', dx: 'ERC etapa 2', color: '#fbbf24' },
+      { organo: 'cerebro', sistema: 'nervioso', severidad: 'leve', dx: 'Cefalea tensional', color: '#fde68a' },
+    ],
+    sistemas_afectados: ['cardiovascular', 'endocrino', 'urinario'],
+  });
+
+  const genModoGuardia = (p) => ({
+    paciente: p,
+    alertas_criticas: [{ tipo: 'alergia', descripcion: p.alergias?.length ? `ALERGIA A: ${p.alergias.join(', ').toUpperCase()}` : 'Sin alergias' }],
+    medicamentos: [{ nombre: 'Losartán 50mg', dosis: 'c/24h' }, { nombre: 'Metformina 850mg', dosis: 'c/12h' }],
+    dx_activos: ['HTA controlada', 'DM tipo 2', 'Dislipidemia'],
+    ultimo_signo: { pa: '128/82', fc: 72, glucosa: 98 },
+    contacto_emergencia: p.emergencia,
+  });
+
+  // ─── PASO 6: Odontología ─────────────────────────────────────────────────
+  const genOdontograma = (pid) => ({
+    paciente_id: pid,
+    dientes: Array.from({ length: 32 }, (_, i) => {
+      const numero = (i < 16) ? (11 + i + Math.floor(i / 8) * 10) : (31 + (i - 16) + Math.floor((i - 16) / 8) * 10);
+      const estados = ['sano', 'sano', 'sano', 'sano', 'sano', 'caries', 'restauracion', 'sano', 'sano', 'corona'];
+      return { numero: numero <= 28 ? numero : (11 + i), estado: estados[i % estados.length], superficies: {} };
+    }),
+    ultima_actualizacion: '2026-04-12',
+  });
+
+  const genPeriodontograma = (pid) => ({
+    paciente_id: pid,
+    mediciones: Array.from({ length: 32 }, (_, i) => ({
+      diente: 11 + i, profundidad_bolsa: { mesial: 2, central: 2, distal: 3 },
+      sangrado: i % 5 === 0, placa: i % 4 === 0, movilidad: 0,
+    })),
+    indice_placa: 22, indice_sangrado: 18, fecha: '2026-04-12',
+  });
+
+  const genHallazgosDientes = () => ({
+    hallazgos: [
+      { id: 1, diente: 16, tipo: 'caries', superficie: 'oclusal', severidad: 'moderada', fecha: '2026-03-15' },
+      { id: 2, diente: 26, tipo: 'restauración', superficie: 'mesio-oclusal', material: 'resina', fecha: '2025-11-20' },
+      { id: 3, diente: 36, tipo: 'corona', material: 'porcelana-metal', fecha: '2024-08-10' },
+    ],
+  });
+
+  const genPlanTratamientoOdonto = () => ({
+    fases: [
+      { id: 1, nombre: 'Fase 1 — Profilaxis', procedimientos: [{ id: 11, descripcion: 'Limpieza dental profesional', estado: 'completado', costo: 600 }] },
+      { id: 2, nombre: 'Fase 2 — Operatoria', procedimientos: [
+        { id: 21, descripcion: 'Obturación resina #16 oclusal', estado: 'pendiente', costo: 1200 },
+        { id: 22, descripcion: 'Reemplazo restauración #26', estado: 'pendiente', costo: 1500 },
+      ]},
+      { id: 3, nombre: 'Fase 3 — Mantenimiento', procedimientos: [{ id: 31, descripcion: 'Control 6 meses', estado: 'programado', costo: 400 }] },
+    ],
+    costo_total: 3700,
+  });
+
+  // ─── PASO 7: Traumatología ───────────────────────────────────────────────
+  const genLesiones = () => ({
+    lesiones: [
+      { id: 1, zona_corporal: 'lumbar', tipo: 'lumbalgia mecánica', severidad: 'moderada', activa: true, fecha_inicio: '2024-08-12', notas: 'Episodios recurrentes asociados a postura laboral.' },
+      { id: 2, zona_corporal: 'rodilla_derecha', tipo: 'condromalacia rotuliana', severidad: 'leve', activa: true, fecha_inicio: '2025-02-03', notas: 'Mejora con fortalecimiento de cuádriceps.' },
+      { id: 3, zona_corporal: 'hombro_izquierdo', tipo: 'tendinitis del manguito rotador', severidad: 'leve', activa: false, fecha_inicio: '2023-11-15', fecha_resolucion: '2024-03-20' },
+    ],
+  });
+
+  const genPlanTratamientoTrauma = () => ({
+    procedimientos: [
+      { id: 1, descripcion: 'Rehabilitación lumbar — 12 sesiones', estado: 'en_curso', avance: 7, fase: 'activa' },
+      { id: 2, descripcion: 'Programa de fortalecimiento de core', estado: 'en_curso', avance: 60, fase: 'activa' },
+      { id: 3, descripcion: 'Infiltración con corticoide L4-L5', estado: 'considerado', avance: 0, fase: 'evaluación' },
+    ],
+  });
+
+  // ─── PASO 8: PUM-AI / Gemini respuestas ──────────────────────────────────
+  const pumaiResumen = (p) =>
+    `Paciente ${p.nombre_completo}, ${p.edad} años, ${p.sexo_label.toLowerCase()}. Diagnóstico principal: ${p.dx_principal}. ` +
+    `Riesgo clínico: ${p.riesgo.toUpperCase()}. ${p.alergias?.length ? `Alergias: ${p.alergias.join(', ')}. ` : 'Sin alergias documentadas. '}` +
+    `Última consulta: control estable. Adherencia a tratamiento: buena. Recomendación: mantener seguimiento trimestral.`;
+
+  const pumaiNarrativa = (p) =>
+    `# Narrativa Clínica — ${p.nombre_completo}\n\n` +
+    `**${p.nombre_completo}**, ${p.sexo === 'M' ? 'masculino' : 'femenina'} de ${p.edad} años, con ocupación de ${p.ocupacion}, ` +
+    `acude a control de su padecimiento principal: **${p.dx_principal}**.\n\n` +
+    `## Antecedentes\n\nTipo sanguíneo ${p.tipo_sangre}. ` +
+    (p.alergias?.length ? `Refiere alergia a **${p.alergias.join(' y ')}**. ` : 'Niega alergias medicamentosas. ') +
+    `Sin antecedentes quirúrgicos relevantes. Antecedentes familiares positivos para cardiopatía isquémica en línea paterna.\n\n` +
+    `## Estado Actual\n\nPaciente clínicamente estable, somatometría: peso ${p.peso_kg} kg, talla ${p.talla_cm} cm, IMC ${p.imc} kg/m². ` +
+    `Signos vitales dentro de rangos aceptables. Apego terapéutico reportado del 92%.\n\n` +
+    `## Plan\n\n1. Continuar esquema farmacológico actual.\n2. Solicitar QS6 + perfil lipídico.\n3. Reforzar medidas higiénico-dietéticas.\n4. Cita en 12 semanas.\n\n` +
+    `_Documento generado por IA · ${new Date().toLocaleString('es-MX')}_`;
+
+  const pumaiCorrelacion = (p) =>
+    `Se identifican 3 correlaciones clínicamente significativas:\n\n` +
+    `1. **PA sistólica elevada** asociada a adherencia subóptima en últimos 60 días. Recomendación: pillbox electrónico.\n\n` +
+    `2. **IMC ${p.imc} kg/m²** asociado a sedentarismo. Recomendación: actividad física graduada + nutrición.\n\n` +
+    `3. **Patrón de sueño irregular** asociado a ansiedad situacional. Recomendación: higiene del sueño + valoración por psicología.`;
+
+  // ─── PASO 9: Interceptor de fetch ────────────────────────────────────────
   const originalFetch = window.fetch ? window.fetch.bind(window) : null;
 
   const interceptFetch = async function (input, init) {
     const url = typeof input === 'string' ? input : (input?.url || '');
 
-    // No interceptar archivos locales (assets, geometries, draco, models, fuentes, CDN externo)
+    // Llamadas a Gemini API → respuesta hardcoded en formato Gemini
+    if (url.includes('generativelanguage.googleapis.com')) {
+      // El cuerpo del request indica qué módulo es. Intento detectar.
+      let body = init?.body;
+      if (typeof body === 'string') {
+        try { body = JSON.parse(body); } catch (e) {}
+      }
+      const prompt = body?.contents?.[0]?.parts?.[0]?.text || '';
+      let respText = '';
+      // Buscar paciente referenciado para personalizar la respuesta
+      const pacIdMatch = prompt.match(/[0-9a-f-]{36}/);
+      const p = pacIdMatch ? getPaciente(pacIdMatch[0]) : PACIENTES[1];
+      if (prompt.toLowerCase().includes('narrativ')) respText = pumaiNarrativa(p);
+      else if (prompt.toLowerCase().includes('correlaci')) respText = pumaiCorrelacion(p);
+      else respText = pumaiResumen(p);
+      return jsonResponse({ candidates: [{ content: { parts: [{ text: respText }] }, finishReason: 'STOP' }] }, { delayMs: thinkingDelay(2000, 4000) });
+    }
+
+    // Archivos estáticos locales — pasar a fetch original
     if (url.startsWith('http') && !url.includes(window.location.host)) {
       return originalFetch(input, init);
     }
-    if (url.match(/\.(glb|gltf|js|css|png|jpg|jpeg|svg|ico|woff2?|ttf|json|wasm)(\?|$)/i)) {
+    if (url.match(/\.(glb|gltf|js|css|png|jpg|jpeg|svg|ico|webp|gif|woff2?|ttf|json|wasm|drc)(\?|$)/i)) {
       return originalFetch(input, init);
     }
 
     console.debug('[DEMO MOCK]', (init?.method || 'GET'), url);
 
-    // ─── AUTH ────────────────────────────────────────────────────────────
-    if (url.includes('/auth/me')) {
-      return jsonResponse(DRA_VEGA);
-    }
-    if (url.includes('/identity/login')) {
-      return jsonResponse({ success: true, user: DRA_VEGA });
-    }
+    const pid = extractPacienteId(url) || PACIENTES[1].id;
+    const paciente = getPaciente(pid);
+
+    // ─── AUTH ─────────────────────────────────────────────────────────
+    if (url.includes('/auth/me')) return jsonResponse(DRA_VEGA);
+    if (url.includes('/identity/login')) return jsonResponse({ success: true, user: DRA_VEGA });
     if (url.includes('/identity/logout')) {
-      // En demo, "logout" recarga la página (vuelve al estado inicial limpio)
-      setTimeout(() => { window.location.reload(); }, 200);
+      setTimeout(() => window.location.reload(), 200);
       return jsonResponse({ success: true });
     }
 
-    // ─── PUM-AI (con thinking delay) ─────────────────────────────────────
-    if (url.includes('/pumai/resumen-ejecutivo') || url.includes('/pumai/resumen')) {
-      const p = getPaciente(extractPacienteId(url));
-      return jsonResponse(PUMAI_RESPONSES.resumen(p), { delayMs: thinkingDelay(2500, 4500) });
-    }
-    if (url.includes('/pumai/cambios-recientes') || url.includes('/pumai/cambios')) {
-      const p = getPaciente(extractPacienteId(url));
-      return jsonResponse(PUMAI_RESPONSES.cambios(p), { delayMs: thinkingDelay(2000, 4000) });
-    }
-    if (url.includes('/pumai/complejidad')) {
-      const p = getPaciente(extractPacienteId(url));
-      return jsonResponse(PUMAI_RESPONSES.complejidad(p), { delayMs: thinkingDelay(2000, 3500) });
-    }
-    if (url.includes('/pumai/correlacion')) {
-      const p = getPaciente(extractPacienteId(url));
-      return jsonResponse(PUMAI_RESPONSES.correlacion(p), { delayMs: thinkingDelay(3000, 5000) });
-    }
-    if (url.includes('/pumai/narrativa')) {
-      const p = getPaciente(extractPacienteId(url));
-      return jsonResponse(PUMAI_RESPONSES.narrativa(p), { delayMs: thinkingDelay(3500, 5500) });
-    }
-    // Batch completo (los 5 widgets en una sola llamada)
-    if (url.includes('/analisis-completo') || url.includes('/pumai/batch')) {
-      const p = getPaciente(extractPacienteId(url));
-      return jsonResponse({
-        resumen_ejecutivo: PUMAI_RESPONSES.resumen(p),
-        cambios_recientes: PUMAI_RESPONSES.cambios(p),
-        complejidad_clinica: PUMAI_RESPONSES.complejidad(p),
-        correlacion_clinica: { ...PUMAI_RESPONSES.correlacion(p), pendiente: false },
-        narrativa_clinica: { ...PUMAI_RESPONSES.narrativa(p), pendiente: false },
-      }, { delayMs: thinkingDelay(3500, 5500) });
-    }
-
-    // ─── PACIENTES ───────────────────────────────────────────────────────
-    if (url.match(/\/api\/v1\/pacientes\/?$/) || url.match(/\/api\/v1\/pacientes\?/)) {
-      return jsonResponse({ pacientes: PACIENTES, total: PACIENTES.length });
-    }
-    if (url.match(/\/api\/v1\/pacientes\/[0-9a-f-]{36}\/?$/)) {
-      const id = extractPacienteId(url);
-      const p = getPaciente(id);
-      return jsonResponse(p);
-    }
-
-    // Notas clínicas / evoluciones
-    if (url.match(/\/api\/v1\/pacientes\/[0-9a-f-]{36}\/(notas|evolucion|expediente)/)) {
-      if ((init?.method || 'GET') === 'GET') {
-        return jsonResponse({
-          notas: [
-            { id: 1, fecha: '2026-04-12', tipo: 'Consulta general', medico: 'Dra. Vega', texto: 'Paciente acude a control. Refiere mejoría en cefaleas. Sin nuevas alergias.' },
-            { id: 2, fecha: '2026-03-08', tipo: 'Seguimiento', medico: 'Dra. Vega', texto: 'Control mensual. PA 128/82. Continuar tratamiento.' },
-            { id: 3, fecha: '2026-02-01', tipo: 'Primera vez', medico: 'Dra. Vega', texto: 'Paciente de nuevo ingreso. Se realiza historia clínica completa.' },
-          ],
-        });
-      }
-      // POST / PUT — simula guardado (con localStorage temporal)
-      const body = init?.body ? (typeof init.body === 'string' ? JSON.parse(init.body) : init.body) : {};
-      const newNote = { id: Date.now(), fecha: new Date().toISOString().slice(0, 10), medico: 'Dra. Vega', ...body };
-      try {
-        const key = `demo_notas_${extractPacienteId(url) || 'global'}`;
-        const existing = JSON.parse(localStorage.getItem(key) || '[]');
-        existing.push(newNote);
-        localStorage.setItem(key, JSON.stringify(existing));
-      } catch (e) { /* ignore */ }
-      return jsonResponse({ success: true, nota: newNote }, { delayMs: 600 });
-    }
-
-    // Signos vitales
-    if (url.match(/\/api\/v1\/pacientes\/[0-9a-f-]{36}\/signos/)) {
-      return jsonResponse({
-        signos: [
-          { fecha: '2026-04-12', pa_sistolica: 128, pa_diastolica: 82, fc: 72, fr: 16, temp: 36.6, sat_o2: 98, peso: 89, glucosa: 98 },
-          { fecha: '2026-03-08', pa_sistolica: 132, pa_diastolica: 85, fc: 75, fr: 18, temp: 36.8, sat_o2: 97, peso: 89.5, glucosa: 102 },
-          { fecha: '2026-02-01', pa_sistolica: 138, pa_diastolica: 88, fc: 78, fr: 17, temp: 36.7, sat_o2: 97, peso: 90, glucosa: 112 },
-        ],
-      });
-    }
-
-    // Diagnósticos / problemas / tratamientos
-    if (url.match(/\/(problemas|diagnosticos)/)) {
-      return jsonResponse({
-        diagnosticos: [
-          { id: 1, cie10: 'I10', descripcion: 'Hipertensión arterial esencial', estado: 'activo', fecha_inicio: '2024-03-15' },
-          { id: 2, cie10: 'E11', descripcion: 'Diabetes mellitus tipo 2', estado: 'controlado', fecha_inicio: '2025-01-20' },
-        ],
-      });
-    }
-    if (url.match(/\/tratamientos/)) {
-      return jsonResponse({
-        tratamientos: [
-          { id: 1, medicamento: 'Losartán', dosis: '50 mg', frecuencia: 'Cada 24 hrs', via: 'Oral', activo: true },
-          { id: 2, medicamento: 'Metformina', dosis: '850 mg', frecuencia: 'Cada 12 hrs', via: 'Oral', activo: true },
-          { id: 3, medicamento: 'Atorvastatina', dosis: '20 mg', frecuencia: 'Cada 24 hrs', via: 'Oral', activo: true },
-        ],
-      });
-    }
-
-    // ─── RECETAS ─────────────────────────────────────────────────────────
-    if (url.includes('/api/v1/recetas')) {
-      if (url.includes('/verificar/')) {
-        return jsonResponse({ valida: true, paciente: PACIENTES[0].nombre_completo, medico: 'Dra. Vega', fecha: '2026-04-12' });
-      }
-      return jsonResponse({
-        recetas: [
-          { id: 'rx-001', paciente_id: PACIENTES[0].id, fecha: '2026-04-12', medicamentos: ['Losartán 50mg', 'Metformina 850mg'], qr: 'demo-qr-001' },
-          { id: 'rx-002', paciente_id: PACIENTES[1].id, fecha: '2026-04-10', medicamentos: ['Sertralina 50mg'], qr: 'demo-qr-002' },
-        ],
-      });
-    }
-
-    // ─── TELECONSULTA / LIVEKIT ──────────────────────────────────────────
-    if (url.includes('/api/v1/teleconsultas')) {
-      if (url.includes('/validar-codigo')) {
-        return jsonResponse({ valido: true, sala: 'demo-sala-mirc-2026', paciente: PACIENTES[0].nombre_completo });
-      }
-      if (url.includes('/token') || url.includes('/livekit-token')) {
-        // Token "fake" — LiveKit lo rechazará y la app caerá a fallback simulado
-        return jsonResponse({
-          token: 'demo-livekit-token-no-real-connection',
-          url: 'wss://demo-livekit.example.com',
-          sala: 'demo-sala-mirc',
-          modo_demo: true,
-        });
-      }
-      return jsonResponse({
-        teleconsultas: [
-          { id: 1, paciente: PACIENTES[0].nombre_completo, fecha: '2026-04-15 10:00', estado: 'programada' },
-          { id: 2, paciente: PACIENTES[1].nombre_completo, fecha: '2026-04-15 11:30', estado: 'programada' },
-        ],
-      });
-    }
-
-    // ─── DASHBOARD / ADMIN ───────────────────────────────────────────────
-    if (url.includes('/api/v1/dashboard')) {
-      return jsonResponse({
-        stats: {
-          pacientes_total: PACIENTES.length, consultas_hoy: 7, teleconsultas_hoy: 2,
-          recetas_emitidas_mes: 142, alertas_activas: 3,
-        },
-        proximas_citas: [
-          { hora: '10:00', paciente: PACIENTES[0].nombre_completo, tipo: 'Control HTA' },
-          { hora: '11:30', paciente: PACIENTES[1].nombre_completo, tipo: 'Seguimiento migraña' },
-          { hora: '13:00', paciente: PACIENTES[2].nombre_completo, tipo: 'Resultados de labs' },
-        ],
-      });
-    }
-    if (url.includes('/api/v1/admin')) {
-      return jsonResponse({
-        usuarios: [
-          { id: 1, nombre: 'Dra. María Vega Hernández', rol: 'admin', activo: true, email: 'dra.vega@iztacala.unam.mx' },
-          { id: 2, nombre: 'Dr. Carlos Mendoza', rol: 'doctor', activo: true, email: 'carlos.mendoza@iztacala.unam.mx' },
-          { id: 3, nombre: 'Enf. Patricia Solís', rol: 'enfermeria', activo: true, email: 'patricia.solis@iztacala.unam.mx' },
-        ],
-        auditoria: [
-          { fecha: '2026-04-12 14:32', usuario: 'dra_vega', accion: 'Consultó expediente Juan Galindo' },
-          { fecha: '2026-04-12 14:15', usuario: 'dra_vega', accion: 'Emitió receta Sofía Moreno' },
-          { fecha: '2026-04-12 13:48', usuario: 'dra_vega', accion: 'Login exitoso' },
-        ],
-      });
-    }
-
-    // ─── ODONTOLOGÍA / TRAUMATOLOGÍA ─────────────────────────────────────
-    if (url.includes('/api/v1/odontologia')) {
-      return jsonResponse({
-        odontograma: {
-          dientes: Array.from({ length: 32 }, (_, i) => ({
-            numero: i + 11,
-            estado: ['sano', 'sano', 'sano', 'caries', 'sano', 'restauracion'][i % 6],
-          })),
-        },
-      });
-    }
-    if (url.includes('/api/v1/traumatologia')) {
-      return jsonResponse({
-        antecedentes: [
-          { fecha: '2024-08-12', region: 'Lumbar', dx: 'Lumbalgia mecánica', resuelto: false },
-        ],
-      });
-    }
-
-    // ─── ESTUDIOS / DOCUMENTOS / INTERCONSULTAS ──────────────────────────
-    if (url.match(/\/(estudios|laboratorios)/)) {
-      return jsonResponse({
-        estudios: [
-          { id: 1, fecha: '2026-03-15', tipo: 'BH + QS6 + Perfil Lipídico', estado: 'completado', resultados: 'Dentro de parámetros normales' },
-          { id: 2, fecha: '2026-01-20', tipo: 'Rx Tórax PA y Lateral', estado: 'completado', resultados: 'Sin alteraciones' },
-        ],
-      });
-    }
-    if (url.match(/\/documentos/)) {
-      return jsonResponse({ documentos: [
+    // ─── EXPEDIENTE — endpoints específicos del paciente ───────────────
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/resumen-360/)) return jsonResponse(genResumen360(paciente));
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/mapeo-anatomico/)) return jsonResponse(genMapeoAnatomico(paciente));
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/timeline/)) return jsonResponse(genTimeline(paciente));
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/(problemas-clinicos|problemas|diagnosticos)/)) return jsonResponse(genProblemas(paciente));
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/riesgos/)) return jsonResponse(genRiesgos(paciente));
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/alertas/)) return jsonResponse(genAlertas(paciente));
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/modo-guardia/)) return jsonResponse(genModoGuardia(paciente));
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/objetivos/)) return jsonResponse(genObjetivos(paciente));
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/signos-vitales/)) return jsonResponse(genSignosVitales(paciente));
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/medicamentos/)) return jsonResponse(genMedicamentos(paciente));
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/(tratamientos)/)) return jsonResponse(genMedicamentos(paciente));
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/decisiones-pendientes/)) return jsonResponse(genDecisiones(paciente));
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/decisiones/)) return jsonResponse(genDecisiones(paciente));
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/psicosocial/)) return jsonResponse(genPsicosocial(paciente));
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/(archivos|documentos)/)) {
+      return jsonResponse({ archivos: [
+        { id: 1, nombre: 'Consentimiento informado', tipo: 'pdf', tamano: 145000, fecha: '2026-01-15', categoria: 'consentimiento' },
+        { id: 2, nombre: 'Historia clínica inicial', tipo: 'pdf', tamano: 287000, fecha: '2026-01-15', categoria: 'historia' },
+        { id: 3, nombre: 'Resultados laboratorio marzo 2026', tipo: 'pdf', tamano: 95000, fecha: '2026-03-15', categoria: 'laboratorio' },
+      ], documentos: [
         { id: 1, nombre: 'Consentimiento informado', fecha: '2026-01-15', tipo: 'pdf' },
         { id: 2, nombre: 'Historia clínica inicial', fecha: '2026-01-15', tipo: 'pdf' },
       ]});
     }
-    if (url.match(/\/interconsultas/)) {
-      return jsonResponse({ interconsultas: [
-        { id: 1, fecha: '2026-02-20', especialidad: 'Cardiología', motivo: 'Valoración HTA', estado: 'completada' },
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/consentimientos/)) return jsonResponse({
+      consentimientos: [
+        { id: 1, tipo: 'Tratamiento de datos personales', firmado: true, fecha: '2026-01-15' },
+        { id: 2, tipo: 'Expediente clínico electrónico', firmado: true, fecha: '2026-01-15' },
+        { id: 3, tipo: 'Grabación de teleconsulta', firmado: true, fecha: '2026-02-08' },
+      ],
+    });
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/(estudios|laboratorios)/)) return jsonResponse(genEstudios(paciente));
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/(preventivo|prevencion|vacunas|tamizajes)/)) return jsonResponse(genPreventivo(paciente));
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/interconsultas/)) return jsonResponse({
+      interconsultas: [
+        { id: 1, fecha: '2026-02-20', especialidad: 'Cardiología', medico_referido: 'Dr. Mendoza', motivo: 'Valoración HTA', estado: 'completada', conclusiones: 'HTA controlada. Sin datos de daño a órgano blanco.' },
+        { id: 2, fecha: '2026-04-08', especialidad: 'Nutrición', medico_referido: 'Lic. Hernández', motivo: 'Plan alimenticio diabetes', estado: 'completada', conclusiones: 'Plan personalizado entregado. Seguimiento mensual.' },
+        { id: 3, fecha: '2026-05-15', especialidad: 'Oftalmología', medico_referido: 'Dra. Salinas', motivo: 'Tamizaje retinopatía diabética', estado: 'programada' },
+      ],
+    });
+    if (url.match(/pacientes\/[0-9a-f-]{36}\/notas|pacientes\/[0-9a-f-]{36}\/evolucion/)) {
+      return jsonResponse({ notas: [
+        { id: 1, fecha: '2026-04-12', tipo: 'Consulta general', medico: 'Dra. Vega', texto: 'Control trimestral. PA 128/82. Continuar manejo actual.' },
+        { id: 2, fecha: '2026-03-08', tipo: 'Seguimiento', medico: 'Dra. Vega', texto: 'PA 132/85. Reforzar adherencia a tratamiento.' },
       ]});
     }
-    if (url.match(/\/(objetivos|metas)/)) {
-      return jsonResponse({ objetivos: [
-        { id: 1, descripcion: 'PA <130/80', estado: 'en_curso', avance: 75 },
-        { id: 2, descripcion: 'HbA1c <7%', estado: 'logrado', avance: 100 },
-        { id: 3, descripcion: 'Reducir 5 kg', estado: 'en_curso', avance: 40 },
-      ]});
-    }
-    if (url.match(/\/(riesgos|riesgo)/)) {
-      return jsonResponse({ riesgos: [
-        { factor: 'Cardiovascular Framingham', score: 12, categoria: 'moderado' },
-        { factor: 'Diabetes FINDRISC', score: 8, categoria: 'bajo' },
-      ]});
-    }
-    if (url.match(/\/(psicosocial)/)) {
-      return jsonResponse({
-        gad7: 5, phq9: 4,
-        red_apoyo: 'familiar fuerte', vivienda: 'propia', empleo: 'formal',
-        observaciones: 'Paciente con red de apoyo adecuada y estabilidad psicosocial.',
-      });
-    }
-    if (url.match(/\/(preventivo|prevencion)/)) {
-      return jsonResponse({ acciones: [
-        { tipo: 'Vacuna influenza', estado: 'aplicada', fecha: '2025-10-15' },
-        { tipo: 'Vacuna COVID refuerzo', estado: 'aplicada', fecha: '2025-09-20' },
-        { tipo: 'Mastografía bienal', estado: 'pendiente', vencimiento: '2026-06-01' },
-        { tipo: 'Examen prostático', estado: 'pendiente', vencimiento: '2026-12-01' },
-      ]});
+    // Endpoint genérico de paciente
+    if (url.match(/\/api\/v1\/pacientes\/[0-9a-f-]{36}\/?$/)) return jsonResponse(paciente);
+    if (url.match(/\/api\/v1\/pacientes\/?$/) || url.match(/\/api\/v1\/pacientes\?/)) {
+      return jsonResponse({ pacientes: PACIENTES, total: PACIENTES.length });
     }
 
-    // ─── FALLBACK genérico para CUALQUIER OTRO endpoint ─────────────────
-    // Responde 200 con objeto vacío para no romper componentes
+    // ─── PUM-AI ────────────────────────────────────────────────────────
+    if (url.includes('/pumai/resumen')) return jsonResponse({ resumen: pumaiResumen(paciente), generado: new Date().toISOString() }, { delayMs: thinkingDelay(2500, 4500) });
+    if (url.includes('/pumai/cambios')) return jsonResponse({
+      cambios_detectados: [
+        { categoria: 'Signos vitales', descripcion: 'PA promedio mejorada: 128/82 vs 138/88 hace 90 días', tendencia: 'mejora' },
+        { categoria: 'Laboratorios', descripcion: 'Glucosa 98 mg/dL (de 112)', tendencia: 'mejora' },
+        { categoria: 'Adherencia', descripcion: '92% reportada', tendencia: 'mejora' },
+      ],
+      resumen: 'Evolución favorable en los últimos 3 meses.',
+    }, { delayMs: thinkingDelay(2000, 4000) });
+    if (url.includes('/pumai/complejidad')) return jsonResponse({
+      puntuacion: paciente.riesgo === 'alto' ? 75 : (paciente.riesgo === 'medio' ? 50 : 25),
+      categoria: paciente.riesgo === 'alto' ? 'alta' : (paciente.riesgo === 'medio' ? 'media' : 'baja'),
+      factores: [
+        { factor: 'Edad', peso: 10, presente: paciente.edad > 60 },
+        { factor: 'HTA crónica', peso: 20, presente: true },
+        { factor: 'DM tipo 2', peso: 25, presente: true },
+      ],
+      resumen: `Complejidad ${paciente.riesgo}. Manejo recomendado: seguimiento ${paciente.riesgo === 'alto' ? 'intensivo' : 'estándar'}.`,
+    }, { delayMs: thinkingDelay(2000, 3500) });
+    if (url.includes('/pumai/correlacion')) return jsonResponse({
+      correlaciones: [
+        { hallazgo: 'PA elevada', factor_asociado: 'Adherencia subóptima', fuerza_evidencia: 'moderada', recomendacion: 'Pillbox electrónico' },
+        { hallazgo: `IMC ${paciente.imc}`, factor_asociado: 'Sedentarismo', fuerza_evidencia: 'alta', recomendacion: 'Actividad física graduada' },
+      ],
+      resumen: pumaiCorrelacion(paciente),
+    }, { delayMs: thinkingDelay(3000, 5000) });
+    if (url.includes('/pumai/narrativa')) return jsonResponse({ narrativa: pumaiNarrativa(paciente), generado: new Date().toISOString() }, { delayMs: thinkingDelay(3500, 5500) });
+    if (url.includes('/analisis-completo') || url.includes('/pumai/batch')) return jsonResponse({
+      resumen_ejecutivo: { resumen: pumaiResumen(paciente) },
+      cambios_recientes: { resumen: 'Evolución favorable.' },
+      complejidad_clinica: { puntuacion: 50, categoria: 'media' },
+      correlacion_clinica: { resumen: pumaiCorrelacion(paciente), pendiente: false },
+      narrativa_clinica: { narrativa: pumaiNarrativa(paciente), pendiente: false },
+    }, { delayMs: thinkingDelay(3500, 5500) });
+
+    // ─── ODONTOLOGÍA ───────────────────────────────────────────────────
+    if (url.match(/\/api\/v1\/odontologia\/[0-9a-f-]{36}\/odontograma/)) return jsonResponse(genOdontograma(pid));
+    if (url.match(/\/api\/v1\/odontologia\/[0-9a-f-]{36}\/periodontograma/)) return jsonResponse(genPeriodontograma(pid));
+    if (url.match(/\/api\/v1\/odontologia\/[0-9a-f-]{36}\/hallazgos/)) return jsonResponse(genHallazgosDientes());
+    if (url.match(/\/api\/v1\/odontologia\/[0-9a-f-]{36}\/plan-tratamiento/)) return jsonResponse(genPlanTratamientoOdonto());
+    if (url.match(/\/api\/v1\/odontologia\/[0-9a-f-]{36}\/imagenes/)) return jsonResponse({ imagenes: [] });
+    if (url.includes('/api/v1/odontologia')) return jsonResponse({ data: [] });
+
+    // ─── TRAUMATOLOGÍA ─────────────────────────────────────────────────
+    if (url.match(/\/api\/v1\/traumatologia\/[0-9a-f-]{36}\/lesiones\/[^/]+\/evoluciones/)) return jsonResponse({
+      evoluciones: [
+        { id: 1, fecha: '2026-04-10', notas: 'Mejoría sintomática. EVA 3/10.', medico: 'Dra. Vega' },
+        { id: 2, fecha: '2026-03-15', notas: 'EVA 5/10. Continúa rehabilitación.', medico: 'Dra. Vega' },
+      ],
+    });
+    if (url.match(/\/api\/v1\/traumatologia\/[0-9a-f-]{36}\/lesiones/)) return jsonResponse(genLesiones());
+    if (url.match(/\/api\/v1\/traumatologia\/[0-9a-f-]{36}\/plan-tratamiento/)) return jsonResponse(genPlanTratamientoTrauma());
+    if (url.match(/\/api\/v1\/traumatologia\/[0-9a-f-]{36}\/imagenes/)) return jsonResponse({ imagenes: [] });
+    if (url.includes('/api/v1/traumatologia')) return jsonResponse({ data: [] });
+
+    // ─── RECETAS ───────────────────────────────────────────────────────
+    if (url.includes('/api/v1/recetas/verificar/')) return jsonResponse({ valida: true, paciente: paciente.nombre_completo, medico: 'Dra. Vega', fecha: '2026-04-12' });
+    if (url.includes('/api/v1/recetas')) return jsonResponse({ recetas: [
+      { id: 'rx-001', paciente_id: PACIENTES[0].id, fecha: '2026-04-12', medicamentos: ['Losartán 50mg', 'Metformina 850mg'], qr: 'demo-qr-001' },
+    ]});
+
+    // ─── TELECONSULTA / LIVEKIT ────────────────────────────────────────
+    if (url.includes('/api/v1/teleconsultas/validar-codigo')) return jsonResponse({ valido: true, sala: 'demo-sala-mirc-2026', paciente: PACIENTES[0].nombre_completo });
+    if (url.includes('/teleconsulta-api/token') || url.includes('/livekit-token') || url.includes('/teleconsultas/token')) {
+      return jsonResponse({ token: 'demo-token', url: 'wss://demo-livekit.example.com', sala: 'demo-sala-mirc', modo_demo: true });
+    }
+    if (url.includes('/api/v1/teleconsultas')) return jsonResponse({
+      teleconsultas: [
+        { id: 1, paciente: PACIENTES[0].nombre_completo, fecha: '2026-04-15 10:00', estado: 'programada' },
+        { id: 2, paciente: PACIENTES[1].nombre_completo, fecha: '2026-04-15 11:30', estado: 'programada' },
+      ],
+    });
+
+    // ─── DASHBOARD / ADMIN ─────────────────────────────────────────────
+    if (url.includes('/api/v1/dashboard')) return jsonResponse({
+      stats: { pacientes_total: PACIENTES.length, consultas_hoy: 7, teleconsultas_hoy: 2, recetas_emitidas_mes: 142, alertas_activas: 3 },
+      proximas_citas: [
+        { hora: '10:00', paciente: PACIENTES[0].nombre_completo, tipo: 'Control HTA' },
+        { hora: '11:30', paciente: PACIENTES[1].nombre_completo, tipo: 'Seguimiento migraña' },
+        { hora: '13:00', paciente: PACIENTES[2].nombre_completo, tipo: 'Resultados labs' },
+      ],
+    });
+    if (url.includes('/api/v1/admin/stats')) return jsonResponse({ usuarios_activos: 24, sesiones_hoy: 87, accesos_expedientes: 142 });
+    if (url.includes('/api/v1/admin/roles')) return jsonResponse({ roles: ['admin', 'doctor', 'enfermeria', 'paciente', 'especialista'] });
+    if (url.includes('/api/v1/admin/permisos')) return jsonResponse({ matriz: {} });
+    if (url.includes('/api/v1/admin/politicas')) return jsonResponse({ politicas: [] });
+    if (url.includes('/api/v1/admin/auditoria')) return jsonResponse({
+      eventos: [
+        { fecha: '2026-04-12 14:32', usuario: 'dra_vega', accion: 'Consultó expediente Juan Galindo', ip: '10.211.55.10' },
+        { fecha: '2026-04-12 14:15', usuario: 'dra_vega', accion: 'Emitió receta Sofía Moreno', ip: '10.211.55.10' },
+        { fecha: '2026-04-12 13:48', usuario: 'dra_vega', accion: 'Login exitoso', ip: '10.211.55.10' },
+        { fecha: '2026-04-12 11:20', usuario: 'cmendoza', accion: 'Interconsulta cardiología J. Galindo', ip: '10.211.55.11' },
+      ],
+    });
+    if (url.includes('/api/v1/admin')) return jsonResponse({ data: [] });
+
+    // ─── Endpoints content / expediente genéricos ──────────────────────
+    if (url.includes('/api/v1/content')) return jsonResponse({ items: [] });
+    if (url.includes('/api/v1/expediente')) return jsonResponse({ data: [] });
+
+    // ─── Fallback genérico ─────────────────────────────────────────────
     if (url.includes('/api/') || url.includes('/auth/')) {
       console.debug('[DEMO MOCK] fallback genérico para', url);
-      return jsonResponse({ demo: true, message: 'Endpoint mockeado genéricamente', data: [] });
+      return jsonResponse({ demo: true, data: [], items: [], eventos: [] });
     }
 
-    // No es API — dejar pasar
     return originalFetch ? originalFetch(input, init) : Promise.reject(new Error('No fetch available'));
   };
 
-  // Asignación robusta: aplica el interceptor a window, globalThis y self
-  // (algunos bundlers minificados usan unas referencias y otras otras).
   try { window.fetch = interceptFetch; } catch(e) {}
   try { globalThis.fetch = interceptFetch; } catch(e) {}
   try { self.fetch = interceptFetch; } catch(e) {}
 
-  // ─── Cookie/JWT mock — por si la app valida sesión en document.cookie ───
   try {
     document.cookie = 'mirc_session=demo-session-dra-vega; path=/; SameSite=Lax';
     document.cookie = 'access_token=demo-jwt-not-real; path=/; SameSite=Lax';
   } catch(e) {}
 
-  // ─── PASO 7: Banner visual + auto-llenado de login ───────────────────────
-  // El demo redirige a /login. En lugar de pelear con esa redirección
-  // (que viene del Router con basename y el ProtectedRoute), aceptamos
-  // mostrar la pantalla de login pero PRE-RELLENADA con credenciales
-  // mock + un botón funcional. Un click y entras.
-
+  // ─── PASO 10: Auto-rellenar Login + Banner ───────────────────────────────
   const DEMO_USERNAME = 'dra_vega';
   const DEMO_PASSWORD = 'demo2026';
 
-  // Setter nativo de React: hay que usar el descriptor original del prototype
-  // para que React detecte el cambio de value (si solo asignás .value no
-  // actualiza el state, porque React rastrea via Object.defineProperty).
   const setReactInputValue = (input, value) => {
     const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
     setter.call(input, value);
     input.dispatchEvent(new Event('input', { bubbles: true }));
   };
 
-  // Observador: cuando el LoginPage se monta (aparecen los inputs), llenamos.
   let loginFilled = false;
   const fillLoginIfPresent = () => {
     if (loginFilled) return;
@@ -541,8 +591,6 @@
       setReactInputValue(userInput, DEMO_USERNAME);
       setReactInputValue(passInput, DEMO_PASSWORD);
       loginFilled = true;
-      console.info('[DEMO] Credenciales pre-rellenadas:', DEMO_USERNAME);
-      // Mostrar hint visual junto al formulario
       const form = userInput.closest('form');
       if (form && !form.querySelector('.demo-hint')) {
         const hint = document.createElement('div');
@@ -555,23 +603,18 @@
   };
 
   window.addEventListener('DOMContentLoaded', () => {
-    // Banner inferior persistente
     const banner = document.createElement('div');
     banner.id = 'mirc-demo-banner';
     banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:linear-gradient(90deg,#1e40af,#3b82f6);color:#fff;text-align:center;padding:6px 12px;font:600 11px system-ui;z-index:99999;letter-spacing:.3px;box-shadow:0 -2px 8px rgba(0,0,0,.15);';
-    banner.innerHTML = '🎬 <strong>MODO DEMO</strong> · MIRC Expediente 360 · FES Iztacala UNAM · Datos ficticios, no se guardan · Usuario admin precargado: <strong>Dra. María Vega</strong>';
+    banner.innerHTML = '🎬 <strong>MODO DEMO</strong> · MIRC Expediente 360 · FES Iztacala UNAM · Datos ficticios · Sesión: <strong>Dra. María Vega</strong>';
     document.body.appendChild(banner);
     document.body.style.paddingBottom = '28px';
 
-    // Intentar llenar login si ya está montado
     fillLoginIfPresent();
-
-    // Observar cambios del DOM por si LoginPage se monta después
     const observer = new MutationObserver(() => fillLoginIfPresent());
     observer.observe(document.body, { childList: true, subtree: true });
-    // Cortar el observer después de 30s para no consumir recursos
     setTimeout(() => observer.disconnect(), 30000);
   });
 
-  console.info('%c[MIRC DEMO] Mocks cargados — Dra. Vega autoenticada', 'background:#1e40af;color:#fff;padding:4px 10px;border-radius:4px;font-weight:bold');
+  console.info('%c[MIRC DEMO v2] Mocks cargados (Gemini + Expediente + Odonto + Trauma)', 'background:#1e40af;color:#fff;padding:4px 10px;border-radius:4px;font-weight:bold');
 })();
