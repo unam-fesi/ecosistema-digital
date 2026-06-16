@@ -102,15 +102,9 @@
 
   /* 6. Tilt 3D en tarjetas */
   function tiltCards(){
-    if (reduce || !fine) return;
-    document.querySelectorAll(".spa-card, .card").forEach(function(c){
-      c.classList.add("cx-tilt");
-      c.addEventListener("mousemove", function(e){
-        var r=c.getBoundingClientRect(), px=(e.clientX-r.left)/r.width-.5, py=(e.clientY-r.top)/r.height-.5;
-        c.style.transform="perspective(800px) rotateX("+(-py*5).toFixed(2)+"deg) rotateY("+(px*6).toFixed(2)+"deg) translateY(-4px)";
-      });
-      c.addEventListener("mouseleave", function(){ c.style.transform=""; });
-    });
+    // Inclinación 3D desactivada: las cards ya no "se mueven" siguiendo el mouse.
+    // El realce cinemático ahora es por CSS (barrido de luz + glow al hover).
+    return;
   }
 
   /* 7. Parallax suave del hero por mouse */

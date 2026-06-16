@@ -71,6 +71,7 @@
       <a href="#" data-section="quienes" onclick="SPA.goToSection('quienes');return false">¿Quiénes Somos?</a>
       <a href="#" data-section="tecnologia" onclick="SPA.goToSection('tecnologia');return false">Tecnología</a>
       <a href="#" data-section="colaboracion" onclick="SPA.goToSection('colaboracion');return false">Colaboración</a>
+      <a href="#" data-section="proyectos" onclick="SPA.goToSection('proyectos');return false">Nuevos Proyectos</a>
       <a href="#" data-section="servicios" onclick="SPA.goToSection('servicios');return false">Servicios</a>
       <a href="#" data-section="cursos" onclick="SPA.goToSection('cursos');return false">Cursos</a>
       <a href="#" data-section="logros" onclick="SPA.goToSection('logros');return false">Logros</a>
@@ -126,27 +127,12 @@
 
   <!-- Floating Section Cards -->
   <div class="spa-cards-grid">
-    <!-- Card destacada: MIRC Expediente 360 (proyecto principal) -->
-    <div class="spa-card spa-card-featured" onclick="window.open('https://unam-fesi.github.io/ecosistema-digital/MIRC-Demo/','_blank','noopener')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.open('https://unam-fesi.github.io/ecosistema-digital/MIRC-Demo/','_blank','noopener')}" role="link" tabindex="0" aria-label="Abrir el demo de MIRC Expediente 360 en una pestaña nueva">
-      <div class="mirc-glow" aria-hidden="true"></div>
-      <div class="mirc-head">
-        <div class="mirc-headtext">
-          <span class="mirc-tag">★ Proyecto principal</span>
-          <h3 class="mirc-title">MIRC Expediente 360</h3>
-          <p class="mirc-sub">El Expediente Clínico Electrónico de FES Iztacala UNAM</p>
-          <p class="mirc-lead">Tecnología que no se ve en otros EMRs en México:</p>
-        </div>
-        <div class="mirc-cta">Ver demo <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></div>
-      </div>
-      <div class="mirc-features">
-      <div class="mirc-feat"><span class="mirc-feat-ico">🧠</span><p><b>IA Clínica Local (PUM-AI)</b> — MedGemma corriendo en servidores propios. Cinco asistentes que resumen, detectan cambios, evalúan complejidad, correlacionan hallazgos y redactan narrativa clínica automáticamente.</p></div>
-      <div class="mirc-feat"><span class="mirc-feat-ico">🫀</span><p><b>Anatomía 3D Interactiva</b> — Modelos volumétricos navegables del cuerpo humano dentro del expediente.</p></div>
-      <div class="mirc-feat"><span class="mirc-feat-ico">🎥</span><p><b>Teleconsulta Integrada</b> — Videollamada médica con grabación cifrada y retención NOM-024 (5 años).</p></div>
-      <div class="mirc-feat"><span class="mirc-feat-ico">🔒</span><p><b>Soberanía de Datos</b> — Cero envíos a APIs externas; cumple NOM-024-SSA3, COFEPRIS y LFPDPPP desde la arquitectura.</p></div>
-      <div class="mirc-feat"><span class="mirc-feat-ico">🏥</span><p><b>Multi-Especialidad</b> — Portales dedicados para Cardiología, Neumología, Neurología, Odontología, Psicología, Nutrición y más.</p></div>
-      <div class="mirc-feat"><span class="mirc-feat-ico">👥</span><p><b>Multi-Perfil</b> — Flujos diferenciados para médico, enfermería, especialista, paciente y administración.</p></div>
-      <div class="mirc-feat"><span class="mirc-feat-ico">🛡</span><p><b>Stack 100% Open Source</b> — Proxmox, FastAPI, Keycloak, PostgreSQL, MongoDB, vLLM, LiveKit, TrueNAS.</p></div>
-      </div>
+    <!-- Card: Nuevos Proyectos (lleva a la sección) -->
+    <div class="spa-card" data-section="proyectos" style="background:linear-gradient(135deg,rgba(196,162,78,0.20),rgba(124,92,255,0.12));border-color:rgba(196,162,78,0.32)">
+      <div class="spa-card-emoji">🚀</div>
+      <div class="spa-card-title">Nuevos Proyectos</div>
+      <div class="spa-card-desc">MIRC Expediente 360, Hospital Virtual, Aura y más iniciativas tecnológicas del ecosistema.</div>
+      <div class="spa-card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
     </div>
 
     <!-- Card: ¿Quiénes Somos? -->
@@ -223,29 +209,6 @@
       </div>
     </div>
 
-    <!-- Card: Nuevos Proyectos -->
-    <div class="spa-card" style="background:linear-gradient(135deg,rgba(45,106,45,0.2),rgba(26,74,26,0.15));border-color:rgba(100,200,80,0.2)" onclick="openProyecto()">
-      <div class="spa-card-emoji">🌳</div>
-      <div class="spa-card-title">Nuevos Proyectos</div>
-      <div class="spa-card-desc">475 Aniversario UNAM — Proyecto de sustentabilidad y plantación digital.</div>
-      <div style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 12px;border-radius:8px;background:linear-gradient(135deg,#f4d03f,#C4A24E);color:#000;letter-spacing:0.5px;text-transform:uppercase">nuevo</div>
-    </div>
-
-    <!-- Card: Aura (proyecto hermano - bienestar emocional) -->
-    <div class="spa-card" style="background:linear-gradient(135deg,rgba(124,92,255,0.18),rgba(56,189,248,0.10));border-color:rgba(124,92,255,0.30)" onclick="window.open('https://unam-fesi.github.io/aura-fesi/','_blank','noopener')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.open('https://unam-fesi.github.io/aura-fesi/','_blank','noopener')}" role="link" tabindex="0" aria-label="Abrir Aura en una pestaña nueva">
-      <div class="spa-card-emoji">💜</div>
-      <div class="spa-card-title">Aura</div>
-      <div class="spa-card-desc">Plataforma de bienestar emocional de la FES Iztacala: acompañamiento anónimo, recursos de autocuidado y herramientas para momentos difíciles.</div>
-      <div style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 12px;border-radius:8px;background:linear-gradient(135deg,#7C5CFF,#38BDF8);color:#fff;letter-spacing:0.5px;text-transform:uppercase">Visitar &#8599;</div>
-    </div>
-
-    <!-- Card: Hospital Virtual (proyecto) -->
-    <div class="spa-card" style="background:linear-gradient(135deg,rgba(13,179,158,0.16),rgba(37,99,235,0.10));border-color:rgba(13,179,158,0.30)" onclick="window.open('https://unam-fesi.github.io/hospitalvirtual/','_blank','noopener')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.open('https://unam-fesi.github.io/hospitalvirtual/','_blank','noopener')}" role="link" tabindex="0" aria-label="Abrir Hospital Virtual en una pestaña nueva">
-      <div class="spa-card-emoji">🥽</div>
-      <div class="spa-card-title">Hospital Virtual</div>
-      <div class="spa-card-desc">Simulador clínico en 3D donde recorres un hospital en primera persona y atiendes casos reales basados en las Guías de Práctica Clínica del IMSS. Tú decides el triage, el diagnóstico y el tratamiento; el paciente responde por voz y PUM-AI, nuestra inteligencia artificial, evalúa, corrige y complementa tu desempeño según tu nivel.</div>
-      <div style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 12px;border-radius:8px;background:linear-gradient(135deg,#0DB39E,#2563EB);color:#fff;letter-spacing:0.5px;text-transform:uppercase">Visitar &#8599;</div>
-    </div>
   </div>
 </div>
 
@@ -341,6 +304,66 @@
       <div class="card-grid card-grid-3 reveal" id="proyectosGrid" style="min-height:200px">
         <div style="grid-column:1/-1;text-align:center;color:#94A3B8;font-size:14px">Cargando proyectos...</div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SPA SECTION: Nuevos Proyectos
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="spa-section-overlay" id="spa-section-proyectos" data-dark="true">
+  <div class="spa-section-content">
+    <button class="spa-panel-close-hint" onclick="SPA.navigateBack()" title="Cerrar">✕</button>
+    <div class="sec-header reveal" data-parallax="0.18">
+      <div class="sec-tag"><span class="dot"></span> Innovación</div>
+      <h2 class="serif">Nuevos Proyectos</h2>
+      <p>Iniciativas tecnológicas del Ecosistema Digital FES Iztacala.</p>
+    </div>
+    <div class="spa-card spa-card-featured reveal" onclick="window.open('https://unam-fesi.github.io/ecosistema-digital/MIRC-Demo/','_blank','noopener')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.open('https://unam-fesi.github.io/ecosistema-digital/MIRC-Demo/','_blank','noopener')}" role="link" tabindex="0" aria-label="Abrir el demo de MIRC Expediente 360 en una pestaña nueva">
+      <div class="mirc-glow" aria-hidden="true"></div>
+      <div class="mirc-head">
+        <div class="mirc-headtext">
+          <span class="mirc-tag">★ Proyecto principal</span>
+          <h3 class="mirc-title">MIRC Expediente 360</h3>
+          <p class="mirc-sub">El Expediente Clínico Electrónico de FES Iztacala UNAM</p>
+          <p class="mirc-lead">Tecnología que no se ve en otros EMRs en México:</p>
+        </div>
+        <div class="mirc-cta">Ver demo <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M7 17L17 7M17 7H8M17 7v9"/></svg></div>
+      </div>
+      <div class="mirc-features">
+      <div class="mirc-feat"><span class="mirc-feat-ico">🧠</span><p><b>IA Clínica Local (PUM-AI)</b> — MedGemma corriendo en servidores propios. Cinco asistentes que resumen, detectan cambios, evalúan complejidad, correlacionan hallazgos y redactan narrativa clínica automáticamente.</p></div>
+      <div class="mirc-feat"><span class="mirc-feat-ico">🫀</span><p><b>Anatomía 3D Interactiva</b> — Modelos volumétricos navegables del cuerpo humano dentro del expediente.</p></div>
+      <div class="mirc-feat"><span class="mirc-feat-ico">🎥</span><p><b>Teleconsulta Integrada</b> — Videollamada médica con grabación cifrada y retención NOM-024 (5 años).</p></div>
+      <div class="mirc-feat"><span class="mirc-feat-ico">🔒</span><p><b>Soberanía de Datos</b> — Cero envíos a APIs externas; cumple NOM-024-SSA3, COFEPRIS y LFPDPPP desde la arquitectura.</p></div>
+      <div class="mirc-feat"><span class="mirc-feat-ico">🏥</span><p><b>Multi-Especialidad</b> — Portales dedicados para Cardiología, Neumología, Neurología, Odontología, Psicología, Nutrición y más.</p></div>
+      <div class="mirc-feat"><span class="mirc-feat-ico">👥</span><p><b>Multi-Perfil</b> — Flujos diferenciados para médico, enfermería, especialista, paciente y administración.</p></div>
+      <div class="mirc-feat"><span class="mirc-feat-ico">🛡</span><p><b>Stack 100% Open Source</b> — Proxmox, FastAPI, Keycloak, PostgreSQL, MongoDB, vLLM, LiveKit, TrueNAS.</p></div>
+      </div>
+    </div>
+    <div class="proyectos-nuevos-grid">
+    <!-- Card: Nuevos Proyectos -->
+    <div class="spa-card reveal" style="background:linear-gradient(135deg,rgba(45,106,45,0.2),rgba(26,74,26,0.15));border-color:rgba(100,200,80,0.2)" onclick="openProyecto()">
+      <div class="spa-card-emoji">🌳</div>
+      <div class="spa-card-title">475 Aniversario UNAM</div>
+      <div class="spa-card-desc">475 Aniversario UNAM — Proyecto de sustentabilidad y plantación digital.</div>
+      <div style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 12px;border-radius:8px;background:linear-gradient(135deg,#f4d03f,#C4A24E);color:#000;letter-spacing:0.5px;text-transform:uppercase">nuevo</div>
+    </div>
+
+    <!-- Card: Aura (proyecto hermano - bienestar emocional) -->
+    <div class="spa-card reveal" style="background:linear-gradient(135deg,rgba(124,92,255,0.18),rgba(56,189,248,0.10));border-color:rgba(124,92,255,0.30)" onclick="window.open('https://unam-fesi.github.io/aura-fesi/','_blank','noopener')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.open('https://unam-fesi.github.io/aura-fesi/','_blank','noopener')}" role="link" tabindex="0" aria-label="Abrir Aura en una pestaña nueva">
+      <div class="spa-card-emoji">💜</div>
+      <div class="spa-card-title">Aura</div>
+      <div class="spa-card-desc">Plataforma de bienestar emocional de la FES Iztacala: acompañamiento anónimo, recursos de autocuidado y herramientas para momentos difíciles.</div>
+      <div style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 12px;border-radius:8px;background:linear-gradient(135deg,#7C5CFF,#38BDF8);color:#fff;letter-spacing:0.5px;text-transform:uppercase">Visitar &#8599;</div>
+    </div>
+
+    <!-- Card: Hospital Virtual (proyecto) -->
+    <div class="spa-card reveal" style="background:linear-gradient(135deg,rgba(13,179,158,0.16),rgba(37,99,235,0.10));border-color:rgba(13,179,158,0.30)" onclick="window.open('https://unam-fesi.github.io/hospitalvirtual/','_blank','noopener')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.open('https://unam-fesi.github.io/hospitalvirtual/','_blank','noopener')}" role="link" tabindex="0" aria-label="Abrir Hospital Virtual en una pestaña nueva">
+      <div class="spa-card-emoji">🥽</div>
+      <div class="spa-card-title">Hospital Virtual</div>
+      <div class="spa-card-desc">Simulador clínico en 3D donde recorres un hospital en primera persona y atiendes casos reales basados en las Guías de Práctica Clínica del IMSS. Tú decides el triage, el diagnóstico y el tratamiento; el paciente responde por voz y PUM-AI, nuestra inteligencia artificial, evalúa, corrige y complementa tu desempeño según tu nivel.</div>
+      <div style="margin-top:12px;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:4px 12px;border-radius:8px;background:linear-gradient(135deg,#0DB39E,#2563EB);color:#fff;letter-spacing:0.5px;text-transform:uppercase">Visitar &#8599;</div>
+    </div>
     </div>
   </div>
 </div>
