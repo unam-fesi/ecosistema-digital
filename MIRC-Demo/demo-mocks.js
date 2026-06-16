@@ -234,9 +234,9 @@
   const getPaciente = (id) => PACIENTES.find((p) => p.id === id) || PACIENTES[1]; // default: Sofía
 
   // ─── PASO 6: Interceptor de fetch global ─────────────────────────────────
-  const originalFetch = window.fetch.bind(window);
+  const originalFetch = window.fetch ? window.fetch.bind(window) : null;
 
-  window.fetch = async function (input, init) {
+  const interceptFetch = async function (input, init) {
     const url = typeof input === 'string' ? input : (input?.url || '');
 
     // No interceptar archivos locales (assets, geometries, draco, models, fuentes, CDN externo)
@@ -498,8 +498,20 @@
     }
 
     // No es API — dejar pasar
-    return originalFetch(input, init);
+    return originalFetch ? originalFetch(input, init) : Promise.reject(new Error('No fetch available'));
   };
+
+  // Asignación robusta: aplica el interceptor a window, globalThis y self
+  // (algunos bundlers minificados usan unas referencias y otras otras).
+  try { window.fetch = interceptFetch; } catch(e) {}
+  try { globalThis.fetch = interceptFetch; } catch(e) {}
+  try { self.fetch = interceptFetch; } catch(e) {}
+
+  // ─── Cookie/JWT mock — por si la app valida sesión en document.cookie ───
+  try {
+    document.cookie = 'mirc_session=demo-session-dra-vega; path=/; SameSite=Lax';
+    document.cookie = 'access_token=demo-jwt-not-real; path=/; SameSite=Lax';
+  } catch(e) {}
 
   // ─── PASO 7: Banner visual de modo demo ──────────────────────────────────
   window.addEventListener('DOMContentLoaded', () => {
