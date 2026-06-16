@@ -18,18 +18,22 @@ body { font-family:'Inter',system-ui,-apple-system,sans-serif; color:#1E293B; ba
 .serif { font-family:'Playfair Display',Georgia,serif; }
 
 /* ═══════════════════════════════════════════════════════════════════════
-   CURSOR PERSONALIZADO — Garra de puma dorada (outline brilloso)
-   SVG 32×32 con stroke dorado #f4d03f, fill transparente y filter drop-shadow
-   dorado para efecto glow. Hotspot en (16,16) — centro de la garra.
+   CURSOR PERSONALIZADO — Garra de puma dorada (outline + uñitas)
+   SVG 32×32 con:
+   - 4 dedos elipse (outline dorado #f4d03f)
+   - 4 uñitas curvadas pequeñas saliendo de cada dedo (formas de gancho)
+   - 1 palma curveada inferior
+   - filter feGaussianBlur + feFlood para efecto glow brilloso
+   Hotspot en (16,16) — centro de la garra.
    ═══════════════════════════════════════════════════════════════════════ */
 html, body, * {
-  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><defs><filter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'><feGaussianBlur stdDeviation='0.7' result='b'/><feFlood flood-color='%23f4d03f' flood-opacity='0.85'/><feComposite in2='b' operator='in'/><feMerge><feMergeNode/><feMergeNode in='SourceGraphic'/></feMerge></filter></defs><g fill='none' stroke='%23f4d03f' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' filter='url(%23g)'><ellipse cx='8' cy='10' rx='2.3' ry='3.2'/><ellipse cx='14' cy='6.5' rx='2.3' ry='3.4'/><ellipse cx='20' cy='6.5' rx='2.3' ry='3.4'/><ellipse cx='26' cy='10' rx='2.3' ry='3.2'/><path d='M9 17 Q6.5 22 10.5 26.5 Q14 30.5 17 30.5 Q20 30.5 23.5 26.5 Q27.5 22 25 17 Q22 14.5 17 14.5 Q12 14.5 9 17 Z'/></g></svg>") 16 16, auto;
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><defs><filter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'><feGaussianBlur stdDeviation='0.7' result='b'/><feFlood flood-color='%23f4d03f' flood-opacity='0.85'/><feComposite in2='b' operator='in'/><feMerge><feMergeNode/><feMergeNode in='SourceGraphic'/></feMerge></filter></defs><g fill='none' stroke='%23f4d03f' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' filter='url(%23g)'><ellipse cx='8' cy='10' rx='2.3' ry='3.2'/><ellipse cx='14' cy='6.5' rx='2.3' ry='3.4'/><ellipse cx='20' cy='6.5' rx='2.3' ry='3.4'/><ellipse cx='26' cy='10' rx='2.3' ry='3.2'/><path d='M6.5 7.5 Q7 5.5 8.5 6.5' stroke-width='1.3'/><path d='M12.5 3.5 Q13 1.5 14.5 2.5' stroke-width='1.3'/><path d='M19.5 2.5 Q20.5 1 21.5 3' stroke-width='1.3'/><path d='M25.5 6 Q26.5 4.5 27.5 6.5' stroke-width='1.3'/><path d='M9 17 Q6.5 22 10.5 26.5 Q14 30.5 17 30.5 Q20 30.5 23.5 26.5 Q27.5 22 25 17 Q22 14.5 17 14.5 Q12 14.5 9 17 Z'/></g></svg>") 16 16, auto;
 }
-/* Variante pointer para botones y links — misma garra pero ligeramente más brillante */
+/* Variante pointer para botones y links — misma garra con uñas pero más brillante */
 a, button, .spa-card, .spa-card-featured, .entorno-card, .servicio-card, .carrera-card,
 [onclick], [role="button"], .nav-links a, .landing-enter-btn, input[type="submit"],
 .btn-login, .modal-close, .spa-panel-close-hint {
-  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><defs><filter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'><feGaussianBlur stdDeviation='1.2' result='b'/><feFlood flood-color='%23f4d03f' flood-opacity='1'/><feComposite in2='b' operator='in'/><feMerge><feMergeNode/><feMergeNode in='SourceGraphic'/></feMerge></filter></defs><g fill='none' stroke='%23f4d03f' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' filter='url(%23g)'><ellipse cx='8' cy='10' rx='2.3' ry='3.2'/><ellipse cx='14' cy='6.5' rx='2.3' ry='3.4'/><ellipse cx='20' cy='6.5' rx='2.3' ry='3.4'/><ellipse cx='26' cy='10' rx='2.3' ry='3.2'/><path d='M9 17 Q6.5 22 10.5 26.5 Q14 30.5 17 30.5 Q20 30.5 23.5 26.5 Q27.5 22 25 17 Q22 14.5 17 14.5 Q12 14.5 9 17 Z'/></g></svg>") 16 16, pointer !important;
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><defs><filter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'><feGaussianBlur stdDeviation='1.2' result='b'/><feFlood flood-color='%23f4d03f' flood-opacity='1'/><feComposite in2='b' operator='in'/><feMerge><feMergeNode/><feMergeNode in='SourceGraphic'/></feMerge></filter></defs><g fill='none' stroke='%23f4d03f' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' filter='url(%23g)'><ellipse cx='8' cy='10' rx='2.3' ry='3.2'/><ellipse cx='14' cy='6.5' rx='2.3' ry='3.4'/><ellipse cx='20' cy='6.5' rx='2.3' ry='3.4'/><ellipse cx='26' cy='10' rx='2.3' ry='3.2'/><path d='M6.5 7.5 Q7 5.5 8.5 6.5' stroke-width='1.5'/><path d='M12.5 3.5 Q13 1.5 14.5 2.5' stroke-width='1.5'/><path d='M19.5 2.5 Q20.5 1 21.5 3' stroke-width='1.5'/><path d='M25.5 6 Q26.5 4.5 27.5 6.5' stroke-width='1.5'/><path d='M9 17 Q6.5 22 10.5 26.5 Q14 30.5 17 30.5 Q20 30.5 23.5 26.5 Q27.5 22 25 17 Q22 14.5 17 14.5 Q12 14.5 9 17 Z'/></g></svg>") 16 16, pointer !important;
 }
 /* Inputs y textareas: cursor de texto (no garra — confunde) */
 input[type="text"], input[type="email"], input[type="password"], input[type="number"],
@@ -1485,27 +1489,27 @@ body.spa-locked { overflow: hidden; }
   bottom: 0 !important;
   width: 100% !important;
   height: 100vh !important;
-  height: -webkit-fill-available !important;   /* Safari iOS */
-  height: 100dvh !important;                   /* Chrome / Safari 15.4+ */
+  height: -webkit-fill-available !important;
+  height: 100dvh !important;
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch !important;
   overscroll-behavior: contain;
-  padding: 32px 20px 64px !important;
-  padding-top: max(32px, env(safe-area-inset-top)) !important;
+  padding: 110px 20px 64px !important;
+  padding-top: max(110px, calc(env(safe-area-inset-top) + 100px)) !important;
   padding-bottom: max(64px, env(safe-area-inset-bottom)) !important;
   box-sizing: border-box !important;
-  /* CRÍTICO Safari: anular transform y backdrop-filter en el elemento que
-     tiene overflow:scroll. El backdrop-filter va a un pseudo-elemento. */
   transform: none !important;
   -webkit-transform: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  background: rgba(6, 16, 30, 0.92) !important;  /* color sólido en lugar de blur */
+  /* Fondo OPACO 100% para que el footer del sitio principal (que existe en
+     spa-base con opacity:0.3 + blur:12px) NO se vea detrás del overlay.
+     Gradient sutil azul marino para dar profundidad. */
+  background: linear-gradient(180deg, #0C2340 0%, #0A1A30 100%) !important;
   display: block !important;
-  /* Forzar GPU layer separado para evitar repaint glitches */
   will-change: scroll-position;
-  /* Asegurar que sea el elemento que recibe el scroll touch */
   touch-action: pan-y;
+  z-index: 1500 !important;
 }
 /* Contenido centrado horizontalmente, sin margin auto vertical */
 .spa-section-overlay.active > .spa-section-content {
