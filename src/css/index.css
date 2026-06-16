@@ -863,9 +863,12 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 .login-overlay {
   position:fixed; inset:0; z-index:10000;
   background:rgba(2,8,20,0.8); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
-  display:flex;
-  padding:40px 20px;
-  overflow-y:auto; -webkit-overflow-scrolling:touch;
+  /* Grid centra perfectamente en ambos ejes y respeta scroll cuando el card
+     excede la viewport (use place-items con safe-area en mente). */
+  display:grid;
+  place-items:center;
+  padding:max(40px, env(safe-area-inset-top)) 20px max(40px, env(safe-area-inset-bottom));
+  overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
   opacity:0; pointer-events:none; transition:opacity 0.3s;
 }
 .login-overlay.active { opacity:1; pointer-events:all; }
@@ -873,8 +876,15 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   background:#fff; border-radius:24px; padding:44px 40px; max-width:400px; width:100%;
   box-shadow:0 30px 80px rgba(0,0,0,0.3); text-align:center;
   animation:fadeUp 0.4s ease both;
-  margin:auto;
-  flex-shrink:0;
+  /* Sin margin auto — el grid place-items se encarga del centrado.
+     justify-self:center permite que el card no se estire al 100% del width. */
+  justify-self:center;
+}
+/* Cuando el card es más alto que la viewport, el grid place-items lo
+   alinea arriba en lugar de centrar (alineación 'start' implícita por scroll).
+   Para height-corto: grid + place-items:center centra perfecto. */
+@media (max-height:700px){
+  .login-overlay{ place-items:start center; padding-top:max(20px, env(safe-area-inset-top)); }
 }
 .login-card img { height:70px; margin-bottom:20px; display:block; margin-left:auto; margin-right:auto; }
 .login-card h2 { font-family:'Playfair Display',Georgia,serif; font-size:24px; color:var(--navy); margin-bottom:6px; }
@@ -1387,16 +1397,30 @@ body.spa-locked { overflow: hidden; }
   padding-bottom:max(64px, env(safe-area-inset-bottom)); }
 .spa-section-content{ margin: 0 auto; }
 
-/* FIX SCROLL CRÍTICO — el overlay tiene transform:scale(0.92) en estado base
-   y JS lo cambia a scale(1) inline durante la animación. Cualquier transform
-   en un elemento con overflow-y:auto crea un containing block que rompe el
-   cálculo de scrollHeight y bloquea el scroll real. Forzamos sin transform
-   cuando el overlay está activo — pierde la animación scale pero el scroll
-   funciona en TODA su altura, no solo dentro del bounding box transformado. */
+/* FIX SCROLL CRÍTICO — múltiple defensa:
+   1. transform: none !important — el JS pone transform:scale(1) inline que
+      en algunos browsers rompe scrollHeight. !important sobre inline sin
+      !important garantiza identidad sin transformación.
+   2. height: 100dvh / 100vh — altura FIJA exacta a viewport (no min-height).
+      Min-height permite que el overlay crezca con el contenido y eso impide
+      que el overflow-y:auto sepa cuándo activar el scrollbar.
+   3. overscroll-behavior:contain — el scroll se queda en el overlay, no se
+      filtra al body bloqueado por lockScroll. */
 .spa-section-overlay.active {
   transform: none !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  max-height: 100vh !important;
+  max-height: 100dvh !important;
+  overflow-y: auto !important;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
+}
+/* Después de la animación de entrada, asegurar que la opacity inline del JS
+   no impida el scroll por algún re-paint raro */
+.spa-section-overlay.active > .spa-section-content {
+  margin-top: 0;
+  margin-bottom: 40px;
 }
 
 /* Densidad por zoom/resolución: tipografías y paddings flexibles */
