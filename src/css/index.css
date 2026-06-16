@@ -1441,3 +1441,10 @@ body.spa-locked { overflow: hidden; }
 #spa-section-proyectos .spa-card .spa-card-title{ color:#fff; }
 #spa-section-proyectos .spa-card .spa-card-desc{ color:rgba(226,232,240,.80); }
 .proyectos-nuevos-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; }
+
+/* Logos de los proyectos (reemplazan el emoji) */
+.spa-card-logo{ height:54px; width:auto; max-width:78%; object-fit:contain; display:block;
+  margin:0 0 14px; filter:drop-shadow(0 4px 14px rgba(0,0,0,.30)); }
+.mirc-logo{ height:48px; width:auto; max-width:240px; object-fit:contain; display:block; margin:0 0 12px;
+  filter:drop-shadow(0 4px 14px rgba(0,0,0,.35)); }
+@media(max-width:600px){ .spa-card-logo{ height:46px; } .mirc-logo{ height:40px; } }
