@@ -513,14 +513,64 @@
     document.cookie = 'access_token=demo-jwt-not-real; path=/; SameSite=Lax';
   } catch(e) {}
 
-  // ─── PASO 7: Banner visual de modo demo ──────────────────────────────────
+  // ─── PASO 7: Banner visual + auto-llenado de login ───────────────────────
+  // El demo redirige a /login. En lugar de pelear con esa redirección
+  // (que viene del Router con basename y el ProtectedRoute), aceptamos
+  // mostrar la pantalla de login pero PRE-RELLENADA con credenciales
+  // mock + un botón funcional. Un click y entras.
+
+  const DEMO_USERNAME = 'dra_vega';
+  const DEMO_PASSWORD = 'demo2026';
+
+  // Setter nativo de React: hay que usar el descriptor original del prototype
+  // para que React detecte el cambio de value (si solo asignás .value no
+  // actualiza el state, porque React rastrea via Object.defineProperty).
+  const setReactInputValue = (input, value) => {
+    const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+    setter.call(input, value);
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+  };
+
+  // Observador: cuando el LoginPage se monta (aparecen los inputs), llenamos.
+  let loginFilled = false;
+  const fillLoginIfPresent = () => {
+    if (loginFilled) return;
+    const userInput = document.querySelector('input[autocomplete="username"], input[type="text"][placeholder*="suario" i]');
+    const passInput = document.querySelector('input[autocomplete="current-password"], input[type="password"]');
+    if (userInput && passInput) {
+      setReactInputValue(userInput, DEMO_USERNAME);
+      setReactInputValue(passInput, DEMO_PASSWORD);
+      loginFilled = true;
+      console.info('[DEMO] Credenciales pre-rellenadas:', DEMO_USERNAME);
+      // Mostrar hint visual junto al formulario
+      const form = userInput.closest('form');
+      if (form && !form.querySelector('.demo-hint')) {
+        const hint = document.createElement('div');
+        hint.className = 'demo-hint';
+        hint.style.cssText = 'margin-top:14px;padding:12px;background:rgba(255,255,255,0.08);border:1px dashed rgba(255,255,255,0.25);border-radius:10px;color:#fff;font:500 12px/1.5 system-ui;text-align:center';
+        hint.innerHTML = '🎬 <strong>MODO DEMO</strong> — Credenciales pre-cargadas<br>Solo presiona <strong>Iniciar Sesión</strong> para entrar';
+        form.appendChild(hint);
+      }
+    }
+  };
+
   window.addEventListener('DOMContentLoaded', () => {
+    // Banner inferior persistente
     const banner = document.createElement('div');
     banner.id = 'mirc-demo-banner';
     banner.style.cssText = 'position:fixed;bottom:0;left:0;right:0;background:linear-gradient(90deg,#1e40af,#3b82f6);color:#fff;text-align:center;padding:6px 12px;font:600 11px system-ui;z-index:99999;letter-spacing:.3px;box-shadow:0 -2px 8px rgba(0,0,0,.15);';
-    banner.innerHTML = '🎬 <strong>MODO DEMO</strong> · MIRC Expediente 360 · FES Iztacala UNAM · Sesión iniciada como <strong>Dra. María Vega</strong> · Los datos son ficticios y no se guardan';
+    banner.innerHTML = '🎬 <strong>MODO DEMO</strong> · MIRC Expediente 360 · FES Iztacala UNAM · Datos ficticios, no se guardan · Usuario admin precargado: <strong>Dra. María Vega</strong>';
     document.body.appendChild(banner);
     document.body.style.paddingBottom = '28px';
+
+    // Intentar llenar login si ya está montado
+    fillLoginIfPresent();
+
+    // Observar cambios del DOM por si LoginPage se monta después
+    const observer = new MutationObserver(() => fillLoginIfPresent());
+    observer.observe(document.body, { childList: true, subtree: true });
+    // Cortar el observer después de 30s para no consumir recursos
+    setTimeout(() => observer.disconnect(), 30000);
   });
 
   console.info('%c[MIRC DEMO] Mocks cargados — Dra. Vega autoenticada', 'background:#1e40af;color:#fff;padding:4px 10px;border-radius:4px;font-weight:bold');
