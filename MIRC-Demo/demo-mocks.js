@@ -101,31 +101,102 @@
 
   // ─── PASO 5: Generadores de datos clínicos plausibles ────────────────────
 
-  const genTimeline = (p) => ({
-    eventos: [
-      { id: 1, fecha: '2026-04-12', tipo: 'consulta', titulo: 'Consulta de control', medico: 'Dra. Vega', resumen: 'Paciente acude a control trimestral. Estable.', icono: 'stethoscope' },
-      { id: 2, fecha: '2026-03-15', tipo: 'laboratorio', titulo: 'BH + QS6 + Perfil Lipídico', medico: 'Lab. Clínico FESI', resumen: 'Resultados dentro de parámetros normales.', icono: 'test-tube' },
-      { id: 3, fecha: '2026-03-08', tipo: 'consulta', titulo: 'Seguimiento mensual', medico: 'Dra. Vega', resumen: 'PA 128/82. Continuar tratamiento.', icono: 'stethoscope' },
-      { id: 4, fecha: '2026-02-20', tipo: 'interconsulta', titulo: 'Valoración cardiología', medico: 'Dr. Mendoza (Cardio)', resumen: 'HTA controlada. Sin datos de daño a órgano blanco.', icono: 'heart' },
-      { id: 5, fecha: '2026-02-01', tipo: 'consulta', titulo: 'Primera vez', medico: 'Dra. Vega', resumen: 'Historia clínica completa.', icono: 'user-plus' },
-      { id: 6, fecha: '2026-01-15', tipo: 'documento', titulo: 'Firma consentimiento informado', medico: '—', resumen: 'Aceptación de uso de expediente electrónico.', icono: 'file-text' },
-      { id: 7, fecha: '2025-12-10', tipo: 'vacuna', titulo: 'Vacuna influenza estacional', medico: 'Enf. Solís', resumen: 'Aplicada lote 2025-A.', icono: 'syringe' },
-      { id: 8, fecha: '2025-11-22', tipo: 'estudio', titulo: 'Rx Tórax PA y Lateral', medico: 'Rx Diagnóstico FESI', resumen: 'Sin alteraciones radiológicas.', icono: 'image' },
-    ],
-  });
+  const genTimeline = (p) => {
+    const ep1 = {
+      titulo: 'Control HTA + DM2', especialidad: 'Medicina General',
+      fecha_inicio: '2026-01-15', fecha_fin: '2026-04-12', estado: 'en_curso',
+      eventos: [
+        { id: 1, fecha: '2026-04-12', tipo: 'consulta', titulo: 'Consulta de control', medico: 'Dra. Vega', resumen: 'Paciente acude a control trimestral. Estable. PA 128/82.', icono: 'stethoscope', linkedStudies: [] },
+        { id: 2, fecha: '2026-03-15', tipo: 'laboratorio', titulo: 'BH + QS6 + Perfil Lipídico', medico: 'Lab. Clínico FESI', resumen: 'Resultados dentro de parámetros normales.', icono: 'test-tube', linkedStudies: ['QS6', 'Lipídico'] },
+        { id: 3, fecha: '2026-03-08', tipo: 'consulta', titulo: 'Seguimiento mensual', medico: 'Dra. Vega', resumen: 'PA 132/85. Continuar tratamiento.', icono: 'stethoscope', linkedStudies: [] },
+        { id: 4, fecha: '2026-02-01', tipo: 'consulta', titulo: 'Primera vez', medico: 'Dra. Vega', resumen: 'Historia clínica completa. Inicio de tratamiento.', icono: 'user-plus', linkedStudies: [] },
+        { id: 5, fecha: '2026-01-15', tipo: 'documento', titulo: 'Consentimiento informado', medico: '—', resumen: 'Firma de aceptación de expediente electrónico.', icono: 'file-text', linkedStudies: [] },
+      ],
+    };
+    const ep2 = {
+      titulo: 'Interconsulta Cardiología', especialidad: 'Cardiología',
+      fecha_inicio: '2026-02-20', fecha_fin: '2026-02-20', estado: 'resuelto',
+      eventos: [
+        { id: 6, fecha: '2026-02-20', tipo: 'interconsulta', titulo: 'Valoración cardiología', medico: 'Dr. Mendoza', resumen: 'HTA controlada. Sin datos de daño a órgano blanco. ECG normal.', icono: 'heart', linkedStudies: ['ECG'] },
+      ],
+    };
+    const ep3 = {
+      titulo: 'Prevención y vacunación', especialidad: 'Medicina Preventiva',
+      fecha_inicio: '2025-09-20', fecha_fin: '2025-12-10', estado: 'resuelto',
+      eventos: [
+        { id: 7, fecha: '2025-12-10', tipo: 'vacuna', titulo: 'Vacuna influenza estacional', medico: 'Enf. Solís', resumen: 'Aplicada lote INF25-A1234.', icono: 'syringe', linkedStudies: [] },
+        { id: 8, fecha: '2025-11-22', tipo: 'estudio', titulo: 'Rx Tórax PA y Lateral', medico: 'Rx Diagnóstico FESI', resumen: 'Sin alteraciones radiológicas.', icono: 'image', linkedStudies: [] },
+        { id: 9, fecha: '2025-09-20', tipo: 'vacuna', titulo: 'COVID-19 refuerzo 2025', medico: 'Enf. Solís', resumen: 'Aplicada lote CV25-B5678.', icono: 'syringe', linkedStudies: [] },
+      ],
+    };
+    return {
+      paciente_id: p.id, episodios: [ep1, ep2, ep3],
+      total_episodios: 3, total_eventos: 9,
+      rango_fechas: { desde: '2025-09-20', hasta: '2026-04-12' },
+    };
+  };
 
-  const genProblemas = (p) => ({
-    problemas: [
-      { id: 1, cie10: 'I10', descripcion: 'Hipertensión arterial esencial (primaria)', estado: 'activo', fecha_inicio: '2024-03-15', severidad: 'moderado', controlado: true, notas: 'Bajo tratamiento con Losartán 50mg/día. Última PA: 128/82 mmHg.' },
-      { id: 2, cie10: 'E11.9', descripcion: 'Diabetes mellitus tipo 2 sin complicaciones', estado: 'controlado', fecha_inicio: '2025-01-20', severidad: 'leve', controlado: true, notas: 'HbA1c 6.4% en último control. Metformina 850mg c/12h.' },
-      { id: 3, cie10: 'E78.5', descripcion: 'Hiperlipidemia mixta', estado: 'activo', fecha_inicio: '2025-06-10', severidad: 'leve', controlado: false, notas: 'Atorvastatina 20mg. LDL en última medición: 142 mg/dL.' },
-    ],
-    diagnosticos: [
-      { id: 1, cie10: 'I10', descripcion: 'Hipertensión arterial esencial', estado: 'activo', fecha_inicio: '2024-03-15' },
-      { id: 2, cie10: 'E11.9', descripcion: 'Diabetes mellitus tipo 2', estado: 'controlado', fecha_inicio: '2025-01-20' },
-      { id: 3, cie10: 'E78.5', descripcion: 'Hiperlipidemia mixta', estado: 'activo', fecha_inicio: '2025-06-10' },
-    ],
-  });
+  const genProblemas = (p) => {
+    const probHTA = {
+      id: 1, problema_id: 1, nombre_problema: 'Hipertensión arterial esencial', cie10_codigo: 'I10',
+      estado: 'activo', severidad: 'moderado', fecha_inicio: '2024-03-15',
+      descripcion: 'HTA primaria diagnosticada en 2024. Bajo tratamiento con IECA/ARA-II.',
+      notas_clinicas: 'PA promedio últimos 90 días: 130/85 mmHg. Mantener Losartán 50mg/día.',
+      tratamientos: [{ nombre: 'Losartán 50mg c/24h', estado: 'activo' }],
+      estudios: [{ nombre: 'QS6 con función renal', fecha: '2026-03-15' }],
+      especialistas: [{ nombre: 'Dr. Mendoza (Cardio)', fecha: '2026-02-20' }],
+      metas_clinicas: [{ descripcion: 'PA <130/80 mmHg', avance: 75 }],
+      evolucion: [
+        { fecha: '2026-04-12', valor_pa_sistolica: 128 }, { fecha: '2026-03-08', valor_pa_sistolica: 132 },
+        { fecha: '2026-02-01', valor_pa_sistolica: 138 }, { fecha: '2026-01-15', valor_pa_sistolica: 142 },
+      ],
+      notas: [
+        { fecha: '2026-04-12', autor: 'Dra. Vega', texto: 'Paciente con adherencia adecuada. Mantener esquema.' },
+        { fecha: '2026-02-20', autor: 'Dr. Mendoza', texto: 'Sin daño a órgano blanco.' },
+      ],
+    };
+    const probDM = {
+      id: 2, problema_id: 2, nombre_problema: 'Diabetes mellitus tipo 2 sin complicaciones', cie10_codigo: 'E11.9',
+      estado: 'cronico', severidad: 'leve', fecha_inicio: '2025-01-20',
+      descripcion: 'DM2 de reciente diagnóstico. HbA1c en meta con Metformina.',
+      notas_clinicas: 'HbA1c 6.4% en último control. Continuar Metformina 850mg c/12h.',
+      tratamientos: [{ nombre: 'Metformina 850mg c/12h', estado: 'activo' }],
+      estudios: [{ nombre: 'HbA1c trimestral', fecha: '2026-03-15' }],
+      especialistas: [{ nombre: 'Lic. Hernández (Nutrición)', fecha: '2026-04-08' }],
+      metas_clinicas: [{ descripcion: 'HbA1c <7%', avance: 100 }],
+      evolucion: [
+        { fecha: '2026-03-15', valor_hba1c: 6.4 }, { fecha: '2025-12-10', valor_hba1c: 6.7 },
+        { fecha: '2025-08-22', valor_hba1c: 7.1 }, { fecha: '2025-04-15', valor_hba1c: 7.6 },
+      ],
+      notas: [
+        { fecha: '2026-04-08', autor: 'Lic. Hernández', texto: 'Plan nutricional entregado.' },
+        { fecha: '2026-03-15', autor: 'Dra. Vega', texto: 'Excelente respuesta a Metformina.' },
+      ],
+    };
+    const probDislipidemia = {
+      id: 3, problema_id: 3, nombre_problema: 'Hiperlipidemia mixta', cie10_codigo: 'E78.5',
+      estado: 'activo', severidad: 'leve', fecha_inicio: '2025-06-10',
+      descripcion: 'Dislipidemia mixta. Bajo tratamiento con estatina de moderada intensidad.',
+      notas_clinicas: 'LDL 142 mg/dL en última medición. Continuar Atorvastatina 20mg.',
+      tratamientos: [{ nombre: 'Atorvastatina 20mg c/24h HS', estado: 'activo' }],
+      estudios: [{ nombre: 'Perfil lipídico semestral', fecha: '2026-03-15' }],
+      especialistas: [],
+      metas_clinicas: [{ descripcion: 'LDL <100 mg/dL', avance: 40 }],
+      evolucion: [
+        { fecha: '2026-03-15', valor_ldl: 142 }, { fecha: '2025-12-10', valor_ldl: 156 },
+        { fecha: '2025-08-22', valor_ldl: 168 },
+      ],
+      notas: [{ fecha: '2026-03-15', autor: 'Dra. Vega', texto: 'Continuar tratamiento, sin efectos adversos.' }],
+    };
+    return {
+      activos: [probHTA, probDislipidemia],
+      cronicos: [probDM],
+      resueltos: [],
+      // legacy
+      problemas: [probHTA, probDM, probDislipidemia],
+      diagnosticos: [probHTA, probDM, probDislipidemia],
+    };
+  };
 
   const genRiesgos = (p) => ({
     riesgos: [
@@ -207,11 +278,11 @@
 
   const genEstudios = (p) => ({
     estudios: [
-      { id: 1, fecha: '2026-03-15', tipo: 'BH + QS6 + Perfil Lipídico', categoria: 'laboratorio', estado: 'completado', urgencia: 'rutina', resultados: 'Dentro de parámetros normales', archivo_url: '#', notas: 'Glucosa 98, HbA1c 6.4, LDL 142 (alto), HDL 48, TG 165, Creatinina 0.9' },
-      { id: 2, fecha: '2026-01-20', tipo: 'Rx Tórax PA y Lateral', categoria: 'imagenología', estado: 'completado', urgencia: 'rutina', resultados: 'Sin alteraciones radiológicas', archivo_url: '#' },
-      { id: 3, fecha: '2025-11-08', tipo: 'ECG 12 derivaciones', categoria: 'cardiología', estado: 'completado', urgencia: 'rutina', resultados: 'Ritmo sinusal regular, sin datos de isquemia', archivo_url: '#' },
-      { id: 4, fecha: '2025-09-22', tipo: 'EGO + Urocultivo', categoria: 'laboratorio', estado: 'completado', urgencia: 'rutina', resultados: 'Normal', archivo_url: '#' },
-      { id: 5, fecha: '2026-04-15', tipo: 'Perfil tiroideo', categoria: 'laboratorio', estado: 'pendiente', urgencia: 'rutina', notas: 'Solicitado en consulta de hoy' },
+      { id: 1, tipo_estudio: 'Biometría hemática + QS6 + Perfil Lipídico', fecha_estudio: '2026-03-15', resultado: 'Glucosa 98 mg/dL, HbA1c 6.4%, Creatinina 0.9 mg/dL, LDL 142 mg/dL, HDL 48 mg/dL, TG 165 mg/dL', interpretacion: 'Glucosa y función renal en metas. Perfil lipídico requiere ajuste (LDL elevado).', url_adjunto: '#', estado: 'completado' },
+      { id: 2, tipo_estudio: 'Rx Tórax PA y Lateral', fecha_estudio: '2026-01-20', resultado: 'Silueta cardiomediastinal de tamaño normal. Campos pulmonares sin opacidades.', interpretacion: 'Sin alteraciones radiológicas.', url_adjunto: '#', estado: 'completado' },
+      { id: 3, tipo_estudio: 'ECG 12 derivaciones', fecha_estudio: '2025-11-08', resultado: 'Ritmo sinusal regular 72 lpm. Eje normal. Sin alteraciones de la repolarización.', interpretacion: 'ECG normal, sin datos de isquemia ni hipertrofia ventricular.', url_adjunto: '#', estado: 'completado' },
+      { id: 4, tipo_estudio: 'EGO + Urocultivo', fecha_estudio: '2025-09-22', resultado: 'Aspecto claro, densidad 1.020, pH 6.0, sin proteínas ni glucosa. Urocultivo: sin desarrollo.', interpretacion: 'EGO dentro de parámetros normales.', url_adjunto: '#', estado: 'completado' },
+      { id: 5, tipo_estudio: 'Perfil tiroideo (TSH + T4L)', fecha_estudio: '2026-04-15', resultado: null, interpretacion: 'Solicitado en consulta de hoy. Pendiente realización.', url_adjunto: null, estado: 'pendiente' },
     ],
     laboratorios: [
       { fecha: '2026-03-15', glucosa: 98, hba1c: 6.4, creatinina: 0.9, ldl: 142, hdl: 48, trigliceridos: 165, colesterol_total: 220 },
@@ -528,13 +599,22 @@
     });
 
     // ─── DASHBOARD / ADMIN ─────────────────────────────────────────────
-    if (url.includes('/api/v1/dashboard')) return jsonResponse({
-      stats: { pacientes_total: PACIENTES.length, consultas_hoy: 7, teleconsultas_hoy: 2, recetas_emitidas_mes: 142, alertas_activas: 3 },
+    if (url.includes('/api/v1/dashboard/stats')) return jsonResponse({
+      total_pacientes: PACIENTES.length,
+      alertas_activas: 3,
+      riesgos_altos: 1,
+      problemas_activos: 8,
+      consultas_hoy: 7,
+      teleconsultas_hoy: 2,
+      recetas_emitidas_mes: 142,
       proximas_citas: [
         { hora: '10:00', paciente: PACIENTES[0].nombre_completo, tipo: 'Control HTA' },
         { hora: '11:30', paciente: PACIENTES[1].nombre_completo, tipo: 'Seguimiento migraña' },
         { hora: '13:00', paciente: PACIENTES[2].nombre_completo, tipo: 'Resultados labs' },
       ],
+    });
+    if (url.includes('/api/v1/dashboard')) return jsonResponse({
+      total_pacientes: PACIENTES.length, alertas_activas: 3, riesgos_altos: 1, problemas_activos: 8,
     });
     if (url.includes('/api/v1/admin/stats')) return jsonResponse({ usuarios_activos: 24, sesiones_hoy: 87, accesos_expedientes: 142 });
     if (url.includes('/api/v1/admin/roles')) return jsonResponse({ roles: ['admin', 'doctor', 'enfermeria', 'paciente', 'especialista'] });
@@ -585,12 +665,22 @@
   let loginFilled = false;
   const fillLoginIfPresent = () => {
     if (loginFilled) return;
-    const userInput = document.querySelector('input[autocomplete="username"], input[type="text"][placeholder*="suario" i]');
-    const passInput = document.querySelector('input[autocomplete="current-password"], input[type="password"]');
+    // Búsqueda agresiva — varias formas de localizar los inputs
+    const allInputs = document.querySelectorAll('input');
+    let userInput = null, passInput = null;
+    for (const inp of allInputs) {
+      const isPw = inp.type === 'password' || (inp.autocomplete || '').includes('password');
+      const isUser = !isPw && (inp.type === 'text' || inp.type === 'email' || !inp.type) &&
+        ((inp.autocomplete || '').includes('username') ||
+         /usuario|user|email|correo/i.test((inp.placeholder || '') + ' ' + (inp.name || '') + ' ' + (inp.id || '')));
+      if (isUser && !userInput) userInput = inp;
+      if (isPw && !passInput) passInput = inp;
+    }
     if (userInput && passInput) {
       setReactInputValue(userInput, DEMO_USERNAME);
       setReactInputValue(passInput, DEMO_PASSWORD);
       loginFilled = true;
+      console.info('[DEMO] ✓ Credenciales pre-rellenadas:', DEMO_USERNAME);
       const form = userInput.closest('form');
       if (form && !form.querySelector('.demo-hint')) {
         const hint = document.createElement('div');
@@ -599,6 +689,16 @@
         hint.innerHTML = '🎬 <strong>MODO DEMO</strong> — Credenciales pre-cargadas<br>Solo presiona <strong>Iniciar Sesión</strong> para entrar';
         form.appendChild(hint);
       }
+    }
+  };
+
+  // Resetea el flag cuando cambia la URL (navegación SPA) — permite re-llenar
+  // si el usuario va y vuelve al login dentro de la misma carga
+  let lastUrl = location.href;
+  const checkUrlChange = () => {
+    if (location.href !== lastUrl) {
+      lastUrl = location.href;
+      loginFilled = false;
     }
   };
 
@@ -611,9 +711,16 @@
     document.body.style.paddingBottom = '28px';
 
     fillLoginIfPresent();
-    const observer = new MutationObserver(() => fillLoginIfPresent());
+
+    // Estrategia triple para detectar el LoginPage:
+    // 1) MutationObserver — para SPA route changes
+    const observer = new MutationObserver(() => { checkUrlChange(); fillLoginIfPresent(); });
     observer.observe(document.body, { childList: true, subtree: true });
-    setTimeout(() => observer.disconnect(), 30000);
+    // 2) Polling cada 500ms — respaldo si el observer falla en algún edge case
+    const pollId = setInterval(() => { checkUrlChange(); fillLoginIfPresent(); }, 500);
+    // 3) Reset si se hace popstate
+    window.addEventListener('popstate', () => { loginFilled = false; setTimeout(fillLoginIfPresent, 100); });
+    // Sin timeout — el polling corre toda la sesión (no consume CPU significativo)
   });
 
   console.info('%c[MIRC DEMO v2] Mocks cargados (Gemini + Expediente + Odonto + Trauma)', 'background:#1e40af;color:#fff;padding:4px 10px;border-radius:4px;font-weight:bold');
