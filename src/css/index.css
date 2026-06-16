@@ -193,22 +193,42 @@ input[type="search"], input[type="tel"], input[type="url"], textarea, [contented
   animation:particleRise 6s ease-in-out infinite;
   box-shadow:0 0 8px rgba(196,162,78,0.6), 0 0 14px rgba(244,208,63,0.4); }
 
-/* Partículas en TODOS los overlays SPA — contenedor fijo dentro del overlay
-   que se ve a través del backdrop oscuro azul marino. Las partículas suben
-   desde abajo hasta ~78vh y se desvanecen (definido en @keyframes particleRise). */
-.spa-section-overlay .overlay-particles {
-  position: fixed;
-  inset: 0;
+/* Partículas en TODOS los overlays SPA — contenedor ABSOLUTO dentro del
+   overlay (position:absolute funciona mejor que fixed dentro de elementos
+   con overflow:auto en Safari). Las partículas se ven en los costados del
+   panel blanco (zona azul marino del backdrop).
+
+   Estructura z-index del overlay activo:
+   - overlay (1500) → fondo navy con gradient
+   - .overlay-particles (1)  → partículas detrás del panel
+   - .spa-section-content (auto → mayor que 1 por orden DOM)  → panel blanco encima */
+.spa-section-overlay > .overlay-particles {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 100vh;  /* alto fijo igual a viewport — las partículas viven en ese rango */
   pointer-events: none;
   overflow: hidden;
-  z-index: 1;  /* detrás del .spa-section-content (z-index implícito mayor) */
+  z-index: 1;
+}
+.spa-section-overlay.active > .overlay-particles {
+  /* Cuando el overlay está activo, position:fixed funciona porque ya quitamos
+     todos los transform del padre. Garantiza que las partículas se vean en
+     viewport aunque el usuario scrollee el overlay. */
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  height: auto;
 }
 .spa-section-overlay .overlay-particles .particle {
   position: absolute;
   border-radius: 50%;
   opacity: 0;
   animation: particleRise 7s ease-in-out infinite;
-  box-shadow: 0 0 10px rgba(196,162,78,0.7), 0 0 18px rgba(244,208,63,0.4);
+  box-shadow: 0 0 10px rgba(196,162,78,0.8), 0 0 22px rgba(244,208,63,0.5);
+}
+/* El panel blanco va ENCIMA de las partículas */
+.spa-section-overlay > .spa-section-content {
+  position: relative;
+  z-index: 2;
 }
 
 /* Floating orbs */
@@ -465,10 +485,13 @@ input[type="search"], input[type="tel"], input[type="url"], textarea, [contented
   font-size:13px; font-weight:600; color:var(--gold); }
 
 /* Servicio Detail Modal */
-.servicio-modal-overlay { position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.6);
+.servicio-modal-overlay { position:fixed; inset:0; z-index:11000; background:rgba(0,0,0,0.6);
   backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); display:none;
-  overflow-y:auto; -webkit-overflow-scrolling:touch;
-  padding:40px 20px;
+  overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
+  padding:110px 20px 40px;
+  padding-top:max(110px, calc(env(safe-area-inset-top) + 100px));
+  padding-bottom:max(40px, env(safe-area-inset-bottom));
+  box-sizing:border-box;
   opacity:0; transition:opacity 0.35s; }
 .servicio-modal-overlay.active { display:block; opacity:1; }
 .servicio-modal-card { background:#fff; border-radius:24px; width:90%; max-width:560px;
@@ -485,10 +508,15 @@ input[type="search"], input[type="tel"], input[type="url"], textarea, [contented
 .servicio-modal-body { padding:0 32px 32px; }
 
 /* Generic Modal Overlay (Inscripción, Publicar Proyecto) */
-.modal-overlay { position:fixed; inset:0; z-index:10000; background:rgba(0,0,0,0.6);
+/* padding-top:110px y z-index:11000 dejan el card debajo del navbar y por
+   encima del backdrop-filter del navbar (que crea stacking context propio). */
+.modal-overlay { position:fixed; inset:0; z-index:11000; background:rgba(0,0,0,0.6);
   backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); display:none;
-  overflow-y:auto; -webkit-overflow-scrolling:touch;
-  padding:40px 20px; }
+  overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
+  padding:110px 20px 40px;
+  padding-top:max(110px, calc(env(safe-area-inset-top) + 100px));
+  padding-bottom:max(40px, env(safe-area-inset-bottom));
+  box-sizing:border-box; }
 .modal-overlay.active { display:block; }
 .modal-card { background:#fff; border-radius:24px; width:90%; max-width:480px;
   padding:40px 32px; position:relative; margin:0 auto;
@@ -1502,12 +1530,8 @@ body.spa-locked { overflow: hidden; }
   -webkit-transform: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  /* Fondo OPACO 100% para que el footer del sitio principal (que existe en
-     spa-base con opacity:0.3 + blur:12px) NO se vea detrás del overlay.
-     Gradient sutil azul marino para dar profundidad. */
   background: linear-gradient(180deg, #0C2340 0%, #0A1A30 100%) !important;
   display: block !important;
-  will-change: scroll-position;
   touch-action: pan-y;
   z-index: 1500 !important;
 }
