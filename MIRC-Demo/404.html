@@ -4,7 +4,14 @@
     <meta charset="UTF-8" />
     <meta http-equiv="Cache-Control" content="no-store" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="assets/MIRCLogo.png" />
+    <!-- BASE HREF — ancla la resolución de URLs relativas a la carpeta del
+         demo, sin importar a qué ruta interna (ej. /expediente/X/resumen)
+         haya navegado el SPA. Sin esto, history.replaceState cambia el
+         baseURI y los <script src="assets/..."> fallan con MIME error porque
+         GitHub Pages devuelve 404.html (HTML) en vez del JS. -->
+    <base href="/ecosistema-digital/MIRC-Demo/" />
+
+    <link rel="icon" type="image/png" href="/ecosistema-digital/MIRC-Demo/assets/MIRCLogo.png" />
     <title>MIRC Expediente 360 — DEMO · FES Iztacala UNAM</title>
     <meta name="description" content="Demostración interactiva del Expediente Clínico Electrónico MIRC desarrollado por FES Iztacala UNAM. Datos ficticios.">
 
@@ -12,7 +19,10 @@
          SPA Fallback decoder — pareja del 404.html del root del repo.
          Cuando GitHub Pages redirige una URL como /MIRC-Demo/dashboard
          hacia /MIRC-Demo/?p=/dashboard, este script restaura la URL real
-         antes de que React Router lea history.location. ═══════════════════ -->
+         antes de que React Router lea history.location.
+         IMPORTANTE: el <base href> de arriba garantiza que los <script>
+         siguientes siempre resuelvan contra /MIRC-Demo/, no contra la URL
+         restaurada (que incluye /expediente/X/...). ═══════════════════════ -->
     <script>
       (function () {
         var s = location.search;
@@ -28,15 +38,15 @@
     </script>
 
     <!-- DEMO MOCKS — interceptor de fetch + auto-login Dra. Vega -->
-    <!-- DEBE cargarse ANTES que el bundle de React -->
-    <script src="demo-mocks.js"></script>
+    <!-- Paths ABSOLUTOS para ser inmunes al baseURI cambiante -->
+    <script src="/ecosistema-digital/MIRC-Demo/demo-mocks.js"></script>
     <!-- LiveKit Client SDK para teleconsulta WebRTC -->
     <script src="https://cdn.jsdelivr.net/npm/livekit-client@2.9.1/dist/livekit-client.umd.js"></script>
-    <script type="module" crossorigin src="assets/index-34hC4YBY.js"></script>
-    <link rel="modulepreload" crossorigin href="assets/vendor-CdTHj2FR.js">
-    <link rel="modulepreload" crossorigin href="assets/animation-C8wuVdZs.js">
-    <link rel="modulepreload" crossorigin href="assets/charts-D963uIMn.js">
-    <link rel="stylesheet" crossorigin href="assets/index-n1HIPrLh.css">
+    <script type="module" crossorigin src="/ecosistema-digital/MIRC-Demo/assets/index-34hC4YBY.js"></script>
+    <link rel="modulepreload" crossorigin href="/ecosistema-digital/MIRC-Demo/assets/vendor-CdTHj2FR.js">
+    <link rel="modulepreload" crossorigin href="/ecosistema-digital/MIRC-Demo/assets/animation-C8wuVdZs.js">
+    <link rel="modulepreload" crossorigin href="/ecosistema-digital/MIRC-Demo/assets/charts-D963uIMn.js">
+    <link rel="stylesheet" crossorigin href="/ecosistema-digital/MIRC-Demo/assets/index-n1HIPrLh.css">
   </head>
   <body class="bg-gray-50">
     <div id="root"></div>

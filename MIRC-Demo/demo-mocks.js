@@ -390,14 +390,35 @@
   });
 
   const genResumen360 = (p) => ({
-    paciente: p,
+    // Pasa el paciente con todos sus alias (sexo_registrado lo lee el mapper)
+    paciente: { ...p, sexo_registrado: p.sexo, edad: p.edad },
+    // Resumen narrativo (compatibilidad con código viejo)
     resumen_clinico: `Paciente ${p.nombre_completo}, ${p.edad} años, ${p.sexo_label.toLowerCase()}. Dx principal: ${p.dx_principal}. Riesgo ${p.riesgo}. Bajo tratamiento crónico estable.`,
+    // CAMPOS QUE EL FRONTEND lee (mapResumen360ToClinical en ResumenIAWidget)
+    problemas: {
+      principales: ['Hipertensión arterial esencial', 'Diabetes mellitus tipo 2', 'Hiperlipidemia mixta', 'EPOC leve', 'Lumbalgia crónica', 'Cefalea tensional + TAG leve'],
+      total: 8,
+    },
+    medicamentos: {
+      principales: ['Losartán 50mg c/24h', 'Metformina 850mg c/12h', 'Atorvastatina 20mg c/24h', 'ASA 100mg c/24h', 'Salbutamol inhalado PRN'],
+      total: 7,
+    },
+    alergias_criticas: p.alergias || [],
+    riesgos: {
+      nivel_global: p.riesgo,
+      tipos_riesgo: ['Cardiovascular moderado (Framingham 12%)', 'Renal leve (ERC etapa 2, TFG 78)', 'Respiratorio leve (EPOC GOLD A)'],
+    },
+    decisiones_pendientes: 3,
+    complejidad: 'media-alta',
+    ultimo_encuentro: { fecha: '2026-04-12', tipo: 'Control trimestral', medico: 'Dra. Vega' },
+    proximo_encuentro: { fecha: '2026-07-12', tipo: 'Seguimiento HTA + DM2' },
+    // KPIs adicionales
     ultimo_signo: { fecha: '2026-04-12', pa: '128/82', fc: 72, glucosa: 98 },
     proxima_cita: '2026-07-12',
-    medicamentos_activos: 4,
-    problemas_activos: 3,
+    medicamentos_activos: 5,
+    problemas_activos: 5,
     alertas_activas: 3,
-    objetivos_en_curso: 3,
+    objetivos_en_curso: 4,
   });
 
   // ─── MAPEO ANATÓMICO — el formato que el Vista3DPage entiende ────────────
