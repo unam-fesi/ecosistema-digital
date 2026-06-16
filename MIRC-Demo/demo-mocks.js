@@ -50,13 +50,22 @@
   };
 
   const PACIENTES = [
+    // ─── JUAN GALINDO — paciente "ESTRELLA" del demo, MULTI-COMORBILIDAD ────
     { id: 'b0000001-0000-0000-0000-000000000001', nombre: 'Juan', apellido_paterno: 'Galindo', apellido_materno: 'López',
       curp: 'GALJ840615HDFLPN01', sexo: 'M', sexo_label: 'Masculino', fecha_nacimiento: '1984-06-15', tipo_sangre: 'O+',
       telefono: '55 1234 5678', email: 'juan.galindo@example.com',
-      domicilio: 'Av. Insurgentes Sur 1234, Col. Del Valle, CDMX', ocupacion: 'Ingeniero de Software',
-      escolaridad: 'Licenciatura', peso_kg: 89, talla_cm: 172, alergias: ['Penicilina'],
-      dx_principal: 'Hipertensión arterial controlada', riesgo: 'medio',
-      emergencia: { nombre: 'Laura Galindo López', parentesco: 'Hermana', telefono: '55 9876 5432' } },
+      domicilio: 'Av. Insurgentes Sur 1234, Col. Del Valle, Benito Juárez, CDMX, CP 03100',
+      ocupacion: 'Ingeniero de Software', escolaridad: 'Maestría en Ingeniería',
+      lugar_origen: 'Ciudad de México',
+      peso_kg: 89, talla_cm: 172, alergias: ['Penicilina', 'AINEs (ASA)'],
+      dx_principal: 'HTA + DM2 + Dislipidemia + EPOC leve + Lumbalgia crónica',
+      riesgo: 'alto',
+      emergencia: { nombre: 'Laura Galindo López', parentesco: 'Hermana', telefono: '55 9876 5432' },
+      antecedentes_familiares: 'Padre con cardiopatía isquémica y DM2 (finado 68 años, IAM). Madre viva 70 años con HTA. Hermana sana.',
+      antecedentes_personales: 'Tabaquismo: 1 cajetilla/día por 18 años (suspendido hace 2 años). Alcoholismo social (3 copas/sem). Sedentario.',
+      ocupacionales: 'Posición prolongada frente a computadora 10 hrs/día. Estrés laboral moderado.',
+      vacunas_completas: false,
+      cirugias_previas: 'Apendicectomía (2002). Sin otras cirugías mayores.' },
     { id: 'b0000001-0000-0000-0000-000000000002', nombre: 'Sofía', apellido_paterno: 'Moreno', apellido_materno: 'Sánchez',
       curp: 'MOSS920728MDFRNF09', sexo: 'F', sexo_label: 'Femenino', fecha_nacimiento: '1992-07-28', tipo_sangre: 'A-',
       telefono: '55 2345 6789', email: 'sofia.moreno@example.com',
@@ -97,7 +106,7 @@
     const m = url.match(/(pacientes|odontologia|traumatologia)\/([0-9a-f-]{36})/);
     return m ? m[2] : null;
   };
-  const getPaciente = (id) => PACIENTES.find((p) => p.id === id) || PACIENTES[1];
+  const getPaciente = (id) => PACIENTES.find((p) => p.id === id) || PACIENTES[0];
 
   // ─── PASO 5: Generadores de datos clínicos plausibles ────────────────────
 
@@ -139,12 +148,12 @@
   const genProblemas = (p) => {
     const probHTA = {
       id: 1, problema_id: 1, nombre_problema: 'Hipertensión arterial esencial', cie10_codigo: 'I10',
-      estado: 'activo', severidad: 'moderado', fecha_inicio: '2024-03-15',
+      estado: 'activo', severidad: 'moderado', fecha_inicio: '2024-03-15', especialidad: 'Cardiología',
       descripcion: 'HTA primaria diagnosticada en 2024. Bajo tratamiento con IECA/ARA-II.',
-      notas_clinicas: 'PA promedio últimos 90 días: 130/85 mmHg. Mantener Losartán 50mg/día.',
-      tratamientos: [{ nombre: 'Losartán 50mg c/24h', estado: 'activo' }],
-      estudios: [{ nombre: 'QS6 con función renal', fecha: '2026-03-15' }],
-      especialistas: [{ nombre: 'Dr. Mendoza (Cardio)', fecha: '2026-02-20' }],
+      notas_clinicas: 'PA promedio últimos 90 días: 130/85 mmHg. Sin daño a órgano blanco.',
+      tratamientos: [{ nombre: 'Losartán 50mg c/24h', estado: 'activo' }, { nombre: 'ASA 100mg c/24h', estado: 'activo' }],
+      estudios: [{ nombre: 'QS6 con función renal', fecha: '2026-03-15' }, { nombre: 'ECG 12 derivaciones', fecha: '2025-11-08' }],
+      especialistas: [{ nombre: 'Dr. Mendoza (Cardiología)', fecha: '2026-02-20' }],
       metas_clinicas: [{ descripcion: 'PA <130/80 mmHg', avance: 75 }],
       evolucion: [
         { fecha: '2026-04-12', valor_pa_sistolica: 128 }, { fecha: '2026-03-08', valor_pa_sistolica: 132 },
@@ -152,31 +161,31 @@
       ],
       notas: [
         { fecha: '2026-04-12', autor: 'Dra. Vega', texto: 'Paciente con adherencia adecuada. Mantener esquema.' },
-        { fecha: '2026-02-20', autor: 'Dr. Mendoza', texto: 'Sin daño a órgano blanco.' },
+        { fecha: '2026-02-20', autor: 'Dr. Mendoza', texto: 'Sin datos de daño a órgano blanco. Continuar Losartán.' },
       ],
     };
     const probDM = {
       id: 2, problema_id: 2, nombre_problema: 'Diabetes mellitus tipo 2 sin complicaciones', cie10_codigo: 'E11.9',
-      estado: 'cronico', severidad: 'leve', fecha_inicio: '2025-01-20',
-      descripcion: 'DM2 de reciente diagnóstico. HbA1c en meta con Metformina.',
-      notas_clinicas: 'HbA1c 6.4% en último control. Continuar Metformina 850mg c/12h.',
+      estado: 'cronico', severidad: 'moderado', fecha_inicio: '2023-08-22', especialidad: 'Endocrinología',
+      descripcion: 'DM2 diagnosticada en 2023. HbA1c en meta con Metformina.',
+      notas_clinicas: 'HbA1c 6.8% último control. Adherencia farmacológica 92%.',
       tratamientos: [{ nombre: 'Metformina 850mg c/12h', estado: 'activo' }],
       estudios: [{ nombre: 'HbA1c trimestral', fecha: '2026-03-15' }],
       especialistas: [{ nombre: 'Lic. Hernández (Nutrición)', fecha: '2026-04-08' }],
-      metas_clinicas: [{ descripcion: 'HbA1c <7%', avance: 100 }],
+      metas_clinicas: [{ descripcion: 'HbA1c <7%', avance: 100 }, { descripcion: 'Reducir 8 kg', avance: 35 }],
       evolucion: [
-        { fecha: '2026-03-15', valor_hba1c: 6.4 }, { fecha: '2025-12-10', valor_hba1c: 6.7 },
-        { fecha: '2025-08-22', valor_hba1c: 7.1 }, { fecha: '2025-04-15', valor_hba1c: 7.6 },
+        { fecha: '2026-03-15', valor_hba1c: 6.8 }, { fecha: '2025-12-10', valor_hba1c: 7.0 },
+        { fecha: '2025-08-22', valor_hba1c: 7.4 }, { fecha: '2024-04-15', valor_hba1c: 8.1 },
       ],
       notas: [
-        { fecha: '2026-04-08', autor: 'Lic. Hernández', texto: 'Plan nutricional entregado.' },
-        { fecha: '2026-03-15', autor: 'Dra. Vega', texto: 'Excelente respuesta a Metformina.' },
+        { fecha: '2026-04-08', autor: 'Lic. Hernández', texto: 'Plan nutricional 1800 kcal entregado.' },
+        { fecha: '2026-03-15', autor: 'Dra. Vega', texto: 'Excelente respuesta a Metformina. Mantener.' },
       ],
     };
     const probDislipidemia = {
       id: 3, problema_id: 3, nombre_problema: 'Hiperlipidemia mixta', cie10_codigo: 'E78.5',
-      estado: 'activo', severidad: 'leve', fecha_inicio: '2025-06-10',
-      descripcion: 'Dislipidemia mixta. Bajo tratamiento con estatina de moderada intensidad.',
+      estado: 'activo', severidad: 'moderado', fecha_inicio: '2024-06-10', especialidad: 'Cardiología',
+      descripcion: 'Dislipidemia mixta. Bajo tratamiento con estatina.',
       notas_clinicas: 'LDL 142 mg/dL en última medición. Continuar Atorvastatina 20mg.',
       tratamientos: [{ nombre: 'Atorvastatina 20mg c/24h HS', estado: 'activo' }],
       estudios: [{ nombre: 'Perfil lipídico semestral', fecha: '2026-03-15' }],
@@ -184,17 +193,77 @@
       metas_clinicas: [{ descripcion: 'LDL <100 mg/dL', avance: 40 }],
       evolucion: [
         { fecha: '2026-03-15', valor_ldl: 142 }, { fecha: '2025-12-10', valor_ldl: 156 },
-        { fecha: '2025-08-22', valor_ldl: 168 },
+        { fecha: '2025-06-10', valor_ldl: 198 },
       ],
-      notas: [{ fecha: '2026-03-15', autor: 'Dra. Vega', texto: 'Continuar tratamiento, sin efectos adversos.' }],
+      notas: [{ fecha: '2026-03-15', autor: 'Dra. Vega', texto: 'Reforzar adherencia y dieta hipograsa.' }],
+    };
+    const probEPOC = {
+      id: 4, problema_id: 4, nombre_problema: 'EPOC leve (GOLD A) por tabaquismo', cie10_codigo: 'J44.9',
+      estado: 'activo', severidad: 'leve', fecha_inicio: '2025-02-14', especialidad: 'Neumología',
+      descripcion: 'EPOC leve secundario a tabaquismo de 18 años. Suspendió en 2024.',
+      notas_clinicas: 'Espirometría FEV1/FVC 0.68. Tos matutina ocasional. mMRC 1.',
+      tratamientos: [{ nombre: 'Salbutamol inhalado prn (rescate)', estado: 'activo' }],
+      estudios: [{ nombre: 'Espirometría', fecha: '2025-02-14' }, { nombre: 'Rx Tórax PA y Lateral', fecha: '2025-11-22' }],
+      especialistas: [{ nombre: 'Dra. Rivera (Neumología)', fecha: '2025-02-14' }],
+      metas_clinicas: [{ descripcion: 'Mantener abstinencia tabaco', avance: 100 }, { descripcion: 'Actividad aeróbica 150 min/sem', avance: 50 }],
+      evolucion: [{ fecha: '2026-02-14', fev1_porcentaje: 78 }, { fecha: '2025-02-14', fev1_porcentaje: 75 }],
+      notas: [{ fecha: '2025-02-14', autor: 'Dra. Rivera', texto: 'Mantener cesación tabáquica. Vacuna influenza anual.' }],
+    };
+    const probLumbalgia = {
+      id: 5, problema_id: 5, nombre_problema: 'Lumbalgia mecánica crónica + Espondiloartrosis L4-L5', cie10_codigo: 'M54.5',
+      estado: 'activo', severidad: 'moderado', fecha_inicio: '2024-08-12', especialidad: 'Traumatología',
+      descripcion: 'Lumbalgia crónica con episodios agudos. Asociada a postura laboral sedente.',
+      notas_clinicas: 'EVA actual 5/10. Mejora con AINE + estiramientos. Sin déficit neurológico.',
+      tratamientos: [{ nombre: 'Diclofenaco 100mg prn (crisis)', estado: 'activo' }, { nombre: 'Rehabilitación 12 sesiones', estado: 'en_curso' }],
+      estudios: [{ nombre: 'Rx columna lumbar', fecha: '2024-11-08' }, { nombre: 'RMN columna (pendiente)', fecha: null }],
+      especialistas: [{ nombre: 'Dr. Salinas (Traumatología)', fecha: '2024-08-12' }, { nombre: 'Fis. Romero', fecha: '2026-03-20' }],
+      metas_clinicas: [{ descripcion: 'EVA <3/10', avance: 40 }, { descripcion: 'Fortalecimiento de core', avance: 60 }],
+      evolucion: [{ fecha: '2026-04-12', eva: 5 }, { fecha: '2026-02-01', eva: 7 }, { fecha: '2024-08-12', eva: 8 }],
+      notas: [{ fecha: '2026-03-20', autor: 'Fis. Romero', texto: 'Avance en programa McKenzie. Continuar.' }],
+    };
+    const probCefalea = {
+      id: 6, problema_id: 6, nombre_problema: 'Cefalea tensional crónica + TAG leve', cie10_codigo: 'G44.2',
+      estado: 'activo', severidad: 'leve', fecha_inicio: '2025-09-15', especialidad: 'Neurología',
+      descripcion: 'Cefalea tensional asociada a estrés laboral. Sin signos de alarma.',
+      notas_clinicas: 'Episodios 2-3 veces/semana. Mejora con descanso. GAD-7: 8/21.',
+      tratamientos: [{ nombre: 'Paracetamol 500mg prn', estado: 'activo' }, { nombre: 'Higiene del sueño', estado: 'activo' }],
+      estudios: [],
+      especialistas: [{ nombre: 'Psic. Martínez', fecha: '2025-10-05' }],
+      metas_clinicas: [{ descripcion: 'Frecuencia <1/semana', avance: 50 }],
+      evolucion: [],
+      notas: [{ fecha: '2025-10-05', autor: 'Psic. Martínez', texto: 'Técnicas de relajación enseñadas. Reevaluar en 3 meses.' }],
+    };
+    const probHigadoGraso = {
+      id: 7, problema_id: 7, nombre_problema: 'Hígado graso no alcohólico', cie10_codigo: 'K76.0',
+      estado: 'cronico', severidad: 'leve', fecha_inicio: '2025-06-10', especialidad: 'Gastroenterología',
+      descripcion: 'Esteatosis hepática grado I por USG. Transaminasas levemente elevadas.',
+      notas_clinicas: 'ALT 52, AST 48. Continuar dieta hipocalórica + ejercicio.',
+      tratamientos: [{ nombre: 'Dieta hipograsa + reducción peso', estado: 'activo' }],
+      estudios: [{ nombre: 'USG abdominal', fecha: '2025-06-10' }, { nombre: 'PFH', fecha: '2026-03-15' }],
+      especialistas: [],
+      metas_clinicas: [{ descripcion: 'Reducir 8 kg', avance: 35 }],
+      evolucion: [],
+      notas: [],
+    };
+    const probERC = {
+      id: 8, problema_id: 8, nombre_problema: 'Enfermedad renal crónica etapa 2', cie10_codigo: 'N18.2',
+      estado: 'cronico', severidad: 'leve', fecha_inicio: '2025-08-22', especialidad: 'Nefrología',
+      descripcion: 'ERC etapa 2 (TFG 78). Vigilancia, evitar nefrotóxicos.',
+      notas_clinicas: 'TFG estimada 78 mL/min/1.73m². Sin proteinuria. Albuminuria <30 mg/g.',
+      tratamientos: [{ nombre: 'Control estricto PA + glucosa', estado: 'activo' }, { nombre: 'Evitar AINEs', estado: 'activo' }],
+      estudios: [{ nombre: 'EGO + microalbuminuria', fecha: '2025-09-22' }],
+      especialistas: [],
+      metas_clinicas: [{ descripcion: 'Mantener TFG >60', avance: 100 }],
+      evolucion: [{ fecha: '2026-03-15', tfg: 78 }, { fecha: '2025-08-22', tfg: 76 }],
+      notas: [],
     };
     return {
-      activos: [probHTA, probDislipidemia],
-      cronicos: [probDM],
+      activos: [probHTA, probDislipidemia, probEPOC, probLumbalgia, probCefalea],
+      cronicos: [probDM, probHigadoGraso, probERC],
       resueltos: [],
       // legacy
-      problemas: [probHTA, probDM, probDislipidemia],
-      diagnosticos: [probHTA, probDM, probDislipidemia],
+      problemas: [probHTA, probDM, probDislipidemia, probEPOC, probLumbalgia, probCefalea, probHigadoGraso, probERC],
+      diagnosticos: [probHTA, probDM, probDislipidemia, probEPOC, probLumbalgia, probCefalea, probHigadoGraso, probERC],
     };
   };
 
@@ -236,15 +305,20 @@
 
   const genMedicamentos = (p) => ({
     medicamentos: [
-      { id: 1, principio_activo: 'Losartán', nombre_comercial: 'Cozaar', dosis: '50 mg', frecuencia: 'Cada 24 hrs', via: 'Oral', activo: true, fecha_inicio: '2024-03-15', prescriptor: 'Dra. Vega' },
-      { id: 2, principio_activo: 'Metformina', nombre_comercial: 'Glucophage', dosis: '850 mg', frecuencia: 'Cada 12 hrs', via: 'Oral', activo: true, fecha_inicio: '2025-01-20', prescriptor: 'Dra. Vega' },
-      { id: 3, principio_activo: 'Atorvastatina', nombre_comercial: 'Lipitor', dosis: '20 mg', frecuencia: 'Cada 24 hrs (HS)', via: 'Oral', activo: true, fecha_inicio: '2025-06-10', prescriptor: 'Dra. Vega' },
-      { id: 4, principio_activo: 'Ácido acetilsalicílico', nombre_comercial: 'ASA Protect', dosis: '100 mg', frecuencia: 'Cada 24 hrs', via: 'Oral', activo: true, fecha_inicio: '2025-08-22', prescriptor: 'Dra. Vega' },
+      { id: 1, principio_activo: 'Losartán', nombre_comercial: 'Cozaar', dosis: '50 mg', frecuencia: 'Cada 24 hrs', via: 'Oral', activo: true, fecha_inicio: '2024-03-15', prescriptor: 'Dra. Vega', indicacion: 'HTA' },
+      { id: 2, principio_activo: 'Metformina', nombre_comercial: 'Glucophage', dosis: '850 mg', frecuencia: 'Cada 12 hrs', via: 'Oral', activo: true, fecha_inicio: '2023-08-22', prescriptor: 'Dra. Vega', indicacion: 'DM2' },
+      { id: 3, principio_activo: 'Atorvastatina', nombre_comercial: 'Lipitor', dosis: '20 mg', frecuencia: 'Cada 24 hrs (HS)', via: 'Oral', activo: true, fecha_inicio: '2024-06-10', prescriptor: 'Dra. Vega', indicacion: 'Dislipidemia' },
+      { id: 4, principio_activo: 'Ácido acetilsalicílico', nombre_comercial: 'ASA Protect', dosis: '100 mg', frecuencia: 'Cada 24 hrs', via: 'Oral', activo: true, fecha_inicio: '2024-03-15', prescriptor: 'Dra. Vega', indicacion: 'Prevención CV primaria' },
+      { id: 5, principio_activo: 'Salbutamol', nombre_comercial: 'Ventolin', dosis: '100 mcg', frecuencia: 'PRN (rescate)', via: 'Inhalado', activo: true, fecha_inicio: '2025-02-14', prescriptor: 'Dra. Rivera', indicacion: 'EPOC' },
+      { id: 6, principio_activo: 'Diclofenaco', nombre_comercial: 'Voltaren', dosis: '100 mg', frecuencia: 'PRN (crisis lumbalgia)', via: 'Oral', activo: true, fecha_inicio: '2024-08-12', prescriptor: 'Dr. Salinas', indicacion: 'Lumbalgia' },
+      { id: 7, principio_activo: 'Paracetamol', nombre_comercial: 'Tylenol', dosis: '500 mg', frecuencia: 'PRN (cefalea)', via: 'Oral', activo: true, fecha_inicio: '2025-09-15', prescriptor: 'Dra. Vega', indicacion: 'Cefalea tensional' },
     ],
     tratamientos: [
       { id: 1, medicamento: 'Losartán 50mg', dosis: '50 mg', frecuencia: 'Cada 24 hrs', via: 'Oral', activo: true },
       { id: 2, medicamento: 'Metformina 850mg', dosis: '850 mg', frecuencia: 'Cada 12 hrs', via: 'Oral', activo: true },
       { id: 3, medicamento: 'Atorvastatina 20mg', dosis: '20 mg', frecuencia: 'Cada 24 hrs', via: 'Oral', activo: true },
+      { id: 4, medicamento: 'ASA 100mg', dosis: '100 mg', frecuencia: 'Cada 24 hrs', via: 'Oral', activo: true },
+      { id: 5, medicamento: 'Salbutamol inhalado', dosis: '100 mcg', frecuencia: 'PRN', via: 'Inhalado', activo: true },
     ],
   });
 
@@ -326,14 +400,30 @@
     objetivos_en_curso: 3,
   });
 
+  // ─── MAPEO ANATÓMICO — el formato que el Vista3DPage entiende ────────────
+  // Cada mapeo tiene body_part_id que coincide con los IDs del avatar 3D:
+  // head, neck, chest, heart, leftLung, rightLung, spine, leftArm, rightArm,
+  // liver, leftKidney, rightKidney, lowerBack, abdomen, hip, leftLeg, rightLeg,
+  // leftFoot, rightFoot.
   const genMapeoAnatomico = (p) => ({
-    organos_afectados: [
-      { organo: 'corazon', sistema: 'cardiovascular', severidad: 'medio', dx: 'HTA', color: '#f59e0b' },
-      { organo: 'pancreas', sistema: 'endocrino', severidad: 'medio', dx: 'DM tipo 2', color: '#f59e0b' },
-      { organo: 'rinones', sistema: 'urinario', severidad: 'leve', dx: 'ERC etapa 2', color: '#fbbf24' },
-      { organo: 'cerebro', sistema: 'nervioso', severidad: 'leve', dx: 'Cefalea tensional', color: '#fde68a' },
+    paciente_id: p.id,
+    mapeos: [
+      { body_part_id: 'heart', diagnostico_descripcion: 'Hipertensión arterial esencial — bajo tratamiento, controlada', cie10_codigo: 'I10', severidad: 'moderado', estado: 'activo', tratamiento_asociado: 'Losartán 50mg c/24h', notas_clinicas: 'PA promedio últimos 90 días: 130/85 mmHg. Sin daño a órgano blanco.', especialidad: 'Cardiología', fecha_diagnostico: '2024-03-15' },
+      { body_part_id: 'chest', diagnostico_descripcion: 'Riesgo cardiovascular moderado (Framingham 12%)', cie10_codigo: 'Z82.4', severidad: 'moderado', estado: 'activo', tratamiento_asociado: 'ASA 100mg c/24h profiláctico', notas_clinicas: 'Padre con IAM a los 68. Continuar prevención secundaria.', especialidad: 'Cardiología', fecha_diagnostico: '2024-03-15' },
+      { body_part_id: 'abdomen', diagnostico_descripcion: 'Diabetes mellitus tipo 2 sin complicaciones', cie10_codigo: 'E11.9', severidad: 'moderado', estado: 'activo', tratamiento_asociado: 'Metformina 850mg c/12h', notas_clinicas: 'HbA1c 6.8% último control. Adherencia 92%.', especialidad: 'Endocrinología', fecha_diagnostico: '2023-08-22' },
+      { body_part_id: 'liver', diagnostico_descripcion: 'Hígado graso no alcohólico (esteatosis hepática)', cie10_codigo: 'K76.0', severidad: 'leve', estado: 'activo', tratamiento_asociado: 'Dieta hipocalórica + actividad física', notas_clinicas: 'USG abdominal: esteatosis grado I. Transaminasas levemente elevadas.', especialidad: 'Gastroenterología', fecha_diagnostico: '2025-06-10' },
+      { body_part_id: 'leftKidney', diagnostico_descripcion: 'Enfermedad renal crónica etapa 2 (TFG 78 mL/min)', cie10_codigo: 'N18.2', severidad: 'leve', estado: 'activo', tratamiento_asociado: 'Control PA estricto, evitar AINEs', notas_clinicas: 'TFG 78 mL/min/1.73m². Sin proteinuria. Vigilancia.', especialidad: 'Nefrología', fecha_diagnostico: '2025-08-22' },
+      { body_part_id: 'rightKidney', diagnostico_descripcion: 'Enfermedad renal crónica etapa 2 (bilateral)', cie10_codigo: 'N18.2', severidad: 'leve', estado: 'activo', tratamiento_asociado: 'Control PA estricto', notas_clinicas: 'Mismo dx que riñón izquierdo. Función bilateral conservada.', especialidad: 'Nefrología', fecha_diagnostico: '2025-08-22' },
+      { body_part_id: 'leftLung', diagnostico_descripcion: 'EPOC leve (GOLD A) por tabaquismo histórico', cie10_codigo: 'J44.9', severidad: 'leve', estado: 'activo', tratamiento_asociado: 'Salbutamol 100mcg inhalado prn', notas_clinicas: 'Espirometría: FEV1/FVC 0.68. Suspendió tabaco hace 2 años.', especialidad: 'Neumología', fecha_diagnostico: '2025-02-14' },
+      { body_part_id: 'rightLung', diagnostico_descripcion: 'EPOC leve (afectación bilateral, predominio en lóbulos superiores)', cie10_codigo: 'J44.9', severidad: 'leve', estado: 'activo', tratamiento_asociado: 'Salbutamol 100mcg inhalado prn', notas_clinicas: 'Bilateral. Tos matutina ocasional.', especialidad: 'Neumología', fecha_diagnostico: '2025-02-14' },
+      { body_part_id: 'spine', diagnostico_descripcion: 'Espondiloartrosis lumbar L4-L5', cie10_codigo: 'M47.816', severidad: 'leve', estado: 'activo', tratamiento_asociado: 'Rehabilitación + ejercicios McKenzie', notas_clinicas: 'Rx columna lumbar: cambios degenerativos leves L4-L5.', especialidad: 'Traumatología', fecha_diagnostico: '2024-11-08' },
+      { body_part_id: 'lowerBack', diagnostico_descripcion: 'Lumbalgia mecánica crónica con episodios agudos', cie10_codigo: 'M54.5', severidad: 'moderado', estado: 'activo', tratamiento_asociado: 'Diclofenaco 100mg prn + RHB 12 sesiones', notas_clinicas: 'Asociado a postura laboral sedente. EVA 5/10 actual.', especialidad: 'Traumatología', fecha_diagnostico: '2024-08-12' },
+      { body_part_id: 'rightLeg', diagnostico_descripcion: 'Condromalacia rotuliana rodilla derecha', cie10_codigo: 'M22.40', severidad: 'leve', estado: 'activo', tratamiento_asociado: 'Fortalecimiento de cuádriceps + AINE tópico', notas_clinicas: 'Dolor anterior rodilla con flexión sostenida. Mejora con ejercicio.', especialidad: 'Traumatología', fecha_diagnostico: '2025-02-03' },
+      { body_part_id: 'head', diagnostico_descripcion: 'Cefalea tensional crónica + Trastorno de ansiedad generalizada leve', cie10_codigo: 'G44.2 + F41.1', severidad: 'leve', estado: 'activo', tratamiento_asociado: 'Higiene del sueño + técnicas de relajación', notas_clinicas: 'Asociado a estrés laboral. GAD-7: 8/21. Sin necesidad de farmacoterapia.', especialidad: 'Psicología', fecha_diagnostico: '2025-09-15' },
+      { body_part_id: 'neck', diagnostico_descripcion: 'Contractura muscular cervical', cie10_codigo: 'M62.838', severidad: 'leve', estado: 'controlado', tratamiento_asociado: 'Estiramientos + pausas activas', notas_clinicas: 'Por postura laboral prolongada. Mejora con ergonomía.', especialidad: 'Traumatología', fecha_diagnostico: '2025-04-20' },
     ],
-    sistemas_afectados: ['cardiovascular', 'endocrino', 'urinario'],
+    sistemas_afectados: ['cardiovascular', 'endocrino', 'urinario', 'respiratorio', 'musculoesquelético', 'nervioso'],
+    total_hallazgos: 13,
   });
 
   const genModoGuardia = (p) => ({
@@ -367,9 +457,14 @@
 
   const genHallazgosDientes = () => ({
     hallazgos: [
-      { id: 1, diente: 16, tipo: 'caries', superficie: 'oclusal', severidad: 'moderada', fecha: '2026-03-15' },
-      { id: 2, diente: 26, tipo: 'restauración', superficie: 'mesio-oclusal', material: 'resina', fecha: '2025-11-20' },
-      { id: 3, diente: 36, tipo: 'corona', material: 'porcelana-metal', fecha: '2024-08-10' },
+      { id: 1, diente: 16, tipo: 'caries', superficie: 'oclusal', severidad: 'moderada', fecha: '2026-03-15', estado: 'pendiente' },
+      { id: 2, diente: 17, tipo: 'caries', superficie: 'distal', severidad: 'leve', fecha: '2026-03-15', estado: 'pendiente' },
+      { id: 3, diente: 26, tipo: 'restauración', superficie: 'mesio-oclusal', material: 'resina', fecha: '2025-11-20', estado: 'completado' },
+      { id: 4, diente: 36, tipo: 'corona', material: 'porcelana-metal', fecha: '2024-08-10', estado: 'completado' },
+      { id: 5, diente: 46, tipo: 'endodoncia', estado: 'completado', fecha: '2023-04-22' },
+      { id: 6, diente: 38, tipo: 'ausente', estado: 'extraído', fecha: '2020-06-10' },
+      { id: 7, diente: 48, tipo: 'ausente', estado: 'extraído', fecha: '2020-06-10' },
+      { id: 8, diente: 11, tipo: 'fractura', superficie: 'incisal', severidad: 'leve', fecha: '2025-09-05', estado: 'pendiente' },
     ],
   });
 
@@ -388,9 +483,12 @@
   // ─── PASO 7: Traumatología ───────────────────────────────────────────────
   const genLesiones = () => ({
     lesiones: [
-      { id: 1, zona_corporal: 'lumbar', tipo: 'lumbalgia mecánica', severidad: 'moderada', activa: true, fecha_inicio: '2024-08-12', notas: 'Episodios recurrentes asociados a postura laboral.' },
-      { id: 2, zona_corporal: 'rodilla_derecha', tipo: 'condromalacia rotuliana', severidad: 'leve', activa: true, fecha_inicio: '2025-02-03', notas: 'Mejora con fortalecimiento de cuádriceps.' },
-      { id: 3, zona_corporal: 'hombro_izquierdo', tipo: 'tendinitis del manguito rotador', severidad: 'leve', activa: false, fecha_inicio: '2023-11-15', fecha_resolucion: '2024-03-20' },
+      { id: 1, zona_corporal: 'lumbar', zona: 'lumbar', tipo: 'lumbalgia mecánica crónica', severidad: 'moderada', activa: true, fecha_inicio: '2024-08-12', notas: 'Episodios recurrentes asociados a postura laboral sedente. EVA actual 5/10.', diagnostico_cie10: 'M54.5' },
+      { id: 2, zona_corporal: 'columna_lumbar', zona: 'columna_lumbar', tipo: 'espondiloartrosis L4-L5', severidad: 'leve', activa: true, fecha_inicio: '2024-11-08', notas: 'Cambios degenerativos en Rx columna lumbar. Sin compromiso neurológico.', diagnostico_cie10: 'M47.816' },
+      { id: 3, zona_corporal: 'rodilla_derecha', zona: 'rodilla_derecha', tipo: 'condromalacia rotuliana', severidad: 'leve', activa: true, fecha_inicio: '2025-02-03', notas: 'Dolor anterior rodilla con flexión sostenida. Mejora con fortalecimiento.', diagnostico_cie10: 'M22.40' },
+      { id: 4, zona_corporal: 'cuello', zona: 'cuello', tipo: 'contractura muscular cervical', severidad: 'leve', activa: true, fecha_inicio: '2025-04-20', notas: 'Por postura laboral. Mejora con ergonomía y estiramientos.', diagnostico_cie10: 'M62.838' },
+      { id: 5, zona_corporal: 'hombro_izquierdo', zona: 'hombro_izquierdo', tipo: 'tendinitis del manguito rotador', severidad: 'leve', activa: false, fecha_inicio: '2023-11-15', fecha_resolucion: '2024-03-20', notas: 'Resuelta con RHB.', diagnostico_cie10: 'M75.10' },
+      { id: 6, zona_corporal: 'tobillo_derecho', zona: 'tobillo_derecho', tipo: 'esguince grado I', severidad: 'leve', activa: false, fecha_inicio: '2022-07-10', fecha_resolucion: '2022-08-15', notas: 'Esguince deportivo (futbol). Resuelto.', diagnostico_cie10: 'S93.4' },
     ],
   });
 
