@@ -1366,3 +1366,8 @@ body.spa-locked { overflow: hidden; }
   .spa-section-overlay{ align-items:flex-start; }
   .spa-section-content{ padding-top:40px; }
 }
+
+/* Muro de Proyectos: el título se veía blanco sobre tarjeta clara (lo pisaba
+   la definición del modal "475"). Lo forzamos a oro, legible. */
+#proyectosGrid .proyecto-title{ color:var(--gold) !important; text-shadow:none !important; }
+#proyectosGrid .proyecto-card{ max-width:none; animation:none; box-shadow:var(--shadow-soft); }
