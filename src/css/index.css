@@ -1371,3 +1371,51 @@ body.spa-locked { overflow: hidden; }
    la definición del modal "475"). Lo forzamos a oro, legible. */
 #proyectosGrid .proyecto-title{ color:var(--gold) !important; text-shadow:none !important; }
 #proyectosGrid .proyecto-card{ max-width:none; animation:none; box-shadow:var(--shadow-soft); }
+
+/* ============================================================
+   MIRC Expediente 360 — card destacada (proyecto principal)
+   Ocupa toda la fila de la grid. Estilo tecnológico/clínico.
+   ============================================================ */
+.spa-card-featured{
+  grid-column:1 / -1;
+  position:relative; overflow:hidden; cursor:pointer;
+  padding:34px 34px 30px; border-radius:26px;
+  background:linear-gradient(150deg,#0A1A30 0%, #0C2340 50%, #102B4F 100%);
+  border:1px solid rgba(196,162,78,.30);
+  box-shadow:0 24px 70px rgba(8,20,40,.45), inset 0 0 0 1px rgba(255,255,255,.03);
+  transition:transform .35s cubic-bezier(.22,1,.36,1), box-shadow .35s;
+}
+.spa-card-featured:hover{ transform:translateY(-5px);
+  box-shadow:0 34px 90px rgba(8,20,40,.55), 0 0 60px rgba(196,162,78,.18); }
+.spa-card-featured:focus-visible{ outline:none; box-shadow:0 0 0 3px rgba(196,162,78,.55); }
+.mirc-glow{ position:absolute; inset:0; pointer-events:none; z-index:0;
+  background:radial-gradient(700px 220px at 12% -10%, rgba(56,189,248,.18), transparent 60%),
+            radial-gradient(600px 240px at 108% 0%, rgba(124,92,255,.16), transparent 55%); }
+.spa-card-featured > *{ position:relative; z-index:1; }
+.mirc-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-bottom:22px; }
+.mirc-tag{ display:inline-block; font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase;
+  color:#0A1A30; background:linear-gradient(135deg,#f4d03f,#C4A24E); padding:5px 12px; border-radius:999px; margin-bottom:12px; }
+.mirc-title{ font-family:'Playfair Display',Georgia,serif; font-weight:800; line-height:1.05; margin:0 0 6px;
+  font-size:clamp(26px,3.4vw,40px);
+  background:linear-gradient(100deg,#f4d03f,#EBD9A8 45%,#C4A24E 90%); background-size:200% auto;
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  animation:shimmerGold 5s linear infinite; }
+.mirc-sub{ color:#E2E8F0; font-size:clamp(14px,1.6vw,17px); font-weight:600; margin:0 0 8px; }
+.mirc-lead{ color:#9FB2C9; font-size:13.5px; margin:0; }
+.mirc-cta{ flex-shrink:0; display:inline-flex; align-items:center; gap:8px; white-space:nowrap;
+  font-weight:800; font-size:14px; color:#0A1A30; padding:12px 20px; border-radius:14px;
+  background:linear-gradient(135deg,#f4d03f,#C4A24E); box-shadow:0 10px 30px rgba(196,162,78,.30);
+  transition:transform .2s, box-shadow .2s; }
+.spa-card-featured:hover .mirc-cta{ transform:translateY(-2px); box-shadow:0 16px 40px rgba(196,162,78,.42); }
+.mirc-features{ display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; }
+.mirc-feat{ display:flex; gap:11px; align-items:flex-start; padding:13px 15px; border-radius:14px;
+  background:rgba(255,255,255,.045); border:1px solid rgba(255,255,255,.08); transition:background .2s,border-color .2s,transform .2s; }
+.mirc-feat:hover{ background:rgba(196,162,78,.10); border-color:rgba(196,162,78,.28); transform:translateY(-2px); }
+.mirc-feat-ico{ font-size:20px; line-height:1.2; flex-shrink:0; }
+.mirc-feat p{ margin:0; font-size:12.5px; line-height:1.55; color:#C3D0E0; }
+.mirc-feat b{ color:#fff; font-weight:700; }
+@media(max-width:600px){
+  .spa-card-featured{ padding:26px 20px 22px; }
+  .mirc-cta{ width:100%; justify-content:center; }
+}
+@media (prefers-reduced-motion:reduce){ .mirc-title{ animation:none; } }
