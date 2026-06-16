@@ -43,25 +43,25 @@ const impactoItems=[
 ];
 
 const galeriaItems=[
-  {l:'Inteligencia Artificial',e:'🧠',g:'linear-gradient(135deg,#2563EB,#06B6D4)',img:'public/assets/ED-IA.png',
+  {l:'Inteligencia Artificial',e:'🧠',g:'linear-gradient(135deg,#2563EB,#06B6D4)',img:'public/assets/ED-IA.webp',
    desc:'Soluciones basadas en inteligencia artificial para análisis predictivo, automatización de procesos, innovación educativa y gestión del conocimiento. Incluye machine learning, procesamiento de lenguaje natural y visión computacional aplicados a las ciencias de la salud y la educación.'},
-  {l:'Realidad Virtual',e:'🥽',g:'linear-gradient(135deg,#7C3AED,#EC4899)',img:'public/assets/ED-RV.png',
+  {l:'Realidad Virtual',e:'🥽',g:'linear-gradient(135deg,#7C3AED,#EC4899)',img:'public/assets/ED-RV.webp',
    desc:'Experiencias inmersivas con equipos de última generación para simulación clínica, escenarios formativos y entornos de aprendizaje. Catálogo especializado de software VR por carrera con aplicaciones para anatomía, enfermería, psicología, biología y odontología.'},
-  {l:'Realidad Aumentada',e:'📱',g:'linear-gradient(135deg,#EA580C,#FACC15)',img:'public/assets/ED-RA.png',
+  {l:'Realidad Aumentada',e:'📱',g:'linear-gradient(135deg,#EA580C,#FACC15)',img:'public/assets/ED-RA.webp',
    desc:'Visualización enriquecida con modelos 3D interactivos superpuestos al mundo real. Material didáctico innovador para la comprensión de procesos complejos en anatomía, fisiología, ecología y más. Creación de contenido AR para enseñanza y divulgación.'},
-  {l:'Telemedicina',e:'🏥',g:'linear-gradient(135deg,#059669,#14B8A6)',img:'public/assets/ED-Telemed.png',
+  {l:'Telemedicina',e:'🏥',g:'linear-gradient(135deg,#059669,#14B8A6)',img:'public/assets/ED-Telemed.webp',
    desc:'Orientación, asesoría y acompañamiento remoto en procesos de salud digital. Teleconsulta, telemonitoreo y apoyo a la enseñanza clínica a distancia. Integración de tecnologías para la atención médica y el seguimiento de pacientes.'},
-  {l:'Análisis de Datos',e:'📊',g:'linear-gradient(135deg,#4F46E5,#3B82F6)',img:'public/assets/ED-Data.png',
+  {l:'Análisis de Datos',e:'📊',g:'linear-gradient(135deg,#4F46E5,#3B82F6)',img:'public/assets/ED-Data.webp',
    desc:'Organización, consulta, integración y análisis de información para proyectos académicos y de investigación. Visualización de datos, análisis estadístico avanzado, minería de datos y herramientas de Business Intelligence aplicadas al ámbito universitario.'},
-  {l:'Simuladores',e:'🔬',g:'linear-gradient(135deg,#F43F5E,#F97316)',img:'public/assets/ED-Simulador.png',
+  {l:'Simuladores',e:'🔬',g:'linear-gradient(135deg,#F43F5E,#F97316)',img:'public/assets/ED-Simulador.webp',
    desc:'Simuladores de baja, media y alta fidelidad para todas las carreras. Desde maniquíes básicos hasta simuladores de paciente completo con respuestas fisiológicas en tiempo real. Escenarios clínicos, ambientales y de investigación para entrenamiento práctico seguro.'},
-  {l:'Evaluación de Experiencia de Usuario',e:'📐',g:'linear-gradient(135deg,#0EA5E9,#4F46E5)',img:'public/assets/ED-UX.png',
+  {l:'Evaluación de Experiencia de Usuario',e:'📐',g:'linear-gradient(135deg,#0EA5E9,#4F46E5)',img:'public/assets/ED-UX.webp',
    desc:'Medición y evaluación de conectividad, latencia, disponibilidad y asertividad de los servicios tecnológicos. Análisis de usabilidad, pruebas con usuarios, métricas de rendimiento y optimización continua de la experiencia digital en el ecosistema.'},
-  {l:'Colaboración Interescolar',e:'🤝',g:'linear-gradient(135deg,#8B5CF6,#A855F7)',img:'public/assets/ED-Colab.png',
+  {l:'Colaboración Interescolar',e:'🤝',g:'linear-gradient(135deg,#8B5CF6,#A855F7)',img:'public/assets/ED-Colab.webp',
    desc:'Interacción y colaboración con otras escuelas y facultades de la UNAM compartiendo servicios tecnológicos, recursos y conocimiento. Proyectos conjuntos de investigación, enseñanza y extensión que potencian el impacto interdisciplinario.'},
   {l:'PUM-AI',e:'🤖',g:'linear-gradient(135deg,#C4A24E,#0C2340)',img:'public/assets/PUM-AI.gif',
-   desc:'Asistente virtual híbrido con tecnología local y en la nube. Utiliza RAG (Retrieval-Augmented Generation) y LoRA para información propietaria de la UNAM. Soporta todos los proyectos del ecosistema, incluyendo registros electrónicos MIRC. Modelos Claude + Gemini para respuestas precisas y contextualizadas.'},
-  {l:'Aula Inmersiva',e:'🎓',g:'linear-gradient(135deg,#059669,#2563EB)',img:'public/assets/ED-RV.png',
+   desc:'Plataforma de inteligencia artificial clínica y académica soberana, desarrollada y operada íntegramente en infraestructura propia de la FES Iztacala UNAM. Integra modelos especializados afinados (fine-tuning) sobre dominios concretos del ecosistema universitario: medicina clínica basada en Guías de Práctica Clínica del IMSS, herbolaria mexicana tradicional, evaluación psicosocial y de salud mental, análisis preliminar sugerido para apoyo a la decisión médica, gestión administrativa y automatización de procesos académicos. Cada dominio cuenta con su propio motor RAG (Retrieval-Augmented Generation) anclado a fuentes verificadas — expedientes clínicos del MIRC, normativa NOM-024-SSA3, cuadros básicos IMSS, literatura médica curada y bases botánicas indígenas. Soberanía de datos absoluta: cero envíos de información sensible a APIs de terceros, cumplimiento nativo de NOM-024-SSA3, COFEPRIS y LFPDPPP desde la arquitectura. Incluye trazabilidad de inferencias, explicabilidad por hallazgo, control granular de roles, auditoría inmutable, embeddings vectoriales locales y soporte multi-modal (texto, voz, imagen DICOM y modelos 3D anatómicos). Sirve transversalmente a MIRC Expediente 360, Hospital Virtual, Aura y los nuevos proyectos del ecosistema, garantizando que ningún dato del paciente, del estudiante o del docente abandona nunca los servidores de la universidad.'},
+  {l:'Aula Inmersiva',e:'🎓',g:'linear-gradient(135deg,#059669,#2563EB)',img:'public/assets/ED-RV.webp',
    desc:'Espacio de aprendizaje interprofesional equipado con tecnología de punta para experiencias educativas inmersivas. Combina realidad virtual, aumentada y simulación para crear escenarios de formación colaborativa entre todas las carreras de la FES Iztacala.'}
 ];
 
