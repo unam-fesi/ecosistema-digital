@@ -1385,10 +1385,19 @@ body.spa-locked { overflow: hidden; }
 .spa-section-overlay{ min-height:100vh; min-height:100dvh;
   padding-top:max(40px, env(safe-area-inset-top));
   padding-bottom:max(64px, env(safe-area-inset-bottom)); }
-/* Anclamos el panel arriba SIN margin-auto. Antes "margin-bottom:auto" causaba
-   que en contenido alto el scroll no funcionara correctamente (auto luchaba
-   con el overflow-y:auto del overlay). Margins simétricos garantizan scroll fluido. */
 .spa-section-content{ margin: 0 auto; }
+
+/* FIX SCROLL CRÍTICO — el overlay tiene transform:scale(0.92) en estado base
+   y JS lo cambia a scale(1) inline durante la animación. Cualquier transform
+   en un elemento con overflow-y:auto crea un containing block que rompe el
+   cálculo de scrollHeight y bloquea el scroll real. Forzamos sin transform
+   cuando el overlay está activo — pierde la animación scale pero el scroll
+   funciona en TODA su altura, no solo dentro del bounding box transformado. */
+.spa-section-overlay.active {
+  transform: none !important;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
 
 /* Densidad por zoom/resolución: tipografías y paddings flexibles */
 @media (max-width:1024px){
