@@ -1385,13 +1385,10 @@ body.spa-locked { overflow: hidden; }
 .spa-section-overlay{ min-height:100vh; min-height:100dvh;
   padding-top:max(40px, env(safe-area-inset-top));
   padding-bottom:max(64px, env(safe-area-inset-bottom)); }
-/* Anclamos el panel arriba (margin-top:auto sólo centraba cuando el contenido
-   cabía; si era más alto que el viewport, empujaba la parte superior fuera y
-   recortaba el contenido sin poder scrollear hasta él). Ahora el panel siempre
-   empieza desde arriba y todo el contenido es alcanzable con scroll. */
-.spa-section-content{ margin-top:0; margin-bottom:auto; }
-/* Si el contenido SÍ cabe en una viewport alta, igual queremos un poco de aire
-   superior — ya lo proveen padding-top del overlay. */
+/* Anclamos el panel arriba SIN margin-auto. Antes "margin-bottom:auto" causaba
+   que en contenido alto el scroll no funcionara correctamente (auto luchaba
+   con el overflow-y:auto del overlay). Margins simétricos garantizan scroll fluido. */
+.spa-section-content{ margin: 0 auto; }
 
 /* Densidad por zoom/resolución: tipografías y paddings flexibles */
 @media (max-width:1024px){
@@ -1477,7 +1474,9 @@ body.spa-locked { overflow: hidden; }
   background: #ffffff !important;
   border: 1px solid rgba(196, 162, 78, 0.18) !important;
 }
-#spa-section-proyectos .sec-header h2 { color: #C4A24E !important; }
+/* Título "Nuevos Proyectos" en navy (homologado con el resto de los paneles
+   claros como Colaboración, Quiénes Somos, Tecnología). */
+#spa-section-proyectos .sec-header h2 { color: var(--navy) !important; }
 #spa-section-proyectos .sec-header p { color: #64748b !important; }
 #spa-section-proyectos .spa-card-featured { grid-column: auto; margin: 0 0 22px; }
 
