@@ -98,6 +98,41 @@ function showLoginModal() {
   if (modal) {
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
+
+    // ─── iOS Safari: el teclado virtual tapa el input al hacer focus.
+    // Hacemos scrollIntoView con block:'center' después de un pequeño delay
+    // para que el browser termine de animar el keyboard antes del scroll.
+    // Esto solo se registra una vez por modal show. ───────────────────────
+    if (!modal.dataset.iosFixRegistered) {
+      modal.dataset.iosFixRegistered = 'true';
+      const inputs = modal.querySelectorAll('input');
+      inputs.forEach((input) => {
+        input.addEventListener('focus', () => {
+          // Doble setTimeout — primero esperamos al keyboard, luego al
+          // visualViewport resize que iOS dispara cuando aparece.
+          setTimeout(() => {
+            try {
+              input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            } catch (e) {
+              // Fallback para browsers sin smooth scroll
+              input.scrollIntoView(false);
+            }
+          }, 300);
+        });
+      });
+
+      // Adicionalmente: si el visualViewport API existe (iOS 13+ / Chrome 61+),
+      // escuchar resize para ajustar al teclado.
+      if (window.visualViewport) {
+        const adjustForKeyboard = () => {
+          const focused = document.activeElement;
+          if (focused && modal.contains(focused) && focused.tagName === 'INPUT') {
+            setTimeout(() => focused.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50);
+          }
+        };
+        window.visualViewport.addEventListener('resize', adjustForKeyboard);
+      }
+    }
   }
 }
 

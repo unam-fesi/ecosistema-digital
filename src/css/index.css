@@ -863,11 +863,15 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 .login-overlay {
   position:fixed; inset:0; z-index:10000;
   background:rgba(2,8,20,0.8); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
-  /* Misma estrategia que los paneles SPA: scroll fijo en el overlay, card con
-     margin vertical razonable. Sin flex/grid centering que rompe scroll. */
   overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
   opacity:0; pointer-events:none; transition:opacity 0.3s;
-  padding:0 20px;
+  /* Padding-top suficiente para evitar que el navbar fijo (z-index:1000,
+     altura ~80px) tape el card. El overlay tiene z-index:10000 pero el
+     navbar tiene su propio backdrop-filter que crea un stacking context
+     que en algunos browsers cubre visualmente la parte superior. */
+  padding: 120px 20px 40px;
+  scroll-padding-top: 120px;
+  scroll-padding-bottom: 380px;
   box-sizing:border-box;
 }
 .login-overlay.active { opacity:1; pointer-events:all; }
@@ -875,13 +879,21 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
   background:#fff; border-radius:24px; padding:44px 40px; max-width:400px; width:100%;
   box-shadow:0 30px 80px rgba(0,0,0,0.3); text-align:center;
   animation:fadeUp 0.4s ease both;
-  /* Margin-top fijo (10vh) garantiza que el card siempre se vea cerca del
-     tercio superior — visible al cargar y permite scroll si excede. */
-  margin: max(10vh, 60px) auto max(40px, env(safe-area-inset-bottom));
+  /* Centra horizontalmente, margin-top:0 (el padding del overlay ya da el
+     espacio). margin-bottom:auto permite que cuando el card cabe en la
+     viewport, quede empujado contra el padding-top del overlay (cerca del
+     tope, debajo del navbar). Si excede la viewport, scroll natural. */
+  margin: 0 auto auto;
   box-sizing:border-box;
 }
+.login-card .input,
+.login-card input,
+.login-card .form-group {
+  scroll-margin-top: 140px;
+  scroll-margin-bottom: 80px;
+}
 @media (max-height:700px){
-  .login-card{ margin: 24px auto; }
+  .login-overlay{ padding: 90px 20px 30px; }
 }
 .login-card img { height:70px; margin-bottom:20px; display:block; margin-left:auto; margin-right:auto; }
 .login-card h2 { font-family:'Playfair Display',Georgia,serif; font-size:24px; color:var(--navy); margin-bottom:6px; }
