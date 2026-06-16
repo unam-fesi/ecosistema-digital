@@ -1356,7 +1356,13 @@ body.spa-locked { overflow: hidden; }
 .spa-section-overlay{ min-height:100vh; min-height:100dvh;
   padding-top:max(40px, env(safe-area-inset-top));
   padding-bottom:max(64px, env(safe-area-inset-bottom)); }
-.spa-section-content{ margin-block:auto; }
+/* Anclamos el panel arriba (margin-top:auto sólo centraba cuando el contenido
+   cabía; si era más alto que el viewport, empujaba la parte superior fuera y
+   recortaba el contenido sin poder scrollear hasta él). Ahora el panel siempre
+   empieza desde arriba y todo el contenido es alcanzable con scroll. */
+.spa-section-content{ margin-top:0; margin-bottom:auto; }
+/* Si el contenido SÍ cabe en una viewport alta, igual queremos un poco de aire
+   superior — ya lo proveen padding-top del overlay. */
 
 /* Densidad por zoom/resolución: tipografías y paddings flexibles */
 @media (max-width:1024px){

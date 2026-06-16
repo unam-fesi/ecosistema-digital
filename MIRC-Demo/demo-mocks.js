@@ -532,19 +532,34 @@
 
     // Llamadas a Gemini API → respuesta hardcoded en formato Gemini
     if (url.includes('generativelanguage.googleapis.com')) {
-      // El cuerpo del request indica qué módulo es. Intento detectar.
       let body = init?.body;
       if (typeof body === 'string') {
         try { body = JSON.parse(body); } catch (e) {}
       }
       const prompt = body?.contents?.[0]?.parts?.[0]?.text || '';
-      let respText = '';
-      // Buscar paciente referenciado para personalizar la respuesta
+      const systemPrompt = body?.systemInstruction?.parts?.[0]?.text || '';
+      const fullPrompt = (prompt + ' ' + systemPrompt).toLowerCase();
+      // Default = Juan Galindo (paciente principal del demo, no Sofía)
       const pacIdMatch = prompt.match(/[0-9a-f-]{36}/);
-      const p = pacIdMatch ? getPaciente(pacIdMatch[0]) : PACIENTES[1];
-      if (prompt.toLowerCase().includes('narrativ')) respText = pumaiNarrativa(p);
-      else if (prompt.toLowerCase().includes('correlaci')) respText = pumaiCorrelacion(p);
+      const p = pacIdMatch ? getPaciente(pacIdMatch[0]) : PACIENTES[0];
+      let respText = '';
+
+      // ¿Es una solicitud de "qué cambió"? El componente espera JSON array
+      if (fullPrompt.includes('cambio') || fullPrompt.includes('última consulta') || fullPrompt.includes('ultima consulta')) {
+        respText = JSON.stringify([
+          { cambio: 'PA promedio mejoró', tipo: 'signo_vital', importancia: 'informativa', detalle: 'PA pasó de 138/88 a 128/82 mmHg en los últimos 3 meses. Adherencia al tratamiento adecuada.' },
+          { cambio: 'HbA1c en meta', tipo: 'lab_alterado', importancia: 'informativa', detalle: 'HbA1c bajó de 7.4% a 6.8% en 6 meses. Continuar Metformina 850mg c/12h.' },
+          { cambio: 'LDL elevado pendiente de optimizar', tipo: 'lab_alterado', importancia: 'importante', detalle: 'LDL en 142 mg/dL — meta < 100 para riesgo CV moderado. Considerar intensificar Atorvastatina.' },
+          { cambio: 'Lumbalgia con manejo de RHB', tipo: 'nota_especialista', importancia: 'informativa', detalle: 'Fisioterapia reporta avance 60% en programa McKenzie. EVA bajó de 7 a 5.' },
+          { cambio: 'Vacuna influenza pendiente', tipo: 'alerta_nueva', importancia: 'importante', detalle: 'Última aplicación octubre 2025. Próxima dosis recomendada en otoño 2026.' },
+          { cambio: 'Cesación tabáquica mantenida', tipo: 'nuevo_diagnostico', importancia: 'informativa', detalle: 'Paciente lleva 2 años sin fumar. Continuar refuerzo positivo.' },
+        ]);
+      }
+      // ¿Es una solicitud de correlación / narrativa / resumen?
+      else if (fullPrompt.includes('narrativ')) respText = pumaiNarrativa(p);
+      else if (fullPrompt.includes('correlaci')) respText = pumaiCorrelacion(p);
       else respText = pumaiResumen(p);
+
       return jsonResponse({ candidates: [{ content: { parts: [{ text: respText }] }, finishReason: 'STOP' }] }, { delayMs: thinkingDelay(2000, 4000) });
     }
 
@@ -558,7 +573,7 @@
 
     console.debug('[DEMO MOCK]', (init?.method || 'GET'), url);
 
-    const pid = extractPacienteId(url) || PACIENTES[1].id;
+    const pid = extractPacienteId(url) || PACIENTES[0].id;
     const paciente = getPaciente(pid);
 
     // ─── AUTH ─────────────────────────────────────────────────────────
@@ -677,6 +692,47 @@
     if (url.match(/\/api\/v1\/traumatologia\/[0-9a-f-]{36}\/plan-tratamiento/)) return jsonResponse(genPlanTratamientoTrauma());
     if (url.match(/\/api\/v1\/traumatologia\/[0-9a-f-]{36}\/imagenes/)) return jsonResponse({ imagenes: [] });
     if (url.includes('/api/v1/traumatologia')) return jsonResponse({ data: [] });
+
+    // ─── CATÁLOGO DE MEDICAMENTOS (IMSS) ───────────────────────────────
+    // Catálogo demo con varios fármacos. El nombre debe permitir que las
+    // reglas mock del PumAIAlert disparen (busca regex por nombre).
+    const CATALOGO_MEDS = [
+      { id: 'med-fentanilo', clave_imss: '0440', nombre: 'Fentanilo', principio_activo: 'Fentanilo', presentacion: 'Solución inyectable 0.5 mg / 10 mL', via: 'IV / IM / Epidural', grupo_principal_id: 'opioides', grupo_principal_nombre: 'Analgésicos opioides', controlado: true, clase_control: 'Clase III (estupefaciente)', cuadro_basico: true, riesgo_embarazo: 'C', contraindicaciones_precauciones: 'Depresión respiratoria, asma bronquial aguda, íleo paralítico. Uso concomitante con benzodiazepinas (riesgo de depresión SNC fatal). Insuficiencia hepática severa.', interacciones: 'Benzodiazepinas (depresión respiratoria), IMAO, alcohol, otros depresores SNC.', efectos_adversos: 'Depresión respiratoria, sedación, náusea, vómito, estreñimiento severo, hipotensión.', dosis_recomendada: '25-100 mcg IV cada 30-60 min según dolor.', activo: true },
+      { id: 'med-tramadol', clave_imss: '0104', nombre: 'Tramadol', principio_activo: 'Tramadol', presentacion: 'Cápsulas 50 mg', via: 'Oral', grupo_principal_id: 'opioides', grupo_principal_nombre: 'Analgésicos opioides débiles', controlado: true, clase_control: 'Clase IV', cuadro_basico: true, riesgo_embarazo: 'C', contraindicaciones_precauciones: 'Riesgo de convulsiones (epilepsia mal controlada). Síndrome serotoninérgico con ISRS.', interacciones: 'ISRS, IRSN, IMAO, otros opioides.', efectos_adversos: 'Náusea, mareo, somnolencia, estreñimiento.', activo: true },
+      { id: 'med-paracetamol', clave_imss: '0104', nombre: 'Paracetamol', principio_activo: 'Paracetamol', presentacion: 'Tabletas 500 mg', via: 'Oral', grupo_principal_id: 'analgesicos', grupo_principal_nombre: 'Analgésicos no opioides', controlado: false, cuadro_basico: true, riesgo_embarazo: 'B', contraindicaciones_precauciones: 'Hepatopatía grave. Dosis máxima 4 g/día.', interacciones: 'Warfarina (potencia INR).', efectos_adversos: 'Hepatotoxicidad en sobredosis.', activo: true },
+      { id: 'med-diclofenaco', clave_imss: '0103', nombre: 'Diclofenaco', principio_activo: 'Diclofenaco sódico', presentacion: 'Tabletas 100 mg', via: 'Oral', grupo_principal_id: 'aines', grupo_principal_nombre: 'AINE', controlado: false, cuadro_basico: true, riesgo_embarazo: 'C', contraindicaciones_precauciones: 'Úlcera gástrica, ERC, embarazo 3T, asma sensible AINEs. Vigilar función renal.', interacciones: 'Anticoagulantes, antihipertensivos, litio.', efectos_adversos: 'Dispepsia, úlcera, hipertensión, edema.', activo: true },
+      { id: 'med-losartan', clave_imss: '2520', nombre: 'Losartán', principio_activo: 'Losartán potásico', presentacion: 'Tabletas 50 mg', via: 'Oral', grupo_principal_id: 'ara2', grupo_principal_nombre: 'ARA II', controlado: false, cuadro_basico: true, riesgo_embarazo: 'D', contraindicaciones_precauciones: 'Embarazo, estenosis renal bilateral, hiperpotasemia.', interacciones: 'IECA (no combinar), diuréticos ahorradores K+, AINEs.', efectos_adversos: 'Hiperpotasemia, hipotensión, deterioro renal.', activo: true },
+      { id: 'med-metformina', clave_imss: '1054', nombre: 'Metformina', principio_activo: 'Metformina', presentacion: 'Tabletas 850 mg', via: 'Oral', grupo_principal_id: 'biguanidas', grupo_principal_nombre: 'Hipoglucemiantes orales', controlado: false, cuadro_basico: true, riesgo_embarazo: 'B', contraindicaciones_precauciones: 'TFG <30, acidosis metabólica, sepsis.', interacciones: 'Medios de contraste yodados (suspender 48h).', efectos_adversos: 'Náusea, diarrea, acidosis láctica (raro).', activo: true },
+      { id: 'med-salbutamol', clave_imss: '0429', nombre: 'Salbutamol', principio_activo: 'Salbutamol', presentacion: 'Inhalador 100 mcg/dosis', via: 'Inhalado', grupo_principal_id: 'broncodilatadores', grupo_principal_nombre: 'Broncodilatadores beta-2', controlado: false, cuadro_basico: true, riesgo_embarazo: 'C', contraindicaciones_precauciones: 'Taquiarritmias graves.', interacciones: 'Betabloqueadores (antagoniza efecto).', efectos_adversos: 'Temblor, taquicardia, cefalea.', activo: true },
+      { id: 'med-amoxi', clave_imss: '1937', nombre: 'Amoxicilina', principio_activo: 'Amoxicilina', presentacion: 'Cápsulas 500 mg', via: 'Oral', grupo_principal_id: 'penicilinas', grupo_principal_nombre: 'Penicilinas', controlado: false, cuadro_basico: true, riesgo_embarazo: 'B', contraindicaciones_precauciones: 'Alergia a penicilinas.', interacciones: 'Anticonceptivos orales.', efectos_adversos: 'Diarrea, rash, anafilaxia.', activo: true },
+      { id: 'med-atorvastatina', clave_imss: '4106', nombre: 'Atorvastatina', principio_activo: 'Atorvastatina', presentacion: 'Tabletas 20 mg', via: 'Oral', grupo_principal_id: 'estatinas', grupo_principal_nombre: 'Estatinas', controlado: false, cuadro_basico: true, riesgo_embarazo: 'X', contraindicaciones_precauciones: 'Embarazo, lactancia, hepatopatía activa.', interacciones: 'Macrólidos, fibratos, ciclosporina.', efectos_adversos: 'Mialgia, rabdomiólisis (raro), elevación PFH.', activo: true },
+    ];
+
+    if (url.match(/\/api\/v1\/medicamentos-catalogo\/search/)) {
+      const q = new URL(url, 'http://x').searchParams.get('q') || '';
+      const qLower = q.toLowerCase();
+      const resultados = CATALOGO_MEDS.filter((m) =>
+        !q || m.nombre.toLowerCase().includes(qLower) || m.principio_activo.toLowerCase().includes(qLower) || m.clave_imss.includes(q)
+      );
+      return jsonResponse(resultados.slice(0, 15), { delayMs: 200 });
+    }
+    if (url.match(/\/api\/v1\/medicamentos-catalogo\/health/)) return jsonResponse({ ok: true });
+    if (url.match(/\/api\/v1\/medicamentos-catalogo\/grupos\/lista/)) return jsonResponse([
+      { id: 'opioides', nombre: 'Analgésicos opioides' }, { id: 'analgesicos', nombre: 'Analgésicos no opioides' },
+      { id: 'aines', nombre: 'AINE' }, { id: 'ara2', nombre: 'ARA II' }, { id: 'iecas', nombre: 'IECA' },
+      { id: 'biguanidas', nombre: 'Hipoglucemiantes' }, { id: 'estatinas', nombre: 'Estatinas' },
+      { id: 'broncodilatadores', nombre: 'Broncodilatadores' }, { id: 'penicilinas', nombre: 'Penicilinas' },
+    ]);
+    if (url.match(/\/api\/v1\/medicamentos-catalogo\/clave\//)) {
+      const clave = decodeURIComponent(url.split('/clave/')[1].split('?')[0]);
+      const med = CATALOGO_MEDS.find((m) => m.clave_imss === clave);
+      return med ? jsonResponse(med) : jsonResponse({ error: 'No encontrado' }, { status: 404 });
+    }
+    if (url.match(/\/api\/v1\/medicamentos-catalogo\/[^/?]+$/)) {
+      const id = url.split('/medicamentos-catalogo/')[1].split('?')[0];
+      const med = CATALOGO_MEDS.find((m) => m.id === id);
+      return med ? jsonResponse(med) : jsonResponse({ error: 'No encontrado' }, { status: 404 });
+    }
 
     // ─── RECETAS ───────────────────────────────────────────────────────
     if (url.includes('/api/v1/recetas/verificar/')) return jsonResponse({ valida: true, paciente: paciente.nombre_completo, medico: 'Dra. Vega', fecha: '2026-04-12' });
