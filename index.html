@@ -1797,38 +1797,50 @@ function enterMainApp(instant) {
   }
 })();
 
-/* ─── Generate landing particles ─── */
+/* ─── Generate particles + body.overlay-open class for hiding scroll-progress ─── */
 (function() {
-  // Helper: rellena un contenedor con N partículas doradas/blancas que suben
+  // Helper: rellena un contenedor con N partículas doradas/blancas grandes y brillosas
   function spawnParticles(container, count) {
     if (!container) return;
     for (let i = 0; i < count; i++) {
       const p = document.createElement('div');
       p.className = 'particle';
-      const size = 1 + Math.random() * 4;
+      const size = 2 + Math.random() * 5;  // 2-7px (antes 1-5px)
       p.style.cssText = 'left:' + Math.random()*100 + '%;bottom:-10px;width:' + size + 'px;height:' + size + 'px;' +
-        'background:' + (Math.random() > 0.5 ? 'var(--gold)' : 'rgba(255,255,255,0.65)') + ';' +
+        'background:' + (Math.random() > 0.4 ? '#f4d03f' : 'rgba(255,255,255,0.85)') + ';' +
         'animation-delay:' + Math.random()*7 + 's;animation-duration:' + (5+Math.random()*5) + 's;';
       container.appendChild(p);
     }
   }
 
-  // 1) Landing principal — 30 partículas (antes 20, ahora más densidad)
-  spawnParticles(document.getElementById('landingParticles'), 30);
-  // 2) Hero del main-app (cuando se entra ya dentro del sitio)
-  spawnParticles(document.getElementById('heroParticles'), 30);
+  spawnParticles(document.getElementById('landingParticles'), 35);
+  spawnParticles(document.getElementById('heroParticles'), 35);
 
-  // 3) Partículas en cada uno de los SPA section overlays — se ven en la
-  // zona azul marino del backdrop, detrás del panel blanco. El contenedor
-  // se inyecta una sola vez al cargar la página, las partículas corren con
-  // animation-delay aleatorios para que no parezca sincronizado.
+  // Partículas en cada overlay SPA — 50 partículas para asegurar densidad visible
   document.querySelectorAll('.spa-section-overlay').forEach(overlay => {
-    if (overlay.querySelector('.overlay-particles')) return; // ya tiene
+    if (overlay.querySelector('.overlay-particles')) return;
     const wrap = document.createElement('div');
     wrap.className = 'overlay-particles';
     overlay.insertBefore(wrap, overlay.firstChild);
-    spawnParticles(wrap, 24);
+    spawnParticles(wrap, 50);
   });
+
+  // ─── Tracker de overlay activo — agrega clase 'overlay-open' al body
+  // cuando hay cualquier overlay/modal visible, para que el CSS oculte
+  // scroll-progress y otros elementos que se ven encima.
+  function updateOverlayState() {
+    const anyActive = document.querySelector(
+      '.spa-section-overlay.active, .modal-overlay.active, .servicio-modal-overlay.active, .login-overlay.active'
+    );
+    document.body.classList.toggle('overlay-open', !!anyActive);
+  }
+  // Observa cambios de clase en todos los overlays
+  const overlayObserver = new MutationObserver(updateOverlayState);
+  document.querySelectorAll('.spa-section-overlay, .modal-overlay, .servicio-modal-overlay, .login-overlay').forEach(el => {
+    overlayObserver.observe(el, { attributes: true, attributeFilter: ['class'] });
+  });
+  // Verificación inicial
+  updateOverlayState();
 })();
 </script>
 

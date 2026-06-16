@@ -91,6 +91,7 @@ input[type="search"], input[type="tel"], input[type="url"], textarea, [contented
   background:linear-gradient(90deg, #C4A24E, #D4B86A, #C4A24E);
   background-size:200% 100%; animation:shimmer 2s linear infinite;
   box-shadow:0 0 12px rgba(196,162,78,0.6);
+  pointer-events:none;
 }
 
 /* ─── NAVBAR ─── */
@@ -193,43 +194,39 @@ input[type="search"], input[type="tel"], input[type="url"], textarea, [contented
   animation:particleRise 6s ease-in-out infinite;
   box-shadow:0 0 8px rgba(196,162,78,0.6), 0 0 14px rgba(244,208,63,0.4); }
 
-/* Partículas en TODOS los overlays SPA — contenedor ABSOLUTO dentro del
-   overlay (position:absolute funciona mejor que fixed dentro de elementos
-   con overflow:auto en Safari). Las partículas se ven en los costados del
-   panel blanco (zona azul marino del backdrop).
-
-   Estructura z-index del overlay activo:
-   - overlay (1500) → fondo navy con gradient
-   - .overlay-particles (1)  → partículas detrás del panel
-   - .spa-section-content (auto → mayor que 1 por orden DOM)  → panel blanco encima */
+/* ─── Partículas en overlays SPA — contenedor FIJO a viewport ────────────
+   Se ven en los costados oscuros del panel blanco (la zona del backdrop).
+   El panel blanco las tapa donde ocupa, así que solo se ven en los bordes. */
 .spa-section-overlay > .overlay-particles {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 100vh;  /* alto fijo igual a viewport — las partículas viven en ese rango */
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
   pointer-events: none;
   overflow: hidden;
   z-index: 1;
+  display: none;  /* solo visible cuando overlay active */
 }
 .spa-section-overlay.active > .overlay-particles {
-  /* Cuando el overlay está activo, position:fixed funciona porque ya quitamos
-     todos los transform del padre. Garantiza que las partículas se vean en
-     viewport aunque el usuario scrollee el overlay. */
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  height: auto;
+  display: block;
 }
 .spa-section-overlay .overlay-particles .particle {
   position: absolute;
   border-radius: 50%;
   opacity: 0;
   animation: particleRise 7s ease-in-out infinite;
-  box-shadow: 0 0 10px rgba(196,162,78,0.8), 0 0 22px rgba(244,208,63,0.5);
+  /* Glow MUCHO más intenso para que se vea contra el fondo navy */
+  box-shadow: 0 0 12px rgba(196,162,78,1), 0 0 28px rgba(244,208,63,0.7), 0 0 50px rgba(244,208,63,0.3);
 }
 /* El panel blanco va ENCIMA de las partículas */
 .spa-section-overlay > .spa-section-content {
   position: relative;
   z-index: 2;
 }
+
+/* Ocultar scroll-progress + scroll-cinematic cuando hay overlay/modal activo
+   (estaban visibles arriba como línea azul sobre el panel) */
+body.overlay-open .scroll-progress { display: none !important; }
+body.overlay-open #scrollCine,
+body.overlay-open .scroll-cine { display: none !important; }
 
 /* Floating orbs */
 .hero-orb { position:absolute; border-radius:50%; border:1px solid rgba(196,162,78,0.25);
@@ -488,8 +485,8 @@ input[type="search"], input[type="tel"], input[type="url"], textarea, [contented
 .servicio-modal-overlay { position:fixed; inset:0; z-index:11000; background:rgba(0,0,0,0.6);
   backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); display:none;
   overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
-  padding:110px 20px 40px;
-  padding-top:max(110px, calc(env(safe-area-inset-top) + 100px));
+  padding:140px 20px 40px;
+  padding-top:max(140px, calc(env(safe-area-inset-top) + 130px));
   padding-bottom:max(40px, env(safe-area-inset-bottom));
   box-sizing:border-box;
   opacity:0; transition:opacity 0.35s; }
@@ -513,8 +510,8 @@ input[type="search"], input[type="tel"], input[type="url"], textarea, [contented
 .modal-overlay { position:fixed; inset:0; z-index:11000; background:rgba(0,0,0,0.6);
   backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); display:none;
   overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
-  padding:110px 20px 40px;
-  padding-top:max(110px, calc(env(safe-area-inset-top) + 100px));
+  padding:140px 20px 40px;
+  padding-top:max(140px, calc(env(safe-area-inset-top) + 130px));
   padding-bottom:max(40px, env(safe-area-inset-bottom));
   box-sizing:border-box; }
 .modal-overlay.active { display:block; }
@@ -1522,8 +1519,8 @@ body.spa-locked { overflow: hidden; }
   overflow-y: auto !important;
   -webkit-overflow-scrolling: touch !important;
   overscroll-behavior: contain;
-  padding: 110px 20px 64px !important;
-  padding-top: max(110px, calc(env(safe-area-inset-top) + 100px)) !important;
+  padding: 140px 20px 64px !important;
+  padding-top: max(140px, calc(env(safe-area-inset-top) + 130px)) !important;
   padding-bottom: max(64px, env(safe-area-inset-bottom)) !important;
   box-sizing: border-box !important;
   transform: none !important;
