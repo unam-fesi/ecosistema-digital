@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Redirigiendo…</title>
+  <script>
+    // ═══════════════════════════════════════════════════════════════════════
+    // SPA Fallback para GitHub Pages — patrón "spa-github-pages" (rafrex)
+    //
+    // GitHub Pages sirve este archivo cuando una URL no coincide con un
+    // archivo físico. Para que las rutas internas de SPAs como /MIRC-Demo/
+    // funcionen (ej. /MIRC-Demo/dashboard, /MIRC-Demo/pacientes), aquí
+    // detectamos a qué SPA pertenece la URL, redirigimos a su index.html
+    // y codificamos la ruta original como query param. El index.html del
+    // SPA decodifica el query param y restaura la URL via history.replaceState
+    // antes de que React Router monte.
+    //
+    // Solo afecta a paths bajo SPAs registradas; cualquier otro 404 muestra
+    // un mensaje genérico.
+    // ═══════════════════════════════════════════════════════════════════════
+
+    (function () {
+      var path = location.pathname;
+      var search = location.search;
+      var hash = location.hash;
+
+      // SPAs registradas en este repo (segmentos exactos después del repo name)
+      // Si más adelante se agregan otros demos, registrarlos aquí.
+      var SPAS = ['/MIRC-Demo/'];
+
+      // Detectar a qué SPA pertenece el path
+      for (var i = 0; i < SPAS.length; i++) {
+        var spa = SPAS[i];
+        // Buscar el segmento /<repo>/<spa>… en el pathname
+        var spaIdx = path.indexOf(spa);
+        if (spaIdx >= 0) {
+          // Base = todo lo anterior + el segmento de la SPA (ej. /ecosistema-digital/MIRC-Demo/)
+          var base = path.substring(0, spaIdx + spa.length);
+          // Ruta interna del SPA = lo que sigue después
+          var innerPath = '/' + path.substring(spaIdx + spa.length);
+          // Reconstruir como query param ?p=/dashboard&q=originalQuery
+          var newUrl = base + '?p=' + encodeURIComponent(innerPath);
+          if (search) {
+            newUrl += '&q=' + encodeURIComponent(search.substring(1));
+          }
+          if (hash) newUrl += hash;
+          location.replace(newUrl);
+          return;
+        }
+      }
+
+      // No es ruta de SPA — mostrar mensaje genérico de 404
+      document.title = '404 — Página no encontrada';
+      document.body.innerHTML =
+        '<div style="font-family:system-ui,sans-serif;padding:60px 20px;text-align:center;color:#475569">' +
+        '<h1 style="font-size:48px;margin:0 0 16px;color:#0f172a">404</h1>' +
+        '<p style="font-size:18px;margin:0 0 28px">La página que buscas no existe en este sitio.</p>' +
+        '<p><a href="/ecosistema-digital/" style="color:#3b82f6;text-decoration:none;font-weight:600">← Volver al inicio</a></p>' +
+        '</div>';
+    })();
+  </script>
+</head>
+<body></body>
+</html>

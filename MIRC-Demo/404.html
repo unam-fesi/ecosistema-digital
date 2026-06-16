@@ -7,6 +7,26 @@
     <link rel="icon" type="image/png" href="assets/MIRCLogo.png" />
     <title>MIRC Expediente 360 — DEMO · FES Iztacala UNAM</title>
     <meta name="description" content="Demostración interactiva del Expediente Clínico Electrónico MIRC desarrollado por FES Iztacala UNAM. Datos ficticios.">
+
+    <!-- ═══════════════════════════════════════════════════════════════════
+         SPA Fallback decoder — pareja del 404.html del root del repo.
+         Cuando GitHub Pages redirige una URL como /MIRC-Demo/dashboard
+         hacia /MIRC-Demo/?p=/dashboard, este script restaura la URL real
+         antes de que React Router lea history.location. ═══════════════════ -->
+    <script>
+      (function () {
+        var s = location.search;
+        if (!s) return;
+        var params = new URLSearchParams(s);
+        var p = params.get('p'); // ruta interna codificada por 404.html
+        var q = params.get('q'); // query string original
+        if (p) {
+          var restoredUrl = location.pathname.replace(/\/$/, '') + p + (q ? '?' + q : '') + location.hash;
+          history.replaceState(null, '', restoredUrl);
+        }
+      })();
+    </script>
+
     <!-- DEMO MOCKS — interceptor de fetch + auto-login Dra. Vega -->
     <!-- DEBE cargarse ANTES que el bundle de React -->
     <script src="demo-mocks.js"></script>
