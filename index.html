@@ -127,12 +127,15 @@
 
   <!-- Floating Section Cards -->
   <div class="spa-cards-grid">
-    <!-- Card: Nuevos Proyectos (fondo blanco con letras doradas, estilo limpio) -->
-    <div class="spa-card" data-section="proyectos" style="background:#ffffff;border:1px solid rgba(196,162,78,0.45);box-shadow:0 8px 24px rgba(0,0,0,0.15)">
+    <!-- Card: Nuevos Proyectos (fondo blanco sólido con letras doradas) -->
+    <!-- !important + backdrop-filter:none anulan la regla base .spa-card que tiene
+         background translúcido + blur, los cuales hacían que el card se viera
+         azulado al heredar el tinte del landing-screen detrás. -->
+    <div class="spa-card spa-card-blanco-dorado" data-section="proyectos" style="background:#ffffff !important;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;border:1px solid rgba(196,162,78,0.45) !important;box-shadow:0 8px 24px rgba(0,0,0,0.18) !important">
       <div class="spa-card-emoji" style="filter:drop-shadow(0 2px 4px rgba(196,162,78,0.4))">🚀</div>
-      <div class="spa-card-title" style="color:#C4A24E;font-weight:800">Nuevos Proyectos</div>
-      <div class="spa-card-desc" style="color:#475569">MIRC Expediente 360, Hospital Virtual, Aura y más iniciativas tecnológicas del ecosistema.</div>
-      <div class="spa-card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4A24E" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+      <div class="spa-card-title" style="color:#C4A24E !important;font-weight:800">Nuevos Proyectos</div>
+      <div class="spa-card-desc" style="color:#475569 !important">MIRC Expediente 360, Hospital Virtual, Aura y más iniciativas tecnológicas del ecosistema.</div>
+      <div class="spa-card-arrow" style="background:rgba(196,162,78,0.15) !important"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4A24E" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
     </div>
 
     <!-- Card: ¿Quiénes Somos? -->

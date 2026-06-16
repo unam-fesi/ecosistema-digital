@@ -1132,6 +1132,35 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 }
 .spa-card:hover .spa-card-arrow { background: var(--gold); transform: scale(1.1); }
 
+/* ──────────────────────────────────────────────────────────────────────
+   Card "Nuevos Proyectos" — variante blanca con tipografía dorada.
+   La regla base de .spa-card tiene fondo translúcido + backdrop-blur que,
+   sobre el landing oscuro, daba al card un tinte azulado. Aquí lo forzamos
+   a fondo blanco sólido sin blur para que se vea limpio y diferenciado.
+   ────────────────────────────────────────────────────────────────────── */
+.spa-card.spa-card-blanco-dorado {
+  background: #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border: 1px solid rgba(196, 162, 78, 0.45) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18) !important;
+}
+.spa-card.spa-card-blanco-dorado::before { display: none !important; }
+.spa-card.spa-card-blanco-dorado .spa-card-title { color: #C4A24E !important; font-weight: 800 !important; }
+.spa-card.spa-card-blanco-dorado .spa-card-desc { color: #475569 !important; }
+.spa-card.spa-card-blanco-dorado .spa-card-arrow { background: rgba(196, 162, 78, 0.15) !important; }
+.spa-card.spa-card-blanco-dorado:hover {
+  border-color: rgba(196, 162, 78, 0.75) !important;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.22), 0 0 30px rgba(196, 162, 78, 0.18) !important;
+  transform: translateY(-12px) scale(1.02);
+}
+.spa-card.spa-card-blanco-dorado:hover .spa-card-arrow {
+  background: var(--gold) !important;
+}
+.spa-card.spa-card-blanco-dorado:hover .spa-card-arrow svg {
+  stroke: #ffffff !important;
+}
+
 /* Section overlays */
 /* ─── OVERLAY: dark backdrop with floating panel ─── */
 .spa-section-overlay {
