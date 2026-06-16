@@ -303,24 +303,28 @@
     ],
   });
 
-  const genMedicamentos = (p) => ({
-    medicamentos: [
-      { id: 1, principio_activo: 'Losartán', nombre_comercial: 'Cozaar', dosis: '50 mg', frecuencia: 'Cada 24 hrs', via: 'Oral', activo: true, fecha_inicio: '2024-03-15', prescriptor: 'Dra. Vega', indicacion: 'HTA' },
-      { id: 2, principio_activo: 'Metformina', nombre_comercial: 'Glucophage', dosis: '850 mg', frecuencia: 'Cada 12 hrs', via: 'Oral', activo: true, fecha_inicio: '2023-08-22', prescriptor: 'Dra. Vega', indicacion: 'DM2' },
-      { id: 3, principio_activo: 'Atorvastatina', nombre_comercial: 'Lipitor', dosis: '20 mg', frecuencia: 'Cada 24 hrs (HS)', via: 'Oral', activo: true, fecha_inicio: '2024-06-10', prescriptor: 'Dra. Vega', indicacion: 'Dislipidemia' },
-      { id: 4, principio_activo: 'Ácido acetilsalicílico', nombre_comercial: 'ASA Protect', dosis: '100 mg', frecuencia: 'Cada 24 hrs', via: 'Oral', activo: true, fecha_inicio: '2024-03-15', prescriptor: 'Dra. Vega', indicacion: 'Prevención CV primaria' },
-      { id: 5, principio_activo: 'Salbutamol', nombre_comercial: 'Ventolin', dosis: '100 mcg', frecuencia: 'PRN (rescate)', via: 'Inhalado', activo: true, fecha_inicio: '2025-02-14', prescriptor: 'Dra. Rivera', indicacion: 'EPOC' },
-      { id: 6, principio_activo: 'Diclofenaco', nombre_comercial: 'Voltaren', dosis: '100 mg', frecuencia: 'PRN (crisis lumbalgia)', via: 'Oral', activo: true, fecha_inicio: '2024-08-12', prescriptor: 'Dr. Salinas', indicacion: 'Lumbalgia' },
-      { id: 7, principio_activo: 'Paracetamol', nombre_comercial: 'Tylenol', dosis: '500 mg', frecuencia: 'PRN (cefalea)', via: 'Oral', activo: true, fecha_inicio: '2025-09-15', prescriptor: 'Dra. Vega', indicacion: 'Cefalea tensional' },
-    ],
-    tratamientos: [
-      { id: 1, medicamento: 'Losartán 50mg', dosis: '50 mg', frecuencia: 'Cada 24 hrs', via: 'Oral', activo: true },
-      { id: 2, medicamento: 'Metformina 850mg', dosis: '850 mg', frecuencia: 'Cada 12 hrs', via: 'Oral', activo: true },
-      { id: 3, medicamento: 'Atorvastatina 20mg', dosis: '20 mg', frecuencia: 'Cada 24 hrs', via: 'Oral', activo: true },
-      { id: 4, medicamento: 'ASA 100mg', dosis: '100 mg', frecuencia: 'Cada 24 hrs', via: 'Oral', activo: true },
-      { id: 5, medicamento: 'Salbutamol inhalado', dosis: '100 mcg', frecuencia: 'PRN', via: 'Inhalado', activo: true },
-    ],
-  });
+  const genMedicamentos = (p) => {
+    const meds = [
+      { id: 1, nombre: 'Losartán 50mg', name: 'Losartán', medicamento: { nombre: 'Losartán', concentracion: '50 mg', forma_farmaceutica: 'Tableta' }, principio_activo: 'Losartán potásico', nombre_comercial: 'Cozaar', dosis: '50 mg c/24h', dose: '50 mg', frequency: 'Cada 24 horas (mañana)', frecuencia: 'Cada 24 horas', via: 'Oral', route: 'Oral', estado: 'activo', status: 'activo', fecha_prescripcion: '2024-03-15', fecha_inicio: '2024-03-15', startDate: '2024-03-15', prescriptor: 'Dra. María Vega Hernández', prescriber: 'Dra. Vega', diagnostico: 'Hipertensión arterial esencial (I10)', diagnosis: 'HTA', indicacion: 'Control de HTA', adherencia: 95, adherence: 95, duracion: 'Crónico', activo: true,
+        efectos_adversos: ['Mareo ocasional al iniciar (resuelto)'],
+        historial_dosis: [{ fecha: '2024-03-15', dosis_anterior: '—', dosis_nueva: '50 mg c/24h', motivo: 'Inicio tratamiento' }] },
+      { id: 2, nombre: 'Metformina 850mg', name: 'Metformina', medicamento: { nombre: 'Metformina', concentracion: '850 mg', forma_farmaceutica: 'Tableta' }, principio_activo: 'Metformina clorhidrato', nombre_comercial: 'Glucophage', dosis: '850 mg c/12h', dose: '850 mg', frequency: 'Cada 12 horas (con alimentos)', frecuencia: 'Cada 12 horas', via: 'Oral', route: 'Oral', estado: 'activo', status: 'activo', fecha_prescripcion: '2023-08-22', startDate: '2023-08-22', prescriptor: 'Dra. María Vega Hernández', prescriber: 'Dra. Vega', diagnostico: 'Diabetes mellitus tipo 2 (E11.9)', diagnosis: 'DM2', indicacion: 'Control glucémico', adherencia: 92, adherence: 92, duracion: 'Crónico', activo: true,
+        efectos_adversos: ['Diarrea ocasional primer mes (resuelto)'],
+        historial_dosis: [{ fecha: '2023-08-22', dosis_anterior: '—', dosis_nueva: '500 mg c/12h', motivo: 'Inicio escalado' }, { fecha: '2024-02-10', dosis_anterior: '500 mg c/12h', dosis_nueva: '850 mg c/12h', motivo: 'Ajuste por HbA1c 7.8%' }] },
+      { id: 3, nombre: 'Atorvastatina 20mg', name: 'Atorvastatina', medicamento: { nombre: 'Atorvastatina', concentracion: '20 mg', forma_farmaceutica: 'Tableta' }, principio_activo: 'Atorvastatina cálcica', nombre_comercial: 'Lipitor', dosis: '20 mg c/24h HS', dose: '20 mg', frequency: 'Cada 24 horas (al acostarse)', frecuencia: 'Cada 24 horas (HS)', via: 'Oral', route: 'Oral', estado: 'activo', status: 'activo', fecha_prescripcion: '2024-06-10', startDate: '2024-06-10', prescriptor: 'Dra. María Vega Hernández', prescriber: 'Dra. Vega', diagnostico: 'Hiperlipidemia mixta (E78.5)', diagnosis: 'Dislipidemia', indicacion: 'Reducción de LDL', adherencia: 88, adherence: 88, duracion: 'Crónico', activo: true,
+        efectos_adversos: ['Sin efectos adversos reportados'],
+        historial_dosis: [{ fecha: '2024-06-10', dosis_anterior: '—', dosis_nueva: '20 mg c/24h', motivo: 'Inicio por LDL 198 mg/dL' }] },
+      { id: 4, nombre: 'ASA 100mg', name: 'Ácido acetilsalicílico', medicamento: { nombre: 'Ácido acetilsalicílico', concentracion: '100 mg', forma_farmaceutica: 'Tableta' }, principio_activo: 'Ácido acetilsalicílico', nombre_comercial: 'ASA Protect', dosis: '100 mg c/24h', dose: '100 mg', frequency: 'Cada 24 horas', frecuencia: 'Cada 24 horas', via: 'Oral', route: 'Oral', estado: 'activo', status: 'activo', fecha_prescripcion: '2024-03-15', startDate: '2024-03-15', prescriptor: 'Dra. María Vega Hernández', prescriber: 'Dra. Vega', diagnostico: 'Prevención cardiovascular primaria', diagnosis: 'Prevención CV', indicacion: 'Antiagregante plaquetario', adherencia: 98, adherence: 98, duracion: 'Crónico', activo: true, efectos_adversos: [], historial_dosis: [] },
+      { id: 5, nombre: 'Salbutamol 100mcg inhalado', name: 'Salbutamol', medicamento: { nombre: 'Salbutamol', concentracion: '100 mcg/dosis', forma_farmaceutica: 'Inhalador' }, principio_activo: 'Salbutamol', nombre_comercial: 'Ventolin', dosis: '2 disparos PRN', dose: '100 mcg/dosis', frequency: 'PRN (rescate, máximo c/4h)', frecuencia: 'PRN', via: 'Inhalado', route: 'Inhalado', estado: 'activo', status: 'activo', fecha_prescripcion: '2025-02-14', startDate: '2025-02-14', prescriptor: 'Dra. Rivera (Neumología)', prescriber: 'Dra. Rivera', diagnostico: 'EPOC leve GOLD A (J44.9)', diagnosis: 'EPOC', indicacion: 'Rescate broncoespasmo', adherencia: 100, adherence: 100, duracion: 'Permanente', activo: true, efectos_adversos: [], historial_dosis: [] },
+      { id: 6, nombre: 'Diclofenaco 100mg', name: 'Diclofenaco', medicamento: { nombre: 'Diclofenaco sódico', concentracion: '100 mg', forma_farmaceutica: 'Tableta' }, principio_activo: 'Diclofenaco sódico', nombre_comercial: 'Voltaren', dosis: '100 mg PRN', dose: '100 mg', frequency: 'PRN (crisis dolor, máximo c/12h, no más de 5 días)', frecuencia: 'PRN', via: 'Oral', route: 'Oral', estado: 'activo', status: 'activo', fecha_prescripcion: '2024-08-12', startDate: '2024-08-12', prescriptor: 'Dr. Salinas (Traumatología)', prescriber: 'Dr. Salinas', diagnostico: 'Lumbalgia crónica (M54.5)', diagnosis: 'Lumbalgia', indicacion: 'Dolor lumbar agudo', adherencia: 70, adherence: 70, duracion: 'PRN', activo: true, efectos_adversos: ['Dispepsia leve (con omeprazol profiláctico)'], historial_dosis: [] },
+      { id: 7, nombre: 'Paracetamol 500mg', name: 'Paracetamol', medicamento: { nombre: 'Paracetamol', concentracion: '500 mg', forma_farmaceutica: 'Tableta' }, principio_activo: 'Paracetamol', nombre_comercial: 'Tylenol', dosis: '500 mg PRN', dose: '500 mg', frequency: 'PRN (cefalea, máximo c/6h)', frecuencia: 'PRN', via: 'Oral', route: 'Oral', estado: 'activo', status: 'activo', fecha_prescripcion: '2025-09-15', startDate: '2025-09-15', prescriptor: 'Dra. María Vega Hernández', prescriber: 'Dra. Vega', diagnostico: 'Cefalea tensional (G44.2)', diagnosis: 'Cefalea', indicacion: 'Analgesia leve', adherencia: 85, adherence: 85, duracion: 'PRN', activo: true, efectos_adversos: [], historial_dosis: [] },
+    ];
+    return { medicamentos: meds, tratamientos: meds, prescripciones_activas: meds, medicamentos_activos: meds,
+      interacciones_detectadas: [
+        { medicamento_1: 'Losartán', medicamento_2: 'ASA', severidad: 'leve', descripcion: 'Riesgo bajo de hiperpotasemia y disminución del efecto antihipertensivo en uso prolongado. Vigilancia adecuada.' },
+        { medicamento_1: 'Atorvastatina', medicamento_2: 'Diclofenaco', severidad: 'leve', descripcion: 'Posible aumento del riesgo de miopatía. Vigilar CPK si uso prolongado.' },
+      ] };
+  };
 
   const genDecisiones = (p) => ({
     decisiones: [
@@ -502,14 +506,22 @@
   });
 
   // ─── PASO 7: Traumatología ───────────────────────────────────────────────
+  // IMPORTANTE: 'zona_corporal' debe usar nombres que `normalizeZona` reconozca.
+  // El hook useTraumatologia mapea:
+  //  'Cabeza'→head, 'Cuello'→neck, 'Hombro Izquierdo'→leftShoulder,
+  //  'Hombro Derecho'→rightShoulder, 'Tórax'→chest, 'Columna Vertebral'→lowerBack,
+  //  'Brazo Izquierdo'→leftArm, 'Brazo Derecho'→rightArm,
+  //  'Espalda Baja'→lowerBack, 'Cadera'→hip,
+  //  'Pierna Izquierda'→leftLeg, 'Pierna Derecha'→rightLeg,
+  //  'Pie Izquierdo'→leftFoot, 'Pie Derecho'→rightFoot
   const genLesiones = () => ({
     lesiones: [
-      { id: 1, zona_corporal: 'lumbar', zona: 'lumbar', tipo: 'lumbalgia mecánica crónica', severidad: 'moderada', activa: true, fecha_inicio: '2024-08-12', notas: 'Episodios recurrentes asociados a postura laboral sedente. EVA actual 5/10.', diagnostico_cie10: 'M54.5' },
-      { id: 2, zona_corporal: 'columna_lumbar', zona: 'columna_lumbar', tipo: 'espondiloartrosis L4-L5', severidad: 'leve', activa: true, fecha_inicio: '2024-11-08', notas: 'Cambios degenerativos en Rx columna lumbar. Sin compromiso neurológico.', diagnostico_cie10: 'M47.816' },
-      { id: 3, zona_corporal: 'rodilla_derecha', zona: 'rodilla_derecha', tipo: 'condromalacia rotuliana', severidad: 'leve', activa: true, fecha_inicio: '2025-02-03', notas: 'Dolor anterior rodilla con flexión sostenida. Mejora con fortalecimiento.', diagnostico_cie10: 'M22.40' },
-      { id: 4, zona_corporal: 'cuello', zona: 'cuello', tipo: 'contractura muscular cervical', severidad: 'leve', activa: true, fecha_inicio: '2025-04-20', notas: 'Por postura laboral. Mejora con ergonomía y estiramientos.', diagnostico_cie10: 'M62.838' },
-      { id: 5, zona_corporal: 'hombro_izquierdo', zona: 'hombro_izquierdo', tipo: 'tendinitis del manguito rotador', severidad: 'leve', activa: false, fecha_inicio: '2023-11-15', fecha_resolucion: '2024-03-20', notas: 'Resuelta con RHB.', diagnostico_cie10: 'M75.10' },
-      { id: 6, zona_corporal: 'tobillo_derecho', zona: 'tobillo_derecho', tipo: 'esguince grado I', severidad: 'leve', activa: false, fecha_inicio: '2022-07-10', fecha_resolucion: '2022-08-15', notas: 'Esguince deportivo (futbol). Resuelto.', diagnostico_cie10: 'S93.4' },
+      { id: 'les-1', zona_corporal: 'Espalda Baja', zona: 'lowerBack', tipo: 'Lumbalgia mecánica crónica', severidad: 'moderada', estado: 'en_tratamiento_conservador', activa: true, fecha_lesion: '2024-08-12', fecha_diagnostico: '2024-08-12', notas: 'Episodios recurrentes asociados a postura laboral sedente. EVA actual 5/10.', diagnostico_cie10: 'M54.5', registrado_por: 'Dr. Salinas (Traumatología)', hueso: 'L4-L5' },
+      { id: 'les-2', zona_corporal: 'Columna Vertebral', zona: 'lowerBack', tipo: 'Espondiloartrosis L4-L5', severidad: 'leve', estado: 'en_seguimiento', activa: true, fecha_lesion: '2024-11-08', fecha_diagnostico: '2024-11-08', notas: 'Cambios degenerativos en Rx columna lumbar. Sin compromiso neurológico.', diagnostico_cie10: 'M47.816', registrado_por: 'Dr. Salinas (Traumatología)', hueso: 'Vértebras lumbares' },
+      { id: 'les-3', zona_corporal: 'Pierna Derecha', zona: 'rightLeg', tipo: 'Condromalacia rotuliana', severidad: 'leve', estado: 'en_tratamiento_conservador', activa: true, fecha_lesion: '2025-02-03', fecha_diagnostico: '2025-02-03', notas: 'Dolor anterior rodilla con flexión sostenida. Mejora con fortalecimiento.', diagnostico_cie10: 'M22.40', registrado_por: 'Dr. Salinas (Traumatología)', hueso: 'Rótula derecha' },
+      { id: 'les-4', zona_corporal: 'Cuello', zona: 'neck', tipo: 'Contractura muscular cervical', severidad: 'leve', estado: 'en_seguimiento', activa: true, fecha_lesion: '2025-04-20', fecha_diagnostico: '2025-04-20', notas: 'Por postura laboral. Mejora con ergonomía y estiramientos.', diagnostico_cie10: 'M62.838', registrado_por: 'Dra. Vega', hueso: 'Trapecio cervical' },
+      { id: 'les-5', zona_corporal: 'Hombro Izquierdo', zona: 'leftShoulder', tipo: 'Tendinitis del manguito rotador (resuelta)', severidad: 'leve', estado: 'resuelta', activa: false, fecha_lesion: '2023-11-15', fecha_resolucion: '2024-03-20', notas: 'Resuelta con 12 sesiones de RHB.', diagnostico_cie10: 'M75.10', registrado_por: 'Dr. Salinas', hueso: 'Manguito rotador izquierdo' },
+      { id: 'les-6', zona_corporal: 'Pie Derecho', zona: 'rightFoot', tipo: 'Esguince de tobillo grado I (resuelto)', severidad: 'grado_I', estado: 'resuelta', activa: false, fecha_lesion: '2022-07-10', fecha_resolucion: '2022-08-15', notas: 'Esguince deportivo (fútbol). Resuelto con inmovilización + RHB.', diagnostico_cie10: 'S93.4', registrado_por: 'Dr. Salinas', hueso: 'Ligamento peroneoastragalino anterior' },
     ],
   });
 
@@ -527,23 +539,80 @@
     `Riesgo clínico: ${p.riesgo.toUpperCase()}. ${p.alergias?.length ? `Alergias: ${p.alergias.join(', ')}. ` : 'Sin alergias documentadas. '}` +
     `Última consulta: control estable. Adherencia a tratamiento: buena. Recomendación: mantener seguimiento trimestral.`;
 
+  // Narrativa en TEXTO PLANO (sin markdown — el componente lo muestra tal cual).
   const pumaiNarrativa = (p) =>
-    `# Narrativa Clínica — ${p.nombre_completo}\n\n` +
-    `**${p.nombre_completo}**, ${p.sexo === 'M' ? 'masculino' : 'femenina'} de ${p.edad} años, con ocupación de ${p.ocupacion}, ` +
-    `acude a control de su padecimiento principal: **${p.dx_principal}**.\n\n` +
-    `## Antecedentes\n\nTipo sanguíneo ${p.tipo_sangre}. ` +
-    (p.alergias?.length ? `Refiere alergia a **${p.alergias.join(' y ')}**. ` : 'Niega alergias medicamentosas. ') +
-    `Sin antecedentes quirúrgicos relevantes. Antecedentes familiares positivos para cardiopatía isquémica en línea paterna.\n\n` +
-    `## Estado Actual\n\nPaciente clínicamente estable, somatometría: peso ${p.peso_kg} kg, talla ${p.talla_cm} cm, IMC ${p.imc} kg/m². ` +
-    `Signos vitales dentro de rangos aceptables. Apego terapéutico reportado del 92%.\n\n` +
-    `## Plan\n\n1. Continuar esquema farmacológico actual.\n2. Solicitar QS6 + perfil lipídico.\n3. Reforzar medidas higiénico-dietéticas.\n4. Cita en 12 semanas.\n\n` +
-    `_Documento generado por IA · ${new Date().toLocaleString('es-MX')}_`;
+`NOTA DE EVOLUCIÓN CLÍNICA — Control trimestral
+
+PACIENTE: ${p.nombre_completo}, ${p.sexo === 'M' ? 'masculino' : 'femenina'} de ${p.edad} años, originario de ${p.lugar_origen || 'CDMX'}, con ocupación de ${p.ocupacion}.
+
+MOTIVO DE CONSULTA: Acude a control trimestral de sus padecimientos crónicos.
+
+PADECIMIENTO ACTUAL: Paciente con diagnósticos múltiples — ${p.dx_principal}. Refiere buen apego al tratamiento farmacológico (adherencia reportada 92%). Niega sintomatología cardiovascular aguda, hipoglucemias o disnea de reciente aparición. Refiere lumbalgia crónica con EVA actual 5/10, manejada con AINE PRN y rehabilitación.
+
+ANTECEDENTES RELEVANTES: Tipo sanguíneo ${p.tipo_sangre}. Refiere alergia a ${(p.alergias || []).join(' y ') || 'ninguna documentada'}. Tabaquismo previo (suspendido hace 2 años). Apendicectomía en 2002 sin complicaciones. Antecedentes familiares positivos para cardiopatía isquémica y DM2 en línea paterna.
+
+EXPLORACIÓN FÍSICA: Paciente alerta, orientado, sin facies álgicas. Somatometría: peso ${p.peso_kg} kg, talla ${p.talla_cm} cm, IMC ${p.imc} kg/m² (sobrepeso). Signos vitales: PA 128/82 mmHg, FC 72 lpm, FR 16 rpm, Temp 36.6°C, SatO2 98%. Campos pulmonares con murmullo vesicular conservado. Ruidos cardíacos rítmicos sin soplos. Abdomen blando, depresible, no doloroso. Extremidades sin edema. Sin signos de focalización neurológica.
+
+LABORATORIOS RECIENTES (15-mar-2026): Glucosa 98 mg/dL, HbA1c 6.8%, Creatinina 0.9 mg/dL (TFG estimada 78 mL/min), LDL 142 mg/dL, HDL 48 mg/dL, Triglicéridos 165 mg/dL. Sin alteraciones electrolíticas.
+
+EVALUACIÓN: Paciente con HTA y DM2 controladas. Dislipidemia con LDL fuera de meta (142 vs objetivo <100). ERC etapa 2 estable. EPOC leve estable sin exacerbaciones. Lumbalgia crónica con avance en rehabilitación.
+
+PLAN:
+1. Continuar Losartán 50 mg cada 24 h y Metformina 850 mg cada 12 h.
+2. Continuar Atorvastatina 20 mg HS — reforzar adherencia (88%).
+3. Continuar ASA 100 mg cada 24 h como prevención cardiovascular.
+4. Salbutamol inhalado PRN para rescate.
+5. Continuar plan de rehabilitación lumbar — 5 sesiones restantes.
+6. Solicitar perfil tiroideo en próxima visita.
+7. Cita de seguimiento en 12 semanas (12-jul-2026).
+
+Documento generado por PUM-AI · MedGemma 27B · ${new Date().toLocaleString('es-MX')}
+Este documento es un apoyo a la decisión clínica y no sustituye el criterio del médico tratante.`;
+
+  // Correlaciones ahora en formato ARRAY que el componente espera
+  const pumaiCorrelacionArray = (p) => [
+    {
+      correlacion: 'Adherencia subóptima a Atorvastatina (88%) explica LDL persistentemente elevado (142 mg/dL vs meta <100)',
+      nivel_alerta: 'media',
+      datos_involucrados: ['Adherencia 88%', 'LDL 142 mg/dL', 'Atorvastatina 20mg HS'],
+      evidencia: 'En los últimos 6 meses, la adherencia reportada por pillbox electrónico es 88% mientras que el LDL no ha alcanzado meta. Estudios clínicos demuestran reducción de LDL de ~6 mg/dL por cada 10% de mejora en adherencia.',
+      accion_sugerida: 'Reforzar educación al paciente sobre toma diaria HS. Considerar intensificar a Atorvastatina 40mg si en próximos 3 meses sigue fuera de meta.',
+    },
+    {
+      correlacion: `IMC ${p.imc} kg/m² (sobrepeso) + sedentarismo laboral correlacionan con HTA + DM2 + Dislipidemia + Hígado graso`,
+      nivel_alerta: 'alta',
+      datos_involucrados: [`IMC ${p.imc}`, 'Sedentarismo 10h/día', 'HTA', 'DM2', 'Dislipidemia', 'Esteatosis hepática'],
+      evidencia: 'El paciente presenta síndrome metabólico clásico. La modificación del estilo de vida es la intervención de mayor impacto: reducir 5-10% del peso mejora HTA, glucemia, lípidos y revierte esteatosis hepática.',
+      accion_sugerida: 'Programa estructurado de actividad física aeróbica 150 min/sem + entrenamiento de resistencia 2 veces/sem. Meta inicial: bajar 8 kg en 12 meses. Reforzar adherencia al plan nutricional de Lic. Hernández.',
+    },
+    {
+      correlacion: 'Lumbalgia crónica + sedentarismo + sobrepeso forman un círculo vicioso que limita el ejercicio prescrito',
+      nivel_alerta: 'media',
+      datos_involucrados: ['Lumbalgia EVA 5/10', 'IMC sobrepeso', 'Sedentarismo laboral'],
+      evidencia: 'El dolor lumbar limita el ejercicio aeróbico, lo que dificulta el descenso de peso, lo que perpetúa la sobrecarga lumbar. Romper este ciclo requiere intervención multimodal.',
+      accion_sugerida: 'Continuar programa McKenzie con Fis. Romero. Adicionar natación o bicicleta estacionaria (bajo impacto). Reevaluar a las 6 semanas.',
+    },
+    {
+      correlacion: 'EPOC leve + antecedente tabáquico + estrés laboral aumentan riesgo de exacerbación durante invierno',
+      nivel_alerta: 'baja',
+      datos_involucrados: ['EPOC GOLD A', 'Ex-fumador 18 años', 'Estrés laboral moderado', 'Próximo invierno'],
+      evidencia: 'Los pacientes con EPOC y antecedente tabáquico tienen mayor riesgo de infecciones respiratorias en temporada invernal. El estrés crónico puede desencadenar broncoespasmo.',
+      accion_sugerida: 'Asegurar vacuna influenza estacional (próxima octubre 2026). Continuar Salbutamol PRN. Vigilar síntomas catarrales y reforzar técnicas de relajación.',
+    },
+    {
+      correlacion: 'Cefalea tensional + estrés laboral + postura sedente prolongada se retroalimentan',
+      nivel_alerta: 'baja',
+      datos_involucrados: ['Cefalea tensional 2-3/semana', 'GAD-7: 8/21', 'Postura sedente 10h/día'],
+      evidencia: 'La tensión muscular cervical secundaria a postura prolongada y estrés laboral perpetúa el patrón de cefalea tensional.',
+      accion_sugerida: 'Pausas activas cada 60 minutos. Ergonomía del puesto de trabajo. Continuar técnicas de relajación con Psic. Martínez. Paracetamol 500mg PRN.',
+    },
+  ];
 
   const pumaiCorrelacion = (p) =>
-    `Se identifican 3 correlaciones clínicamente significativas:\n\n` +
-    `1. **PA sistólica elevada** asociada a adherencia subóptima en últimos 60 días. Recomendación: pillbox electrónico.\n\n` +
-    `2. **IMC ${p.imc} kg/m²** asociado a sedentarismo. Recomendación: actividad física graduada + nutrición.\n\n` +
-    `3. **Patrón de sueño irregular** asociado a ansiedad situacional. Recomendación: higiene del sueño + valoración por psicología.`;
+    `Análisis del Motor de Correlación Clínica IA — ${p.nombre_completo}\n\n` +
+    pumaiCorrelacionArray(p).map((c, i) =>
+      `${i + 1}. [${c.nivel_alerta.toUpperCase()}] ${c.correlacion}\nEvidencia: ${c.evidencia}\nAcción sugerida: ${c.accion_sugerida}`
+    ).join('\n\n');
 
   // ─── PASO 9: Interceptor de fetch ────────────────────────────────────────
   const originalFetch = window.fetch ? window.fetch.bind(window) : null;
@@ -576,9 +645,9 @@
           { cambio: 'Cesación tabáquica mantenida', tipo: 'nuevo_diagnostico', importancia: 'informativa', detalle: 'Paciente lleva 2 años sin fumar. Continuar refuerzo positivo.' },
         ]);
       }
-      // ¿Es una solicitud de correlación / narrativa / resumen?
+      // Correlaciones — devuelve ARRAY JSON (no texto)
+      else if (fullPrompt.includes('correlaci')) respText = JSON.stringify(pumaiCorrelacionArray(p));
       else if (fullPrompt.includes('narrativ')) respText = pumaiNarrativa(p);
-      else if (fullPrompt.includes('correlaci')) respText = pumaiCorrelacion(p);
       else respText = pumaiResumen(p);
 
       return jsonResponse({ candidates: [{ content: { parts: [{ text: respText }] }, finishReason: 'STOP' }] }, { delayMs: thinkingDelay(2000, 4000) });
@@ -621,14 +690,19 @@
     if (url.match(/pacientes\/[0-9a-f-]{36}\/decisiones/)) return jsonResponse(genDecisiones(paciente));
     if (url.match(/pacientes\/[0-9a-f-]{36}\/psicosocial/)) return jsonResponse(genPsicosocial(paciente));
     if (url.match(/pacientes\/[0-9a-f-]{36}\/(archivos|documentos)/)) {
-      return jsonResponse({ archivos: [
-        { id: 1, nombre: 'Consentimiento informado', tipo: 'pdf', tamano: 145000, fecha: '2026-01-15', categoria: 'consentimiento' },
-        { id: 2, nombre: 'Historia clínica inicial', tipo: 'pdf', tamano: 287000, fecha: '2026-01-15', categoria: 'historia' },
-        { id: 3, nombre: 'Resultados laboratorio marzo 2026', tipo: 'pdf', tamano: 95000, fecha: '2026-03-15', categoria: 'laboratorio' },
-      ], documentos: [
-        { id: 1, nombre: 'Consentimiento informado', fecha: '2026-01-15', tipo: 'pdf' },
-        { id: 2, nombre: 'Historia clínica inicial', fecha: '2026-01-15', tipo: 'pdf' },
-      ]});
+      const docsDetallados = [
+        { id: 1, nombre: 'Consentimiento informado de tratamiento', autor: 'Paciente + Dra. Vega', fechaCreacion: '2026-01-15', fecha_creacion: '2026-01-15', tamano: '142 KB', tamano_bytes: 145000, tipo: 'documento', formato: 'PDF', categoria: 'Consentimientos', descripcion: 'Consentimiento informado para tratamiento crónico de HTA y DM2. Incluye plan terapéutico, riesgos y beneficios discutidos.', firmadoPor: ['Juan Galindo López', 'Dra. María Vega Hernández'] },
+        { id: 2, nombre: 'Historia clínica completa - Primera vez', autor: 'Dra. Vega', fechaCreacion: '2026-01-15', fecha_creacion: '2026-01-15', tamano: '287 KB', tamano_bytes: 287000, tipo: 'documento', formato: 'PDF', categoria: 'Historia Clínica', descripcion: 'Historia clínica integral inicial: antecedentes heredofamiliares, personales patológicos, alergias, exploración física completa.', firmadoPor: ['Dra. María Vega Hernández'] },
+        { id: 3, nombre: 'Resultados laboratorio - QS6 + Perfil Lipídico', autor: 'Lab. Clínico FESI', fechaCreacion: '2026-03-15', fecha_creacion: '2026-03-15', tamano: '95 KB', tamano_bytes: 95000, tipo: 'documento', formato: 'PDF', categoria: 'Laboratorio', descripcion: 'BH + QS6 + Perfil Lipídico. Glucosa 98, HbA1c 6.8, Creatinina 0.9, LDL 142, HDL 48, TG 165.', firmadoPor: ['Q.F.B. Patricia Núñez'] },
+        { id: 4, nombre: 'Radiografía de tórax PA y Lateral', autor: 'Rx Diagnóstico FESI', fechaCreacion: '2025-11-22', fecha_creacion: '2025-11-22', tamano: '2.4 MB', tamano_bytes: 2400000, tipo: 'imagen', formato: 'DICOM/JPG', categoria: 'Imagenología', descripcion: 'Rx Tórax PA y Lateral — Silueta cardiomediastinal normal. Campos pulmonares sin opacidades.', firmadoPor: ['Dr. Roberto Morales (Radiólogo)'] },
+        { id: 5, nombre: 'Electrocardiograma 12 derivaciones', autor: 'Dr. Mendoza (Cardiología)', fechaCreacion: '2025-11-08', fecha_creacion: '2025-11-08', tamano: '180 KB', tamano_bytes: 180000, tipo: 'documento', formato: 'PDF', categoria: 'Cardiología', descripcion: 'ECG en reposo — Ritmo sinusal regular 72 lpm. Eje normal. Sin alteraciones de repolarización.', firmadoPor: ['Dr. Carlos Mendoza'] },
+        { id: 6, nombre: 'Interconsulta a Cardiología - Resultado', autor: 'Dr. Mendoza', fechaCreacion: '2026-02-20', fecha_creacion: '2026-02-20', tamano: '156 KB', tamano_bytes: 156000, tipo: 'documento', formato: 'PDF', categoria: 'Interconsultas', descripcion: 'Valoración cardiológica: HTA controlada, sin datos de daño a órgano blanco. Continuar Losartán.', firmadoPor: ['Dr. Carlos Mendoza'] },
+        { id: 7, nombre: 'Plan nutricional personalizado', autor: 'Lic. Hernández (Nutrición)', fechaCreacion: '2026-04-08', fecha_creacion: '2026-04-08', tamano: '420 KB', tamano_bytes: 420000, tipo: 'documento', formato: 'PDF', categoria: 'Nutrición', descripcion: 'Plan alimenticio de 1800 kcal con 50% CHO, 25% proteína, 25% grasas. Indicaciones para DM2 e Dislipidemia.', firmadoPor: ['Lic. Patricia Hernández', 'Juan Galindo López'] },
+        { id: 8, nombre: 'Espirometría basal', autor: 'Dra. Rivera (Neumología)', fechaCreacion: '2025-02-14', fecha_creacion: '2025-02-14', tamano: '210 KB', tamano_bytes: 210000, tipo: 'documento', formato: 'PDF', categoria: 'Neumología', descripcion: 'Espirometría — FEV1/FVC 0.68. Patrón obstructivo leve compatible con EPOC GOLD A.', firmadoPor: ['Dra. Adriana Rivera'] },
+        { id: 9, nombre: 'Receta médica - Última emisión', autor: 'Dra. Vega', fechaCreacion: '2026-04-12', fecha_creacion: '2026-04-12', tamano: '78 KB', tamano_bytes: 78000, tipo: 'documento', formato: 'PDF', categoria: 'Recetas', descripcion: 'Renovación de receta: Losartán + Metformina + Atorvastatina + ASA. Vigencia 90 días.', firmadoPor: ['Dra. María Vega Hernández'] },
+        { id: 10, nombre: 'USG abdominal', autor: 'Dr. Morales', fechaCreacion: '2025-06-10', fecha_creacion: '2025-06-10', tamano: '1.8 MB', tamano_bytes: 1800000, tipo: 'imagen', formato: 'DICOM/JPG', categoria: 'Imagenología', descripcion: 'USG abdominal — Esteatosis hepática grado I. Resto sin alteraciones.', firmadoPor: ['Dr. Roberto Morales'] },
+      ];
+      return jsonResponse({ archivos: docsDetallados, documentos: docsDetallados, total: docsDetallados.length });
     }
     if (url.match(/pacientes\/[0-9a-f-]{36}\/consentimientos/)) return jsonResponse({
       consentimientos: [
@@ -757,6 +831,63 @@
 
     // ─── RECETAS ───────────────────────────────────────────────────────
     if (url.includes('/api/v1/recetas/verificar/')) return jsonResponse({ valida: true, paciente: paciente.nombre_completo, medico: 'Dra. Vega', fecha: '2026-04-12' });
+    // GET PDF de receta — interceptado en window.open más abajo
+    if (url.match(/\/api\/v1\/recetas\/[^/]+\/pdf/)) {
+      // Genera un HTML como receta médica y lo devuelve. Pero el componente
+      // hace window.open(url) directamente, no fetch — así que esto rara vez
+      // se invoca. window.open se intercepta más abajo.
+      return new Response('<html>Receta PDF — abrir vía window.open</html>', { status: 200, headers: { 'Content-Type': 'text/html' } });
+    }
+    // POST crear receta — el frontend envía {paciente_id, medico_id, items, diagnostico_principal, template, ...}
+    if (url.match(/\/api\/v1\/recetas\/?$/) && (init?.method || 'GET') === 'POST') {
+      let body = init?.body;
+      if (typeof body === 'string') { try { body = JSON.parse(body); } catch(e) { body = {}; } }
+      const recetaId = 'rx-' + Date.now();
+      const folio = 'MIRC-' + String(Date.now()).slice(-8);
+      const hash = Array.from({length:64}, () => 'abcdef0123456789'[Math.floor(Math.random()*16)]).join('');
+      const receta = {
+        id: recetaId,
+        folio_display: folio,
+        paciente_id: body?.paciente_id || paciente.id,
+        paciente: paciente,
+        medico_id: 'med-dra-vega',
+        medico: { nombre: 'Dra. María Vega Hernández', cedula: '12345678', especialidad: 'Medicina General' },
+        fecha_emision: new Date().toISOString(),
+        template: body?.template || 'generico',
+        diagnostico_principal: body?.diagnostico_principal || 'Hipertensión arterial esencial (I10)',
+        items: body?.items || [],
+        vigencia_dias: 90,
+        estado: 'emitida',
+        firma_digital: {
+          hash_sha256: hash,
+          algoritmo: 'SHA-256',
+          firmado_por: 'Dra. María Vega Hernández',
+          fecha_firma: new Date().toISOString(),
+        },
+      };
+      // Guardar en memoria para que el PDF lo recupere
+      window.__demoRecetas = window.__demoRecetas || {};
+      window.__demoRecetas[recetaId] = receta;
+      return jsonResponse(receta);
+    }
+    // POST firmar receta
+    if (url.match(/\/api\/v1\/recetas\/[^/]+\/firmar/)) {
+      const recetaId = url.match(/recetas\/([^/]+)\/firmar/)[1];
+      const receta = (window.__demoRecetas || {})[recetaId];
+      return jsonResponse({ success: true, receta });
+    }
+    // GET receta individual
+    if (url.match(/\/api\/v1\/recetas\/[^/?]+(\?|$)/) && !url.includes('verificar')) {
+      const recetaId = url.match(/recetas\/([^/?]+)/)[1];
+      const receta = (window.__demoRecetas || {})[recetaId];
+      if (receta) return jsonResponse(receta);
+    }
+    // Lista de recetas del paciente
+    if (url.match(/\/api\/v1\/recetas\/paciente\//)) {
+      return jsonResponse({ recetas: [
+        { id: 'rx-historico-1', folio_display: 'MIRC-20260412', fecha_emision: '2026-04-12T10:30:00', diagnostico_principal: 'HTA + DM2 + Dislipidemia', items: [{ medicamento_nombre: 'Losartán 50mg' }, { medicamento_nombre: 'Metformina 850mg' }, { medicamento_nombre: 'Atorvastatina 20mg' }], estado: 'emitida' },
+      ], total: 1 });
+    }
     if (url.includes('/api/v1/recetas')) return jsonResponse({ recetas: [
       { id: 'rx-001', paciente_id: PACIENTES[0].id, fecha: '2026-04-12', medicamentos: ['Losartán 50mg', 'Metformina 850mg'], qr: 'demo-qr-001' },
     ]});
@@ -821,6 +952,154 @@
   try { window.fetch = interceptFetch; } catch(e) {}
   try { globalThis.fetch = interceptFetch; } catch(e) {}
   try { self.fetch = interceptFetch; } catch(e) {}
+
+  // ─── Interceptor de window.open para PDFs de receta ─────────────────────
+  // Cuando el componente llama window.open('/api/v1/recetas/{id}/pdf', '_blank')
+  // generamos un HTML formateado como receta médica en lugar de pedir un PDF
+  // real al backend (que no existe en demo).
+  const originalOpen = window.open.bind(window);
+  window.open = function (url, target, features) {
+    if (typeof url === 'string' && url.includes('/api/v1/recetas/') && url.includes('/pdf')) {
+      const recetaId = (url.match(/recetas\/([^/?]+)\/pdf/) || [])[1];
+      const receta = (window.__demoRecetas || {})[recetaId] || {
+        folio_display: 'MIRC-DEMO-' + Date.now().toString().slice(-6),
+        paciente: PACIENTES[0],
+        medico: { nombre: 'Dra. María Vega Hernández', cedula: '12345678', especialidad: 'Medicina General' },
+        fecha_emision: new Date().toISOString(),
+        diagnostico_principal: 'Hipertensión arterial esencial (I10)',
+        items: [{ medicamento_nombre: 'Losartán', concentracion: '50 mg', dosis: '50 mg', frecuencia: 'Cada 24 horas', via: 'Oral', duracion: '90 días', cantidad: '30 tabletas' }],
+        firma_digital: { hash_sha256: 'demo-hash-' + Date.now() },
+      };
+      const p = receta.paciente || PACIENTES[0];
+      const med = receta.medico || { nombre: 'Dra. María Vega Hernández', cedula: '12345678', especialidad: 'Medicina General' };
+      const items = receta.items || [];
+      const fecha = new Date(receta.fecha_emision || Date.now()).toLocaleString('es-MX', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+      const itemsHtml = items.map((it, i) => `
+        <tr>
+          <td style="padding:10px;border-bottom:1px solid #e2e8f0;vertical-align:top">${i + 1}</td>
+          <td style="padding:10px;border-bottom:1px solid #e2e8f0;vertical-align:top">
+            <div style="font-weight:600;color:#0f172a">${it.medicamento_nombre || it.nombre || 'Medicamento'} ${it.concentracion || ''}</div>
+            <div style="font-size:11px;color:#64748b;margin-top:2px">${it.principio_activo || ''}</div>
+          </td>
+          <td style="padding:10px;border-bottom:1px solid #e2e8f0;vertical-align:top">${it.dosis || it.dosis_prescrita || ''}<br><span style="font-size:11px;color:#64748b">${it.via || 'Oral'}</span></td>
+          <td style="padding:10px;border-bottom:1px solid #e2e8f0;vertical-align:top">${it.frecuencia || ''}</td>
+          <td style="padding:10px;border-bottom:1px solid #e2e8f0;vertical-align:top">${it.duracion || '—'}</td>
+          <td style="padding:10px;border-bottom:1px solid #e2e8f0;vertical-align:top">${it.cantidad || it.cantidad_prescrita || '—'}</td>
+        </tr>`).join('');
+      const html = `<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="UTF-8"><title>Receta médica — ${receta.folio_display}</title>
+<style>
+  @media print { @page { size: letter; margin: 12mm } body { -webkit-print-color-adjust: exact } .no-print { display:none !important } }
+  body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; color: #0f172a; margin: 0; padding: 30px; background: #f8fafc }
+  .sheet { max-width: 720px; margin: 0 auto; background: #fff; padding: 36px 42px; box-shadow: 0 8px 32px rgba(0,0,0,.12); border-radius: 8px }
+  .header { display:flex; align-items:center; justify-content:space-between; border-bottom: 3px solid #1e40af; padding-bottom: 18px; margin-bottom: 24px }
+  .logo { font-size: 22px; font-weight: 800; color: #1e40af; letter-spacing: 0.05em }
+  .logo span { color: #C4A24E }
+  .folio { text-align: right; font-size: 11px; color: #64748b }
+  .folio b { color: #1e40af; font-size: 14px; display: block }
+  .section { margin-bottom: 22px }
+  .section-title { font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; font-size: 13px }
+  .grid div b { color: #475569; font-weight: 600 }
+  table { width: 100%; border-collapse: collapse; font-size: 13px }
+  table th { background: #f1f5f9; padding: 10px; text-align: left; font-weight: 600; color: #475569; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid #cbd5e1 }
+  .dx-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 4px; font-size: 13px }
+  .firma-box { display:flex; justify-content:space-between; align-items:flex-end; margin-top: 60px; padding-top: 24px; border-top: 1px solid #e2e8f0 }
+  .firma { text-align: center; flex: 1 }
+  .firma-line { width: 80%; margin: 0 auto 6px; border-top: 1px solid #475569; padding-top: 6px; font-weight: 600; font-size: 13px }
+  .firma-sub { font-size: 11px; color: #64748b }
+  .qr { text-align: center }
+  .qr-code { width: 90px; height: 90px; background: #1e40af; display:inline-flex; align-items:center; justify-content:center; color:#fff; font-size:9px; border-radius: 6px; padding: 8px; text-align:center }
+  .hash { font-family: monospace; font-size: 9px; color: #94a3b8; word-break: break-all; margin-top: 6px }
+  .actions { position: fixed; top: 20px; right: 20px; display: flex; gap: 8px }
+  .actions button { padding: 10px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,.15) }
+  .btn-print { background: #1e40af; color: #fff }
+  .btn-close { background: #fff; color: #475569; border: 1px solid #e2e8f0 }
+  .demo-banner { position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(90deg,#1e40af,#3b82f6); color: #fff; text-align: center; padding: 6px 12px; font: 600 11px system-ui; z-index: 999 }
+</style></head>
+<body>
+<div class="actions no-print">
+  <button class="btn-print" onclick="window.print()">🖨 Imprimir</button>
+  <button class="btn-close" onclick="window.close()">✕ Cerrar</button>
+</div>
+
+<div class="sheet">
+  <div class="header">
+    <div>
+      <div class="logo">MIRC <span>360</span></div>
+      <div style="font-size:11px;color:#64748b;margin-top:4px;letter-spacing:0.05em">EXPEDIENTE CLÍNICO ELECTRÓNICO · FES IZTACALA UNAM</div>
+    </div>
+    <div class="folio">
+      RECETA MÉDICA<br>
+      <b>${receta.folio_display}</b>
+      <div style="margin-top:8px">${fecha}</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Paciente</div>
+    <div class="grid">
+      <div><b>Nombre:</b> ${p.nombre_completo || (p.nombre + ' ' + (p.apellido_paterno || '') + ' ' + (p.apellido_materno || ''))}</div>
+      <div><b>CURP:</b> ${p.curp || '—'}</div>
+      <div><b>Edad:</b> ${p.edad || '—'} años</div>
+      <div><b>Sexo:</b> ${p.sexo_label || p.sexo || '—'}</div>
+      <div><b>Tipo sanguíneo:</b> ${p.tipo_sangre || '—'}</div>
+      <div><b>Alergias:</b> <span style="color:#dc2626">${(p.alergias || []).join(', ') || 'Sin alergias documentadas'}</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Diagnóstico principal</div>
+    <div class="dx-box">${receta.diagnostico_principal || receta.diagnostico || 'Sin diagnóstico registrado'}</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Prescripción</div>
+    <table>
+      <thead><tr>
+        <th style="width:30px">#</th>
+        <th>Medicamento</th>
+        <th>Dosis / Vía</th>
+        <th>Frecuencia</th>
+        <th>Duración</th>
+        <th>Cantidad</th>
+      </tr></thead>
+      <tbody>${itemsHtml || '<tr><td colspan="6" style="padding:20px;text-align:center;color:#94a3b8">Sin medicamentos prescritos</td></tr>'}</tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Indicaciones generales</div>
+    <ol style="font-size:13px;color:#475569;line-height:1.8;margin-top:6px">
+      <li>Tomar los medicamentos conforme a las indicaciones.</li>
+      <li>No suspender el tratamiento sin consultar al médico tratante.</li>
+      <li>Acudir a control en la fecha indicada (12 semanas).</li>
+      <li>Ante cualquier reacción adversa, suspender e informar inmediatamente.</li>
+    </ol>
+  </div>
+
+  <div class="firma-box">
+    <div class="firma">
+      <div class="firma-line">${med.nombre}</div>
+      <div class="firma-sub">${med.especialidad} · Céd. Prof. ${med.cedula}</div>
+      <div class="firma-sub">FES Iztacala — UNAM</div>
+    </div>
+    <div class="qr">
+      <div class="qr-code">QR<br>${receta.folio_display}</div>
+      <div class="hash">SHA-256: ${(receta.firma_digital?.hash_sha256 || '').slice(0, 32)}…</div>
+    </div>
+  </div>
+</div>
+
+<div class="demo-banner no-print">🎬 MODO DEMO · Receta de ejemplo · MIRC Expediente 360 · FES Iztacala UNAM</div>
+</body></html>`;
+      const blob = new Blob([html], { type: 'text/html' });
+      const blobUrl = URL.createObjectURL(blob);
+      return originalOpen(blobUrl, target || '_blank', features);
+    }
+    return originalOpen(url, target, features);
+  };
 
   try {
     document.cookie = 'mirc_session=demo-session-dra-vega; path=/; SameSite=Lax';
