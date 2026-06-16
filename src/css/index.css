@@ -17,6 +17,26 @@ html { scroll-behavior:smooth; }
 body { font-family:'Inter',system-ui,-apple-system,sans-serif; color:#1E293B; background:#0C2340; overflow-x:hidden; }
 .serif { font-family:'Playfair Display',Georgia,serif; }
 
+/* ═══════════════════════════════════════════════════════════════════════
+   CURSOR PERSONALIZADO — Garra de puma dorada (outline brilloso)
+   SVG 32×32 con stroke dorado #f4d03f, fill transparente y filter drop-shadow
+   dorado para efecto glow. Hotspot en (16,16) — centro de la garra.
+   ═══════════════════════════════════════════════════════════════════════ */
+html, body, * {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><defs><filter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'><feGaussianBlur stdDeviation='0.7' result='b'/><feFlood flood-color='%23f4d03f' flood-opacity='0.85'/><feComposite in2='b' operator='in'/><feMerge><feMergeNode/><feMergeNode in='SourceGraphic'/></feMerge></filter></defs><g fill='none' stroke='%23f4d03f' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round' filter='url(%23g)'><ellipse cx='8' cy='10' rx='2.3' ry='3.2'/><ellipse cx='14' cy='6.5' rx='2.3' ry='3.4'/><ellipse cx='20' cy='6.5' rx='2.3' ry='3.4'/><ellipse cx='26' cy='10' rx='2.3' ry='3.2'/><path d='M9 17 Q6.5 22 10.5 26.5 Q14 30.5 17 30.5 Q20 30.5 23.5 26.5 Q27.5 22 25 17 Q22 14.5 17 14.5 Q12 14.5 9 17 Z'/></g></svg>") 16 16, auto;
+}
+/* Variante pointer para botones y links — misma garra pero ligeramente más brillante */
+a, button, .spa-card, .spa-card-featured, .entorno-card, .servicio-card, .carrera-card,
+[onclick], [role="button"], .nav-links a, .landing-enter-btn, input[type="submit"],
+.btn-login, .modal-close, .spa-panel-close-hint {
+  cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'><defs><filter id='g' x='-50%25' y='-50%25' width='200%25' height='200%25'><feGaussianBlur stdDeviation='1.2' result='b'/><feFlood flood-color='%23f4d03f' flood-opacity='1'/><feComposite in2='b' operator='in'/><feMerge><feMergeNode/><feMergeNode in='SourceGraphic'/></feMerge></filter></defs><g fill='none' stroke='%23f4d03f' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' filter='url(%23g)'><ellipse cx='8' cy='10' rx='2.3' ry='3.2'/><ellipse cx='14' cy='6.5' rx='2.3' ry='3.4'/><ellipse cx='20' cy='6.5' rx='2.3' ry='3.4'/><ellipse cx='26' cy='10' rx='2.3' ry='3.2'/><path d='M9 17 Q6.5 22 10.5 26.5 Q14 30.5 17 30.5 Q20 30.5 23.5 26.5 Q27.5 22 25 17 Q22 14.5 17 14.5 Q12 14.5 9 17 Z'/></g></svg>") 16 16, pointer !important;
+}
+/* Inputs y textareas: cursor de texto (no garra — confunde) */
+input[type="text"], input[type="email"], input[type="password"], input[type="number"],
+input[type="search"], input[type="tel"], input[type="url"], textarea, [contenteditable="true"] {
+  cursor: text !important;
+}
+
 /* ─── CURSOR GLOW ─── */
 .cursor-glow {
   position:fixed; pointer-events:none; z-index:9999;
@@ -37,7 +57,12 @@ body { font-family:'Inter',system-ui,-apple-system,sans-serif; color:#1E293B; ba
 @keyframes scaleUp  { from{opacity:0;transform:scale(0.85)} to{opacity:1;transform:scale(1)} }
 @keyframes fadeIn   { from{opacity:0} to{opacity:1} }
 @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-@keyframes particleRise  { 0%{transform:translateY(0) scale(1);opacity:0} 20%{opacity:0.9} 100%{transform:translateY(-140px) scale(0);opacity:0} }
+@keyframes particleRise  {
+  0%   { transform:translateY(0) scale(1); opacity:0 }
+  10%  { opacity:0.95 }
+  60%  { opacity:0.8 }
+  100% { transform:translateY(-78vh) scale(0.2); opacity:0 }
+}
 @keyframes orbit    { from{transform:rotate(0deg) translateX(120px) rotate(0deg)} to{transform:rotate(360deg) translateX(120px) rotate(-360deg)} }
 @keyframes orbitRev { from{transform:rotate(0deg) translateX(80px) rotate(0deg)} to{transform:rotate(-360deg) translateX(80px) rotate(360deg)} }
 @keyframes pulse    { 0%,100%{transform:scale(1)} 50%{transform:scale(1.05)} }
@@ -159,8 +184,28 @@ body { font-family:'Inter',system-ui,-apple-system,sans-serif; color:#1E293B; ba
 .hero-radial { position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
   width:900px; height:900px;
   background:radial-gradient(circle,rgba(196,162,78,0.07) 0%,transparent 60%); pointer-events:none; }
-.hero-particles { position:absolute; inset:0; pointer-events:none; }
-.particle { position:absolute; border-radius:50%; opacity:0; animation:particleRise 4s ease-in-out infinite; }
+.hero-particles { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+.particle { position:absolute; border-radius:50%; opacity:0;
+  animation:particleRise 6s ease-in-out infinite;
+  box-shadow:0 0 8px rgba(196,162,78,0.6), 0 0 14px rgba(244,208,63,0.4); }
+
+/* Partículas en TODOS los overlays SPA — contenedor fijo dentro del overlay
+   que se ve a través del backdrop oscuro azul marino. Las partículas suben
+   desde abajo hasta ~78vh y se desvanecen (definido en @keyframes particleRise). */
+.spa-section-overlay .overlay-particles {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;  /* detrás del .spa-section-content (z-index implícito mayor) */
+}
+.spa-section-overlay .overlay-particles .particle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+  animation: particleRise 7s ease-in-out infinite;
+  box-shadow: 0 0 10px rgba(196,162,78,0.7), 0 0 18px rgba(244,208,63,0.4);
+}
 
 /* Floating orbs */
 .hero-orb { position:absolute; border-radius:50%; border:1px solid rgba(196,162,78,0.25);

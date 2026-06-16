@@ -1804,18 +1804,36 @@ function enterMainApp(instant) {
 
 /* ─── Generate landing particles ─── */
 (function() {
-  const pp = document.getElementById('landingParticles');
-  if (pp) {
-    for (let i = 0; i < 20; i++) {
+  // Helper: rellena un contenedor con N partículas doradas/blancas que suben
+  function spawnParticles(container, count) {
+    if (!container) return;
+    for (let i = 0; i < count; i++) {
       const p = document.createElement('div');
       p.className = 'particle';
       const size = 1 + Math.random() * 4;
       p.style.cssText = 'left:' + Math.random()*100 + '%;bottom:-10px;width:' + size + 'px;height:' + size + 'px;' +
-        'background:' + (Math.random() > 0.5 ? 'var(--gold)' : 'rgba(255,255,255,0.6)') + ';' +
-        'animation-delay:' + Math.random()*6 + 's;animation-duration:' + (3+Math.random()*4) + 's;';
-      pp.appendChild(p);
+        'background:' + (Math.random() > 0.5 ? 'var(--gold)' : 'rgba(255,255,255,0.65)') + ';' +
+        'animation-delay:' + Math.random()*7 + 's;animation-duration:' + (5+Math.random()*5) + 's;';
+      container.appendChild(p);
     }
   }
+
+  // 1) Landing principal — 30 partículas (antes 20, ahora más densidad)
+  spawnParticles(document.getElementById('landingParticles'), 30);
+  // 2) Hero del main-app (cuando se entra ya dentro del sitio)
+  spawnParticles(document.getElementById('heroParticles'), 30);
+
+  // 3) Partículas en cada uno de los SPA section overlays — se ven en la
+  // zona azul marino del backdrop, detrás del panel blanco. El contenedor
+  // se inyecta una sola vez al cargar la página, las partículas corren con
+  // animation-delay aleatorios para que no parezca sincronizado.
+  document.querySelectorAll('.spa-section-overlay').forEach(overlay => {
+    if (overlay.querySelector('.overlay-particles')) return; // ya tiene
+    const wrap = document.createElement('div');
+    wrap.className = 'overlay-particles';
+    overlay.insertBefore(wrap, overlay.firstChild);
+    spawnParticles(wrap, 24);
+  });
 })();
 </script>
 
