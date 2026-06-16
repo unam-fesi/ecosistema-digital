@@ -863,28 +863,25 @@ footer::before { content:''; position:absolute; top:-200px; left:50%; transform:
 .login-overlay {
   position:fixed; inset:0; z-index:10000;
   background:rgba(2,8,20,0.8); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
-  /* Grid centra perfectamente en ambos ejes y respeta scroll cuando el card
-     excede la viewport (use place-items con safe-area en mente). */
-  display:grid;
-  place-items:center;
-  padding:max(40px, env(safe-area-inset-top)) 20px max(40px, env(safe-area-inset-bottom));
+  /* Misma estrategia que los paneles SPA: scroll fijo en el overlay, card con
+     margin vertical razonable. Sin flex/grid centering que rompe scroll. */
   overflow-y:auto; -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
   opacity:0; pointer-events:none; transition:opacity 0.3s;
+  padding:0 20px;
+  box-sizing:border-box;
 }
 .login-overlay.active { opacity:1; pointer-events:all; }
 .login-card {
   background:#fff; border-radius:24px; padding:44px 40px; max-width:400px; width:100%;
   box-shadow:0 30px 80px rgba(0,0,0,0.3); text-align:center;
   animation:fadeUp 0.4s ease both;
-  /* Sin margin auto — el grid place-items se encarga del centrado.
-     justify-self:center permite que el card no se estire al 100% del width. */
-  justify-self:center;
+  /* Margin-top fijo (10vh) garantiza que el card siempre se vea cerca del
+     tercio superior — visible al cargar y permite scroll si excede. */
+  margin: max(10vh, 60px) auto max(40px, env(safe-area-inset-bottom));
+  box-sizing:border-box;
 }
-/* Cuando el card es más alto que la viewport, el grid place-items lo
-   alinea arriba en lugar de centrar (alineación 'start' implícita por scroll).
-   Para height-corto: grid + place-items:center centra perfecto. */
 @media (max-height:700px){
-  .login-overlay{ place-items:start center; padding-top:max(20px, env(safe-area-inset-top)); }
+  .login-card{ margin: 24px auto; }
 }
 .login-card img { height:70px; margin-bottom:20px; display:block; margin-left:auto; margin-right:auto; }
 .login-card h2 { font-family:'Playfair Display',Georgia,serif; font-size:24px; color:var(--navy); margin-bottom:6px; }
@@ -1391,36 +1388,55 @@ body.spa-locked { overflow: hidden; }
   .modal-card{ animation:none; }
 }
 
-/* Paneles SPA: alto dinámico + respiro inferior para no cortar contenido */
-.spa-section-overlay{ min-height:100vh; min-height:100dvh;
-  padding-top:max(40px, env(safe-area-inset-top));
-  padding-bottom:max(64px, env(safe-area-inset-bottom)); }
-.spa-section-content{ margin: 0 auto; }
+/* ═══════════════════════════════════════════════════════════════════════
+   FIX SCROLL DEFINITIVO — específico para Safari (desktop + iOS)
+   ═══════════════════════════════════════════════════════════════════════
+   Safari tiene 3 quirks que se combinan para romper el scroll:
+   1. backdrop-filter + position:fixed + overflow:scroll = scroll bloqueado
+   2. transform en el elemento con overflow rompe scrollHeight
+   3. 100vh incluye la barra de navegación dinámica
 
-/* FIX SCROLL CRÍTICO — múltiple defensa:
-   1. transform: none !important — el JS pone transform:scale(1) inline que
-      en algunos browsers rompe scrollHeight. !important sobre inline sin
-      !important garantiza identidad sin transformación.
-   2. height: 100dvh / 100vh — altura FIJA exacta a viewport (no min-height).
-      Min-height permite que el overlay crezca con el contenido y eso impide
-      que el overflow-y:auto sepa cuándo activar el scrollbar.
-   3. overscroll-behavior:contain — el scroll se queda en el overlay, no se
-      filtra al body bloqueado por lockScroll. */
+   Solución: mover backdrop-filter a un pseudo-elemento que NO tenga scroll,
+   forzar altura con -webkit-fill-available (Safari) + 100dvh (Chrome moderno),
+   eliminar transform en active, y usar will-change para GPU compositing. */
 .spa-section-overlay.active {
-  transform: none !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100% !important;
   height: 100vh !important;
-  height: 100dvh !important;
-  max-height: 100vh !important;
-  max-height: 100dvh !important;
+  height: -webkit-fill-available !important;   /* Safari iOS */
+  height: 100dvh !important;                   /* Chrome / Safari 15.4+ */
   overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch !important;
   overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
+  padding: 32px 20px 64px !important;
+  padding-top: max(32px, env(safe-area-inset-top)) !important;
+  padding-bottom: max(64px, env(safe-area-inset-bottom)) !important;
+  box-sizing: border-box !important;
+  /* CRÍTICO Safari: anular transform y backdrop-filter en el elemento que
+     tiene overflow:scroll. El backdrop-filter va a un pseudo-elemento. */
+  transform: none !important;
+  -webkit-transform: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: rgba(6, 16, 30, 0.92) !important;  /* color sólido en lugar de blur */
+  display: block !important;
+  /* Forzar GPU layer separado para evitar repaint glitches */
+  will-change: scroll-position;
+  /* Asegurar que sea el elemento que recibe el scroll touch */
+  touch-action: pan-y;
 }
-/* Después de la animación de entrada, asegurar que la opacity inline del JS
-   no impida el scroll por algún re-paint raro */
+/* Contenido centrado horizontalmente, sin margin auto vertical */
 .spa-section-overlay.active > .spa-section-content {
-  margin-top: 0;
-  margin-bottom: 40px;
+  margin: 0 auto !important;
+  max-width: 1100px;
+  width: 100%;
+  box-sizing: border-box;
+  /* Sin transform — el padre con overflow no debe contener transforms */
+  transform: none !important;
 }
 
 /* Densidad por zoom/resolución: tipografías y paddings flexibles */
