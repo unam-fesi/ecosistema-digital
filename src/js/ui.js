@@ -15,10 +15,12 @@ let scrollTicking = false;
 window.addEventListener('scroll',()=>{
   if (!scrollTicking) {
     requestAnimationFrame(() => {
+      // scroll-progress eliminado — guard por si el elemento ya no existe
       const h=document.documentElement.scrollHeight-window.innerHeight;
-      if (h > 0) {
+      const sp = document.getElementById('scrollProgress');
+      if (h > 0 && sp) {
         const pct = Math.min(window.scrollY/h*100, 100);
-        document.getElementById('scrollProgress').style.width=pct+'%';
+        sp.style.width=pct+'%';
       }
       document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>60);
       // Parallax hero (skip on touch for performance)
