@@ -115,3 +115,6 @@
 
 /* Failsafe: contenido ya revelado por el sistema .reveal nunca queda oculto */
 .cx-js .reveal.visible{ opacity:1 !important; transform:none !important; }
+
+/* Fix: ocultar barra de progreso de sección — reaparecía como línea azul cruzando paneles (misma razón por la que se quitó scroll-progress) */
+.cx-sec-progress{display:none!important;}

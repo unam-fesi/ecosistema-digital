@@ -11,6 +11,7 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <style>
 :root{
   --navy:#0C2340;--navy2:#163A64;--navy3:#1a4a7a;--gold:#C4A24E;--gold2:#B8912F;--gold3:#EBD9A8;
@@ -213,8 +214,28 @@ footer{padding:34px 0 48px;color:var(--muted);font-size:12.5px;border-top:1px so
   <div class="proc-log" id="procLog"></div>
 </div></div>
 
+<!-- ══ SCREEN 2.5: ELEGIR MODO ══ -->
+<div class="screen pagebg" id="screen-mode"><div class="wrap pad">
+  <div class="sec-tag"><span class="dot"></span> Elige qué hacer con tus datos</div>
+  <h2 class="serif">¿Qué quieres hacer con <span class="gold">la cohorte</span>?</h2>
+  <p class="sub">Cargaste <b id="modeN">—</b> personas<span id="modeG"></span>. Elige una vía; puedes volver y cambiar cuando quieras.</p>
+  <div class="drops" style="margin-top:26px">
+    <div class="drop" style="cursor:pointer" onclick="goSim()">
+      <div class="ico">🦠</div><h3>Simulación del enjambre</h3>
+      <p>Proceso MiroFish animado y un enjambre 3D navegable donde simulas campañas de vacunación y brotes, y ves cómo responde la población arquetipo por arquetipo. Incluye gemelo digital e informe.</p>
+      <div style="margin-top:12px;display:inline-flex;font-size:12px;font-weight:800;padding:6px 14px;border-radius:8px;background:linear-gradient(135deg,var(--violet),var(--cyan));color:#fff">Abrir simulación →</div>
+    </div>
+    <div class="drop" style="cursor:pointer" onclick="goAnalisis()">
+      <div class="ico">🧠</div><h3>Análisis con IA (dataset + guías)</h3>
+      <p>Conversa con PUM-AI para analizar el dataset con base en las guías de práctica clínica que cargaste: prevalencias, brechas de atención, grupos de riesgo y recomendaciones. Con informe exportable a PDF.</p>
+      <div style="margin-top:12px;display:inline-flex;font-size:12px;font-weight:800;padding:6px 14px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#fff">Abrir análisis →</div>
+    </div>
+  </div>
+</div></div>
+
 <!-- ══ SCREEN 3: LAB (proceso MiroFish → resultados) ══ -->
 <div class="screen pagebg" id="screen-lab"><div class="wrap pad">
+  <button class="btn btn-ghost" style="margin-bottom:6px" onclick="showScreen('screen-mode')">◀ Cambiar modo</button>
   <div class="sec-tag" style="color:var(--violet)"><span class="dot" style="background:var(--violet)"></span> Enjambre de simulación social · Proceso MiroFish</div>
   <h2 class="serif">¿Cómo funciona el enjambre, <span class="gold">paso a paso</span>?</h2>
   <p class="sub">MiroFish convierte tus documentos y tu cohorte en un mundo de miles de individuos que interactúan para predecir un comportamiento. Al concluir la etapa 5 se revela el <b>laboratorio 3D</b> con los resultados y el informe.</p>
@@ -243,10 +264,10 @@ footer{padding:34px 0 48px;color:var(--muted);font-size:12.5px;border-top:1px so
         <div class="stage-overlay">
           <div class="metric-chip"><div class="n" style="color:#34d399" id="mVac">0%</div><div class="l">Vacunados</div></div>
           <div class="metric-chip"><div class="n" style="color:#f87171" id="mInf">0%</div><div class="l">Contagiados</div></div>
-          <div class="metric-chip"><div class="n" style="color:#fbbf24" id="mHes">0%</div><div class="l">Indecisos</div></div>
+          <div class="metric-chip"><div class="n" style="color:#fbbf24" id="mHes">0%</div><div class="l">Sin vacunar</div></div>
           <div class="metric-chip"><div class="n" style="color:#38bdf8" id="mR">—</div><div class="l">R efectiva</div></div>
         </div>
-        <div class="stage-hint">🖱 Arrastra para rotar · rueda para zoom</div>
+        <div class="stage-hint">🖱 Arrastra para rotar · rueda para zoom · <b>clic en un punto</b> = gemelo digital</div>
         <div class="week-badge">Semana <span id="wk">0</span></div>
       </div>
       <div class="controls">
@@ -268,27 +289,63 @@ footer{padding:34px 0 48px;color:var(--muted);font-size:12.5px;border-top:1px so
             <div class="li"><span class="sw" style="background:#1f9d6b"></span>Provacuna</div><div class="li"><span class="sw" style="background:#d99413"></span>Indeciso</div>
             <div class="li"><span class="sw" style="background:#6b4fd6"></span>Renuente</div><div class="li"><span class="sw" style="background:#2f7fb8"></span>Vulnerable</div>
           </div>
-          <div class="note">Cada individuo hereda arquetipo, intención de vacunación, confianza institucional y exposición a desinformación del dataset.</div>
+          <div class="note"><b>El movimiento</b> representa el contacto social: cuando dos individuos se acercan, interactúan (se contagian, se influyen o aceptan la vacuna). El <b>color</b> es su estado. Cada uno hereda arquetipo, intención, confianza y exposición a desinformación del dataset. Haz <b>clic en un punto</b> para abrir su gemelo digital.</div>
         </div>
       </div>
     </div>
 
-    <!-- REPORT -->
     <div class="card" style="margin-top:22px">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:6px">
-        <div><div class="sec-tag" style="margin-bottom:4px"><span class="dot"></span> Informe con IA</div>
-        <h2 class="serif" style="font-size:24px">Reporte epidemiológico (PUM-AI)</h2></div>
-        <div style="display:flex;gap:10px">
-          <button class="btn btn-navy" id="genReport" onclick="generateReport()">🧠 Generar informe con IA</button>
-          <button class="btn btn-ghost" id="pdfBtn" onclick="exportPDF()" disabled>⬇ Exportar PDF</button>
-        </div>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
+        <div><div class="chart-title">Comparador de escenarios</div><div class="note" style="margin-top:2px">Proyección de la curva de contagios con y sin campaña, usando la cobertura objetivo actual (<b id="cmpCob">40%</b>). Ajusta el slider de cobertura y vuelve a comparar.</div></div>
+        <button class="btn btn-navy" onclick="runComparador()">⚖ Comparar con vs sin campaña</button>
       </div>
-      <p class="note">PUM-AI analiza las estadísticas reales calculadas y los resultados de la simulación para redactar el informe. Se envía a Gemini vía tu función segura de Supabase (<code>gemini-epi</code>).</p>
-      <div id="reportOut" style="margin-top:14px"></div>
+      <canvas id="cmpChart" height="220" style="width:100%;margin-top:12px;display:block"></canvas>
+      <div id="cmpSummary" class="note"></div>
     </div>
-    <p class="note" style="margin-top:16px">Próximo: cascada de atención interactiva, mapa coroplético por colonia, gemelo digital del paciente y comparador de escenarios.</p>
+    <p class="note" style="margin-top:18px">💡 ¿Quieres el <b>informe escrito por PUM-AI</b> con estos resultados y exportarlo a PDF? Ve a <a href="#" onclick="showScreen('screen-analisis');return false" style="color:var(--gold2);font-weight:700">Análisis con IA</a>. Próximo: mapa coroplético por colonia.</p>
   </div>
 </div></div>
+
+<!-- ══ SCREEN: ANÁLISIS CON IA ══ -->
+<div class="screen pagebg" id="screen-analisis"><div class="wrap pad">
+  <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:14px;flex-wrap:wrap">
+    <div><div class="sec-tag" style="color:var(--cyan)"><span class="dot" style="background:var(--cyan)"></span> Análisis con IA</div>
+    <h2 class="serif">Pregúntale a <span class="gold">PUM-AI</span> sobre tu dataset</h2>
+    <p class="sub" id="anaSub">PUM-AI responde usando las estadísticas calculadas por Python y el texto de tus guías de práctica clínica.</p></div>
+    <button class="btn btn-ghost" onclick="showScreen('screen-mode')">◀ Cambiar modo</button>
+  </div>
+  <div class="kpi-row" id="anaKpi" style="margin-top:18px"></div>
+  <div class="card" style="margin-top:6px"><div class="chart-title" style="margin-bottom:2px">Cascada de atención en diabetes</div><div class="note" style="margin:2px 0 12px">Del total de la cohorte: cuántos tienen DM2, están diagnosticados, en tratamiento y controlados. La brecha entre barras es dónde se pierde la atención.</div><div id="cascadaChart"></div></div>
+  <div class="card" style="margin-top:14px">
+    <div id="anaChat" style="min-height:80px;max-height:440px;overflow:auto;display:flex;flex-direction:column;gap:12px"></div>
+    <div id="anaChips" style="display:flex;gap:8px;flex-wrap:wrap;margin:14px 0"></div>
+    <div style="display:flex;gap:10px;align-items:center;margin-top:6px">
+      <input id="anaInput" placeholder="Ej. ¿Qué colonias concentran mayor riesgo y qué recomienda la guía?" style="flex:1;padding:12px 14px;border:1.5px solid var(--line);border-radius:11px;font-size:14px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')anaSend(this.value)">
+      <button class="btn btn-navy" onclick="anaSend(document.getElementById('anaInput').value)">Preguntar</button>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
+      <button class="btn btn-gold" id="anaReport" onclick="generateReport()">🧠 Generar informe completo</button>
+      <button class="btn btn-ghost" id="pdfBtn" onclick="exportPDF()" disabled>⬇ Exportar PDF</button>
+    </div>
+    <div id="reportOut" style="margin-top:14px"></div>
+  </div>
+  <p class="note" style="margin-top:12px" id="anaGuideNote"></p>
+</div></div>
+
+<!-- MODAL: GEMELO DIGITAL -->
+<div id="twinModal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(12,35,64,.55);align-items:center;justify-content:center;padding:20px" onclick="if(event.target===this)closeTwin()">
+  <div style="background:#fff;border-radius:18px;max-width:450px;width:100%;box-shadow:0 30px 70px rgba(0,0,0,.35);overflow:hidden">
+    <div style="background:var(--navy);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center">
+      <div><div style="font-size:11px;color:var(--gold3);font-weight:700;letter-spacing:.5px">GEMELO DIGITAL · INDIVIDUO SIMULADO</div><div class="serif" style="font-size:18px" id="twinTitle">Individuo</div></div>
+      <span style="cursor:pointer;font-size:24px;line-height:1" onclick="closeTwin()">&times;</span>
+    </div>
+    <div style="padding:20px">
+      <div id="twinBody"></div>
+      <button class="btn btn-navy" style="width:100%;justify-content:center;margin-top:14px" id="twinAsk" onclick="twinInterview()">🗣 Entrevistar con IA</button>
+      <div id="twinReply" style="margin-top:12px"></div>
+    </div>
+  </div>
+</div>
 
 <footer class="wrap" style="max-width:none"><div class="wrap">Inteligencia Epidemiológica — prototipo · Ecosistema Digital, FES Iztacala UNAM · datos ficticios / cargados localmente · con fines educativos.</div></footer>
 
@@ -356,9 +413,33 @@ async function startAnalysis(demo){
   const s=COHORT.stats;
   plog('<span class="ok">✓</span> '+s.n.toLocaleString('es-MX')+' individuos · HTA '+s.hta+'% · DM2 '+s.dm2+'%','ok');
   plog('<span class="ok">✓</span> Arquetipos: Prov '+s.arq[0]+'% · Indec '+s.arq[1]+'% · Renu '+s.arq[2]+'% · Vuln '+s.arq[3]+'%','ok');
-  plog('<span class="run">▶</span> Sembrando el enjambre 3D…','run');
-  setTimeout(()=>{buildLab();showScreen('screen-lab');startProc();},700);
+  if(!usedDemo && guiaFiles.length){
+    plog('<span class="run">▶</span> Leyendo el texto de las guías (pdf.js)…','run');
+    try{await extractGuides();plog('<span class="ok">✓</span> Guías leídas ('+Math.round(guideText.length/1000)+'k caracteres) — PUM-AI las usará','ok');}
+    catch(e){plog('<span style="color:#f8b4b4">⚠ No se pudo leer el PDF ('+e.message+'). El análisis usará principios generales.</span>');}
+  }
+  plog('<span class="ok">✓</span> Listo. Elige cómo trabajar.','ok');
+  setTimeout(()=>{buildLab();buildModeScreen();buildAna();showScreen('screen-mode');},700);
 }
+/* ============ guías: extracción real de texto (pdf.js) ============ */
+let guideText='';
+async function extractGuides(){
+  if(typeof pdfjsLib==='undefined')throw new Error('pdf.js no cargó');
+  pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  let all='';
+  for(const f of guiaFiles){
+    const buf=await f.arrayBuffer();const pdf=await pdfjsLib.getDocument({data:buf}).promise;
+    const np=Math.min(pdf.numPages,40);all+='### '+f.name+'\n';
+    for(let p=1;p<=np;p++){const pg=await pdf.getPage(p);const tc=await pg.getTextContent();all+=tc.items.map(i=>i.str).join(' ')+'\n';}
+    all+='\n';
+  }
+  guideText=all.replace(/\s+/g,' ').slice(0,9000);
+}
+/* ============ modos ============ */
+function buildModeScreen(){const s=COHORT.stats;document.getElementById('modeN').textContent=s.n.toLocaleString('es-MX');document.getElementById('modeG').textContent=(!usedDemo&&guiaFiles.length)?(' y '+guiaFiles.length+' guía(s)'):(usedDemo?' (cohorte demo)':'');}
+let simEntered=false;
+function goSim(){showScreen('screen-lab');if(!simEntered){simEntered=true;startProc();}}
+function goAnalisis(){showScreen('screen-analisis');}
 
 /* ============ Pyodide ============ */
 let pyodide=null;
@@ -402,7 +483,7 @@ for i in range(N):
     a=0 if inten>=0.66 else (2 if inten<=0.42 else 1)
     if vuln and a!=0 and rng.random()<0.6: a=3
     arqc[a]+=1
-    out.append({'a':a,'i':round(inten,3),'c':round(conf,3),'d':round(des,3),'v':1 if vuln else 0,'m':m})
+    out.append({'a':a,'i':round(inten,3),'c':round(conf,3),'d':round(des,3),'v':1 if vuln else 0,'m':m,'e':edad,'h':1 if th else 0,'dd':1 if td else 0})
 def pc(x,d): return round(x/max(1,d)*100,1)
 muni=[{'name':munis[m],'hta':pc(mh[m][0],mc[m]),'dm2':pc(mh[m][1],mc[m])} for m in range(3)]
 stats={'n':N,'hta':pc(sum(mh[m][0] for m in range(3)),N),'dm2':pc(sum(mh[m][1] for m in range(3)),N),
@@ -438,8 +519,10 @@ def arq_of(i):
     if a in arqmap: return arqmap[a]
     v=inten.iloc[i]; return 0 if v>=0.66 else (2 if v<=0.42 else 1)
 def truthy(x): return 1 if str(x).lower() in('true','1','1.0','si','sí') else 0
+edadc=pd.to_numeric(col('edad',default=40),errors='coerce').fillna(40)
+htac=col('tiene_hta',default=col('dx_hta',default=False)); dmc=col('tiene_dm2',default=col('dx_dm2',default=False))
 idx=np.random.default_rng(3).choice(n,size=min(n,2600),replace=False)
-agents=[{'a':int(arq_of(i)),'i':float(round(inten.iloc[i],3)),'c':float(round(conf.iloc[i],3)),'d':float(round(des.iloc[i],3)),'v':truthy(vulncol.iloc[i]),'m':int(umuni.get(muni.iloc[i],0))} for i in idx]
+agents=[{'a':int(arq_of(i)),'i':float(round(inten.iloc[i],3)),'c':float(round(conf.iloc[i],3)),'d':float(round(des.iloc[i],3)),'v':truthy(vulncol.iloc[i]),'m':int(umuni.get(muni.iloc[i],0)),'e':int(edadc.iloc[i]),'h':truthy(htac.iloc[i]),'dd':truthy(dmc.iloc[i])} for i in idx]
 hta=pct(col('tiene_hta',default=col('dx_hta',default=False))); dm2=pct(col('tiene_dm2',default=col('dx_dm2',default=False)))
 # per-municipio
 mu=[]
@@ -468,7 +551,7 @@ function jsGenerate(N){
     const conf=Math.min(1,Math.max(0,0.65-0.4*marg+(Math.random()-.5)*.3));const des=Math.min(1,Math.max(0,0.35+0.3*marg+(Math.random()-.5)*.3));
     const inten=Math.min(1,Math.max(0,0.5+0.4*conf-0.35*des+(Math.random()-.5)*.2));const vuln=edad>=65||td;
     let a=inten>=0.66?0:inten<=0.42?2:1;if(vuln&&a!==0&&Math.random()<.6)a=3;ac[a]++;
-    agents.push({a,i:+inten.toFixed(3),c:+conf.toFixed(3),d:+des.toFixed(3),v:vuln?1:0,m});}
+    agents.push({a,i:+inten.toFixed(3),c:+conf.toFixed(3),d:+des.toFixed(3),v:vuln?1:0,m,e:edad,h:th?1:0,dd:td?1:0});}
   const pc=(x,d)=>+(x/Math.max(1,d)*100).toFixed(1);
   const muni=munis.map((nm,m)=>({name:nm,hta:pc(mh[m][0],mc[m]),dm2:pc(mh[m][1],mc[m])}));
   return {stats:{n:N,hta:pc(hta,N),dm2:pc(dm2,N),arq:ac.map(x=>pc(x,N)),muni,cascada:{tiene:pc(casc.tiene,N),dx:pc(casc.dx,N),trat:pc(casc.trat,N),ctrl:pc(casc.ctrl,N),silent:pc(casc.tiene-casc.dx,N)},riesgo:[pc(risk[0],N),pc(risk[1],N),pc(risk[2],N)]},agents};
@@ -520,8 +603,12 @@ const PROC=(function(){
     txt('GraphRAG',cx,cy+Rr+24,12,'#8fa3bd','700','center');}
   function sAgents(t){const cols=18,rows=9,sX=Math.max(30,W*0.5-cols*11),sY=60,gX=(W-sX*2)/(cols-1),gY=(H-140)/(rows-1);
     ag.forEach(a=>{const ap=ease(c01(seg(t,a.delay*0.7,a.delay*0.7+0.12)));if(ap<=0)return;const x=sX+a.gx*gX,y=sY+a.gy*gY;glow(x,y,9*ap,'rgba(56,189,248,.18)',ap*0.5);dot(x,y,3.6*ap,a.c,ap);});
-    txt(Math.floor(c01(t/0.85)*(COHORT?COHORT.stats.n:3000)).toLocaleString('es-MX')+' individuos en la cohorte',W*0.5,H-34,15,'#fff','800','center');
-    txt('edad · colonia · comorbilidades · actitud',W*0.5,H-16,11.5,'#9fb2c9','500','center');}
+    // arquetipos con ejemplos etiquetados
+    const EX=[['Provacuna',C.emerald,'34a · Naucalpan · confía'],['Indeciso',C.amber,'42a · Coacalco · dudando'],['Renuente',C.violet,'58a · Ecatepec · desinformado'],['Vulnerable',C.cyan,'71a · Ecatepec · con diabetes']];
+    const cw=Math.min(210,(W-40)/4-8);
+    EX.forEach((e,i)=>{const ap=ease(c01(seg(t,0.42+i*0.09,0.58+i*0.09)));if(ap<=0)return;const x=20+i*(cw+8),y=12;if(x+cw>W-8)return;ctx.save();ctx.globalAlpha=ap;rr(x,y,cw,46,10);ctx.fillStyle='rgba(7,16,34,.72)';ctx.fill();ctx.strokeStyle=e[1];ctx.lineWidth=1.4;ctx.stroke();glow(x+18,y+23,11,e[1],.55);dot(x+18,y+23,6,e[1]);txt(e[0],x+34,y+17,13,'#fff','800');txt(e[2],x+34,y+33,10.5,'#9fb2c9','500');ctx.restore();});
+    txt(Math.floor(c01(t/0.85)*(COHORT?COHORT.stats.n:3000)).toLocaleString('es-MX')+' individuos · 4 arquetipos',W*0.5,H-34,15,'#fff','800','center');
+    txt('cada uno con edad · colonia · comorbilidades · actitud ante la vacuna',W*0.5,H-16,11.5,'#9fb2c9','500','center');}
   function sSim(t){const pad=44,ox=pad,oy=48,iw=W-pad*2,ih=H-116;nn.forEach(n=>{n._x=ox+n.x*iw;n._y=oy+n.y*ih;});
     ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;for(let i=0;i<nn.length;i++){const b=nn[(i+3)%nn.length];ctx.beginPath();ctx.moveTo(nn[i]._x,nn[i]._y);ctx.lineTo(b._x,b._y);ctx.stroke();}
     const cx=ox+iw*0.5,cy=oy+ih*0.5,round=Math.floor(c01(seg(t,0.1,1))*8);
@@ -559,12 +646,13 @@ function revealResults(){
 }
 
 /* ============ ENJAMBRE 3D ============ */
-let scene,cam,renderer,controls,points,geom,sag=[],SN=0,simPlaying=true,week=0,weekAcc=0,campaignActive=false,swarmInit=false;
+let scene,cam,renderer,controls,points,geom,sag=[],SN=0,simPlaying=true,week=0,weekAcc=0,campaignActive=false,swarmInit=false,raycaster=null,twinIdx=-1;
+const ARQ_NAMES=['Provacuna','Indeciso','Renuente','Vulnerable'];
 let params={cob:0.4,des:0.3,den:0.5,vel:12};
 const RAD=48,ARCH_COL=[[0.12,0.62,0.42],[0.85,0.58,0.08],[0.42,0.31,0.84],[0.18,0.5,0.72]];
 const COL_S=[0.5,0.6,0.72],COL_I=[0.88,0.34,0.31],COL_R=[0.7,0.58,0.31],COL_V=[0.12,0.7,0.45];
 let useThree=false,ctx2d=null,dragRot={x:.3,y:0},dragging=false,lastP=null;
-function seedAgents(){sag=COHORT.agents.map(o=>{const u=Math.random(),v=Math.random(),th=2*Math.PI*u,ph=Math.acos(2*v-1),rr=RAD*Math.cbrt(Math.random());return{x:rr*Math.sin(ph)*Math.cos(th),y:rr*Math.sin(ph)*Math.sin(th),z:rr*Math.cos(ph),vx:(Math.random()-.5),vy:(Math.random()-.5),vz:(Math.random()-.5),arch:o.a,opinion:o.i,des:o.d,vuln:o.v,state:'S',vacc:false,tRec:0,cr:0,cg:0,cb:0};});SN=sag.length;}
+function seedAgents(){sag=COHORT.agents.map(o=>{const u=Math.random(),v=Math.random(),th=2*Math.PI*u,ph=Math.acos(2*v-1),rr=RAD*Math.cbrt(Math.random());return{x:rr*Math.sin(ph)*Math.cos(th),y:rr*Math.sin(ph)*Math.sin(th),z:rr*Math.cos(ph),vx:(Math.random()-.5),vy:(Math.random()-.5),vz:(Math.random()-.5),arch:o.a,opinion:o.i,baseOp:o.i,conf:o.c,des:o.d,vuln:o.v,edad:o.e,hta:o.h,dm2:o.dd,muni:o.m,state:'S',vacc:false,tRec:0,cr:0,cg:0,cb:0};});SN=sag.length;}
 function makeSprite(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');const gr=g.createRadialGradient(32,32,0,32,32,32);gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.3,'rgba(255,255,255,.9)');gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c);}
 function initSwarm(){if(swarmInit)return;swarmInit=true;const canvas=document.getElementById('swarmCanvas');seedAgents();
   if(typeof THREE!=='undefined'){useThree=true;renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));scene=new THREE.Scene();cam=new THREE.PerspectiveCamera(55,canvas.clientWidth/500,0.1,1000);cam.position.set(0,0,150);resizeSw();
@@ -572,7 +660,9 @@ function initSwarm(){if(swarmInit)return;swarmInit=true;const canvas=document.ge
     geom=new THREE.BufferGeometry();const pos=new Float32Array(SN*3),col=new Float32Array(SN*3);for(let i=0;i<SN;i++){const a=sag[i];pos[i*3]=a.x;pos[i*3+1]=a.y;pos[i*3+2]=a.z;const c=ARCH_COL[a.arch];col[i*3]=c[0];col[i*3+1]=c[1];col[i*3+2]=c[2];}geom.setAttribute('position',new THREE.BufferAttribute(pos,3));geom.setAttribute('color',new THREE.BufferAttribute(col,3));
     points=new THREE.Points(geom,new THREE.PointsMaterial({size:2.6,map:makeSprite(),vertexColors:true,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending,opacity:.95}));scene.add(points);
     scene.add(new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.SphereGeometry(RAD,16,12)),new THREE.LineBasicMaterial({color:0x2a4a7a,transparent:true,opacity:.09})));
-  }else{useThree=false;ctx2d=canvas.getContext('2d');canvas.width=canvas.clientWidth;canvas.height=500;canvas.addEventListener('pointerdown',e=>{dragging=true;lastP={x:e.clientX,y:e.clientY};});addEventListener('pointerup',()=>dragging=false);addEventListener('pointermove',e=>{if(dragging&&lastP){dragRot.y+=(e.clientX-lastP.x)*.006;dragRot.x+=(e.clientY-lastP.y)*.006;lastP={x:e.clientX,y:e.clientY};}});}
+    raycaster=new THREE.Raycaster();raycaster.params.Points.threshold=3.4;
+    canvas.addEventListener('click',onSwarmClick3D);
+  }else{useThree=false;ctx2d=canvas.getContext('2d');canvas.width=canvas.clientWidth;canvas.height=500;canvas.addEventListener('pointerdown',e=>{dragging=true;lastP={x:e.clientX,y:e.clientY};});addEventListener('pointerup',()=>dragging=false);addEventListener('pointermove',e=>{if(dragging&&lastP){dragRot.y+=(e.clientX-lastP.x)*.006;dragRot.x+=(e.clientY-lastP.y)*.006;lastP={x:e.clientX,y:e.clientY};}});canvas.addEventListener('click',()=>{if(SN)openTwin(Math.floor(Math.random()*SN));});}
   animate();}
 function resizeSw(){const c=document.getElementById('swarmCanvas');const w=c.clientWidth,h=500;if(useThree&&renderer){renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}else if(ctx2d){c.width=w;c.height=h;}}
 addEventListener('resize',()=>{if(renderer||ctx2d)resizeSw();});
@@ -581,22 +671,62 @@ function stepSim(){const cr=6+params.den*10,cr2=cr*cr,cell=cr,grid={};for(let i=
   for(let i=0;i<SN;i++){const a=sag[i];a.vx+=(Math.random()-.5)*.4;a.vy+=(Math.random()-.5)*.4;a.vz+=(Math.random()-.5)*.4;a.x+=a.vx*sp;a.y+=a.vy*sp;a.z+=a.vz*sp;const d=Math.sqrt(a.x*a.x+a.y*a.y+a.z*a.z);if(d>RAD){const f=RAD/d;a.x*=f;a.y*=f;a.z*=f;a.vx*=-.5;a.vy*=-.5;a.vz*=-.5;}
     const gx=Math.floor(a.x/cell),gy=Math.floor(a.y/cell),gz=Math.floor(a.z/cell);let infN=0,totN=0,accN=0,opSum=0;
     for(let dx=-1;dx<=1;dx++)for(let dy=-1;dy<=1;dy++)for(let dz=-1;dz<=1;dz++){const arr=grid[(gx+dx)+','+(gy+dy)+','+(gz+dz)];if(!arr)continue;for(const j of arr){if(j===i)continue;const b=sag[j];const ex=a.x-b.x,ey=a.y-b.y,ez=a.z-b.z;if(ex*ex+ey*ey+ez*ez<cr2){totN++;if(b.state==='I')infN++;if(b.vacc)accN++;opSum+=b.opinion;}}}
-    if(totN>0){a.opinion+=((opSum/totN)-a.opinion)*0.04;a.opinion-=params.des*0.006*(a.arch===2?1.6:1);a.opinion+=accN>0?0.004:0;a.opinion=Math.max(0,Math.min(1,a.opinion));}
-    if(campaignActive&&!a.vacc&&a.state!=='I'){if(Math.random()<params.cob*0.05*a.opinion){a.vacc=true;a.state='S';}}
+    if(totN>0){a.opinion+=((opSum/totN)-a.opinion)*0.03+(a.baseOp-a.opinion)*0.03-params.des*0.004*(a.arch===2?1.5:1)+(accN>0?0.006:0);a.opinion=Math.max(0,Math.min(1,a.opinion));}
+    if(campaignActive&&!a.vacc&&a.state!=='I'){const willing=0.3+0.7*a.opinion;if(Math.random()<params.cob*0.05*willing){a.vacc=true;a.state='S';}}
     if(a.state==='S'&&infN>0){let p=1-Math.pow(1-infBase,infN);if(a.vacc)p*=0.12;if(a.vuln)p*=1.4;if(Math.random()<p)a.state='I';}else if(a.state==='I'){a.tRec++;if(Math.random()<recRate||a.tRec>60)a.state='R';}
     let c;if(a.vacc)c=COL_V;else if(a.state==='I')c=COL_I;else if(a.state==='R')c=COL_R;else{const ac=ARCH_COL[a.arch];c=[COL_S[0]*.5+ac[0]*.5,COL_S[1]*.5+ac[1]*.5,COL_S[2]*.5+ac[2]*.5];}a.cr=c[0];a.cg=c[1];a.cb=c[2];}
-  renderSw();let vac=0,inf=0,hes=0;for(const a of sag){if(a.vacc)vac++;else if(a.state==='I')inf++;if(!a.vacc&&a.opinion<0.55&&a.state==='S')hes++;}
+  renderSw();let vac=0,inf=0,hes=0;for(const a of sag){if(a.vacc)vac++;else if(a.state==='I')inf++;if(!a.vacc)hes++;}
   document.getElementById('mVac').textContent=Math.round(vac/SN*100)+'%';document.getElementById('mInf').textContent=Math.round(inf/SN*100)+'%';document.getElementById('mHes').textContent=Math.round(hes/SN*100)+'%';
   window.SIMSTATE={vac:Math.round(vac/SN*100),inf:Math.round(inf/SN*100),week};const Reff=(1-vac/SN*0.75)*(0.6+params.den*2.2);document.getElementById('mR').textContent=(inf>0||campaignActive)?Reff.toFixed(2):'—';}
 function renderSw(){if(useThree){const pos=geom.attributes.position.array,col=geom.attributes.color.array;for(let i=0;i<SN;i++){const a=sag[i];pos[i*3]=a.x;pos[i*3+1]=a.y;pos[i*3+2]=a.z;col[i*3]=a.cr;col[i*3+1]=a.cg;col[i*3+2]=a.cb;}geom.attributes.position.needsUpdate=true;geom.attributes.color.needsUpdate=true;}
   else if(ctx2d){const W=ctx2d.canvas.width,H=ctx2d.canvas.height,f=Math.min(W,H)/(RAD*2.6);const cx=Math.cos(dragRot.x),sx=Math.sin(dragRot.x),cy=Math.cos(dragRot.y),sy=Math.sin(dragRot.y);ctx2d.clearRect(0,0,W,H);ctx2d.globalCompositeOperation='lighter';for(let i=0;i<sag.length;i++){const a=sag[i];let x=a.x*cy-a.z*sy,z=a.x*sy+a.z*cy;let y=a.y*cx-z*sx;z=a.y*sx+z*cx;const s=(z+RAD)/(2*RAD)*1.5+.4;ctx2d.beginPath();ctx2d.arc(W/2+x*f,H/2+y*f,1.8*s,0,7);ctx2d.fillStyle='rgb('+(a.cr*255|0)+','+(a.cg*255|0)+','+(a.cb*255|0)+')';ctx2d.fill();}ctx2d.globalCompositeOperation='source-over';}}
-function animate(){requestAnimationFrame(animate);if(simPlaying){const steps=Math.max(1,Math.round(params.vel/6));for(let s=0;s<steps;s++)stepSim();weekAcc+=params.vel;if(weekAcc>=120){weekAcc=0;week++;document.getElementById('wk').textContent=week;}}else renderSw();if(useThree){if(controls)controls.update();if(renderer)renderer.render(scene,cam);}}
+function animate(){requestAnimationFrame(animate);if(simPlaying){const steps=Math.max(1,Math.round(params.vel/6));for(let s=0;s<steps;s++)stepSim();weekAcc+=params.vel;if(weekAcc>=120){weekAcc=0;week++;document.getElementById('wk').textContent=week;if(week>=52){simPlaying=false;document.getElementById('playBtn').textContent='▶ Reanudar';}}}else renderSw();if(useThree){if(controls)controls.update();if(renderer)renderer.render(scene,cam);}}
 function bindS(id,key,fmt){const s=document.getElementById(id),o=document.getElementById('v'+id.slice(1));s.oninput=()=>{params[key]=key==='vel'?+s.value:s.value/100;o.textContent=fmt(s.value);};}
 bindS('sCob','cob',v=>v+'%');bindS('sDes','des',v=>v+'%');bindS('sDen','den',v=>v+'%');bindS('sVel','vel',v=>(v/12).toFixed(1)+'×');
 function togglePlay(){simPlaying=!simPlaying;document.getElementById('playBtn').textContent=simPlaying?'⏸ Pausar':'▶ Reanudar';}
-function launchCampaign(){campaignActive=true;}
-function seedOutbreak(){let n=0;for(const a of sag){if(!a.vacc&&Math.random()<0.02){a.state='I';a.tRec=0;n++;}if(n>30)break;}}
-function resetSim(){campaignActive=false;week=0;weekAcc=0;document.getElementById('wk').textContent='0';seedAgents();if(useThree&&geom){const pos=geom.attributes.position.array,col=geom.attributes.color.array;for(let i=0;i<SN;i++){const a=sag[i];pos[i*3]=a.x;pos[i*3+1]=a.y;pos[i*3+2]=a.z;const c=ARCH_COL[a.arch];col[i*3]=c[0];col[i*3+1]=c[1];col[i*3+2]=c[2];}geom.attributes.position.needsUpdate=true;geom.attributes.color.needsUpdate=true;}}
+function resumePlay(){simPlaying=true;document.getElementById('playBtn').textContent='⏸ Pausar';}
+function launchCampaign(){campaignActive=true;week=0;weekAcc=0;document.getElementById('wk').textContent='0';resumePlay();}
+function seedOutbreak(){resumePlay();let n=0;for(const a of sag){if(!a.vacc&&Math.random()<0.02){a.state='I';a.tRec=0;n++;}if(n>30)break;}}
+function resetSim(){campaignActive=false;week=0;weekAcc=0;document.getElementById('wk').textContent='0';resumePlay();seedAgents();if(useThree&&geom){const pos=geom.attributes.position.array,col=geom.attributes.color.array;for(let i=0;i<SN;i++){const a=sag[i];pos[i*3]=a.x;pos[i*3+1]=a.y;pos[i*3+2]=a.z;const c=ARCH_COL[a.arch];col[i*3]=c[0];col[i*3+1]=c[1];col[i*3+2]=c[2];}geom.attributes.position.needsUpdate=true;geom.attributes.color.needsUpdate=true;}}
+
+/* ============ COMPARADOR DE ESCENARIOS (mean-field) ============ */
+function runComparador(){
+  document.getElementById('cmpCob').textContent=Math.round(params.cob*100)+'%';
+  const arq=(COHORT.stats.arq||[25,42,13,20]).map(x=>x/100);const baseInt=[0.8,0.55,0.3,0.5];
+  const willing=arq.reduce((a,f,i)=>a+f*(0.3+0.7*(baseInt[i]||0.5)),0);
+  function sim(cob){let S=0.98,I=0.02,R=0,V=0;const inf=[];const VE=0.85,beta=1.15,gamma=0.3;
+    for(let w=0;w<40;w++){const vac=Math.min(S,cob*0.06*willing);S-=vac;V+=vac;
+      const eff=S+(1-VE)*V;const newI=Math.min(eff,beta*I*eff);const fS=eff>0?newI*(S/eff):0,fV=eff>0?newI*((1-VE)*V/eff):0;
+      S-=fS;V-=fV;I+=fS+fV;const rec=gamma*I;I-=rec;R+=rec;inf.push(Math.max(0,I));}
+    return {inf,V,peak:Math.max.apply(null,inf)};}
+  const A=sim(params.cob),B=sim(0);drawCmp(A.inf,B.inf);
+  const red=B.peak>0?Math.round((1-A.peak/B.peak)*100):0;
+  document.getElementById('cmpSummary').innerHTML='Con campaña ('+Math.round(params.cob*100)+'% objetivo): pico de contagios <b>'+(A.peak*100).toFixed(1)+'%</b> vs <b>'+(B.peak*100).toFixed(1)+'%</b> sin campaña — <b style="color:var(--emerald)">'+red+'% más bajo</b>. Cobertura alcanzada: '+Math.round(A.V*100)+'%.';
+}
+function drawCmp(a,b){const cv=document.getElementById('cmpChart');const ctx=cv.getContext('2d');const W=cv.width=cv.offsetWidth||700,H=cv.height;ctx.clearRect(0,0,W,H);const pad=40,max=Math.max.apply(null,a.concat(b).concat(0.01))*1.1;
+  ctx.strokeStyle='#e7e3d9';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(pad,H-24);ctx.lineTo(W-8,H-24);ctx.moveTo(pad,10);ctx.lineTo(pad,H-24);ctx.stroke();
+  const X=i=>pad+(i/(a.length-1))*(W-pad-12),Y=v=>10+(1-v/max)*(H-40);
+  [[b,'#e0564f'],[a,'#1f9d6b']].forEach(function(p){const arr=p[0],col=p[1];ctx.beginPath();arr.forEach((v,i)=>{ctx[i?'lineTo':'moveTo'](X(i),Y(v));});ctx.strokeStyle=col;ctx.lineWidth=2.6;ctx.stroke();ctx.globalAlpha=.12;ctx.lineTo(X(arr.length-1),H-24);ctx.lineTo(X(0),H-24);ctx.closePath();ctx.fillStyle=col;ctx.fill();ctx.globalAlpha=1;});
+  ctx.fillStyle='#5b6b82';ctx.font='11px Inter';ctx.fillText('Semanas →',W-78,H-8);ctx.fillText('% contagios activos',pad+2,8);
+  ctx.fillStyle='#e0564f';ctx.fillText('● Sin campaña',pad,H-8);ctx.fillStyle='#1f9d6b';ctx.fillText('● Con campaña',pad+104,H-8);
+}
+/* ============ GEMELO DIGITAL ============ */
+function muniName(m){const mu=(COHORT.stats.muni||[])[m];return mu?mu.name:('Zona '+((m||0)+1));}
+function stateName(a){return a.vacc?'Vacunado':a.state==='I'?'Contagiado':a.state==='R'?'Recuperado':'Susceptible';}
+function onSwarmClick3D(e){if(!raycaster||!points)return;const rect=e.target.getBoundingClientRect();const m=new THREE.Vector2(((e.clientX-rect.left)/rect.width)*2-1,-((e.clientY-rect.top)/rect.height)*2+1);raycaster.setFromCamera(m,cam);const hits=raycaster.intersectObject(points);if(hits.length)openTwin(hits[0].index);}
+function openTwin(idx){twinIdx=idx;const a=sag[idx];if(!a)return;
+  document.getElementById('twinTitle').textContent='Individuo #'+(10000+idx)+' · '+ARQ_NAMES[a.arch];
+  const rows=[['Edad',(a.edad!=null?a.edad:'—')+(a.edad!=null?' años':'')],['Municipio',muniName(a.muni)],['Arquetipo',ARQ_NAMES[a.arch]],['Estado actual',stateName(a)],['Hipertensión',a.hta?'Sí':'No'],['Diabetes',a.dm2?'Sí':'No'],['Intención de vacunación',Math.round(a.opinion*100)+'%'],['Confianza institucional',Math.round((a.conf!=null?a.conf:a.baseOp)*100)+'%'],['Exposición a desinformación',Math.round((a.des||0)*100)+'%'],['Vulnerable clínico',a.vuln?'Sí':'No']];
+  document.getElementById('twinBody').innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'+rows.map(r=>'<div style="background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:9px 11px"><div style="font-size:10.5px;color:var(--muted);font-weight:600">'+r[0]+'</div><div style="font-size:14px;font-weight:700;color:var(--navy)">'+r[1]+'</div></div>').join('')+'</div>';
+  document.getElementById('twinReply').innerHTML='';document.getElementById('twinAsk').disabled=false;
+  document.getElementById('twinModal').style.display='flex';}
+function closeTwin(){document.getElementById('twinModal').style.display='none';}
+async function twinInterview(){const a=sag[twinIdx];if(!a)return;const btn=document.getElementById('twinAsk');btn.disabled=true;const out=document.getElementById('twinReply');
+  out.innerHTML='<div class="thinking" style="padding:10px 2px"><div class="sp"></div><div>El individuo está respondiendo…</div></div>';
+  const perfil='Tu perfil: '+a.edad+' años, vives en '+muniName(a.muni)+', arquetipo '+ARQ_NAMES[a.arch]+', '+(a.hta?'tienes hipertensión, ':'')+(a.dm2?'tienes diabetes, ':'')+'tu intención de vacunarte es '+Math.round(a.opinion*100)+'%, tu confianza en las instituciones de salud es '+Math.round((a.conf!=null?a.conf:a.baseOp)*100)+'% y tu exposición a desinformación es '+Math.round((a.des||0)*100)+'%. Pregunta del entrevistador: ¿Te vas a vacunar en la campaña? ¿Por qué? ¿Qué te haría cambiar de opinión?';
+  try{const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+sessionToken},body:JSON.stringify({mode:'entrevista',messages:[{role:'user',content:perfil}]})});const data=await res.json();out.innerHTML='<div style="background:#eef6fb;border-left:3px solid var(--cyan);border-radius:0 10px 10px 0;padding:12px 14px;font-size:14px;line-height:1.55;color:#26364e">“'+(data.reply||'…')+'”</div>';}
+  catch(e){out.innerHTML='<div class="note">No se pudo entrevistar ('+(e.message||e)+').</div>';}
+  finally{btn.disabled=false;}}
 
 /* ============ REPORTE PUM-AI + PDF ============ */
 function buildReportPrompt(){
@@ -613,20 +743,59 @@ DATOS (todos ficticios):
 - Cascada de atención en diabetes: con DM2 ${c.tiene||'?'}%, diagnosticados ${c.dx||'?'}%, en tratamiento ${c.trat||'?'}%, controlados ${c.ctrl||'?'}%, casos silentes ${c.silent||'?'}%
 - Riesgo cardiovascular: bajo ${r[0]}%, intermedio ${r[1]}%, alto ${r[2]}%
 - Simulación de campaña de vacunación (última corrida): cobertura alcanzada ${sim.vac}%, contagiados ${sim.inf}%, semana ${sim.week}
-${guiaFiles.length?'- Guías inyectadas por el usuario: '+guiaFiles.map(f=>f.name).join(', '):'- Guías de referencia: hipertensión y diabetes (principios generales de primer nivel).'}
+${guideText?('- TEXTO DE LAS GUÍAS CARGADAS (extracto, úsalo para las recomendaciones):\n'+guideText):(guiaFiles.length?'- Guías inyectadas: '+guiaFiles.map(f=>f.name).join(', '):'- Guías de referencia: hipertensión y diabetes (principios generales de primer nivel).')}
 
 Redacta el informe con las 6 secciones indicadas. Prioriza equidad (determinantes sociales), la cascada de atención y los grupos rezagados para la campaña.`;
 }
+/* ============ ANÁLISIS conversacional ============ */
+const ANA_CHIPS=['¿Cuál es la prevalencia de HTA y DM2 por municipio y qué la explica?','¿Qué tan grande es la brecha de casos silentes de diabetes y qué recomienda la guía?','¿Qué grupos debería priorizar una campaña, según los arquetipos y el riesgo?','Según la guía cargada, ¿qué metas de control aplican a esta población?'];
+function buildAna(){
+  const s=COHORT.stats;
+  document.getElementById('anaKpi').innerHTML=
+    '<div class="kpi"><div class="n">'+s.n.toLocaleString('es-MX')+'</div><div class="l">Personas</div></div>'+
+    '<div class="kpi"><div class="n" style="color:var(--coral)">'+s.hta+'%</div><div class="l">HTA</div></div>'+
+    '<div class="kpi"><div class="n" style="color:var(--amber)">'+s.dm2+'%</div><div class="l">DM2</div></div>'+
+    '<div class="kpi"><div class="n" style="color:var(--emerald)">'+((s.cascada&&s.cascada.silent)||0)+'%</div><div class="l">Casos silentes DM2</div></div>'+
+    '<div class="kpi"><div class="n" style="color:var(--violet)">'+((s.riesgo&&s.riesgo[2])||0)+'%</div><div class="l">Riesgo CV alto</div></div>';
+  document.getElementById('anaChips').innerHTML=ANA_CHIPS.map(q=>'<button class="btn-mini" onclick="anaSend(this.textContent)">'+q+'</button>').join('');
+  document.getElementById('anaGuideNote').textContent=(!usedDemo&&guideText)?('PUM-AI está usando el texto de: '+guiaFiles.map(f=>f.name).join(', ')+'.'):'Sin guías cargadas: PUM-AI usa principios generales de HTA y diabetes. Carga PDFs para un análisis basado en tus guías.';
+  drawCascada();
+}
+function drawCascada(){
+  const c=(COHORT.stats||{}).cascada;const el=document.getElementById('cascadaChart');if(!el)return;if(!c){el.innerHTML='<div class="note">Sin datos de cascada.</div>';return;}
+  const stages=[['Tiene DM2 (real)',c.tiene,'#38bdf8'],['Diagnosticados',c.dx,'#34d399'],['En tratamiento',c.trat,'#d99413'],['Controlados',c.ctrl,'#1f9d6b']];
+  const VW=760,rowH=48,max=Math.max(...stages.map(s=>s[1]),1),x0=150,barMax=VW-x0-70;
+  let s=`<svg viewBox="0 0 ${VW} ${stages.length*rowH+6}" width="100%">`;
+  stages.forEach((st,i)=>{const y=i*rowH+6,bw=(st[1]/max)*barMax;
+    s+=`<text x="0" y="${y+rowH/2}" font-size="13" font-weight="700" fill="#0C2340" dominant-baseline="central">${st[0]}</text>`;
+    s+=`<rect x="${x0}" y="${y+9}" width="${barMax}" height="${rowH-20}" rx="6" fill="#eef0f3"/>`;
+    s+=`<rect x="${x0}" y="${y+9}" width="${bw}" height="${rowH-20}" rx="6" fill="${st[2]}"><animate attributeName="width" from="0" to="${bw}" dur="0.7s" fill="freeze"/></rect>`;
+    s+=`<text x="${x0+bw+8}" y="${y+rowH/2}" font-size="13.5" font-weight="800" fill="#0C2340" dominant-baseline="central">${st[1]}%</text>`;
+  });
+  s+='</svg>';
+  el.innerHTML=s+`<div class="note" style="margin-top:8px">⚠ <b style="color:var(--coral)">${c.silent}% son casos silentes</b> — tienen diabetes pero no lo saben. Cerrar esa brecha con tamizaje oportuno es la primera prioridad.</div>`;
+}
+function addAnaMsg(text,who){const c=document.getElementById('anaChat');const d=document.createElement('div');const me=who==='user';d.style.cssText='max-width:85%;padding:12px 15px;border-radius:14px;font-size:14px;line-height:1.55;white-space:pre-wrap;'+(me?'align-self:flex-end;background:var(--navy);color:#fff':'align-self:flex-start;background:var(--bg2);border:1px solid var(--line);color:#26364e');d.textContent=text;c.appendChild(d);c.scrollTop=c.scrollHeight;return d;}
+async function anaSend(q){
+  q=(q||'').trim();if(!q)return;document.getElementById('anaInput').value='';
+  addAnaMsg(q,'user');const loading=addAnaMsg('PUM-AI está analizando…','bot');
+  const s=COHORT.stats;const muniTxt=(s.muni||[]).map(m=>m.name+': HTA '+m.hta+'%, DM2 '+m.dm2+'%').join(' | ');const c=s.cascada||{};const r=s.riesgo||[0,0,0];
+  const ctx=`Contexto (cohorte ficticia, N=${s.n}). Prevalencia HTA ${s.hta}%, DM2 ${s.dm2}%. Por municipio: ${muniTxt}. Arquetipos: Provacuna ${s.arq[0]}%, Indeciso ${s.arq[1]}%, Renuente ${s.arq[2]}%, Vulnerable ${s.arq[3]}%. Cascada DM2: tiene ${c.tiene}%, dx ${c.dx}%, tratamiento ${c.trat}%, control ${c.ctrl}%, silentes ${c.silent}%. Riesgo CV: bajo ${r[0]}%, intermedio ${r[1]}%, alto ${r[2]}%. ${guideText?('TEXTO DE GUÍAS:\n'+guideText):'Sin guías cargadas; usa principios generales.'}\n\nPREGUNTA: ${q}`;
+  try{
+    const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+sessionToken},body:JSON.stringify({mode:'analisis',messages:[{role:'user',content:ctx}]})});
+    const data=await res.json();loading.textContent=data.reply||'Sin respuesta.';
+  }catch(e){loading.textContent='No se pudo responder ('+(e.message||e)+').';}
+}
 async function generateReport(){
-  const out=document.getElementById('reportOut');const btn=document.getElementById('genReport');
-  btn.disabled=true;out.innerHTML='<div class="thinking"><div class="sp"></div><div>PUM-AI está analizando las estadísticas y la simulación…</div></div>';
+  const out=document.getElementById('reportOut');const btn=document.getElementById('anaReport');
+  if(btn)btn.disabled=true;out.innerHTML='<div class="thinking"><div class="sp"></div><div>PUM-AI está analizando las estadísticas y la simulación…</div></div>';
   try{
     const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+sessionToken},body:JSON.stringify({messages:[{role:'user',content:buildReportPrompt()}]})});
     const data=await res.json();lastReport=data.reply||'No se recibió respuesta.';
     out.innerHTML='<div class="report-body" id="reportBody"></div>';document.getElementById('reportBody').textContent=lastReport;
     document.getElementById('pdfBtn').disabled=false;
   }catch(e){out.innerHTML='<div class="report-body">No se pudo generar el informe (¿sesión o red?). Detalle: '+(e.message||e)+'</div>';}
-  finally{btn.disabled=false;}
+  finally{if(btn)btn.disabled=false;}
 }
 function exportPDF(){
   if(!lastReport){return;}
