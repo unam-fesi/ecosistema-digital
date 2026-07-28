@@ -26,6 +26,7 @@
      LANDING SCREEN — Logo + Ingresar (no menu, no footer)
      ═══════════════════════════════════════════════════════════════════ -->
 <div id="landing-screen">
+  <canvas id="edParticles" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none"></canvas>
   <div class="hero-blob hero-blob-1"></div>
   <div class="hero-blob hero-blob-2"></div>
   <div class="hero-blob hero-blob-3"></div>
@@ -342,7 +343,7 @@
     </div>
     <div class="proyectos-nuevos-grid">
     <!-- Card: SAPIENS -->
-    <div class="spa-card reveal" style="background:linear-gradient(135deg,rgba(12,35,64,0.20),rgba(196,162,78,0.14));border-color:rgba(196,162,78,0.38)" onclick="window.location.href='inteligencia-epidemiologica/index.html'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='inteligencia-epidemiologica/index.html'}" role="link" tabindex="0" aria-label="Abrir SAPIENS">
+    <div class="spa-card reveal" style="background:linear-gradient(135deg,rgba(12,35,64,0.20),rgba(196,162,78,0.14));border-color:rgba(196,162,78,0.38)" onclick="window.location.href='sapiens/index.html'" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();window.location.href='sapiens/index.html'}" role="link" tabindex="0" aria-label="Abrir SAPIENS">
       <img class="spa-card-logo" src="public/assets/InteligenciaEpi-logo.png" alt="SAPIENS" loading="lazy">
       <div class="spa-card-title">SAPIENS</div>
       <div class="spa-card-desc">Sistema de Análisis Poblacional e Inteligencia Epidemiológica mediante Nodos de Simulación. Un laboratorio donde alumnos y profesores conversan con inteligencia artificial para analizar y simular la salud de comunidades enteras: enjambres de miles de agentes, gemelos digitales de cada persona, detección de brotes, equidad en salud e intervenciones con evidencia científica real.</div>
@@ -1857,5 +1858,25 @@ function enterMainApp(instant) {
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
   <script src="src/js/scroll-cine.js" defer></script>
   <script src="src/js/cinematic.js" defer></script>
+  <script>
+  /* Fondo de partículas — nodos azul marino, conexiones doradas (Ecosistema Digital) */
+  (function(){
+    const canvas=document.getElementById('edParticles');if(!canvas)return;const ctx=canvas.getContext('2d');
+    let W=0,H=0,dpr=Math.min(window.devicePixelRatio||1,2),nodes=[],raf=0;const mouse={x:-9999,y:-9999};
+    const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function count(){return Math.min(120,Math.max(42,Math.floor(W*H/16000)));}
+    function resize(){W=window.innerWidth;H=window.innerHeight;dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.floor(W*dpr);canvas.height=Math.floor(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);nodes=Array.from({length:count()},function(){return {x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.32,vy:(Math.random()-.5)*.32,r:Math.random()*1.5+.8};});}
+    function step(){ctx.clearRect(0,0,W,H);var link=Math.min(165,Math.max(120,W/9));
+      for(var k=0;k<nodes.length;k++){var n=nodes[k];n.x+=n.vx;n.y+=n.vy;if(n.x<0||n.x>W)n.vx*=-1;if(n.y<0||n.y>H)n.vy*=-1;var dx=n.x-mouse.x,dy=n.y-mouse.y,dm=Math.hypot(dx,dy);if(dm<130){var f=(130-dm)/130;n.x+=dx/(dm||1)*f*1.3;n.y+=dy/(dm||1)*f*1.3;}}
+      for(var i=0;i<nodes.length;i++){var a=nodes[i];for(var j=i+1;j<nodes.length;j++){var b=nodes[j];var ax=a.x-b.x,ay=a.y-b.y,d=Math.hypot(ax,ay);if(d<link){var al=(1-d/link)*.55;ctx.strokeStyle='rgba(196,162,78,'+al.toFixed(3)+')';ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}
+        var dma=Math.hypot(a.x-mouse.x,a.y-mouse.y);if(dma<150){var al2=(1-dma/150)*.5;ctx.strokeStyle='rgba(196,162,78,'+al2.toFixed(3)+')';ctx.lineWidth=.9;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(mouse.x,mouse.y);ctx.stroke();}}
+      for(var m2=0;m2<nodes.length;m2++){var p=nodes[m2];ctx.fillStyle='rgba(12,35,64,.82)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.2832);ctx.fill();}
+      raf=requestAnimationFrame(step);}
+    window.addEventListener('resize',resize);
+    window.addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;});
+    window.addEventListener('mouseout',function(){mouse.x=-9999;mouse.y=-9999;});
+    resize();if(reduce){step();cancelAnimationFrame(raf);}else raf=requestAnimationFrame(step);
+  })();
+  </script>
 </body>
 </html>

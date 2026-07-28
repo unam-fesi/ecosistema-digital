@@ -116,5 +116,20 @@
 /* Failsafe: contenido ya revelado por el sistema .reveal nunca queda oculto */
 .cx-js .reveal.visible{ opacity:1 !important; transform:none !important; }
 
-/* Fix: ocultar barra de progreso de sección — reaparecía como línea azul cruzando paneles (misma razón por la que se quitó scroll-progress) */
-.cx-sec-progress{display:none!important;}
+/* ═══════════════════════════════════════════════════════════════
+   PÁGINA INICIAL EN BLANCO + PARTÍCULAS (nodos azul marino,
+   conexiones doradas). Capa aditiva; no toca las secciones internas.
+   ═══════════════════════════════════════════════════════════════ */
+#landing-screen{ background:#ffffff !important; }
+#landing-screen .hero-blob,
+#landing-screen .hero-orb,
+#landing-screen .hero-grid,
+#landing-screen .hero-particles,
+#landing-screen .hero-radial{ display:none !important; }
+#landing-screen #edParticles{ z-index:0 !important; }
+#landing-screen > div[style*="z-index:2"]{ position:relative; z-index:2; }
+.landing-title{ color:#0C2340 !important; }
+.landing-title .gold{ color:#B8912F !important; text-shadow:none !important; }
+.landing-subtitle{ color:#5b6b82 !important; }
+.landing-logo img{ filter:drop-shadow(0 12px 34px rgba(12,35,64,.20)) !important; }
+.hero-badge{ background:rgba(196,162,78,.12) !important; border-color:rgba(196,162,78,.45) !important; color:#0C2340 !important; }
