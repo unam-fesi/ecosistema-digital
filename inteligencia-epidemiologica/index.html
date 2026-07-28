@@ -12,6 +12,7 @@
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root{
   --navy:#0C2340;--navy2:#163A64;--navy3:#1a4a7a;--gold:#C4A24E;--gold2:#B8912F;--gold3:#EBD9A8;
@@ -811,8 +812,8 @@ function buildAna(){
   document.getElementById('anaGuideNote').textContent=(!usedDemo&&guideText)?('PUM-AI está usando el texto de: '+guiaFiles.map(f=>f.name).join(', ')+'.'):'Sin guías cargadas: PUM-AI usa principios generales de HTA y diabetes. Carga PDFs para un análisis basado en tus guías.';
   drawCascada();renderDashboard();
 }
-function drawCascada(){
-  const c=(COHORT.stats||{}).cascada;const el=document.getElementById('cascadaChart');if(!el)return;if(!c){el.innerHTML='<div class="note">Sin datos de cascada.</div>';return;}
+function drawCascada(elId){
+  const c=(COHORT.stats||{}).cascada;const el=document.getElementById(elId||'cascadaChart');if(!el)return;if(!c){el.innerHTML='<div class="note">Sin datos de cascada.</div>';return;}
   const stages=[['Tiene DM2 (real)',c.tiene,'#38bdf8'],['Diagnosticados',c.dx,'#34d399'],['En tratamiento',c.trat,'#d99413'],['Controlados',c.ctrl,'#1f9d6b']];
   const VW=760,rowH=48,max=Math.max(...stages.map(s=>s[1]),1),x0=150,barMax=VW-x0-70;
   let s=`<svg viewBox="0 0 ${VW} ${stages.length*rowH+6}" width="100%">`;
@@ -856,53 +857,109 @@ let mapMetric='hta';
 function mapCard(){return '<div class="card" style="margin-top:16px"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><div><div class="chart-title">🗺️ Mapa por colonia</div><div class="note" style="margin-top:2px">Cada bloque es una colonia, agrupada por municipio y coloreada por el indicador. Más oscuro = más alto.</div></div><div style="display:flex;gap:6px"><button class="btn-mini" id="mm-hta" onclick="setMapMetric(\'hta\')">HTA</button><button class="btn-mini" id="mm-dm2" onclick="setMapMetric(\'dm2\')">DM2</button><button class="btn-mini" id="mm-marg" onclick="setMapMetric(\'marg\')">Marginación</button></div></div><div id="mapaChart" style="margin-top:12px"></div></div>';}
 function setMapMetric(m){mapMetric=m;drawMapa(m);}
 function lerpColor(a,b,t){const p=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];const A=p(a),B=p(b);return 'rgb('+Math.round(A[0]+(B[0]-A[0])*t)+','+Math.round(A[1]+(B[1]-A[1])*t)+','+Math.round(A[2]+(B[2]-A[2])*t)+')';}
-function drawMapa(metric){const el=document.getElementById('mapaChart');if(!el)return;const cols=(COHORT.stats.colonias||[]);['hta','dm2','marg'].forEach(k=>{const b=document.getElementById('mm-'+k);if(b)b.classList.toggle('primary',k===metric);});
+function drawMapa(metric,elId){const el=document.getElementById(elId||'mapaChart');if(!el)return;const cols=(COHORT.stats.colonias||[]);if(!elId)['hta','dm2','marg'].forEach(k=>{const b=document.getElementById('mm-'+k);if(b)b.classList.toggle('primary',k===metric);});
   if(!cols.length){el.innerHTML='<div class="note">Sin datos por colonia (súbelos con columna colonia).</div>';return;}
   const vals=cols.map(c=>metric==='marg'?c.marg*100:c[metric]);const mn=Math.min.apply(null,vals),mx=Math.max.apply(null,vals.concat(mn+1));
   const munis=['Coacalco','Naucalpan','Ecatepec'];let html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">';
   munis.forEach(mu=>{const cc=cols.filter(c=>c.muni===mu||(c.muni||'').indexOf(mu)>=0);if(!cc.length)return;html+='<div><div style="font-weight:800;color:var(--navy);font-size:13px;margin-bottom:8px;text-align:center">'+mu+'</div><div style="display:flex;flex-direction:column;gap:6px">';cc.forEach(c=>{const v=metric==='marg'?c.marg*100:c[metric];const t=(v-mn)/(mx-mn||1);const col=lerpColor('#fdf0d5','#9e2019',Math.max(0,Math.min(1,t)));const tc=t>0.55?'#fff':'#0C2340';html+='<div title="'+c.name+' (n='+c.n+')" style="background:'+col+';border-radius:8px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center;gap:6px"><span style="font-size:11.5px;color:'+tc+';font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+c.name+'</span><b style="font-size:12px;color:'+tc+'">'+(metric==='marg'?c.marg:v+'%')+'</b></div>';});html+='</div></div>';});
   html+='</div><div style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:11px;color:#5b6b82"><span>menor</span><div style="height:10px;flex:1;max-width:220px;border-radius:5px;background:linear-gradient(90deg,#fdf0d5,#9e2019)"></div><span>mayor</span></div>';
   el.innerHTML=html;}
+let anaHistory=[];
+function mdToHtml(t){
+  t=String(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  t=t.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>').replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g,'$1<em>$2</em>');
+  const lines=t.split(/\n/);let html='',lt='';
+  const close=()=>{if(lt){html+='</'+lt+'>';lt='';}};
+  for(let ln of lines){ln=ln.trim();
+    if(/^#{1,6}\s+/.test(ln)){close();html+='<h4 style="margin:12px 0 4px;color:var(--navy);font-size:15px">'+ln.replace(/^#{1,6}\s+/,'')+'</h4>';continue;}
+    let m;
+    if(m=ln.match(/^[-•]\s+(.*)/)){if(lt!=='ul'){close();html+='<ul style="margin:4px 0 6px 18px">';lt='ul';}html+='<li style="margin:2px 0">'+m[1]+'</li>';continue;}
+    if(m=ln.match(/^\d+[.)]\s+(.*)/)){if(lt!=='ol'){close();html+='<ol style="margin:4px 0 6px 20px">';lt='ol';}html+='<li style="margin:2px 0">'+m[1]+'</li>';continue;}
+    close();if(ln==='')continue;html+='<p style="margin:6px 0">'+ln+'</p>';}
+  close();return html;
+}
+function extractViz(raw){const vz=[];const re=/\[\[VIZ\]\]([\s\S]*?)\[\[\/VIZ\]\]/gi;const text=String(raw).replace(re,(m,j)=>{try{const o=JSON.parse(j.trim());(Array.isArray(o)?o:[o]).forEach(x=>vz.push(x));}catch(e){}return '';});return {text:text.trim(),vizzes:vz};}
+function renderViz(el,v){try{const datos=(v.datos||v.data||[]).filter(d=>Array.isArray(d)&&d.length>=2&&isFinite(+d[1]));if(!datos.length){el.remove();return;}const tipo=String(v.tipo||v.type||'barras').toLowerCase();const title=v.titulo||v.title||'';el.innerHTML=(title?'<div class="chart-title" style="margin-bottom:6px">📊 '+title+'</div>':'')+'<div id="'+el.id+'c"></div>';const inner=document.getElementById(el.id+'c');if(tipo.indexOf('don')>=0||tipo.indexOf('pie')>=0||tipo.indexOf('dona')>=0){const pal=['#1f9d6b','#d99413','#e0564f','#2f7fb8','#6b4fd6'];donutL(inner,datos.map((d,i)=>[String(d[0]),+d[1],pal[i%pal.length]]));}else{barsL(inner,datos.map(d=>[String(d[0]),+d[1]]));}}catch(e){el.remove();}}
+function barsL(el,data){if(!el)return;const W=360,H=180,ih=H-38,iw=W-44,bw=iw/data.length,max=Math.max.apply(null,data.map(d=>d[1]).concat(1))*1.15,pal=['#C4A24E','#2f7fb8','#1f9d6b','#e0564f','#6b4fd6','#d99413'];let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%">';for(let g=0;g<=3;g++){const y=10+ih-ih*g/3;s+='<line x1="34" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="#eceadf"/><text x="30" y="'+(y+3)+'" text-anchor="end" font-size="9" fill="#8593a8">'+Math.round(max*g/3)+'</text>';}data.forEach((d,i)=>{const bh=ih*(d[1]/max),x=34+i*bw+bw*0.2,y=10+ih-bh;s+='<rect x="'+x+'" y="'+y+'" width="'+(bw*0.6)+'" height="'+bh+'" rx="3" fill="'+pal[i%pal.length]+'"/><text x="'+(x+bw*0.3)+'" y="'+(y-4)+'" text-anchor="middle" font-size="10" font-weight="700" fill="#26364e">'+d[1]+'</text><text x="'+(x+bw*0.3)+'" y="'+(H-12)+'" text-anchor="middle" font-size="9" fill="#5b6b82">'+String(d[0]).slice(0,12)+'</text>';});s+='</svg>';el.innerHTML=s;}
 function addAnaMsg(text,who){const c=document.getElementById('anaChat');const d=document.createElement('div');const me=who==='user';d.style.cssText='max-width:85%;padding:12px 15px;border-radius:14px;font-size:14px;line-height:1.55;white-space:pre-wrap;'+(me?'align-self:flex-end;background:var(--navy);color:#fff':'align-self:flex-start;background:var(--bg2);border:1px solid var(--line);color:#26364e');d.textContent=text;c.appendChild(d);c.scrollTop=c.scrollHeight;return d;}
 async function anaSend(q){
   q=(q||'').trim();if(!q)return;document.getElementById('anaInput').value='';
   addAnaMsg(q,'user');const loading=addAnaMsg('PUM-AI está analizando…','bot');
   const s=COHORT.stats;const muniTxt=(s.muni||[]).map(m=>m.name+': HTA '+m.hta+'%, DM2 '+m.dm2+'%').join(' | ');const c=s.cascada||{};const r=s.riesgo||[0,0,0];
-  const ctx=`Contexto (cohorte ficticia, N=${s.n}). Prevalencia HTA ${s.hta}%, DM2 ${s.dm2}%. Por municipio: ${muniTxt}. Arquetipos: Provacuna ${s.arq[0]}%, Indeciso ${s.arq[1]}%, Renuente ${s.arq[2]}%, Vulnerable ${s.arq[3]}%. Cascada DM2: tiene ${c.tiene}%, dx ${c.dx}%, tratamiento ${c.trat}%, control ${c.ctrl}%, silentes ${c.silent}%. Riesgo CV: bajo ${r[0]}%, intermedio ${r[1]}%, alto ${r[2]}%. ${guideText?('TEXTO DE GUÍAS:\n'+guideText):'Sin guías cargadas; usa principios generales.'}\n\nPREGUNTA: ${q}`;
+  const ctx=`Contexto (cohorte ficticia, N=${s.n}). Prevalencia HTA ${s.hta}%, DM2 ${s.dm2}%. Por municipio: ${muniTxt}. Arquetipos: Provacuna ${s.arq[0]}%, Indeciso ${s.arq[1]}%, Renuente ${s.arq[2]}%, Vulnerable ${s.arq[3]}%. Cascada DM2: tiene ${c.tiene}%, dx ${c.dx}%, tratamiento ${c.trat}%, control ${c.ctrl}%, silentes ${c.silent}%. Riesgo CV: bajo ${r[0]}%, intermedio ${r[1]}%, alto ${r[2]}%. ${guideText?('TEXTO DE GUÍAS:\n'+guideText):'Sin guías cargadas; usa principios generales.'}\n\nFormatea tu respuesta en Markdown (negritas con **, listas con -, subtítulos con ##). Si tu respuesta compara cifras, añade AL FINAL UNA gráfica con este marcador en una sola línea (JSON válido): [[VIZ]]{"tipo":"barras","titulo":"Título corto","datos":[["Etiqueta",10],["Etiqueta2",20]]}[[/VIZ]] — tipo puede ser "barras" o "dona"; usa solo cifras del contexto.\n\nPREGUNTA: ${q}`;
   try{
-    const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+sessionToken},body:JSON.stringify({mode:'analisis',messages:[{role:'user',content:ctx}]})});
-    const data=await res.json();loading.textContent=data.reply||'Sin respuesta.';
+    const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'analisis',messages:[{role:'user',content:ctx}]})});
+    const data=await res.json();const raw=data.reply||'Sin respuesta.';const ex=extractViz(raw);
+    loading.style.whiteSpace='normal';loading.innerHTML=mdToHtml(ex.text);
+    ex.vizzes.forEach((v,i)=>{const d=document.createElement('div');d.id='vz'+(Date.now()+i);d.style.cssText='margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px';loading.appendChild(d);renderViz(d,v);});
+    anaHistory.push({q:q,a:ex.text});
   }catch(e){loading.textContent='No se pudo responder ('+(e.message||e)+').';}
 }
 async function generateReport(){
   const out=document.getElementById('reportOut');const btn=document.getElementById('anaReport');
-  if(btn)btn.disabled=true;out.innerHTML='<div class="thinking"><div class="sp"></div><div>PUM-AI está analizando las estadísticas y la simulación…</div></div>';
+  if(btn)btn.disabled=true;out.innerHTML='<div class="thinking"><div class="sp"></div><div>PUM-AI está redactando el informe…</div></div>';
   try{
-    const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+sessionToken},body:JSON.stringify({messages:[{role:'user',content:buildReportPrompt()}]})});
+    let prompt=buildReportPrompt();
+    if(anaHistory.length)prompt+='\n\nIntegra también estas consultas previas del usuario a PUM-AI (menciona sus hallazgos donde aporten):\n'+anaHistory.slice(-6).map((h,i)=>(i+1)+'. P: '+h.q+' | R: '+String(h.a).replace(/\s+/g,' ').slice(0,400)).join('\n');
+    const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'report',messages:[{role:'user',content:prompt}]})});
     const data=await res.json();lastReport=data.reply||'No se recibió respuesta.';
-    out.innerHTML='<div class="report-body" id="reportBody"></div>';document.getElementById('reportBody').textContent=lastReport;
-    document.getElementById('pdfBtn').disabled=false;
-  }catch(e){out.innerHTML='<div class="report-body">No se pudo generar el informe (¿sesión o red?). Detalle: '+(e.message||e)+'</div>';}
+    out.innerHTML=buildReportDoc(lastReport);renderReportCharts();
+    document.getElementById('pdfBtn').disabled=false;out.scrollIntoView({behavior:'smooth',block:'start'});
+  }catch(e){out.innerHTML='<div class="report-body">No se pudo generar el informe: '+(e.message||e)+'</div>';}
   finally{if(btn)btn.disabled=false;}
 }
+function kpiTile(l,v,c){return '<div style="background:#f7f5f0;border:1px solid #ece8de;border-radius:10px;padding:10px 12px"><div style="font-size:21px;font-weight:800;font-family:Playfair Display,serif;color:'+c+'">'+v+'</div><div style="font-size:11px;color:#5b6b82;margin-top:1px">'+l+'</div></div>';}
+function buildReportDoc(narr){
+  const s=COHORT.stats;let fecha='';try{fecha=new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'});}catch(e){}
+  const esc='onerror="this.style.display=&quot;none&quot;"';
+  const H='style="font-size:14px;font-weight:700;color:#0C2340;margin-bottom:8px"';
+  const CARD='style="background:#fff;border:1px solid #ece8de;border-radius:12px;padding:14px"';
+  const qa=anaHistory.length?('<h3 style="font-size:17px;font-weight:700;color:#0C2340;margin:22px 0 10px" class="serif">Consultas realizadas a PUM-AI</h3>'+anaHistory.map(h=>'<div style="background:#f7f5f0;border:1px solid #ece8de;border-radius:10px;padding:12px;margin-bottom:10px"><div style="font-weight:700;color:#0C2340;font-size:13px;margin-bottom:4px">🧠 '+h.q+'</div><div style="font-size:13px;color:#26364e;line-height:1.55">'+mdToHtml(h.a)+'</div></div>').join('')):'';
+  return '<div id="reportDoc" style="background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden">'+
+    '<div style="background:linear-gradient(120deg,#0C2340,#163A64);color:#fff;padding:18px 24px;display:flex;align-items:center;gap:16px">'+
+      '<img src="../public/assets/escudo-unam.png" '+esc+' style="height:54px;width:auto">'+
+      '<img src="../public/assets/logo-ecosistema-digital.png" '+esc+' style="height:48px;width:auto">'+
+      '<img src="../public/assets/escudo-fesi.png" '+esc+' style="height:54px;width:auto">'+
+      '<div style="margin-left:auto;text-align:right"><div style="font-size:10.5px;color:#EBD9A8;font-weight:700;letter-spacing:.4px">UNAM · FACULTAD DE ESTUDIOS SUPERIORES IZTACALA</div>'+
+      '<div class="serif" style="font-size:22px;font-weight:700">Informe Epidemiológico</div>'+
+      '<div style="font-size:12px;color:#c3d0e2">Inteligencia Epidemiológica · Ecosistema Digital'+(fecha?(' · '+fecha):'')+'</div></div></div>'+
+    '<div style="padding:22px 26px">'+
+      '<p style="font-size:12px;color:#8a6d24;background:#fdf6e3;border:1px solid #ecd9a8;border-radius:8px;padding:8px 12px;margin-bottom:16px">⚠ Datos ficticios con fines educativos. No constituye consejo médico individual.</p>'+
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px">'+
+        kpiTile('Población',s.n.toLocaleString('es-MX'),'#0C2340')+kpiTile('Prevalencia HTA',s.hta+'%','#e0564f')+kpiTile('Prevalencia DM2',s.dm2+'%','#d99413')+
+        kpiTile('Casos silentes DM2',((s.cascada||{}).silent||0)+'%','#1f9d6b')+kpiTile('Renuentes a vacuna',s.arq[2]+'%','#6b4fd6')+kpiTile('Riesgo CV alto',((s.riesgo||[])[2]||0)+'%','#2f7fb8')+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">'+
+        '<div '+CARD+'><div '+H+'>Prevalencia por municipio</div><div id="r_m"></div></div>'+
+        '<div '+CARD+'><div '+H+'>Riesgo cardiovascular</div><div id="r_r"></div></div>'+
+        '<div '+CARD+'><div '+H+'>Actitud ante la vacuna</div><div id="r_a"></div></div>'+
+        '<div '+CARD+'><div '+H+'>Cascada de atención (diabetes)</div><div id="r_casc"></div></div>'+
+      '</div>'+
+      '<div '+CARD+' style="margin-top:14px"><div '+H+'>Mapa por colonia — prevalencia de HTA</div><div id="r_map"></div></div>'+
+      '<h3 class="serif" style="font-size:18px;color:#0C2340;margin:22px 0 8px">Análisis de PUM-AI</h3>'+
+      '<div style="font-size:13.5px;line-height:1.65;color:#26364e">'+mdToHtml(narr)+'</div>'+qa+
+      '<div style="margin-top:20px;border-top:1px solid #ece8de;padding-top:12px;font-size:11px;color:#8593a8">Generado por PUM-AI (Gemini) · Ecosistema Digital, FES Iztacala UNAM · Inteligencia Epidemiológica.</div>'+
+    '</div></div>';
+}
+function renderReportCharts(){
+  const s=COHORT.stats;
+  if(s.muni)groupedBarL(document.getElementById('r_m'),s.muni.map(x=>x.name),[{n:'HTA',c:'#e0564f',v:s.muni.map(x=>x.hta)},{n:'DM2',c:'#d99413',v:s.muni.map(x=>x.dm2)}]);
+  if(s.riesgo)donutL(document.getElementById('r_r'),[['Bajo',s.riesgo[0],'#1f9d6b'],['Intermedio',s.riesgo[1],'#d99413'],['Alto',s.riesgo[2],'#e0564f']]);
+  donutL(document.getElementById('r_a'),[['Provacuna',s.arq[0],'#1f9d6b'],['Indeciso',s.arq[1],'#d99413'],['Renuente',s.arq[2],'#6b4fd6'],['Vulnerable',s.arq[3],'#2f7fb8']]);
+  drawCascada('r_casc');drawMapa('hta','r_map');
+}
 function exportPDF(){
-  if(!lastReport){return;}
-  const {jsPDF}=window.jspdf;const doc=new jsPDF({unit:'pt',format:'a4'});const s=COHORT.stats;
-  const M=48,W=595,maxW=W-M*2;let y=54;
-  doc.setFillColor(12,35,64);doc.rect(0,0,W,90,'F');
-  doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(18);doc.text('Informe Epidemiológico',M,50);
-  doc.setFontSize(10);doc.setTextColor(235,217,168);doc.text('Inteligencia Epidemiológica · Ecosistema Digital, FES Iztacala UNAM',M,70);
-  y=120;doc.setTextColor(40,54,78);doc.setFontSize(11);doc.setFont('helvetica','bold');doc.text('Indicadores de la cohorte (datos ficticios)',M,y);y+=16;
-  doc.setFont('helvetica','normal');doc.setFontSize(10);
-  const kpis=['Población: '+s.n,'HTA: '+s.hta+'%','DM2: '+s.dm2+'%','Renuentes: '+s.arq[2]+'%','Vulnerables: '+s.arq[3]+'%','Riesgo CV alto: '+((s.riesgo||[])[2]||0)+'%'];
-  kpis.forEach((k,i)=>{doc.text('• '+k,M+(i%2)*250,y+Math.floor(i/2)*15);});y+=Math.ceil(kpis.length/2)*15+14;
-  doc.setDrawColor(220,215,205);doc.line(M,y,W-M,y);y+=18;
-  doc.setFont('helvetica','normal');doc.setFontSize(10.5);doc.setTextColor(30,40,60);
-  const lines=doc.splitTextToSize(lastReport,maxW);
-  for(const ln of lines){if(y>800){doc.addPage();y=54;}doc.text(ln,M,y);y+=15;}
-  doc.setFontSize(8);doc.setTextColor(120,130,150);
-  doc.text('Generado con PUM-AI (Gemini) · datos ficticios · no constituye consejo médico.',M,820);
-  doc.save('informe-epidemiologico.pdf');
+  const node=document.getElementById('reportDoc');const btn=document.getElementById('pdfBtn');
+  if(!node||typeof html2canvas==='undefined'){return;}
+  const old=btn?btn.textContent:'';if(btn){btn.textContent='Generando PDF…';btn.disabled=true;}
+  html2canvas(node,{scale:2,backgroundColor:'#ffffff',useCORS:true}).then(canvas=>{
+    const {jsPDF}=window.jspdf;const pdf=new jsPDF({unit:'pt',format:'a4'});
+    const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight();
+    const iw=pw,ih=canvas.height*(pw/canvas.width);const img=canvas.toDataURL('image/png');
+    pdf.addImage(img,'PNG',0,0,iw,ih);let left=ih-ph,pos=0;
+    while(left>0){pos-=ph;pdf.addPage();pdf.addImage(img,'PNG',0,pos,iw,ih);left-=ph;}
+    pdf.save('informe-epidemiologico.pdf');
+  }).catch(function(){}).then(function(){if(btn){btn.textContent=old;btn.disabled=false;}});
 }
 </script>
 </body>
