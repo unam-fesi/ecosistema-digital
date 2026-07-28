@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Inteligencia Epidemiológica — Ecosistema Digital FES Iztacala</title>
+<title>SAPIENS — Sistema de Análisis Poblacional e Inteligencia Epidemiológica</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -13,6 +13,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
 :root{
   --navy:#0C2340;--navy2:#163A64;--navy3:#1a4a7a;--gold:#C4A24E;--gold2:#B8912F;--gold3:#EBD9A8;
@@ -28,11 +30,39 @@ body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:var(--
 .topbar-in{max-width:1240px;margin:0 auto;padding:12px 24px;display:flex;align-items:center;gap:14px}
 .brand{display:flex;align-items:center;gap:11px;font-weight:800;color:#fff}
 .brand .mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--gold),var(--gold3));display:grid;place-items:center;color:var(--navy);font-weight:900}
+.brand-logo{height:42px;width:auto;border-radius:8px;display:block;background:#fff;padding:3px}
 .brand small{display:block;font-size:10px;font-weight:500;color:var(--gold3)}
 .step-pill{margin-left:auto;display:flex;gap:6px;font-size:12px}
 .step-pill span{padding:5px 11px;border-radius:100px;border:1px solid rgba(235,217,168,.35);color:var(--gold3);font-weight:600}
 .step-pill span.on{background:var(--gold);color:var(--navy);border-color:var(--gold)}
 .logout{margin-left:8px;color:var(--gold3);font-size:12.5px;text-decoration:none;font-weight:600;cursor:pointer}
+.navlink{margin-left:10px;color:#fff;font-size:12.5px;font-weight:700;cursor:pointer;padding:5px 11px;border-radius:100px;border:1px solid rgba(235,217,168,.35);transition:.2s}
+.navlink:hover{background:var(--gold);color:var(--navy);border-color:var(--gold)}
+.rolechip{margin-left:10px;font-size:11px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;padding:4px 10px;border-radius:100px;background:var(--gold);color:var(--navy)}
+/* GESTIÓN / paneles de rol */
+.gtable{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
+.gtable th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);padding:8px 10px;border-bottom:2px solid var(--line)}
+.gtable td{padding:9px 10px;border-bottom:1px solid var(--line);color:#26364e}
+.gtable tr:hover td{background:var(--bg2)}
+.rolbadge{font-size:10px;font-weight:800;padding:2px 8px;border-radius:100px;text-transform:uppercase;letter-spacing:.3px}
+.rolbadge.admin{background:#0C2340;color:#fff}.rolbadge.profesor{background:#6b4fd6;color:#fff}.rolbadge.alumno{background:#1f9d6b;color:#fff}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.form-grid{grid-template-columns:1fr}}
+.form-grid .field{margin-bottom:0}
+.artcard{border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-top:10px;background:#fff}
+.artcard a{color:var(--cyan);font-weight:700;text-decoration:none;font-size:14px}
+.artcard a:hover{text-decoration:underline}
+.artcard .meta{font-size:12px;color:var(--muted);margin-top:3px}
+.proto-steps{display:flex;flex-direction:column;gap:0}
+.proto-step{border-left:2px solid var(--line);padding:0 0 4px 20px;position:relative;margin-left:8px}
+.proto-step::before{content:'';position:absolute;left:-8px;top:4px;width:14px;height:14px;border-radius:50%;background:#fff;border:2px solid var(--line)}
+.proto-step.on::before{background:var(--gold);border-color:var(--gold)}
+.proto-step.done::before{background:var(--emerald);border-color:var(--emerald)}
+.proto-step .ttl{font-weight:700;color:var(--navy);cursor:pointer;padding:8px 0;font-size:14.5px}
+.proto-step .body{display:none;padding:0 0 14px}
+.proto-step.open .body{display:block}
+@media(max-width:820px){#vigGrid{grid-template-columns:1fr!important}}
+.leaflet-popup-content{font-family:'Inter',sans-serif;font-size:13px}
 .wrap{max-width:1240px;margin:0 auto;padding:0 24px}
 .screen{display:none;animation:fade .5s var(--ease)}.screen.active{display:block}
 @keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
@@ -154,10 +184,17 @@ footer{padding:34px 0 48px;color:var(--muted);font-size:12.5px;border-top:1px so
 </head>
 <body>
 <div class="topbar"><div class="topbar-in">
-  <div class="brand"><div class="mark">IE</div><div>Inteligencia Epidemiológica<small>Ecosistema Digital · FES Iztacala UNAM</small></div></div>
+  <div class="brand"><img class="brand-logo" src="../public/assets/InteligenciaEpi-logo.png" alt="SAPIENS" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><div class="mark" style="display:none">S</div><div>SAPIENS<small>Análisis Poblacional e Inteligencia Epidemiológica · FESI UNAM</small></div></div>
   <div class="step-pill" id="stepPill" style="display:none">
     <span id="pill-1" class="on">1 · Cargar</span><span id="pill-2">2 · Procesar</span><span id="pill-3">3 · Laboratorio</span>
   </div>
+  <a class="navlink" id="linkTour" style="display:none" onclick="startTour(true)">❔ Tour</a>
+  <a class="navlink" id="linkVigilancia" style="display:none" onclick="showVigilancia()">🌍 Vigilancia</a>
+  <a class="navlink" id="linkAvanzado" style="display:none" onclick="showAvanzado()">🔬 Análisis+</a>
+  <a class="navlink" id="linkBrote" style="display:none" onclick="showBrote()">🎥 Brote en vivo</a>
+  <a class="navlink" id="linkProto" style="display:none" onclick="showProtocolo()">🎓 Protocolo</a>
+  <a class="navlink" id="linkGestion" style="display:none" onclick="showGestion()">⚙ Gestión</a>
+  <span class="rolechip" id="roleChip" style="display:none"></span>
   <a class="logout" id="logoutLink" style="display:none" onclick="doLogout()">Cerrar sesión ↪</a>
 </div></div>
 
@@ -165,9 +202,10 @@ footer{padding:34px 0 48px;color:var(--muted);font-size:12.5px;border-top:1px so
 <div class="screen active" id="screen-auth">
   <div class="auth-hero"><div class="auth-grid">
     <div>
-      <div class="badge">🔒 Acceso restringido · Cuenta administradora</div>
-      <h1 class="serif">Inteligencia <span class="g">Epidemiológica</span></h1>
-      <p class="sub">Un laboratorio <b>educativo</b> del Ecosistema Digital de la FES Iztacala. Aquí alumnos y profesores conversan con la IA para <b>obtener, analizar y simular</b> el comportamiento de la salud poblacional a partir de una base de datos de tres municipios del Estado de México — y descubren herramientas de IA como el enjambre de simulación social (MiroFish).</p>
+      <div class="badge">🔒 Acceso por rol · Alumno · Profesor · Administrador</div>
+      <h1 class="serif"><span class="g">SAPIENS</span></h1>
+      <p class="serif" style="font-size:16px;color:var(--navy);font-weight:600;margin-top:6px;line-height:1.35">Sistema de Análisis Poblacional e Inteligencia Epidemiológica mediante Nodos de Simulación</p>
+      <p class="sub">Convierte los datos de salud de <b>cualquier población</b> en un laboratorio vivo. Alumnos y profesores conversan con inteligencia artificial para <b>obtener, analizar y simular</b> el comportamiento epidemiológico de comunidades enteras: modelan brotes con <b>enjambres de miles de agentes</b>, exploran el <b>gemelo digital</b> de cada persona, detectan aberraciones, miden desigualdades en salud y diseñan intervenciones sustentadas en evidencia científica real. <b>Del dato individual a la decisión poblacional</b>, en un solo lugar.</p>
       <div class="edu-points">
         <div class="p"><span class="ico">🧠</span><div>Pregunta en español a PUM-AI y obtén análisis, gráficas e informes con fundamento clínico.</div></div>
         <div class="p"><span class="ico">🦠</span><div>Simula campañas de vacunación y observa, arquetipo por arquetipo, cómo responde la población.</div></div>
@@ -177,14 +215,14 @@ footer{padding:34px 0 48px;color:var(--muted);font-size:12.5px;border-top:1px so
     </div>
     <div class="login-card">
       <h3 class="serif">Inicia sesión</h3>
-      <p>Usa la cuenta administradora del Ecosistema Digital para entrar.</p>
+      <p>Entra con la cuenta que te dio tu profesor o el administrador de la sección.</p>
       <form id="loginForm" onsubmit="return false">
-        <div class="field"><label>Correo</label><input type="email" id="loginEmail" placeholder="admin@ecosistemadigital.unam.mx" autocomplete="username"></div>
+        <div class="field"><label>Correo</label><input type="email" id="loginEmail" placeholder="tu.correo@iztacala.unam.mx" autocomplete="username"></div>
         <div class="field"><label>Contraseña</label><input type="password" id="loginPassword" placeholder="••••••••••" autocomplete="current-password"></div>
         <div class="login-err" id="loginErr"></div>
         <button class="btn btn-gold" style="width:100%;justify-content:center" id="btnLogin" onclick="doLogin()">Iniciar sesión</button>
       </form>
-      <div class="login-note">¿No eres admin? Vuelve al <a href="../index.html" style="color:var(--gold2)">portal del Ecosistema Digital</a>.</div>
+      <div class="login-note">Los alumnos son dados de alta por su profesor. ¿Eres profesor y no tienes cuenta? Pídela al <a href="../index.html" style="color:var(--gold2)">administrador del Ecosistema Digital</a>.</div>
     </div>
   </div></div>
 </div>
@@ -192,6 +230,11 @@ footer{padding:34px 0 48px;color:var(--muted);font-size:12.5px;border-top:1px so
 <!-- ══ SCREEN 1: ONBOARDING ══ -->
 <div class="screen pagebg" id="screen-onb">
   <div class="wrap pad">
+    <div id="restoreBanner" style="display:none;background:linear-gradient(135deg,#f0faf5,#eef6fb);border:1px solid #cfe8dc;border-radius:14px;padding:16px 18px;margin-bottom:20px;align-items:center;gap:14px;flex-wrap:wrap">
+      <div style="flex:1;min-width:220px"><div style="font-weight:800;color:var(--navy);font-size:15px">↩ Tienes una sesión guardada</div><div class="note" id="restoreInfo" style="margin-top:2px"></div></div>
+      <button class="btn btn-gold" onclick="restaurarSesion()">Continuar donde me quedé</button>
+      <button class="btn btn-ghost" onclick="document.getElementById('restoreBanner').style.display='none'">Empezar de nuevo</button>
+    </div>
     <div class="sec-tag"><span class="dot"></span> Inicia tu análisis</div>
     <h1 class="serif">Carga los datos y las <span class="gold">guías clínicas</span></h1>
     <p class="sub">Sube la base poblacional y las guías de práctica clínica que quieres inyectar; la IA construirá el análisis, la simulación y el informe con <b>tus</b> datos. ¿Solo quieres ver cómo funciona? Usa la cohorte de demostración.</p>
@@ -245,6 +288,7 @@ footer{padding:34px 0 48px;color:var(--muted);font-size:12.5px;border-top:1px so
     <div class="proc-steps" id="procStepper"></div>
     <div class="stage-wrap dark-panel"><canvas id="procStage"></canvas>
       <div class="stage-badge">Etapa <b><span id="procNum">1</span>/5</b> · <span id="procName">Grafo de conocimiento</span></div>
+      <div id="procTip" style="display:none;position:absolute;bottom:12px;left:12px;right:12px;background:rgba(7,16,34,.9);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:10px 13px;font-size:12.5px;color:#e8eef6;line-height:1.45"></div>
     </div>
     <div class="caption" id="procCaption"></div>
     <div class="proc-controls">
@@ -310,6 +354,18 @@ footer{padding:34px 0 48px;color:var(--muted);font-size:12.5px;border-top:1px so
         <button class="btn btn-navy" onclick="planSend(document.getElementById('planInput').value)">Planear</button>
       </div>
       <div id="planChat" style="margin-top:14px;display:flex;flex-direction:column;gap:12px;max-height:520px;overflow:auto"></div>
+      <div style="margin-top:16px;border-top:1px dashed var(--line);padding-top:14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+          <div><div class="chart-title">📚 Evidencia científica y herramientas</div><div class="note" style="margin-top:2px">Busca artículos reales (Europe PMC / PubMed) para respaldar tu plan, o levanta datos con una encuesta.</div></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap">
+          <input id="artInput" placeholder="Ej. deworming schoolchildren intervention, o COVID metabolic syndrome risk" style="flex:1;min-width:220px;padding:11px 13px;border:1.5px solid var(--line);border-radius:11px;font-size:13.5px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')buscarArticulos(this.value)">
+          <button class="btn-mini primary" onclick="buscarArticulos(document.getElementById('artInput').value)">🔎 Buscar artículos</button>
+          <button class="btn-mini" onclick="openEncuesta()">🧾 Generar encuesta / construir BD</button>
+        </div>
+        <div id="artChips" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"></div>
+        <div id="artResults"></div>
+      </div>
     </div>
 
     <div class="card" style="margin-top:22px">
@@ -345,6 +401,7 @@ footer{padding:34px 0 48px;color:var(--muted);font-size:12.5px;border-top:1px so
     <div style="display:flex;gap:10px;margin-top:16px;flex-wrap:wrap">
       <button class="btn btn-gold" id="anaReport" onclick="generateReport()">🧠 Generar informe completo</button>
       <button class="btn btn-ghost" id="pdfBtn" onclick="exportPDF()" disabled>⬇ Exportar PDF</button>
+      <button class="btn btn-ghost" id="wordBtn" onclick="exportWord()" disabled>⬇ Exportar Word</button>
     </div>
     <div id="reportOut" style="margin-top:14px"></div>
   </div>
@@ -372,7 +429,268 @@ footer{padding:34px 0 48px;color:var(--muted);font-size:12.5px;border-top:1px so
   </div>
 </div>
 
-<footer class="wrap" style="max-width:none"><div class="wrap">Inteligencia Epidemiológica — prototipo · Ecosistema Digital, FES Iztacala UNAM · datos ficticios / cargados localmente · con fines educativos.</div></footer>
+<!-- ══ SCREEN: GESTIÓN (admin / profesor) ══ -->
+<div class="screen pagebg" id="screen-gestion"><div class="wrap pad">
+  <button class="btn btn-ghost" style="margin-bottom:10px" onclick="showScreen('screen-onb')">◀ Volver</button>
+  <div class="sec-tag"><span class="dot"></span> Panel de gestión</div>
+  <h2 class="serif">Administración de <span class="gold">usuarios y grupos</span></h2>
+  <p class="sub" id="gestionSub">Da de alta usuarios y organiza tus grupos. Los alumnos que registres podrán entrar con el correo y la contraseña que definas.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:22px" id="gestionGrid">
+    <div class="card">
+      <div class="chart-title" style="margin-bottom:2px">➕ Dar de alta usuario</div>
+      <p class="note" style="margin:2px 0 12px" id="altaHint">Registra un nuevo usuario de esta sección.</p>
+      <div class="form-grid">
+        <div class="field"><label>Nombre</label><input id="u_nombre"></div>
+        <div class="field"><label>Apellido</label><input id="u_apellido"></div>
+        <div class="field"><label>Correo</label><input id="u_correo" type="email"></div>
+        <div class="field"><label>Teléfono (opcional)</label><input id="u_tel"></div>
+        <div class="field"><label>Carrera</label><input id="u_carrera" placeholder="Ej. Médico Cirujano"></div>
+        <div class="field"><label>Rol</label><select id="u_rol" style="width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:11px;font-size:14px;font-family:inherit"></select></div>
+        <div class="field"><label>Contraseña temporal</label><input id="u_pass" type="text" placeholder="mínimo 6 caracteres"></div>
+        <div class="field"><label>Grupo (opcional)</label><select id="u_grupo" style="width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:11px;font-size:14px;font-family:inherit"></select></div>
+      </div>
+      <div class="login-err" id="altaErr" style="min-height:16px"></div>
+      <button class="btn btn-gold" id="altaBtn" onclick="crearUsuario()" style="margin-top:6px">Registrar usuario</button>
+    </div>
+    <div class="card" id="grupoCard">
+      <div class="chart-title" style="margin-bottom:2px">👥 Mis grupos y guías clínicas</div>
+      <p class="note" style="margin:2px 0 12px">Crea un grupo, comparte su código y define las guías de práctica clínica que tus alumnos deben usar.</p>
+      <div class="form-grid" style="grid-template-columns:2fr 1fr">
+        <div class="field"><label>Nombre del grupo</label><input id="g_nombre" placeholder="Ej. Salud Pública 2026-2"></div>
+        <div class="field"><label>Código</label><input id="g_codigo" placeholder="SP2026"></div>
+      </div>
+      <div class="field"><label>Guías clínicas (una por línea: título — tema)</label><textarea id="g_guias" rows="3" style="width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:11px;font-size:13px;font-family:inherit;resize:vertical" placeholder="GPC Hipertensión Arterial — HTA&#10;GPC Diabetes Mellitus tipo 2 — DM2"></textarea></div>
+      <button class="btn btn-navy" onclick="crearGrupo()">Guardar grupo</button>
+      <div id="gruposList" style="margin-top:14px"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div class="chart-title">Usuarios registrados</div>
+      <button class="btn-mini" onclick="listarUsuarios()">↻ Actualizar</button>
+    </div>
+    <div id="usuariosList" style="overflow:auto"><div class="note" style="margin-top:10px">Cargando…</div></div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div><div class="chart-title">📋 Tablero de encuestas y respuestas</div><div class="note" style="margin-top:2px">Cuántas respuestas ha capturado cada encuesta y sus prevalencias en vivo. Se actualiza al pulsar el botón.</div></div>
+      <button class="btn-mini" onclick="cargarTableroEncuestas()">↻ Actualizar</button>
+    </div>
+    <div id="tableroEncuestas" style="margin-top:10px"><div class="note">Pulsa «Actualizar» para cargar.</div></div>
+  </div>
+</div></div>
+
+<!-- ══ SCREEN: VIGILANCIA EPIDEMIOLÓGICA MUNDIAL ══ -->
+<div class="screen pagebg" id="screen-vigilancia"><div class="wrap pad">
+  <button class="btn btn-ghost" style="margin-bottom:10px" onclick="showScreen('screen-onb')">◀ Volver</button>
+  <div class="sec-tag" style="color:var(--coral)"><span class="dot" style="background:var(--coral)"></span> Vigilancia epidemiológica mundial</div>
+  <h2 class="serif">El mundo en <span class="gold">un mapa</span></h2>
+  <p class="sub">Datos públicos reales de vigilancia (fuente <b>disease.sh</b>, agregada de la OMS y la Universidad Johns Hopkins). Compara la carga de COVID-19 entre países y conecta lo global con tu cohorte local. Son cifras <b>acumuladas de referencia</b> con fines educativos.</p>
+  <div class="kpi-row" id="vigKpi" style="margin-top:16px"></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px">
+    <button class="btn-mini primary" id="vm-casosMill" onclick="setVigMetric('casosMill')">Casos / millón</button>
+    <button class="btn-mini" id="vm-muertesMill" onclick="setVigMetric('muertesMill')">Muertes / millón</button>
+    <button class="btn-mini" id="vm-activos" onclick="setVigMetric('activos')">Casos activos</button>
+    <button class="btn-mini" id="vm-casos" onclick="setVigMetric('casos')">Casos totales</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1.7fr .9fr;gap:16px" id="vigGrid">
+    <div class="card" style="padding:0;overflow:hidden"><div id="worldMap" style="height:480px;width:100%;background:#eef3f8"></div></div>
+    <div class="card">
+      <div class="chart-title" style="margin-bottom:4px">Top 10 países — <span id="vigMetricName">casos / millón</span></div>
+      <div id="vigTop"><div class="note" style="margin-top:8px">Cargando datos mundiales…</div></div>
+      <div class="note" style="margin-top:12px">🔎 Haz clic en un círculo del mapa para ver el detalle del país. El tamaño y el color representan el indicador elegido.</div>
+    </div>
+  </div>
+  <div id="vigStatus" class="note" style="margin-top:10px"></div>
+
+  <div class="card" style="margin-top:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div><div class="chart-title">⚖ Comparar el mundo con mi cohorte</div><div class="note" style="margin-top:2px">Contrasta los datos reales de un país con lo que predijo tu simulación local. Así el alumno ve la <b>brecha</b> entre el modelo y la realidad.</div></div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <select id="cmpPais" style="padding:9px 11px;border:1.5px solid var(--line);border-radius:10px;font-size:13px;font-family:inherit"><option value="Mexico">México</option></select>
+        <button class="btn-mini primary" onclick="compararCohorte()">Comparar</button>
+      </div>
+    </div>
+    <div id="cmpCohorteOut" style="margin-top:12px"><div class="note">Carga una cohorte y corre una simulación en el enjambre; luego pulsa «Comparar».</div></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="chart-title" style="margin-bottom:2px">🤧 Influenza — vigilancia centinela (EE. UU., CDC ILINet)</div>
+    <div class="note" style="margin:2px 0 8px">Porcentaje de consultas por enfermedad tipo influenza (%ILI) semana a semana. Complemento estacional a los datos de COVID-19.</div>
+    <div id="fluChart"><div class="note">Cargando serie de influenza…</div></div>
+    <div id="fluMeta" class="note" style="margin-top:6px"></div>
+  </div>
+
+  <p class="note" style="margin-top:10px">Fuente: <a href="https://disease.sh" target="_blank" rel="noopener" style="color:var(--gold2);font-weight:700">disease.sh</a> · API pública abierta (OMS / Johns Hopkins CSSE · CDC ILINet). Cifras acumuladas de referencia.</p>
+</div></div>
+
+<!-- ══ SCREEN: MODO EDUCATIVO · PROTOCOLO DE INVESTIGACIÓN ══ -->
+<div class="screen pagebg" id="screen-protocolo"><div class="wrap pad">
+  <button class="btn btn-ghost" style="margin-bottom:10px" onclick="showScreen('screen-onb')">◀ Volver</button>
+  <div class="sec-tag" style="color:var(--emerald)"><span class="dot" style="background:var(--emerald)"></span> Modo educativo</div>
+  <h2 class="serif">Protocolo de <span class="gold">investigación científica</span>, paso a paso</h2>
+  <p class="sub">Guía basada en la <b>Rúbrica de Protocolo de Investigación</b> del Módulo de Métodos de Investigación Epidemiológica (Carrera de Médico Cirujano, FES Iztacala). Cada sección muestra sus criterios y su porcentaje de evaluación; escribe tus notas, pregúntale dudas a PUM-AI y al final descarga tu protocolo armado.</p>
+  <div class="card" style="margin-top:14px">
+    <div class="form-grid" style="grid-template-columns:2fr 2fr 1fr 1fr">
+      <div class="field"><label>Título del protocolo</label><input id="protoTitulo" placeholder="Título breve, claro y preciso"></div>
+      <div class="field"><label>Autores (orden alfabético)</label><input id="protoAutores" placeholder="Apellido Nombre; Apellido Nombre…"></div>
+      <div class="field"><label>Grupo</label><input id="protoGrupo" placeholder="Grupo"></div>
+      <div class="field"><label>Equipo</label><input id="protoEquipo" placeholder="Equipo"></div>
+    </div>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin:14px 0;align-items:center"><button class="btn-mini" onclick="protoMarkAll()">✓ Marcar todo lo leído</button><button class="btn-mini" style="background:linear-gradient(100deg,var(--emerald),#17845a);color:#fff;border:none" onclick="autoevaluarProtocolo()">🎓 Autoevaluar con IA (rúbrica)</button><button class="btn-mini primary" onclick="descargarProtocolo()">⬇ Descargar mi protocolo (PDF)</button><span class="note" id="protoProgress"></span></div>
+  <div id="autoevalOut" style="margin-bottom:14px"></div>
+  <div class="card"><div class="proto-steps" id="protoSteps"></div></div>
+</div></div>
+
+<!-- ══ SCREEN: ENCUESTAS → CONSTRUIR BASE DE DATOS ══ -->
+<div class="screen pagebg" id="screen-encuesta"><div class="wrap pad">
+  <button class="btn btn-ghost" style="margin-bottom:10px" onclick="backFromEncuesta()">◀ Volver</button>
+  <div class="sec-tag" style="color:var(--cyan)"><span class="dot" style="background:var(--cyan)"></span> Encuestas y captura</div>
+  <h2 class="serif">Genera una <span class="gold">encuesta</span> y construye tu base de datos</h2>
+  <p class="sub">PUM-AI diseña una encuesta a partir de tus guías clínicas. Descárgala en PDF para aplicarla en campo o usa el formulario digital; las respuestas capturadas se convierten en una cohorte que puedes analizar y simular.</p>
+
+  <div class="card" style="margin-top:20px">
+    <div class="chart-title" style="margin-bottom:2px">1 · Diseña la encuesta con IA</div>
+    <p class="note" style="margin:2px 0 10px">Describe a quién y para qué. PUM-AI propondrá las preguntas alineadas a las guías (HTA, diabetes, factores de riesgo COVID, sociodemográficos).</p>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <input id="encPrompt" placeholder="Ej. Tamizaje de riesgo cardiometabólico en adultos de la comunidad" style="flex:1;min-width:240px;padding:12px 14px;border:1.5px solid var(--line);border-radius:11px;font-size:14px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')generarEncuesta()">
+      <button class="btn btn-gold" id="encGenBtn" onclick="generarEncuesta()">Generar encuesta</button>
+    </div>
+    <div id="encStatus" class="note" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card" id="encEditorCard" style="margin-top:16px;display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div class="chart-title">2 · Revisa las preguntas</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-mini" onclick="addEncField()">+ Pregunta</button>
+        <button class="btn-mini" onclick="exportEncuestaPDF()">⬇ PDF imprimible</button>
+        <button class="btn-mini primary" onclick="guardarEncuesta()">💾 Guardar</button>
+      </div>
+    </div>
+    <input id="encTitulo" placeholder="Título de la encuesta" style="width:100%;margin-top:10px;padding:11px 13px;border:1.5px solid var(--line);border-radius:11px;font-size:15px;font-weight:700;font-family:inherit;color:var(--navy)">
+    <div id="encFields" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card" id="encFillCard" style="margin-top:16px;display:none">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div class="chart-title">3 · Captura una respuesta (formulario digital)</div>
+      <span class="note" id="encRespCount"></span>
+    </div>
+    <p class="note" style="margin:2px 0 10px">Llena una entrevista a un paciente/familia. Cada respuesta guardada se suma a tu base de datos.</p>
+    <div id="encForm" class="form-grid"></div>
+    <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+      <button class="btn btn-navy" onclick="guardarRespuesta()">Guardar respuesta</button>
+      <button class="btn btn-ghost" onclick="construirCohorteDesdeEncuesta()">📥 Construir cohorte con las respuestas</button>
+      <button class="btn btn-ghost" onclick="exportEncCSV()">⬇ Exportar base (CSV/Excel)</button>
+    </div>
+    <div id="encFillStatus" class="note" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card" id="encListCard" style="margin-top:16px">
+    <div class="chart-title" style="margin-bottom:2px">Encuestas guardadas</div>
+    <div id="encList"><div class="note" style="margin-top:8px">Aún no has guardado encuestas.</div></div>
+  </div>
+</div></div>
+
+<!-- ══ SCREEN: ANÁLISIS AVANZADO ══ -->
+<div class="screen pagebg" id="screen-avanzado"><div class="wrap pad">
+  <button class="btn btn-ghost" style="margin-bottom:10px" onclick="showScreen('screen-mode')">◀ Volver</button>
+  <div class="sec-tag" style="color:var(--emerald)"><span class="dot" style="background:var(--emerald)"></span> Análisis avanzado</div>
+  <h2 class="serif">Herramientas de <span class="gold">epidemiología aplicada</span></h2>
+  <p class="sub" id="avSub">Cuatro instrumentos que usan tu cohorte: detección de brotes, equidad en salud, impacto de intervenciones y propagación en el tiempo.</p>
+
+  <div class="card" style="margin-top:18px">
+    <div class="chart-title">🚨 Detector automático de brotes (EARS C1)</div>
+    <div class="note" style="margin:2px 0 10px">Vigilancia de aberraciones: compara los casos de cada semana contra su línea de base (media + 3 desviaciones de las semanas previas). Cuando se supera el umbral, se dispara una alerta — el mismo principio de los sistemas reales de vigilancia sindrómica.</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <select id="brSelCol" style="padding:9px 11px;border:1.5px solid var(--line);border-radius:10px;font-size:13px;font-family:inherit"></select>
+      <button class="btn-mini primary" onclick="runDetector()">Analizar serie</button>
+    </div>
+    <div id="detectorOut" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="chart-title">⚖️ Análisis de equidad en salud</div>
+    <div class="note" style="margin:2px 0 10px">Cruza la marginación de cada colonia con la prevalencia de enfermedad para medir la desigualdad: razón de tasas entre las colonias más y menos marginadas, e índice de concentración.</div>
+    <button class="btn-mini primary" onclick="runEquidad()">Calcular desigualdad</button>
+    <div id="equidadOut" style="margin-top:12px"></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="chart-title">💉 Estimador de impacto de intervenciones</div>
+    <div class="note" style="margin:2px 0 10px">Proyecta cuántos eventos evitarías y a cuántas personas tendrías que intervenir por cada caso evitado (NNT), según la cobertura y la efectividad.</div>
+    <div class="form-grid" style="grid-template-columns:repeat(3,1fr)">
+      <div class="field"><label>Intervención</label><select id="impTipo" onchange="impDefaults()" style="width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:13px;font-family:inherit"><option value="vac">Vacunación COVID-19</option><option value="hta">Control de hipertensión</option><option value="dm2">Tamizaje + tratamiento DM2</option></select></div>
+      <div class="field"><label>Cobertura: <b id="impCobL">60%</b></label><input type="range" id="impCob" min="0" max="100" value="60" oninput="document.getElementById('impCobL').textContent=this.value+'%';runImpacto()"></div>
+      <div class="field"><label>Efectividad: <b id="impEfL">70%</b></label><input type="range" id="impEf" min="0" max="100" value="70" oninput="document.getElementById('impEfL').textContent=this.value+'%';runImpacto()"></div>
+    </div>
+    <div id="impactoOut" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div><div class="chart-title">🔥 Mapa de calor temporal — propagación semana a semana</div><div class="note" style="margin-top:2px">Observa cómo el brote se mueve por las colonias a lo largo del tiempo. Usa ▶ para animar.</div></div>
+      <div style="display:flex;gap:8px;align-items:center"><button class="btn-mini primary" id="htPlay" onclick="toggleHeat()">▶ Reproducir</button><span class="week-badge" style="position:static;background:var(--navy)">Semana <span id="htWk">0</span></span></div>
+    </div>
+    <input type="range" id="htSlider" min="0" max="25" value="0" style="width:100%;margin-top:12px" oninput="drawHeat(+this.value)">
+    <div id="heatOut" style="margin-top:12px"></div>
+  </div>
+</div></div>
+
+<!-- ══ SCREEN: BROTE EN VIVO (aula) ══ -->
+<div class="screen pagebg" id="screen-brote"><div class="wrap pad">
+  <button class="btn btn-ghost" style="margin-bottom:10px" onclick="salirBrote()">◀ Volver</button>
+  <div class="sec-tag" style="color:var(--coral)"><span class="dot" style="background:var(--coral)"></span> Simulacro de respuesta · en vivo</div>
+  <h2 class="serif">Brote en vivo <span class="gold">para el aula</span></h2>
+  <p class="sub">Un simulacro colaborativo: el profesor abre una sesión y cada alumno, desde su dispositivo, decide la respuesta de salud pública cada semana. Las decisiones del grupo cambian el rumbo de la epidemia en tiempo real.</p>
+
+  <div id="broteHome" style="margin-top:20px;display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div class="card" id="broteProfCard">
+      <div class="chart-title">👩‍🏫 Soy profesor — abrir sesión</div>
+      <p class="note" style="margin:4px 0 10px">Crea una sala; comparte el código con tu grupo.</p>
+      <input id="broteTitulo" placeholder="Título del escenario (ej. Brote respiratorio en Ecatepec)" style="width:100%;padding:11px 13px;border:1.5px solid var(--line);border-radius:11px;font-size:14px;font-family:inherit;margin-bottom:10px">
+      <button class="btn btn-gold" onclick="crearBrote()">Abrir sesión</button>
+      <div id="broteProfMsg" class="note" style="margin-top:8px"></div>
+    </div>
+    <div class="card">
+      <div class="chart-title">🙋 Soy alumno — unirme</div>
+      <p class="note" style="margin:4px 0 10px">Escribe el código que te dio tu profesor.</p>
+      <div style="display:flex;gap:8px"><input id="broteCodigo" placeholder="CÓDIGO" style="flex:1;padding:11px 13px;border:1.5px solid var(--line);border-radius:11px;font-size:16px;font-family:inherit;text-transform:uppercase;letter-spacing:2px"><button class="btn btn-navy" onclick="unirseBrote()">Unirme</button></div>
+      <div id="broteAlMsg" class="note" style="margin-top:8px"></div>
+    </div>
+  </div>
+
+  <div id="broteRoom" style="display:none;margin-top:18px">
+    <div class="results-banner" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div><div class="rb-head" style="margin-bottom:0">Sala <span id="broteRoomCode" style="color:var(--gold2)"></span></div><div class="note" id="broteRoomState"></div></div>
+      <div class="week-badge" style="position:static;background:var(--navy)">Semana <span id="broteWk">0</span> / 12</div>
+    </div>
+    <div class="swarm-shell" style="margin-top:14px">
+      <div class="card"><canvas id="broteChart" height="240" style="width:100%;display:block"></canvas><div id="broteMetrics" class="kpi-row" style="margin-top:10px"></div></div>
+      <div class="controls">
+        <div class="ctrl-group" id="broteDecisionBox">
+          <div class="chart-title" style="margin-bottom:8px">Tu decisión de esta semana</div>
+          <div id="broteAcciones" style="display:flex;flex-direction:column;gap:8px"></div>
+          <div id="broteDecMsg" class="note" style="margin-top:8px"></div>
+        </div>
+        <div class="ctrl-group" id="broteProfControls" style="display:none">
+          <div class="chart-title" style="margin-bottom:8px">Control del profesor</div>
+          <div id="broteTally" class="note" style="margin-bottom:10px"></div>
+          <button class="btn-mini primary" style="width:100%;margin-bottom:8px" onclick="avanzarBrote()">▶ Avanzar semana</button>
+          <button class="btn-mini" style="width:100%" onclick="terminarBrote()">■ Terminar simulacro</button>
+        </div>
+      </div>
+    </div>
+    <div id="broteDebrief" style="margin-top:14px"></div>
+  </div>
+</div></div>
+
+<footer class="wrap" style="max-width:none"><div class="wrap">SAPIENS — Sistema de Análisis Poblacional e Inteligencia Epidemiológica mediante Nodos de Simulación · Ecosistema Digital, FES Iztacala UNAM · datos ficticios / cargados localmente · con fines educativos.</div></footer>
 
 <script>
 /* ============ CONFIG + AUTH ============ */
@@ -386,16 +704,35 @@ async function checkSession(){
   if(!sb)return null;
   try{const {data:{session}}=await sb.auth.getSession();return session;}catch(e){return null;}
 }
-function isAdmin(session){return !!(session&&session.user&&session.user.email===ADMIN_EMAIL);}
+let MY_PROFILE=null;
+async function fetchProfile(){
+  try{
+    const res=await fetch(SUPABASE_URL+'/functions/v1/iep-usuarios',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+sessionToken},body:JSON.stringify({action:'perfil'})});
+    const data=await res.json();
+    if(data&&data.ok&&data.perfil){MY_PROFILE=data.perfil;return data.perfil;}
+    return null;
+  }catch(e){return null;}
+}
 async function gate(){
   const s=await checkSession();
-  if(isAdmin(s)){sessionToken=s.access_token||SUPABASE_ANON_KEY;enterApp();}
+  if(s&&s.user){sessionToken=s.access_token||SUPABASE_ANON_KEY;const p=await fetchProfile();if(p)enterApp();}
 }
 function enterApp(){
   document.getElementById('screen-auth').classList.remove('active');
   document.getElementById('stepPill').style.display='flex';
   document.getElementById('logoutLink').style.display='inline';
+  const rol=(MY_PROFILE&&MY_PROFILE.rol)||'alumno';
+  const chip=document.getElementById('roleChip');chip.style.display='inline';chip.textContent=rol;
+  // Gestión: solo admin y profesor. Protocolo y Vigilancia: todos.
+  document.getElementById('linkVigilancia').style.display='inline';
+  document.getElementById('linkAvanzado').style.display='inline';
+  document.getElementById('linkBrote').style.display='inline';
+  document.getElementById('linkProto').style.display='inline';
+  document.getElementById('linkTour').style.display='inline';
+  document.getElementById('linkGestion').style.display=(rol==='admin'||rol==='profesor')?'inline':'none';
   showScreen('screen-onb');
+  loadProgress();
+  setTimeout(()=>{try{if(!localStorage.getItem('iep_tour_v1'))startTour(false);}catch(e){}},900);
 }
 async function doLogin(){
   const email=document.getElementById('loginEmail').value.trim();
@@ -408,8 +745,10 @@ async function doLogin(){
   try{
     const {data,error}=await sb.auth.signInWithPassword({email,password:pass});
     if(error)throw error;
-    if(!isAdmin(data.session)){err.textContent='Esta sección es solo para la cuenta administradora.';await sb.auth.signOut();return;}
-    sessionToken=data.session.access_token||SUPABASE_ANON_KEY;enterApp();
+    sessionToken=data.session.access_token||SUPABASE_ANON_KEY;
+    const p=await fetchProfile();
+    if(!p){err.textContent='Tu cuenta no está dada de alta en esta sección. Pide a tu profesor o al administrador que te registre.';await sb.auth.signOut();sessionToken=SUPABASE_ANON_KEY;return;}
+    enterApp();
   }catch(e){err.textContent=(e&&e.message)?('No se pudo iniciar sesión: '+e.message):'No se pudo iniciar sesión.';}
   finally{btn.textContent='Iniciar sesión';btn.disabled=false;}
 }
@@ -444,6 +783,7 @@ async function startAnalysis(demo){
     catch(e){plog('<span style="color:#f8b4b4">⚠ No se pudo leer el PDF ('+e.message+'). El análisis usará principios generales.</span>');}
   }
   plog('<span class="ok">✓</span> Listo. Elige cómo trabajar.','ok');
+  try{saveCohorteProgress(usedDemo?'demo':'upload');}catch(e){}
   setTimeout(()=>{buildLab();buildModeScreen();buildAna();showScreen('screen-mode');},700);
 }
 /* ============ guías: extracción real de texto (pdf.js) ============ */
@@ -492,6 +832,7 @@ for i in range(N):
     if sexo=='F': pyrF[band]+=1
     else: pyrM[band]+=1
     imc=float(np.clip(rng.normal(26.5+0.045*(edad-40)+2.4*marg,4.2),16,50))
+    talla=float(np.clip(rng.normal(1.72 if sexo=='M' else 1.60,0.07),1.45,1.98)); peso=imc*talla*talla
     ta=rng.normal(118+0.35*(edad-40)+0.6*(imc-26)+6*marg,12); glu=rng.normal(92+0.3*(edad-40)+0.9*(imc-26)+8*marg,20)
     th=bool(ta>=140 or rng.random()<1/(1+np.exp(-(-3.3+0.05*(ta-120)+0.035*(edad-40)+0.06*(imc-26)+1.2*marg))))
     td=bool(glu>=126 or rng.random()<1/(1+np.exp(-(-4.6+0.05*(glu-100)+0.04*(edad-40)+0.07*(imc-27)+0.8*marg))))
@@ -527,11 +868,19 @@ for i in range(N):
     vc=rng.random()<(0.45+0.4*inten); vf=rng.random()<(0.3+0.3*inten)
     vac[0 if (vc and vf) else 1 if (vc or vf) else 2]+=1
     k=munis[m]+'|'+colonia; ee=colacc.get(k,[0,0,0,0.0]); ee[0]+=th; ee[1]+=td; ee[2]+=1; ee[3]+=marg; colacc[k]=ee
-    out.append({'a':a,'i':round(inten,3),'c':round(conf,3),'d':round(des,3),'v':1 if vuln else 0,'m':m,'e':edad,'h':1 if th else 0,'dd':1 if td else 0,'s':sexo,'ob':1 if imc>=30 else 0,'sm':sm,'gx':genet,'ta':int(ta),'gl':int(glu),'ci':int(cintura),'rk':round(rk,2)})
+    out.append({'a':a,'i':round(inten,3),'c':round(conf,3),'d':round(des,3),'v':1 if vuln else 0,'m':m,'e':edad,'h':1 if th else 0,'dd':1 if td else 0,'s':sexo,'ob':1 if imc>=30 else 0,'sm':sm,'gx':genet,'ta':int(ta),'gl':int(glu),'ci':int(cintura),'rk':round(rk,2),'pw':round(peso,1),'al':int(talla*100),'imc':round(imc,1)})
 def pc(x,d): return round(x/max(1,d)*100,1)
 muni=[{'name':munis[m],'hta':pc(mh[m][0],mh[m][2]),'dm2':pc(mh[m][1],mh[m][2])} for m in range(3)]
 colonias=[{'name':k.split('|')[1],'muni':k.split('|')[0],'hta':pc(v[0],v[2]),'dm2':pc(v[1],v[2]),'marg':round(v[3]/max(1,v[2]),2),'n':v[2]} for k,v in colacc.items()]
-stats={'n':N,'hta':pc(sum(mh[m][0] for m in range(3)),N),'dm2':pc(sum(mh[m][1] for m in range(3)),N),
+def _grp(e): return '18-29' if e<30 else '30-44' if e<45 else '45-59' if e<60 else '60-74' if e<75 else '75+'
+def _seg(vals):
+    res=[]
+    for lab,test in vals:
+        sub=[r for r in out if test(r)]; nn=max(1,len(sub))
+        res.append({'k':lab,'n':len(sub),'hta':round(100*sum(r['h'] for r in sub)/nn,1),'dm2':round(100*sum(r['dd'] for r in sub)/nn,1),'obes':round(100*sum(r['ob'] for r in sub)/nn,1),'covidAlto':round(100*sum(1 for r in sub if r['rk']>=0.45)/nn,1)})
+    return res
+desglose={'sexo':_seg([('Femenino',lambda r:r['s']=='F'),('Masculino',lambda r:r['s']=='M')]),'edad':_seg([(g,(lambda gg:(lambda r:_grp(r['e'])==gg))(g)) for g in ['18-29','30-44','45-59','60-74','75+']]),'comorbilidad':_seg([('Con HTA',lambda r:r['h']==1),('Con DM2',lambda r:r['dd']==1),('Con síndrome metabólico',lambda r:r['sm']==1),('Con obesidad',lambda r:r['ob']==1)])}
+stats={'n':N,'hta':pc(sum(mh[m][0] for m in range(3)),N),'dm2':pc(sum(mh[m][1] for m in range(3)),N),'desglose':desglose,
  'arq':[pc(x,N) for x in arqc],'muni':muni,'colonias':colonias,
  'cascada':{'tiene':pc(casc['tiene'],N),'dx':pc(casc['dx'],N),'trat':pc(casc['trat'],N),'ctrl':pc(casc['ctrl'],N),'silent':pc(casc['tiene']-casc['dx'],N)},
  'riesgo':[pc(risk[0],N),pc(risk[1],N),pc(risk[2],N)],
@@ -589,8 +938,21 @@ def gxof(i):
 def rkof(i):
     male=(sexoc.iloc[i]=='M'); g=gxof(i)
     return round(min(0.97,0.05+0.010*max(0,int(edadc.iloc[i])-40)+0.12*truthy(dmc.iloc[i])+0.08*truthy(htac.iloc[i])+0.10*(1 if imcc.iloc[i]>=30 else 0)+0.10*smof(i)+(0.12 if g in ('Trombofilia','Inmunodeficiencia') else 0.05 if g!='Ninguna' else 0.0)+(0.04 if male else 0.0)),2)
+pesoc=pd.to_numeric(col('peso_kg',default=col('peso',default=None)),errors='coerce')
+tallac=pd.to_numeric(col('talla_cm',default=col('talla',default=None)),errors='coerce')
+_tb=pd.Series(np.where(sexoc.values=='M',172.0,160.0)+np.random.default_rng(5).normal(0,6,n))
+tallaf=(tallac.fillna(_tb) if tallac.notna().any() else _tb)
+pesof=(pesoc.fillna(imcc*(tallaf/100.0)**2) if pesoc.notna().any() else imcc*(tallaf/100.0)**2)
 idx=np.random.default_rng(3).choice(n,size=min(n,2600),replace=False)
-agents=[{'a':int(arq_of(i)),'i':float(round(inten.iloc[i],3)),'c':float(round(conf.iloc[i],3)),'d':float(round(des.iloc[i],3)),'v':truthy(vulncol.iloc[i]),'m':int(umuni.get(muni.iloc[i],0)),'e':int(edadc.iloc[i]),'h':truthy(htac.iloc[i]),'dd':truthy(dmc.iloc[i]),'s':str(sexoc.iloc[i]),'ob':1 if imcc.iloc[i]>=30 else 0,'sm':smof(i),'gx':gxof(i),'ta':int(tac.iloc[i]),'gl':int(gluc.iloc[i]),'ci':int(cinc.iloc[i]),'rk':rkof(i)} for i in idx]
+agents=[{'a':int(arq_of(i)),'i':float(round(inten.iloc[i],3)),'c':float(round(conf.iloc[i],3)),'d':float(round(des.iloc[i],3)),'v':truthy(vulncol.iloc[i]),'m':int(umuni.get(muni.iloc[i],0)),'e':int(edadc.iloc[i]),'h':truthy(htac.iloc[i]),'dd':truthy(dmc.iloc[i]),'s':str(sexoc.iloc[i]),'ob':1 if imcc.iloc[i]>=30 else 0,'sm':smof(i),'gx':gxof(i),'ta':int(tac.iloc[i]),'gl':int(gluc.iloc[i]),'ci':int(cinc.iloc[i]),'rk':rkof(i),'pw':round(float(pesof.iloc[i]),1),'al':int(tallaf.iloc[i]),'imc':round(float(imcc.iloc[i]),1)} for i in idx]
+def _grp(e): return '18-29' if e<30 else '30-44' if e<45 else '45-59' if e<60 else '60-74' if e<75 else '75+'
+def _seg(tl):
+    o2=[]
+    for lab,fn in tl:
+        sub=[x for x in agents if fn(x)]; nn=max(1,len(sub))
+        o2.append({'k':lab,'n':len(sub),'hta':round(100*sum(x['h'] for x in sub)/nn,1),'dm2':round(100*sum(x['dd'] for x in sub)/nn,1),'obes':round(100*sum(x['ob'] for x in sub)/nn,1),'covidAlto':round(100*sum(1 for x in sub if x['rk']>=0.45)/nn,1)})
+    return o2
+desglose={'sexo':_seg([('Femenino',lambda x:x['s']=='F'),('Masculino',lambda x:x['s']=='M')]),'edad':_seg([(g,(lambda gg:(lambda x:_grp(x['e'])==gg))(g)) for g in ['18-29','30-44','45-59','60-74','75+']]),'comorbilidad':_seg([('Con HTA',lambda x:x['h']==1),('Con DM2',lambda x:x['dd']==1),('Con síndrome metabólico',lambda x:x['sm']==1),('Con obesidad',lambda x:x['ob']==1)])}
 hta=pct(col('tiene_hta',default=col('dx_hta',default=False))); dm2=pct(col('tiene_dm2',default=col('dx_dm2',default=False)))
 # per-municipio
 mu=[]
@@ -631,7 +993,7 @@ smetab=round(100*sum(x['sm'] for x in agents)/tot,1)
 rcc=[0,0,0]
 for x in agents: rcc[2 if x['rk']>=0.45 else 1 if x['rk']>=0.25 else 0]+=1
 riesgoCovid=[round(100*rcc[k]/tot,1) for k in range(3)]
-stats={'n':int(n),'hta':hta,'dm2':dm2,'arq':[round(x/tot*100,1) for x in ac],'muni':mu,'colonias':colonias,'cascada':casc,'riesgo':risk,'piramide':{'g':labels,'F':pf,'M':pm},'factores':{'obes':obes,'tab':tab,'inact':inact,'diet':diet},'vacunacion':vacn,'comorbilidad':comorb,'smetab':smetab,'riesgoCovid':riesgoCovid}
+stats={'n':int(n),'hta':hta,'dm2':dm2,'desglose':desglose,'arq':[round(x/tot*100,1) for x in ac],'muni':mu,'colonias':colonias,'cascada':casc,'riesgo':risk,'piramide':{'g':labels,'F':pf,'M':pm},'factores':{'obes':obes,'tab':tab,'inact':inact,'diet':diet},'vacunacion':vacn,'comorbilidad':comorb,'smetab':smetab,'riesgoCovid':riesgoCovid}
 json.dumps({'stats':stats,'agents':agents})
 `;
   return JSON.parse(pyodide.runPython(code));
@@ -649,6 +1011,7 @@ function jsGenerate(N){
     if(th){hta++;mh[m][0]++;}if(td){dm2++;mh[m][1]++;}if(th&&td)comorb++;
     if(imc>=30)fac.obes++;if(Math.random()<(0.16+0.05*marg))fac.tab++;if(Math.random()<(0.35+0.3*marg))fac.inact++;if(Math.random()<(0.35+0.25*marg))fac.diet++;
     const cintura=imc*(sexo==='M'?3.4:3.3)+(Math.random()-.5)*12,tg=Math.max(50,150+2*(imc-26)+(Math.random()-.5)*120),hdl=Math.max(25,52-(sexo==='M'?6:0)+(Math.random()-.5)*24);
+    const talla=(sexo==='M'?172:160)+(Math.random()-.5)*12,peso=imc*Math.pow(talla/100,2);
     const smi=(cintura>=(sexo==='M'?102:88)?1:0)+(th?1:0)+(td?1:0)+(tg>=150?1:0)+(hdl<(sexo==='M'?40:50)?1:0);const sm=smi>=3?1:0;if(sm)smc++;
     const gr=Math.random(),genet=gr<0.80?'Ninguna':gr<0.88?'Predisp. cardiovascular':gr<0.94?'Predisp. diabetes':gr<0.975?'Trombofilia':'Inmunodeficiencia';
     const rk=Math.min(0.97,0.05+0.010*Math.max(0,edad-40)+0.12*(td?1:0)+0.08*(th?1:0)+0.10*(imc>=30?1:0)+0.10*sm+((genet==='Trombofilia'||genet==='Inmunodeficiencia')?0.12:genet!=='Ninguna'?0.05:0)+(sexo==='M'?0.04:0));
@@ -660,11 +1023,14 @@ function jsGenerate(N){
     let a=inten>=0.66?0:inten<=0.42?2:1;if(vuln&&a!==0&&Math.random()<.6)a=3;ac[a]++;
     const vc=Math.random()<(.45+.4*inten),vf=Math.random()<(.3+.3*inten);vac[(vc&&vf)?0:(vc||vf)?1:2]++;
     const k=munis[m]+'|'+colonia;const ee=colacc[k]||[0,0,0,0];ee[0]+=th?1:0;ee[1]+=td?1:0;ee[2]++;ee[3]+=marg;colacc[k]=ee;
-    agents.push({a,i:+inten.toFixed(3),c:+conf.toFixed(3),d:+des.toFixed(3),v:vuln?1:0,m,e:edad,h:th?1:0,dd:td?1:0,s:sexo,ob:imc>=30?1:0,sm,gx:genet,ta:Math.round(115+(th?30:0)),gl:Math.round(95+(td?45:0)),ci:Math.round(cintura),rk:+rk.toFixed(2)});}
+    agents.push({a,i:+inten.toFixed(3),c:+conf.toFixed(3),d:+des.toFixed(3),v:vuln?1:0,m,e:edad,h:th?1:0,dd:td?1:0,s:sexo,ob:imc>=30?1:0,sm,gx:genet,ta:Math.round(115+(th?30:0)),gl:Math.round(95+(td?45:0)),ci:Math.round(cintura),rk:+rk.toFixed(2),pw:+peso.toFixed(1),al:Math.round(talla),imc:+imc.toFixed(1)});}
   const pc=(x,d)=>+(x/Math.max(1,d)*100).toFixed(1);
+  const _grp=e=>e<30?'18-29':e<45?'30-44':e<60?'45-59':e<75?'60-74':'75+';
+  const _seg=tl=>tl.map(t=>{const sub=agents.filter(t[1]),nn=Math.max(1,sub.length);return{k:t[0],n:sub.length,hta:pc(sub.filter(x=>x.h).length,nn),dm2:pc(sub.filter(x=>x.dd).length,nn),obes:pc(sub.filter(x=>x.ob).length,nn),covidAlto:pc(sub.filter(x=>x.rk>=0.45).length,nn)};});
+  const desglose={sexo:_seg([['Femenino',x=>x.s==='F'],['Masculino',x=>x.s==='M']]),edad:_seg(['18-29','30-44','45-59','60-74','75+'].map(g=>[g,x=>_grp(x.e)===g])),comorbilidad:_seg([['Con HTA',x=>x.h===1],['Con DM2',x=>x.dd===1],['Con síndrome metabólico',x=>x.sm===1],['Con obesidad',x=>x.ob===1]])};
   const muni=munis.map((nm,m)=>({name:nm,hta:pc(mh[m][0],mh[m][2]),dm2:pc(mh[m][1],mh[m][2])}));
   const colonias=Object.keys(colacc).map(k=>{const v=colacc[k];return{name:k.split('|')[1],muni:k.split('|')[0],hta:pc(v[0],v[2]),dm2:pc(v[1],v[2]),marg:+(v[3]/Math.max(1,v[2])).toFixed(2),n:v[2]};});
-  return {stats:{n:N,hta:pc(hta,N),dm2:pc(dm2,N),arq:ac.map(x=>pc(x,N)),muni,colonias,cascada:{tiene:pc(casc.tiene,N),dx:pc(casc.dx,N),trat:pc(casc.trat,N),ctrl:pc(casc.ctrl,N),silent:pc(casc.tiene-casc.dx,N)},riesgo:[pc(risk[0],N),pc(risk[1],N),pc(risk[2],N)],piramide:{g:['18-29','30-44','45-59','60-74','75+'],F:pyrF,M:pyrM},factores:{obes:pc(fac.obes,N),tab:pc(fac.tab,N),inact:pc(fac.inact,N),diet:pc(fac.diet,N)},vacunacion:[pc(vac[0],N),pc(vac[1],N),pc(vac[2],N)],comorbilidad:pc(comorb,N),smetab:pc(smc,N),riesgoCovid:[pc(rkcat[0],N),pc(rkcat[1],N),pc(rkcat[2],N)]},agents};
+  return {stats:{n:N,hta:pc(hta,N),dm2:pc(dm2,N),desglose,arq:ac.map(x=>pc(x,N)),muni,colonias,cascada:{tiene:pc(casc.tiene,N),dx:pc(casc.dx,N),trat:pc(casc.trat,N),ctrl:pc(casc.ctrl,N),silent:pc(casc.tiene-casc.dx,N)},riesgo:[pc(risk[0],N),pc(risk[1],N),pc(risk[2],N)],piramide:{g:['18-29','30-44','45-59','60-74','75+'],F:pyrF,M:pyrM},factores:{obes:pc(fac.obes,N),tab:pc(fac.tab,N),inact:pc(fac.inact,N),diet:pc(fac.diet,N)},vacunacion:[pc(vac[0],N),pc(vac[1],N),pc(vac[2],N)],comorbilidad:pc(comorb,N),smetab:pc(smc,N),riesgoCovid:[pc(rkcat[0],N),pc(rkcat[1],N),pc(rkcat[2],N)]},agents};
 }
 
 /* ============ LAB header ============ */
@@ -672,8 +1038,10 @@ const PLAN_CHIPS=['Diseña un estudio de investigación con estos datos','Planea
 function addPlanMsg(text,who){const c=document.getElementById('planChat');const d=document.createElement('div');const me=who==='user';d.style.cssText='padding:12px 15px;border-radius:14px;font-size:14px;line-height:1.55;'+(me?'align-self:flex-end;max-width:85%;background:var(--navy);color:#fff':'align-self:flex-start;max-width:97%;background:var(--bg2);border:1px solid var(--line);color:#26364e');if(me)d.textContent=text;c.appendChild(d);c.scrollTop=c.scrollHeight;return d;}
 async function planSend(q){q=(q||'').trim();if(!q)return;const inp=document.getElementById('planInput');if(inp)inp.value='';
   addPlanMsg(q,'user');const load=addPlanMsg('PUM-AI está planeando…','bot');
-  const s=COHORT.stats,sim=window.SIMSTATE||{},c=s.cascada||{},f=s.factores||{};
-  const ctx='Contexto (cohorte ficticia, N='+s.n+'). HTA '+s.hta+'%, DM2 '+s.dm2+'%, obesidad '+(f.obes||'?')+'%, síndrome metabólico '+(s.smetab||'?')+'%, comorbilidad HTA+DM2 '+(s.comorbilidad||'?')+'%, casos silentes DM2 '+c.silent+'%, riesgo CV alto '+((s.riesgo||[])[2]||0)+'%. Arquetipos ante la vacuna: Provacuna '+s.arq[0]+'%, Indeciso '+s.arq[1]+'%, Renuente '+s.arq[2]+'%, Vulnerable '+s.arq[3]+'%. Riesgo de complicación COVID (bajo/mod/alto): '+((s.riesgoCovid||[]).join('/')||'?')+'. Última simulación COVID: cobertura '+(sim.vac||0)+'%, contagios '+(sim.inf||0)+'%, graves '+(sim.sev||0)+'%.\n\nSOLICITUD: '+q;
+  const s=COHORT.stats,sim=window.SIMSTATE||{},c=s.cascada||{},f=s.factores||{},dg=s.desglose||{};
+  const pseg=arr=>(arr||[]).map(x=>x.k+' (n='+x.n+'): HTA '+x.hta+'%, DM2 '+x.dm2+'%, obesidad '+x.obes+'%, COVID alto '+x.covidAlto+'%').join(' | ');
+  const pdesTxt=' Desgloses — sexo: '+pseg(dg.sexo)+'; edad: '+pseg(dg.edad)+'; comorbilidad: '+pseg(dg.comorbilidad)+'.';
+  const ctx='Contexto (cohorte, N='+s.n+'). HTA '+s.hta+'%, DM2 '+s.dm2+'%, obesidad '+(f.obes||'?')+'%, síndrome metabólico '+(s.smetab||'?')+'%, comorbilidad HTA+DM2 '+(s.comorbilidad||'?')+'%, casos silentes DM2 '+c.silent+'%, riesgo CV alto '+((s.riesgo||[])[2]||0)+'%. Arquetipos ante la vacuna: Provacuna '+s.arq[0]+'%, Indeciso '+s.arq[1]+'%, Renuente '+s.arq[2]+'%, Vulnerable '+s.arq[3]+'%. Riesgo de complicación COVID (bajo/mod/alto): '+((s.riesgoCovid||[]).join('/')||'?')+'. Última simulación COVID: cobertura '+(sim.vac||0)+'%, contagios '+(sim.inf||0)+'%, graves '+(sim.sev||0)+'%.'+pdesTxt+'\n\nSOLICITUD: '+q;
   try{const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'plan',messages:[{role:'user',content:ctx}]})});const data=await res.json();load.style.whiteSpace='normal';load.innerHTML=mdToHtml(data.reply||'Sin respuesta.');}
   catch(e){load.textContent='No se pudo planear ('+(e.message||e)+').';}
 }
@@ -746,11 +1114,15 @@ const PROC=(function(){
   const DRAW=[sGraph,sAgents,sSim,sReport,sChat];
   let cur=0,playing=true,started=false,sceneStart=0,localT=0,finished=false,stepEls=[];
   function chrome(){document.getElementById('procNum').textContent=cur+1;document.getElementById('procName').textContent=SC[cur].name;document.getElementById('procCaption').innerHTML=SC[cur].cap;document.getElementById('procLegend').innerHTML=SC[cur].legend.map(l=>'<span class="li"><span class="sw" style="background:'+l[0]+'"></span>'+l[1]+'</span>').join('');stepEls.forEach((el,i)=>{el.classList.toggle('active',i===cur);el.classList.toggle('done',i<cur);});}
-  function goto(i){cur=(i+SC.length)%SC.length;sceneStart=performance.now();localT=0;chrome();}
+  const ARQ_D={'#34D399':['Provacuna','Confía en la vacuna y en las instituciones; se vacuna sin dudar e influye positivamente a su entorno.'],'#FBBF24':['Indeciso','Ni a favor ni en contra; su decisión depende de lo que hagan y digan quienes lo rodean.'],'#7C5CFF':['Renuente','Desconfía o está expuesto a desinformación; pospone o rechaza la vacuna.'],'#38BDF8':['Vulnerable','Clínicamente frágil (edad/comorbilidades); si no se vacuna es quien más riesgo tiene de complicarse.']};
+  function hideTip(){const t=document.getElementById('procTip');if(t)t.style.display='none';}
+  function goto(i){cur=(i+SC.length)%SC.length;sceneStart=performance.now();localT=0;hideTip();chrome();}
   function finish(){if(finished)return;finished=true;playing=false;document.getElementById('procPlay').textContent='▶';revealResults();}
   function loop(now){requestAnimationFrame(loop);if(!ctx)return;ctx.clearRect(0,0,W,H);if(started&&playing&&!finished){localT=now-sceneStart;if(localT>=SC[cur].dur){if(cur>=SC.length-1){finish();return;}goto(cur+1);return;}}const t=finished?1:c01(localT/SC[cur].dur);if(stepEls[cur]){stepEls[cur].querySelector('.pbar').style.width=(t*100)+'%';stepEls.forEach((el,i)=>{if(i!==cur)el.querySelector('.pbar').style.width=i<cur?'100%':'0%';});}DRAW[cur](t);}
   function resize(){if(!cv)return;W=cv.clientWidth;H=400;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);}
   return {init(){cv=document.getElementById('procStage');ctx=cv.getContext('2d');new ResizeObserver(resize).observe(cv);resize();seed();
+    cv.addEventListener('mousemove',()=>{cv.style.cursor=(cur===1)?'pointer':'default';});
+    cv.addEventListener('click',function(e){ if(cur!==1)return; const rect=cv.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top; const cols=18,rows=9,sX=Math.max(30,W*0.5-cols*11),sY=60,gX=(W-sX*2)/(cols-1),gY=(H-140)/(rows-1); let best=null,bd=1e9; ag.forEach(a=>{const x=sX+a.gx*gX,y=sY+a.gy*gY,d=(x-mx)*(x-mx)+(y-my)*(y-my);if(d<bd){bd=d;best=a;}}); if(best&&bd<1200){const info=ARQ_D[best.c]||['Arquetipo','']; const t=document.getElementById('procTip'); if(t){t.style.display='block';t.innerHTML='<span style="width:9px;height:9px;border-radius:50%;display:inline-block;background:'+best.c+';margin-right:6px"></span><b style="color:'+best.c+'">'+info[0]+'</b> — '+info[1]+' <span style="color:#8fa3bd">(clic en otro punto para ver otro arquetipo)</span>';} } });
     const st=document.getElementById('procStepper');SC.forEach((s,i)=>{const d=document.createElement('div');d.className='proc-step';d.innerHTML='<div class="k">'+s.k+'</div><div class="t">'+s.t+'</div><div class="pbar"></div>';d.addEventListener('click',()=>goto(i));st.appendChild(d);});stepEls=[...st.querySelectorAll('.proc-step')];
     document.getElementById('procPrev').onclick=()=>goto(cur-1);document.getElementById('procNext').onclick=()=>{if(cur>=SC.length-1)finish();else goto(cur+1);};document.getElementById('procReplay').onclick=()=>{cur=0;finished=false;sceneStart=performance.now();localT=0;playing=true;document.getElementById('procPlay').textContent='⏸ Pausar';chrome();};document.getElementById('procPlay').onclick=()=>{playing=!playing;document.getElementById('procPlay').textContent=playing?'⏸ Pausar':'▶';if(playing)sceneStart=performance.now()-localT;};document.getElementById('procSkip').onclick=()=>finish();
     chrome();started=true;sceneStart=performance.now();requestAnimationFrame(loop);}};
@@ -772,7 +1144,7 @@ let params={cob:0.4,des:0.3,den:0.5,vel:12};
 const RAD=48,ARCH_COL=[[0.12,0.62,0.42],[0.85,0.58,0.08],[0.42,0.31,0.84],[0.18,0.5,0.72]];
 const COL_S=[0.5,0.6,0.72],COL_I=[0.97,0.55,0.35],COL_R=[0.7,0.58,0.31],COL_V=[0.12,0.7,0.45],COL_SEV=[0.62,0.06,0.12];
 let useThree=false,ctx2d=null,dragRot={x:.3,y:0},dragging=false,lastP=null;
-function seedAgents(){sag=COHORT.agents.map(o=>{const u=Math.random(),v=Math.random(),th=2*Math.PI*u,ph=Math.acos(2*v-1),rr=RAD*Math.cbrt(Math.random());return{x:rr*Math.sin(ph)*Math.cos(th),y:rr*Math.sin(ph)*Math.sin(th),z:rr*Math.cos(ph),vx:(Math.random()-.5),vy:(Math.random()-.5),vz:(Math.random()-.5),arch:o.a,opinion:o.i,baseOp:o.i,conf:o.c,des:o.d,vuln:o.v,edad:o.e,hta:o.h,dm2:o.dd,muni:o.m,sexo:o.s,obes:o.ob,sm:o.sm,gx:o.gx,ta:o.ta,glu:o.gl,cintura:o.ci,rk:(o.rk!=null?o.rk:0.15),state:'S',vacc:false,sev:false,tRec:0,cr:0,cg:0,cb:0};});SN=sag.length;}
+function seedAgents(){sag=COHORT.agents.map(o=>{const u=Math.random(),v=Math.random(),th=2*Math.PI*u,ph=Math.acos(2*v-1),rr=RAD*Math.cbrt(Math.random());return{x:rr*Math.sin(ph)*Math.cos(th),y:rr*Math.sin(ph)*Math.sin(th),z:rr*Math.cos(ph),vx:(Math.random()-.5),vy:(Math.random()-.5),vz:(Math.random()-.5),arch:o.a,opinion:o.i,baseOp:o.i,conf:o.c,des:o.d,vuln:o.v,edad:o.e,hta:o.h,dm2:o.dd,muni:o.m,sexo:o.s,obes:o.ob,sm:o.sm,gx:o.gx,ta:o.ta,glu:o.gl,cintura:o.ci,rk:(o.rk!=null?o.rk:0.15),peso:o.pw,talla:o.al,imc:o.imc,state:'S',vacc:false,sev:false,tRec:0,cr:0,cg:0,cb:0};});SN=sag.length;}
 function makeSprite(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');const gr=g.createRadialGradient(32,32,0,32,32,32);gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.3,'rgba(255,255,255,.9)');gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c);}
 function initSwarm(){if(swarmInit)return;swarmInit=true;const canvas=document.getElementById('swarmCanvas');seedAgents();
   if(typeof THREE!=='undefined'){useThree=true;renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));scene=new THREE.Scene();cam=new THREE.PerspectiveCamera(55,canvas.clientWidth/500,0.1,1000);cam.position.set(0,0,150);resizeSw();
@@ -846,7 +1218,7 @@ function openTwin(idx){twinIdx=idx;const a=sag[idx];if(!a)return;
   document.getElementById('twinBody').innerHTML=
     sec('Identificación')+grid(cell('Edad',(a.edad||'—')+' años')+cell('Sexo',a.sexo==='M'?'Masculino':'Femenino')+cell('Municipio',muniName(a.muni))+cell('Arquetipo (vacuna)',ARQ_NAMES[a.arch]))+
     sec('Antecedentes heredofamiliares / genéticos')+grid(cell('Predisposición genética',a.gx||'Ninguna',(a.gx&&a.gx!=='Ninguna')?'#c0392b':''))+
-    sec('Somatometría y comorbilidades')+grid(cell('Cintura',(a.cintura||'—')+' cm')+cell('Obesidad',a.obes?'Sí':'No',a.obes?'#c0392b':'')+cell('Hipertensión',a.hta?'Sí':'No',a.hta?'#c0392b':'')+cell('Diabetes',a.dm2?'Sí':'No',a.dm2?'#c0392b':'')+cell('Síndrome metabólico',a.sm?'Sí':'No',a.sm?'#c0392b':'')+cell('TA sist. / Glucosa',(a.ta||'—')+' / '+(a.glu||'—')))+
+    sec('Somatometría y comorbilidades')+grid(cell('Peso',(a.peso!=null?a.peso:'—')+' kg')+cell('Talla',(a.talla!=null?a.talla:'—')+' cm')+cell('IMC',(a.imc!=null?a.imc:'—')+' kg/m²',(a.imc>=30?'#c0392b':''))+cell('Cintura',(a.cintura||'—')+' cm')+cell('Obesidad',a.obes?'Sí':'No',a.obes?'#c0392b':'')+cell('Hipertensión',a.hta?'Sí':'No',a.hta?'#c0392b':'')+cell('Diabetes',a.dm2?'Sí':'No',a.dm2?'#c0392b':'')+cell('Síndrome metabólico',a.sm?'Sí':'No',a.sm?'#c0392b':'')+cell('TA sist. / Glucosa',(a.ta||'—')+' / '+(a.glu||'—')))+
     sec('Estado ante COVID-19')+grid(cell('Estado actual',estado,a.sev?'#9e1620':'')+cell('Intención de vacunarse',Math.round(a.opinion*100)+'%'))+
     '<div style="margin-top:11px;background:'+rc[1]+'14;border:1px solid '+rc[1]+'55;border-radius:10px;padding:11px 13px"><div style="font-size:10px;color:var(--muted);font-weight:800;letter-spacing:.3px">RIESGO DE COMPLICACIÓN POR COVID-19</div><div style="font-size:18px;font-weight:800;color:'+rc[1]+'">'+rc[0]+'</div><div style="font-size:12px;color:#26364e;margin-top:4px;line-height:1.45"><b>Variables que interactúan y elevan su riesgo:</b> '+(F.length?F.join(' · '):'ninguna relevante')+'.</div></div>';
   twinMsgs=[];const tc=document.getElementById('twinChat');if(tc)tc.innerHTML='<div style="font-size:12px;color:var(--muted)">Hazle varias preguntas; responde según su perfil. Al abrir otra persona, esta entrevista se reinicia.</div>';
@@ -858,7 +1230,7 @@ function twinBubble(text,who){const c=document.getElementById('twinChat');const 
 async function twinAsk(){const a=sag[twinIdx];if(!a)return;const inp=document.getElementById('twinInput');const q=(inp.value||'').trim();if(!q)return;inp.value='';
   if(twinMsgs.length===0)document.getElementById('twinChat').innerHTML='';
   twinBubble(q,'user');const btn=document.getElementById('twinSend');btn.disabled=true;const load=twinBubble('…','bot');
-  const content=(twinMsgs.length===0?(twinProfile(a)+'\n\nEl entrevistador te pregunta: '+q):q);twinMsgs.push({role:'user',content:content});
+  const content=(twinMsgs.length===0?(twinProfile(a)+(guideText?('\n\nGuía clínica de referencia (úsala para hablar de tu tratamiento/medicamentos como paciente, no como experto): '+guideText.slice(0,2500)):'')+'\n\nEl entrevistador te pregunta: '+q):q);twinMsgs.push({role:'user',content:content});
   try{const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'entrevista',messages:twinMsgs})});const data=await res.json();const rep=data.reply||'…';load.textContent=rep;twinMsgs.push({role:'model',content:rep});}
   catch(e){load.textContent='(no se pudo responder)';twinMsgs.pop();}
   finally{btn.disabled=false;inp.focus();}}
@@ -969,8 +1341,10 @@ function addAnaMsg(text,who){const c=document.getElementById('anaChat');const d=
 async function anaSend(q){
   q=(q||'').trim();if(!q)return;document.getElementById('anaInput').value='';
   addAnaMsg(q,'user');const loading=addAnaMsg('PUM-AI está analizando…','bot');
-  const s=COHORT.stats;const muniTxt=(s.muni||[]).map(m=>m.name+': HTA '+m.hta+'%, DM2 '+m.dm2+'%').join(' | ');const c=s.cascada||{};const r=s.riesgo||[0,0,0];
-  const ctx=`Contexto (cohorte ficticia, N=${s.n}). Prevalencia HTA ${s.hta}%, DM2 ${s.dm2}%. Por municipio: ${muniTxt}. Arquetipos: Provacuna ${s.arq[0]}%, Indeciso ${s.arq[1]}%, Renuente ${s.arq[2]}%, Vulnerable ${s.arq[3]}%. Cascada DM2: tiene ${c.tiene}%, dx ${c.dx}%, tratamiento ${c.trat}%, control ${c.ctrl}%, silentes ${c.silent}%. Riesgo CV: bajo ${r[0]}%, intermedio ${r[1]}%, alto ${r[2]}%. ${guideText?('TEXTO DE GUÍAS:\n'+guideText):'Sin guías cargadas; usa principios generales.'}\n\nFormatea tu respuesta en Markdown (negritas con **, listas con -, subtítulos con ##). Si tu respuesta compara cifras, añade AL FINAL UNA gráfica con este marcador en una sola línea (JSON válido): [[VIZ]]{"tipo":"barras","titulo":"Título corto","datos":[["Etiqueta",10],["Etiqueta2",20]]}[[/VIZ]] — tipo puede ser "barras" o "dona"; usa solo cifras del contexto.\n\nPREGUNTA: ${q}`;
+  const s=COHORT.stats;const muniTxt=(s.muni||[]).map(m=>m.name+': HTA '+m.hta+'%, DM2 '+m.dm2+'%').join(' | ');const c=s.cascada||{};const r=s.riesgo||[0,0,0];const dg=s.desglose||{};
+  const segLine=arr=>(arr||[]).map(x=>x.k+' (n='+x.n+'): HTA '+x.hta+'%, DM2 '+x.dm2+'%, obesidad '+x.obes+'%, riesgo COVID alto '+x.covidAlto+'%').join(' | ');
+  const desTxt='DESGLOSES para SEGMENTAR — por sexo: '+segLine(dg.sexo)+' || por grupo de edad: '+segLine(dg.edad)+' || por comorbilidad: '+segLine(dg.comorbilidad)+'. ';
+  const ctx=`Contexto (cohorte, N=${s.n}). Prevalencia HTA ${s.hta}%, DM2 ${s.dm2}%. Por municipio: ${muniTxt}. ${desTxt} Arquetipos: Provacuna ${s.arq[0]}%, Indeciso ${s.arq[1]}%, Renuente ${s.arq[2]}%, Vulnerable ${s.arq[3]}%. Cascada DM2: tiene ${c.tiene}%, dx ${c.dx}%, tratamiento ${c.trat}%, control ${c.ctrl}%, silentes ${c.silent}%. Riesgo CV: bajo ${r[0]}%, intermedio ${r[1]}%, alto ${r[2]}%. ${guideText?('TEXTO DE GUÍAS:\n'+guideText):'Sin guías cargadas; usa principios generales.'}\n\nFormatea tu respuesta en Markdown (negritas con **, listas con -, subtítulos con ##). Si tu respuesta compara cifras, añade AL FINAL UNA gráfica con este marcador en una sola línea (JSON válido): [[VIZ]]{"tipo":"barras","titulo":"Título corto","datos":[["Etiqueta",10],["Etiqueta2",20]]}[[/VIZ]] — tipo puede ser "barras" o "dona"; usa solo cifras del contexto.\n\nPREGUNTA: ${q}`;
   try{
     const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'analisis',messages:[{role:'user',content:ctx}]})});
     const data=await res.json();const raw=data.reply||'Sin respuesta.';const ex=extractViz(raw);
@@ -979,16 +1353,36 @@ async function anaSend(q){
     anaHistory.push({q:q,a:ex.text});
   }catch(e){loading.textContent='No se pudo responder ('+(e.message||e)+').';}
 }
+let REPORT_REFS=[];
+async function fetchReportRefs(){
+  // Consulta real a Europe PMC con términos derivados de la cohorte y las guías
+  const terms=[];const s=(COHORT&&COHORT.stats)||{};
+  if((s.hta||0)>0)terms.push('hypertension');
+  if((s.dm2||0)>0)terms.push('"type 2 diabetes"');
+  if((s.smetab||0)>0)terms.push('"metabolic syndrome"');
+  terms.push('COVID-19 risk');
+  const base=terms.join(' OR ');
+  const q='('+base+') AND (primary care OR "community intervention" OR prevention OR epidemiology)';
+  try{
+    const url='https://www.ebi.ac.uk/europepmc/webservices/rest/search?query='+encodeURIComponent(q)+'&format=json&pageSize=6&resultType=lite&sort=CITED%20desc';
+    const res=await fetch(url);const data=await res.json();
+    const list=(data&&data.resultList&&data.resultList.result)||[];
+    REPORT_REFS=list.map(a=>({title:a.title||'',authors:(a.authorString||'').slice(0,120),journal:(a.journalTitle||a.source||''),year:a.pubYear||'',link:a.doi?('https://doi.org/'+a.doi):(a.pmid?('https://pubmed.ncbi.nlm.nih.gov/'+a.pmid+'/'):('https://europepmc.org/article/'+(a.source||'MED')+'/'+a.id))}));
+  }catch(e){REPORT_REFS=[];}
+  return REPORT_REFS;
+}
 async function generateReport(){
   const out=document.getElementById('reportOut');const btn=document.getElementById('anaReport');
-  if(btn)btn.disabled=true;out.innerHTML='<div class="thinking"><div class="sp"></div><div>PUM-AI está redactando el informe…</div></div>';
+  if(btn)btn.disabled=true;out.innerHTML='<div class="thinking"><div class="sp"></div><div>Buscando evidencia científica y redactando el informe…</div></div>';
   try{
+    await fetchReportRefs();
     let prompt=buildReportPrompt();
     if(anaHistory.length)prompt+='\n\nIntegra también estas consultas previas del usuario a PUM-AI (menciona sus hallazgos donde aporten):\n'+anaHistory.slice(-6).map((h,i)=>(i+1)+'. P: '+h.q+' | R: '+String(h.a).replace(/\s+/g,' ').slice(0,400)).join('\n');
+    if(REPORT_REFS.length)prompt+='\n\nREFERENCIAS CIENTÍFICAS REALES disponibles (Europe PMC). Cítalas en el texto con corchetes [1], [2]… donde respalden una afirmación, sin inventar otras:\n'+REPORT_REFS.map((r,i)=>'['+(i+1)+'] '+r.title+' ('+r.journal+(r.year?(', '+r.year):'')+')').join('\n');
     const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'report',messages:[{role:'user',content:prompt}]})});
     const data=await res.json();lastReport=data.reply||'No se recibió respuesta.';
     out.innerHTML=buildReportDoc(lastReport);renderReportCharts();
-    document.getElementById('pdfBtn').disabled=false;out.scrollIntoView({behavior:'smooth',block:'start'});
+    document.getElementById('pdfBtn').disabled=false;document.getElementById('wordBtn').disabled=false;out.scrollIntoView({behavior:'smooth',block:'start'});
   }catch(e){out.innerHTML='<div class="report-body">No se pudo generar el informe: '+(e.message||e)+'</div>';}
   finally{if(btn)btn.disabled=false;}
 }
@@ -1006,7 +1400,7 @@ function buildReportDoc(narr){
       '<img src="../public/assets/escudo-fesi.png" '+esc+' style="height:54px;width:auto">'+
       '<div style="margin-left:auto;text-align:right"><div style="font-size:10.5px;color:#EBD9A8;font-weight:700;letter-spacing:.4px">UNAM · FACULTAD DE ESTUDIOS SUPERIORES IZTACALA</div>'+
       '<div class="serif" style="font-size:22px;font-weight:700">Informe Epidemiológico</div>'+
-      '<div style="font-size:12px;color:#c3d0e2">Inteligencia Epidemiológica · Ecosistema Digital'+(fecha?(' · '+fecha):'')+'</div></div></div>'+
+      '<div style="font-size:12px;color:#c3d0e2">SAPIENS · Ecosistema Digital'+(fecha?(' · '+fecha):'')+'</div></div></div>'+
     '<div style="padding:22px 26px">'+
       '<p style="font-size:12px;color:#8a6d24;background:#fdf6e3;border:1px solid #ecd9a8;border-radius:8px;padding:8px 12px;margin-bottom:16px">⚠ Datos ficticios con fines educativos. No constituye consejo médico individual.</p>'+
       '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px">'+
@@ -1021,10 +1415,16 @@ function buildReportDoc(narr){
       '</div>'+
       '<div '+CARD+' style="margin-top:14px"><div '+H+'>Mapa por colonia — prevalencia de HTA</div><div id="r_map"></div></div>'+
       '<h3 class="serif" style="font-size:18px;color:#0C2340;margin:22px 0 8px">Análisis de PUM-AI</h3>'+
-      '<div style="font-size:13.5px;line-height:1.65;color:#26364e">'+mdToHtml(narr)+'</div>'+qa+
-      '<div style="margin-top:20px;border-top:1px solid #ece8de;padding-top:12px;font-size:11px;color:#8593a8">Generado por PUM-AI (Gemini) · Ecosistema Digital, FES Iztacala UNAM · Inteligencia Epidemiológica.</div>'+
+      '<div style="font-size:13.5px;line-height:1.65;color:#26364e">'+mdToHtml(narr)+'</div>'+qa+refsBlock()+
+      '<div style="margin-top:20px;border-top:1px solid #ece8de;padding-top:12px;font-size:11px;color:#8593a8">Generado por PUM-AI (Gemini) · Ecosistema Digital, FES Iztacala UNAM · SAPIENS.</div>'+
     '</div></div>';
 }
+function refsBlock(){
+  if(!REPORT_REFS||!REPORT_REFS.length)return '';
+  const items=REPORT_REFS.map((r,i)=>'<div style="margin-bottom:8px;font-size:12px;color:#26364e;line-height:1.45"><b>['+(i+1)+']</b> '+escR(r.title)+'. <i>'+escR(r.journal)+'</i>'+(r.year?(', '+r.year):'')+'.'+(r.authors?('<br><span style="color:#8593a8">'+escR(r.authors)+'</span>'):'')+'<br><a href="'+r.link+'" target="_blank" rel="noopener" style="color:#2f7fb8;font-size:11.5px;word-break:break-all">'+r.link+'</a></div>').join('');
+  return '<h3 class="serif" style="font-size:17px;color:#0C2340;margin:22px 0 10px">Referencias científicas <span style="font-size:12px;font-weight:400;color:#8593a8">(Europe PMC / PubMed · enlaces reales)</span></h3>'+items;
+}
+function escR(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function renderReportCharts(){
   const s=COHORT.stats;
   if(s.muni)groupedBarL(document.getElementById('r_m'),s.muni.map(x=>x.name),[{n:'HTA',c:'#e0564f',v:s.muni.map(x=>x.hta)},{n:'DM2',c:'#d99413',v:s.muni.map(x=>x.dm2)}]);
@@ -1045,6 +1445,847 @@ function exportPDF(){
     pdf.save('informe-epidemiologico.pdf');
   }).catch(function(){}).then(function(){if(btn){btn.textContent=old;btn.disabled=false;}});
 }
+</script>
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   MÓDULOS AMPLIADOS: roles/gestión · artículos (Europe PMC) ·
+   encuestas → base de datos · modo educativo (protocolo)
+   ═══════════════════════════════════════════════════════════════ */
+function iepFetch(action,payload){
+  return fetch(SUPABASE_URL+'/functions/v1/iep-usuarios',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+sessionToken},body:JSON.stringify(Object.assign({action:action},payload||{}))}).then(r=>r.json());
+}
+
+/* ───────── NAVEGACIÓN ───────── */
+function showProtocolo(){buildProtocolo();showScreen('screen-protocolo');}
+function showGestion(){
+  const rol=(MY_PROFILE&&MY_PROFILE.rol)||'alumno';
+  const rolSel=document.getElementById('u_rol');
+  const opts=(rol==='admin')?[['alumno','Alumno'],['profesor','Profesor']]:[['alumno','Alumno']];
+  rolSel.innerHTML=opts.map(o=>'<option value="'+o[0]+'">'+o[1]+'</option>').join('');
+  document.getElementById('altaHint').textContent=(rol==='admin')?'Como administrador puedes registrar profesores y alumnos.':'Registra a tus alumnos; entrarán con el correo y contraseña que definas.';
+  cargarGrupos();listarUsuarios();
+  showScreen('screen-gestion');
+}
+
+/* ───────── GESTIÓN DE USUARIOS ───────── */
+async function crearUsuario(){
+  const err=document.getElementById('altaErr');err.style.color='var(--coral)';err.textContent='';
+  const btn=document.getElementById('altaBtn');
+  const p={rol:document.getElementById('u_rol').value,nombre:document.getElementById('u_nombre').value.trim(),apellido:document.getElementById('u_apellido').value.trim(),correo:document.getElementById('u_correo').value.trim(),telefono:document.getElementById('u_tel').value.trim(),carrera:document.getElementById('u_carrera').value.trim(),password:document.getElementById('u_pass').value,grupo_id:document.getElementById('u_grupo').value||null};
+  if(!p.nombre||!p.correo||!p.password){err.textContent='Nombre, correo y contraseña son obligatorios.';return;}
+  if(p.password.length<6){err.textContent='La contraseña debe tener al menos 6 caracteres.';return;}
+  btn.disabled=true;btn.textContent='Registrando…';
+  try{
+    const r=await iepFetch('crear',p);
+    if(r&&r.ok){err.style.color='var(--emerald)';err.textContent='✓ Usuario registrado: '+p.correo;
+      ['u_nombre','u_apellido','u_correo','u_tel','u_carrera','u_pass'].forEach(id=>document.getElementById(id).value='');
+      listarUsuarios();}
+    else{err.textContent=(r&&r.error)||'No se pudo registrar.';}
+  }catch(e){err.textContent='Error de red: '+(e.message||e);}
+  finally{btn.disabled=false;btn.textContent='Registrar usuario';}
+}
+async function listarUsuarios(){
+  const box=document.getElementById('usuariosList');box.innerHTML='<div class="note" style="margin-top:10px">Cargando…</div>';
+  try{
+    const r=await iepFetch('listar');
+    if(!r||!r.ok){box.innerHTML='<div class="note" style="margin-top:10px">'+((r&&r.error)||'No se pudo cargar.')+'</div>';return;}
+    const us=r.usuarios||[];
+    if(!us.length){box.innerHTML='<div class="note" style="margin-top:10px">Todavía no hay usuarios registrados.</div>';return;}
+    box.innerHTML='<table class="gtable"><thead><tr><th>Nombre</th><th>Rol</th><th>Correo</th><th>Carrera</th><th>Estado</th></tr></thead><tbody>'+
+      us.map(u=>'<tr><td>'+esc(u.nombre||'')+' '+esc(u.apellido||'')+'</td><td><span class="rolbadge '+u.rol+'">'+u.rol+'</span></td><td>'+esc(u.correo||'')+'</td><td>'+esc(u.carrera||'—')+'</td><td>'+(u.activo===false?'Inactivo':'Activo')+'</td></tr>').join('')+'</tbody></table>';
+  }catch(e){box.innerHTML='<div class="note" style="margin-top:10px">Error: '+(e.message||e)+'</div>';}
+}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* ───────── GRUPOS + GUÍAS ───────── */
+async function cargarGrupos(){
+  const sel=document.getElementById('u_grupo');const list=document.getElementById('gruposList');
+  try{
+    const {data,error}=await sb.from('iep_grupos').select('*').order('created_at',{ascending:false});
+    if(error)throw error;
+    IEP_GRUPOS=data||[];
+    sel.innerHTML='<option value="">— Sin grupo —</option>'+IEP_GRUPOS.map(g=>'<option value="'+g.id+'">'+esc(g.nombre)+' ('+esc(g.codigo)+')</option>').join('');
+    list.innerHTML=IEP_GRUPOS.length?IEP_GRUPOS.map(g=>{const gs=(g.guias||[]);return '<div style="border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px"><div style="font-weight:700;color:var(--navy);font-size:13.5px">'+esc(g.nombre)+' · <span style="color:var(--gold2)">'+esc(g.codigo)+'</span></div>'+(gs.length?'<div class="note" style="margin-top:4px">Guías: '+gs.map(x=>esc(typeof x==='string'?x:(x.titulo||''))).join(' · ')+'</div>':'<div class="note" style="margin-top:4px">Sin guías definidas.</div>')+'</div>';}).join(''):'<div class="note" style="margin-top:8px">Aún no has creado grupos.</div>';
+  }catch(e){list.innerHTML='<div class="note" style="margin-top:8px">No se pudieron cargar los grupos: '+(e.message||e)+'</div>';}
+}
+let IEP_GRUPOS=[];
+async function crearGrupo(){
+  const nombre=document.getElementById('g_nombre').value.trim(),codigo=document.getElementById('g_codigo').value.trim();
+  const guias=document.getElementById('g_guias').value.split('\n').map(x=>x.trim()).filter(Boolean).map(l=>{const p=l.split('—');return {titulo:p[0].trim(),tema:(p[1]||'').trim()};});
+  if(!nombre||!codigo){alert('Indica nombre y código del grupo.');return;}
+  try{
+    const {error}=await sb.from('iep_grupos').insert({profesor_id:MY_PROFILE.user_id,nombre:nombre,codigo:codigo,guias:guias});
+    if(error)throw error;
+    document.getElementById('g_nombre').value='';document.getElementById('g_codigo').value='';document.getElementById('g_guias').value='';
+    cargarGrupos();
+  }catch(e){alert('No se pudo guardar el grupo: '+(e.message||e)+(String(e.message||'').indexOf('duplicate')>=0?' (¿código repetido?)':''));}
+}
+
+/* ───────── ARTÍCULOS CIENTÍFICOS · Europe PMC (links reales) ───────── */
+const ART_CHIPS=['metabolic syndrome COVID-19 severity','vaccine hesitancy determinants intervention','community deworming program effectiveness','physical activity obesity prevention community','hypertension screening primary care Mexico','diabetes care cascade low income'];
+function initArtChips(){const c=document.getElementById('artChips');if(c&&!c.dataset.on){c.dataset.on='1';c.innerHTML=ART_CHIPS.map(q=>'<button class="btn-mini" onclick="buscarArticulos(\''+q.replace(/'/g,"\\'")+'\')">'+q+'</button>').join('');}}
+async function buscarArticulos(q){
+  q=(q||'').trim();if(!q){return;}
+  const box=document.getElementById('artResults');
+  box.innerHTML='<div class="thinking"><div class="sp"></div><div>Buscando en Europe PMC / PubMed…</div></div>';
+  try{
+    const url='https://www.ebi.ac.uk/europepmc/webservices/rest/search?query='+encodeURIComponent(q)+'&format=json&pageSize=8&resultType=lite&sort=CITED%20desc';
+    const res=await fetch(url);const data=await res.json();
+    const list=(data&&data.resultList&&data.resultList.result)||[];
+    if(!list.length){box.innerHTML='<div class="note" style="margin-top:10px">Sin resultados para “'+esc(q)+'”. Prueba términos en inglés o más generales.</div>';return;}
+    box.innerHTML='<div class="note" style="margin:10px 0 4px">🔗 '+list.length+' artículos reales (enlaces verificables). Ordenados por citas.</div>'+list.map(a=>{
+      let link=a.doi?('https://doi.org/'+a.doi):(a.pmid?('https://pubmed.ncbi.nlm.nih.gov/'+a.pmid+'/'):('https://europepmc.org/article/'+(a.source||'MED')+'/'+a.id));
+      const auth=(a.authorString||'').length>90?(a.authorString.slice(0,90)+'…'):(a.authorString||'');
+      return '<div class="artcard"><a href="'+link+'" target="_blank" rel="noopener">'+esc(a.title||'(sin título)')+'</a><div class="meta">'+esc(auth)+'</div><div class="meta">'+esc(a.journalTitle||a.source||'')+(a.pubYear?(' · '+a.pubYear):'')+(a.citedByCount!=null?(' · '+a.citedByCount+' citas'):'')+' · <a href="'+link+'" target="_blank" rel="noopener" style="font-size:12px">abrir ↗</a></div></div>';
+    }).join('');
+  }catch(e){box.innerHTML='<div class="note" style="margin-top:10px">No se pudo consultar Europe PMC ('+(e.message||e)+'). Revisa tu conexión.</div>';}
+}
+
+/* ───────── ENCUESTAS → BASE DE DATOS ───────── */
+const ENC_BASE=[
+  {key:'edad',label:'Edad (años)',type:'number',csv:'edad'},
+  {key:'sexo',label:'Sexo',type:'choice',opts:['Femenino','Masculino'],csv:'sexo'},
+  {key:'municipio',label:'Municipio',type:'choice',opts:['Coacalco','Naucalpan','Ecatepec'],csv:'municipio'},
+  {key:'colonia',label:'Colonia',type:'text',csv:'colonia'},
+  {key:'peso',label:'Peso (kg)',type:'number',csv:'peso_kg'},
+  {key:'talla',label:'Talla (cm)',type:'number',csv:'talla_cm'},
+  {key:'cintura',label:'Perímetro de cintura (cm)',type:'number',csv:'cintura_cm'},
+  {key:'ta_sist',label:'Tensión arterial sistólica (mmHg)',type:'number',csv:'ta_sistolica'},
+  {key:'glucosa',label:'Glucosa en ayuno (mg/dL)',type:'number',csv:'glucosa_ayuno'},
+  {key:'hta',label:'¿Diagnóstico de hipertensión?',type:'choice',opts:['Sí','No'],csv:'tiene_hta'},
+  {key:'dm2',label:'¿Diagnóstico de diabetes?',type:'choice',opts:['Sí','No'],csv:'tiene_dm2'}
+];
+let ENC_FIELDS=[],ENC_RESP=[],ENC_SAVED_ID=null,ENC_RETURN='screen-lab';
+function openEncuesta(){ENC_RETURN=document.querySelector('.screen.active')?document.querySelector('.screen.active').id:'screen-lab';buildEncListSaved();showScreen('screen-encuesta');}
+function backFromEncuesta(){showScreen(ENC_RETURN==='screen-encuesta'?'screen-lab':ENC_RETURN);}
+async function generarEncuesta(){
+  const prompt=document.getElementById('encPrompt').value.trim();
+  const st=document.getElementById('encStatus');const btn=document.getElementById('encGenBtn');
+  st.textContent='';btn.disabled=true;btn.textContent='Generando…';
+  // Base clínica garantizada + preguntas extra de la IA
+  ENC_FIELDS=ENC_BASE.map(f=>Object.assign({},f));
+  try{
+    const ctx='Eres epidemiólogo. Propón entre 5 y 9 PREGUNTAS ADICIONALES para una encuesta de tamizaje comunitario sobre: "'+(prompt||'riesgo cardiometabólico y factores de riesgo COVID')+'". Ya existen preguntas de edad, sexo, municipio, colonia, peso, talla, cintura, tensión, glucosa, diagnóstico de hipertensión y diabetes; NO las repitas. Enfócate en factores de riesgo conductuales y sociodemográficos alineados a guías de práctica clínica (tabaquismo, actividad física, alimentación, antecedentes familiares, acceso a servicios, vacunación COVID). '+(guideText?('Guías de referencia (extracto): '+guideText.slice(0,1500)):'')+'\n\nResponde SOLO con un arreglo JSON válido, sin texto extra, con este formato: [{"label":"texto de la pregunta","type":"number|choice|text","opts":["op1","op2"]}]. "opts" solo si type es "choice".';
+    const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'protocolo',messages:[{role:'user',content:ctx}]})});
+    const data=await res.json();let raw=(data.reply||'').trim();
+    const m=raw.match(/\[[\s\S]*\]/);if(m){try{const arr=JSON.parse(m[0]);arr.forEach((f,i)=>{if(f&&f.label)ENC_FIELDS.push({key:'q'+i,label:f.label,type:(f.type==='number'||f.type==='choice')?f.type:'text',opts:f.opts||[],csv:null});});}catch(e){}}
+    st.textContent='✓ Encuesta propuesta. Revisa y edita las preguntas abajo.';
+  }catch(e){st.textContent='No se pudo consultar la IA; usando la base clínica estándar.';}
+  document.getElementById('encTitulo').value='Encuesta — '+(prompt||'Tamizaje cardiometabólico');
+  document.getElementById('encEditorCard').style.display='block';
+  renderEncEditor();renderEncForm();
+  document.getElementById('encFillCard').style.display='block';
+  btn.disabled=false;btn.textContent='Generar encuesta';
+}
+function renderEncEditor(){
+  const box=document.getElementById('encFields');
+  box.innerHTML=ENC_FIELDS.map((f,i)=>{
+    const base=f.csv?' <span style="font-size:10px;color:var(--emerald);font-weight:800">CLÍNICA</span>':'';
+    const rm=f.csv?'':'<button class="btn-mini" style="padding:4px 8px" onclick="rmEncField('+i+')">✕</button>';
+    return '<div style="display:flex;gap:8px;align-items:center;margin-bottom:7px"><span style="font-size:11px;color:var(--muted);width:20px">'+(i+1)+'</span><input value="'+esc(f.label)+'" oninput="ENC_FIELDS['+i+'].label=this.value" style="flex:1;padding:8px 10px;border:1.5px solid var(--line);border-radius:9px;font-size:13px;font-family:inherit"><span style="font-size:11px;color:var(--muted)">'+f.type+base+'</span>'+rm+'</div>';
+  }).join('');
+}
+function addEncField(){ENC_FIELDS.push({key:'x'+ENC_FIELDS.length,label:'Nueva pregunta',type:'text',opts:[],csv:null});renderEncEditor();renderEncForm();}
+function rmEncField(i){if(ENC_FIELDS[i]&&ENC_FIELDS[i].csv){return;}ENC_FIELDS.splice(i,1);renderEncEditor();renderEncForm();}
+function renderEncForm(){
+  const box=document.getElementById('encForm');
+  box.innerHTML=ENC_FIELDS.map((f,i)=>{
+    let inp;
+    if(f.type==='choice'&&(f.opts||[]).length)inp='<select id="ef_'+i+'" style="width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:13px;font-family:inherit"><option value="">—</option>'+f.opts.map(o=>'<option>'+esc(o)+'</option>').join('')+'</select>';
+    else inp='<input id="ef_'+i+'" '+(f.type==='number'?'type="number"':'')+' style="width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:13px;font-family:inherit">';
+    return '<div class="field"><label style="font-size:12px">'+esc(f.label)+'</label>'+inp+'</div>';
+  }).join('');
+  document.getElementById('encRespCount').textContent=ENC_RESP.length+' respuesta(s) capturada(s)';
+}
+async function guardarRespuesta(){
+  const datos={};let hasAny=false;
+  ENC_FIELDS.forEach((f,i)=>{const el=document.getElementById('ef_'+i);if(el&&el.value!==''){datos[f.key]=el.value;hasAny=true;}});
+  const st=document.getElementById('encFillStatus');
+  if(!hasAny){st.style.color='var(--coral)';st.textContent='Llena al menos un campo.';return;}
+  datos.__labels=ENC_FIELDS.map(f=>({key:f.key,csv:f.csv,label:f.label,type:f.type}));
+  ENC_RESP.push(datos);
+  ENC_FIELDS.forEach((f,i)=>{const el=document.getElementById('ef_'+i);if(el)el.value='';});
+  st.style.color='var(--emerald)';st.textContent='✓ Respuesta guardada localmente ('+ENC_RESP.length+').';
+  document.getElementById('encRespCount').textContent=ENC_RESP.length+' respuesta(s) capturada(s)';
+  // Persistir en la base si la encuesta ya fue guardada
+  if(ENC_SAVED_ID){try{await sb.from('iep_respuestas').insert({encuesta_id:ENC_SAVED_ID,capturado_por:MY_PROFILE.user_id,datos:datos});}catch(e){}}
+}
+async function guardarEncuesta(){
+  const titulo=document.getElementById('encTitulo').value.trim()||'Encuesta sin título';
+  try{
+    const {data,error}=await sb.from('iep_encuestas').insert({autor_id:MY_PROFILE.user_id,titulo:titulo,campos:ENC_FIELDS}).select().single();
+    if(error)throw error;
+    ENC_SAVED_ID=data.id;
+    // sube respuestas locales pendientes
+    if(ENC_RESP.length){const rows=ENC_RESP.map(d=>({encuesta_id:ENC_SAVED_ID,capturado_por:MY_PROFILE.user_id,datos:d}));try{await sb.from('iep_respuestas').insert(rows);}catch(e){}}
+    document.getElementById('encStatus').style.color='var(--emerald)';document.getElementById('encStatus').textContent='✓ Encuesta guardada. Ya puedes compartirla y capturar respuestas.';
+    buildEncListSaved();
+  }catch(e){alert('No se pudo guardar la encuesta: '+(e.message||e));}
+}
+async function buildEncListSaved(){
+  const box=document.getElementById('encList');
+  try{
+    const {data,error}=await sb.from('iep_encuestas').select('*').order('created_at',{ascending:false}).limit(20);
+    if(error)throw error;
+    if(!data||!data.length){box.innerHTML='<div class="note" style="margin-top:8px">Aún no has guardado encuestas.</div>';return;}
+    box.innerHTML=data.map(e=>'<div style="border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:10px"><div><div style="font-weight:700;color:var(--navy);font-size:13.5px">'+esc(e.titulo)+'</div><div class="note">'+((e.campos||[]).length)+' preguntas</div></div><button class="btn-mini" onclick="cargarEncuesta(\''+e.id+'\')">Usar</button></div>').join('');
+  }catch(err){box.innerHTML='<div class="note" style="margin-top:8px">No se pudieron cargar: '+(err.message||err)+'</div>';}
+}
+async function cargarEncuesta(id){
+  try{
+    const {data,error}=await sb.from('iep_encuestas').select('*').eq('id',id).single();
+    if(error)throw error;
+    ENC_FIELDS=(data.campos||[]).map(f=>Object.assign({},f));ENC_SAVED_ID=id;ENC_RESP=[];
+    document.getElementById('encTitulo').value=data.titulo;
+    document.getElementById('encEditorCard').style.display='block';document.getElementById('encFillCard').style.display='block';
+    renderEncEditor();renderEncForm();
+    // carga respuestas existentes
+    try{const r=await sb.from('iep_respuestas').select('datos').eq('encuesta_id',id);if(r.data)ENC_RESP=r.data.map(x=>x.datos);}catch(e){}
+    document.getElementById('encRespCount').textContent=ENC_RESP.length+' respuesta(s) capturada(s)';
+    document.getElementById('encStatus').style.color='var(--emerald)';document.getElementById('encStatus').textContent='✓ Encuesta cargada.';
+  }catch(e){alert('No se pudo cargar: '+(e.message||e));}
+}
+function exportEncuestaPDF(){
+  const titulo=document.getElementById('encTitulo').value.trim()||'Encuesta';
+  try{
+    const {jsPDF}=window.jspdf;const pdf=new jsPDF({unit:'pt',format:'a4'});
+    const pw=pdf.internal.pageSize.getWidth();let y=54;
+    pdf.setFillColor(12,35,64);pdf.rect(0,0,pw,84,'F');
+    pdf.setTextColor(235,217,168);pdf.setFontSize(9);pdf.text('UNAM · FES IZTACALA · SAPIENS',40,32);
+    pdf.setTextColor(255,255,255);pdf.setFontSize(16);pdf.text(titulo,40,58);
+    y=110;pdf.setTextColor(40,54,78);
+    pdf.setFontSize(9);pdf.text('Folio: __________    Fecha: ____ / ____ / ______    Encuestador(a): ______________________',40,y);y+=24;
+    ENC_FIELDS.forEach((f,i)=>{
+      if(y>760){pdf.addPage();y=54;}
+      pdf.setFontSize(11);pdf.setTextColor(12,35,64);
+      const lines=pdf.splitTextToSize((i+1)+'. '+f.label,pw-80);pdf.text(lines,40,y);y+=lines.length*15+2;
+      pdf.setTextColor(90,107,130);pdf.setFontSize(10);
+      if(f.type==='choice'&&(f.opts||[]).length){pdf.text(f.opts.map(o=>'( ) '+o).join('     '),52,y);y+=20;}
+      else{pdf.setDrawColor(200,200,200);pdf.line(52,y+4,pw-40,y+4);y+=22;}
+    });
+    pdf.setFontSize(8);pdf.setTextColor(140,140,140);pdf.text('Datos con fines educativos · Ecosistema Digital FES Iztacala',40,y+10);
+    pdf.save('encuesta-'+titulo.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40)+'.pdf');
+  }catch(e){alert('No se pudo generar el PDF: '+(e.message||e));}
+}
+async function construirCohorteDesdeEncuesta(){
+  const st=document.getElementById('encFillStatus');
+  if(ENC_RESP.length<8){st.style.color='var(--coral)';st.textContent='Necesitas al menos 8 respuestas para construir una cohorte analizable (llevas '+ENC_RESP.length+').';return;}
+  st.style.color='var(--muted)';st.textContent='Construyendo cohorte con Python…';
+  // arma CSV con las columnas canónicas que entiende el motor
+  const cols=ENC_BASE.map(f=>f.csv);const headers=cols.concat(['imc']);
+  const keyByCsv={};ENC_BASE.forEach(f=>keyByCsv[f.csv]=f.key);
+  const rows=ENC_RESP.map(d=>{
+    const rec={};ENC_BASE.forEach(f=>{rec[f.csv]=(d[f.key]!=null?String(d[f.key]).replace(/,/g,' '):'');});
+    const peso=parseFloat(d.peso),talla=parseFloat(d.talla);
+    rec.imc=(peso>0&&talla>0)?(peso/Math.pow(talla/100,2)).toFixed(1):'';
+    return headers.map(h=>rec[h]!=null?rec[h]:'').join(',');
+  });
+  const csv=headers.join(',')+'\n'+rows.join('\n');
+  try{
+    await ensurePyodide();
+    COHORT=await pyParseCsv(csv);usedDemo=false;
+    buildLab();buildModeScreen();buildAna();
+    try{saveCohorteProgress('encuesta');}catch(e){}
+    st.style.color='var(--emerald)';st.textContent='✓ Cohorte construida con '+ENC_RESP.length+' personas. Abriendo modos…';
+    setTimeout(()=>showScreen('screen-mode'),700);
+  }catch(e){st.style.color='var(--coral)';st.textContent='No se pudo construir la cohorte: '+(e.message||e);}
+}
+
+/* ───────── MODO EDUCATIVO · PROTOCOLO ───────── */
+const PROTO_STEPS=[
+  {t:'1 · Título',w:'5%',crit:['Breve, claro y preciso; refleja de forma sintetizada el contenido del trabajo.','Debe contener las variables a estudiar y responder a qué, cómo y en quién.'],ph:'Escribe aquí tu propuesta de título y por qué cumple los criterios…'},
+  {t:'2 · Autores',w:'—',crit:['En orden alfabético, o bien de acuerdo al desempeño durante la elaboración del documento.'],ph:'Lista de autores en el orden acordado…'},
+  {t:'3 · Introducción',w:'20%',crit:['Antecedentes, estado actual, marco teórico, justificación y trascendencia.','Debe ser coherente y congruente con el problema.','Incluye explícitamente: Antecedentes · Estado actual · Justificación · Trascendencia.','Citas pertinentes y numeradas consecutivamente según el orden en que se mencionan por primera vez (Vancouver/ICMJE).'],ph:'Redacta antecedentes, estado actual, justificación y trascendencia con sus citas [1], [2]…'},
+  {t:'4 · Planteamiento del problema',w:'10%',crit:['Redacción clara relacionando las variables a estudiar.','Sintetiza el contenido y se plantea a manera de pregunta.'],ph:'Formula tu pregunta de investigación…'},
+  {t:'5 · Objetivos',w:'10%',crit:['Inician con un verbo en infinitivo.','Actividades claras, factibles, relacionadas con el problema y jerárquicas.','Un objetivo general y al menos un objetivo particular.'],ph:'Objetivo general (verbo en infinitivo)…\nObjetivos particulares…'},
+  {t:'6 · Diseño metodológico',w:'25%',crit:['Tipo de estudio.','Características de la muestra.','Selección de la muestra: tamaño y tipo de muestreo.','Establecimiento de grupos de estudio (si es necesario).','Criterios de inclusión, exclusión y eliminación.','Recursos.','Método: procedimiento para la obtención de variables (recopilación).'],ph:'Describe tipo de estudio, muestra, muestreo, criterios, recursos y procedimiento…'},
+  {t:'7 · Definición operacional de variables',w:'10%',crit:['Tipo de variables.','Escalas de medición de las variables.','Unidades de medición de las variables.','Nivel de significancia (alfa).'],ph:'Tabla de variables: nombre, tipo, escala, unidad; nivel de significancia (α)…'},
+  {t:'8 · Diseño estadístico',w:'15%',crit:['Organización de los datos.','Presentación (cuadros y gráficas).','Análisis (pruebas estadísticas pertinentes).'],ph:'Cómo organizarás, presentarás y analizarás los datos…'},
+  {t:'9 · Consideraciones éticas',w:'—',crit:['Riesgo de la investigación (categoría de riesgo según la normatividad).','Consentimiento informado y confidencialidad de los participantes.'],ph:'Categoría de riesgo y cómo protegerás a los participantes…'},
+  {t:'10 · Cronograma y anexos',w:'—',crit:['Etapas del estudio distribuidas en el tiempo (cronograma).','Anexos: instrumentos, hoja de consentimiento informado, etc.'],ph:'Cronograma por etapas y lista de anexos…'},
+  {t:'11 · Referencias bibliográficas',w:'5%',crit:['Numeradas consecutivamente según el orden en que se citaron en la introducción.','Criterios del Comité Internacional de Editores de Revistas Médicas (Vancouver/ICMJE).','Suficientes, adecuadas al marco teórico y actuales.'],ph:'Tus referencias en formato Vancouver (usa el buscador de artículos para obtener enlaces reales)…'}
+];
+function buildProtocolo(){
+  const box=document.getElementById('protoSteps');
+  box.innerHTML=PROTO_STEPS.map((s,i)=>{
+    const crit='<ul style="margin:6px 0 4px 18px">'+s.crit.map(c=>'<li style="margin:2px 0;font-size:13px;color:#33445e;line-height:1.5">'+esc(c)+'</li>').join('')+'</ul>';
+    const wb=s.w!=='—'?('<span class="rolbadge" style="background:var(--gold);color:var(--navy);margin-left:8px">'+s.w+'</span>'):'';
+    return '<div class="proto-step" id="ps'+i+'"><div class="ttl" onclick="toggleProto('+i+')">'+esc(s.t)+wb+'</div><div class="body">'+crit+
+      '<textarea id="pn'+i+'" rows="3" placeholder="'+esc(s.ph)+'" style="width:100%;margin-top:8px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:13px;font-family:inherit;resize:vertical"></textarea>'+
+      '<div style="display:flex;gap:8px;margin-top:8px"><input id="pq'+i+'" placeholder="Pregúntale una duda de esta sección a PUM-AI…" style="flex:1;padding:9px 11px;border:1.5px solid var(--line);border-radius:10px;font-size:13px;font-family:inherit" onkeydown="if(event.key===\'Enter\')protoAsk('+i+')"><button class="btn-mini primary" onclick="protoAsk('+i+')">Preguntar</button></div><div id="pa'+i+'" style="margin-top:8px"></div></div></div>';
+  }).join('');
+  // Prefill desde el progreso guardado
+  const P=(window.PROGRESO&&window.PROGRESO.protocolo)||{};
+  if(P.titulo)document.getElementById('protoTitulo').value=P.titulo;
+  if(P.autores)document.getElementById('protoAutores').value=P.autores;
+  if(P.grupo)document.getElementById('protoGrupo').value=P.grupo;
+  if(P.equipo)document.getElementById('protoEquipo').value=P.equipo;
+  (P.notas||[]).forEach((v,i)=>{const el=document.getElementById('pn'+i);if(el&&v)el.value=v;});
+  // Auto-guardado
+  ['protoTitulo','protoAutores','protoGrupo','protoEquipo'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('input',saveProgressDebounced);});
+  PROTO_STEPS.forEach((s,i)=>{const el=document.getElementById('pn'+i);if(el)el.addEventListener('input',saveProgressDebounced);});
+  updateProtoProgress();
+}
+function collectProtocolo(){
+  const g=id=>{const el=document.getElementById(id);return el?el.value:'';};
+  return {titulo:g('protoTitulo'),autores:g('protoAutores'),grupo:g('protoGrupo'),equipo:g('protoEquipo'),notas:PROTO_STEPS.map((s,i)=>{const el=document.getElementById('pn'+i);return el?el.value:'';})};
+}
+function descargarProtocolo(){
+  try{
+    const {jsPDF}=window.jspdf;const pdf=new jsPDF({unit:'pt',format:'a4'});
+    const pw=pdf.internal.pageSize.getWidth(),ph=pdf.internal.pageSize.getHeight();let y=54;
+    pdf.setFillColor(12,35,64);pdf.rect(0,0,pw,86,'F');
+    pdf.setTextColor(235,217,168);pdf.setFontSize(9);pdf.text('UNAM · FES IZTACALA · MÉTODOS DE INVESTIGACIÓN EPIDEMIOLÓGICA',40,30);
+    pdf.setTextColor(255,255,255);pdf.setFontSize(15);
+    const tit=(document.getElementById('protoTitulo').value||'Protocolo de investigación').trim();
+    pdf.text(pdf.splitTextToSize(tit,pw-80),40,54);
+    pdf.setFontSize(9);pdf.setTextColor(210,220,235);
+    const aut=(document.getElementById('protoAutores').value||'').trim();const gr=(document.getElementById('protoGrupo').value||'').trim();const eq=(document.getElementById('protoEquipo').value||'').trim();
+    pdf.text('Autores: '+(aut||'—')+'    Grupo: '+(gr||'—')+'    Equipo: '+(eq||'—'),40,76);
+    y=112;
+    PROTO_STEPS.forEach((s,i)=>{
+      const notas=(document.getElementById('pn'+i)&&document.getElementById('pn'+i).value.trim())||'';
+      if(y>770){pdf.addPage();y=54;}
+      pdf.setFillColor(246,244,239);pdf.rect(36,y-14,pw-72,22,'F');
+      pdf.setTextColor(12,35,64);pdf.setFontSize(12);pdf.text(s.t+(s.w!=='—'?('  ('+s.w+')'):''),42,y+1);y+=22;
+      pdf.setTextColor(120,120,120);pdf.setFontSize(8.5);
+      const cl=pdf.splitTextToSize('Criterios: '+s.crit.join('  ·  '),pw-84);pdf.text(cl,42,y);y+=cl.length*11+4;
+      pdf.setTextColor(38,54,78);pdf.setFontSize(10.5);
+      const nl=pdf.splitTextToSize(notas||'(pendiente de redactar)',pw-84);
+      if(y+nl.length*13>ph-40){pdf.addPage();y=54;}
+      pdf.text(nl,42,y);y+=nl.length*13+14;
+    });
+    if(typeof REPORT_REFS!=='undefined'&&REPORT_REFS&&REPORT_REFS.length){
+      if(y>720){pdf.addPage();y=54;}
+      pdf.setTextColor(12,35,64);pdf.setFontSize(12);pdf.text('Referencias sugeridas (Europe PMC)',42,y);y+=18;
+      pdf.setFontSize(8.5);pdf.setTextColor(60,80,110);
+      REPORT_REFS.forEach((r,i)=>{if(y>780){pdf.addPage();y=54;}const t=pdf.splitTextToSize('['+(i+1)+'] '+r.title+'. '+r.journal+(r.year?(', '+r.year):'')+'. '+r.link,pw-84);pdf.text(t,42,y);y+=t.length*11+4;});
+    }
+    pdf.save('protocolo-'+tit.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,40)+'.pdf');
+  }catch(e){alert('No se pudo generar el PDF: '+(e.message||e));}
+}
+function toggleProto(i){const el=document.getElementById('ps'+i);el.classList.toggle('open');if(el.classList.contains('open'))el.classList.add('done');updateProtoProgress();}
+function protoMarkAll(){PROTO_STEPS.forEach((s,i)=>document.getElementById('ps'+i).classList.add('done'));updateProtoProgress();}
+function updateProtoProgress(){const done=PROTO_STEPS.filter((s,i)=>document.getElementById('ps'+i)&&document.getElementById('ps'+i).classList.contains('done')).length;const el=document.getElementById('protoProgress');if(el)el.textContent=done+' / '+PROTO_STEPS.length+' etapas revisadas';}
+async function protoAsk(i){
+  const inp=document.getElementById('pq'+i);const q=(inp.value||'').trim();if(!q)return;inp.value='';
+  const out=document.getElementById('pa'+i);const load=document.createElement('div');load.className='note';load.innerHTML='<span class="thinking" style="padding:6px 0"><span class="sp"></span> PUM-AI está respondiendo…</span>';out.appendChild(load);
+  let ctx='Etapa del protocolo: "'+PROTO_STEPS[i][0]+'". ';
+  if(typeof COHORT!=='undefined'&&COHORT&&COHORT.stats){const s=COHORT.stats;ctx+='La cohorte del alumno tiene N='+s.n+', HTA '+s.hta+'%, DM2 '+s.dm2+'%. ';}
+  if(guideText)ctx+='Guías de referencia (extracto): '+guideText.slice(0,1200)+'. ';
+  ctx+='Responde como tutor de metodología de investigación, claro y didáctico, aplicado a esta etapa. Duda del alumno: '+q;
+  try{
+    const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'protocolo',messages:[{role:'user',content:ctx}]})});
+    const data=await res.json();load.classList.remove('note');load.style.cssText='background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-size:13.5px;color:#26364e;line-height:1.55';load.innerHTML=mdToHtml(data.reply||'Sin respuesta.');
+  }catch(e){load.innerHTML='No se pudo responder ('+(e.message||e)+').';}
+}
+
+/* ───────── TABLERO DE ENCUESTAS (profesor/admin) ───────── */
+function encVal(datos,keys){for(const k of keys){if(datos&&datos[k]!=null&&datos[k]!=='')return datos[k];}return null;}
+function isSi(v){return String(v).toLowerCase().indexOf('s')===0||['1','true'].indexOf(String(v).toLowerCase())>=0;}
+async function cargarTableroEncuestas(){
+  const box=document.getElementById('tableroEncuestas');box.innerHTML='<div class="note" style="margin-top:8px">Cargando…</div>';
+  try{
+    const {data:encs,error}=await sb.from('iep_encuestas').select('id,titulo,created_at').order('created_at',{ascending:false}).limit(30);
+    if(error)throw error;
+    if(!encs||!encs.length){box.innerHTML='<div class="note" style="margin-top:8px">Aún no hay encuestas con respuestas. Genera una en «¿Qué sigue?» → «Generar encuesta».</div>';return;}
+    const cards=[];
+    for(const e of encs){
+      const {data:resp}=await sb.from('iep_respuestas').select('datos').eq('encuesta_id',e.id);
+      const rs=(resp||[]).map(x=>x.datos||{});const n=rs.length;
+      let hta=0,dm2=0,obes=0,edSum=0,edN=0;
+      rs.forEach(d=>{
+        if(isSi(encVal(d,['hta','tiene_hta'])))hta++;
+        if(isSi(encVal(d,['dm2','tiene_dm2'])))dm2++;
+        const pw=parseFloat(encVal(d,['peso','peso_kg'])),al=parseFloat(encVal(d,['talla','talla_cm']));
+        if(pw>0&&al>0){const imc=pw/Math.pow(al/100,2);if(imc>=30)obes++;}
+        const ed=parseFloat(encVal(d,['edad']));if(ed>0){edSum+=ed;edN++;}
+      });
+      const pc=x=>n?Math.round(x/n*100):0;
+      cards.push('<div style="border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:8px">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><div style="font-weight:700;color:var(--navy);font-size:14px">'+esc(e.titulo)+'</div><div style="display:flex;gap:8px;align-items:center"><span class="rolbadge" style="background:var(--cyan);color:#fff">'+n+' respuesta(s)</span>'+(n?'<button class="btn-mini" style="padding:4px 9px" onclick="exportTableroCSV(\''+e.id+'\',\''+esc(e.titulo).replace(/\x27/g,"")+'\')">⬇ CSV</button>':'')+'</div></div>'+
+        (n?('<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px">'+
+          '<div style="text-align:center"><div style="font-size:18px;font-weight:800;color:var(--coral)">'+pc(hta)+'%</div><div class="note">HTA</div></div>'+
+          '<div style="text-align:center"><div style="font-size:18px;font-weight:800;color:var(--amber)">'+pc(dm2)+'%</div><div class="note">DM2</div></div>'+
+          '<div style="text-align:center"><div style="font-size:18px;font-weight:800;color:var(--violet)">'+pc(obes)+'%</div><div class="note">Obesidad</div></div>'+
+          '<div style="text-align:center"><div style="font-size:18px;font-weight:800;color:var(--navy)">'+(edN?Math.round(edSum/edN):'—')+'</div><div class="note">Edad media</div></div>'+
+        '</div>'):'<div class="note" style="margin-top:6px">Sin respuestas capturadas todavía.</div>')+'</div>');
+    }
+    box.innerHTML=cards.join('');
+  }catch(err){box.innerHTML='<div class="note" style="margin-top:8px">No se pudo cargar el tablero: '+(err.message||err)+'</div>';}
+}
+
+/* ───────── VIGILANCIA EPIDEMIOLÓGICA MUNDIAL (disease.sh + Leaflet) ───────── */
+let VIG_MAP=null,VIG_LAYER=null,VIG_DATA=null,VIG_METRIC='casosMill';
+const VIG_METRICS={casosMill:['casos / millón','casesPerOneMillion'],muertesMill:['muertes / millón','deathsPerOneMillion'],activos:['casos activos','active'],casos:['casos totales','cases']};
+function showVigilancia(){showScreen('screen-vigilancia');setTimeout(initVigilancia,120);}
+async function initVigilancia(){
+  if(typeof L==='undefined'){document.getElementById('vigStatus').textContent='No se pudo cargar la librería del mapa (Leaflet). Revisa tu conexión.';return;}
+  if(!VIG_MAP){
+    VIG_MAP=L.map('worldMap',{worldCopyJump:true,minZoom:1,maxZoom:6,scrollWheelZoom:true}).setView([20,10],2);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'© OpenStreetMap · © CARTO',subdomains:'abcd',maxZoom:8}).addTo(VIG_MAP);
+  }
+  if(!VIG_DATA){
+    document.getElementById('vigStatus').textContent='Descargando datos mundiales de disease.sh…';
+    try{
+      const [allR,cR]=await Promise.all([fetch('https://disease.sh/v3/covid-19/all'),fetch('https://disease.sh/v3/covid-19/countries?yesterday=false')]);
+      const all=await allR.json();VIG_DATA=await cR.json();
+      document.getElementById('vigKpi').innerHTML=
+        '<div class="kpi"><div class="n">'+(all.cases||0).toLocaleString('es-MX')+'</div><div class="l">Casos acumulados</div></div>'+
+        '<div class="kpi"><div class="n" style="color:var(--coral)">'+(all.deaths||0).toLocaleString('es-MX')+'</div><div class="l">Defunciones</div></div>'+
+        '<div class="kpi"><div class="n" style="color:var(--emerald)">'+(all.recovered||0).toLocaleString('es-MX')+'</div><div class="l">Recuperados</div></div>'+
+        '<div class="kpi"><div class="n" style="color:var(--cyan)">'+(all.affectedCountries||0)+'</div><div class="l">Países/territorios</div></div>';
+      document.getElementById('vigStatus').textContent='';
+    }catch(e){document.getElementById('vigStatus').textContent='No se pudieron descargar los datos mundiales ('+(e.message||e)+'). Revisa tu conexión.';return;}
+  }
+  VIG_MAP.invalidateSize();drawVig();populateCmpPais();loadInfluenza();
+}
+function populateCmpPais(){
+  if(!VIG_DATA)return;const sel=document.getElementById('cmpPais');const cur=sel.value;
+  const top=VIG_DATA.slice().sort((a,b)=>(b.cases||0)-(a.cases||0));
+  const pref=['Mexico','USA','Brazil','Spain','Argentina','Colombia','Peru','Chile'];
+  const names=pref.filter(p=>top.find(c=>c.country===p)).concat(top.map(c=>c.country));
+  const uniq=[...new Set(names)];
+  sel.innerHTML=uniq.map(n=>'<option value="'+esc(n)+'">'+esc(n==='Mexico'?'México':n==='USA'?'Estados Unidos':n)+'</option>').join('');
+  if(uniq.indexOf(cur)>=0)sel.value=cur;
+}
+function compararCohorte(){
+  const out=document.getElementById('cmpCohorteOut');
+  if(typeof COHORT==='undefined'||!COHORT||!COHORT.stats){out.innerHTML='<div class="note" style="color:var(--coral)">Primero carga o construye una cohorte (pantalla de inicio).</div>';return;}
+  const sim=window.SIMSTATE||{};
+  if(!sim.week){out.innerHTML='<div class="note" style="color:var(--coral)">Corre una simulación en el enjambre (💉 Campaña / 🦠 Brote) para tener cifras locales que comparar.</div>';return;}
+  const pais=document.getElementById('cmpPais').value;
+  const c=(VIG_DATA||[]).find(x=>x.country===pais);
+  if(!c){out.innerHTML='<div class="note" style="color:var(--coral)">No se encontraron datos de ese país.</div>';return;}
+  const s=COHORT.stats;
+  const letReal=c.cases?(c.deaths/c.cases*100):0;
+  const casosMillReal=c.casesPerOneMillion||0;
+  const riesgoAlto=(s.riesgoCovid&&s.riesgoCovid[2])||0;
+  // cohorte local (última simulación)
+  const infPct=sim.inf||0, sevPct=sim.sev||0, vacPct=sim.vac||0;
+  const casosMillCohorte=Math.round(infPct/100*1000000);
+  const letCohorte=infPct?(sevPct/infPct*100):0; // usamos "graves" como proxy de desenlace severo
+  const row=(l,a,b,ca,cb)=>'<tr><td style="font-weight:600">'+l+'</td><td style="text-align:right;color:'+(ca||'#26364e')+';font-weight:700">'+a+'</td><td style="text-align:right;color:'+(cb||'#26364e')+';font-weight:700">'+b+'</td></tr>';
+  out.innerHTML=
+    '<table class="gtable"><thead><tr><th>Indicador</th><th style="text-align:right">'+esc(pais==='Mexico'?'México (real)':pais+' (real)')+'</th><th style="text-align:right">Tu cohorte (simulada)</th></tr></thead><tbody>'+
+      row('Casos por millón',casosMillReal.toLocaleString('es-MX'),casosMillCohorte.toLocaleString('es-MX'))+
+      row('Ataque / contagios',(c.population?((c.cases/c.population*100).toFixed(1)):'—')+'%',infPct+'%')+
+      row('Desenlace grave / letalidad',letReal.toFixed(1)+'% (letalidad)',letCohorte.toFixed(1)+'% (graves/contagiados)','#9e1620','#9e1620')+
+      row('Cobertura de vacunación','—',vacPct+'%')+
+      row('Población en riesgo COVID alto','—',riesgoAlto+'%','','#2f7fb8')+
+    '</tbody></table>'+
+    '<div style="margin-top:12px;background:#eef6fb;border-left:3px solid var(--cyan);border-radius:0 10px 10px 0;padding:12px 14px;font-size:13px;color:#26364e;line-height:1.55"><b>Lectura de la brecha:</b> los datos de '+esc(pais==='Mexico'?'México':pais)+' son <b>acumulados nacionales</b> a lo largo de toda la pandemia; tu cohorte es un <b>modelo cerrado y local</b> de una sola corrida. Las diferencias se explican por la carga de comorbilidades ('+riesgoAlto+'% en riesgo alto), la cobertura de vacunación alcanzada ('+vacPct+'%), la densidad de contacto y el tiempo simulado ('+sim.week+' semanas). Úsalo para discutir por qué un modelo local no reproduce exactamente la realidad y qué factores habría que ajustar.</div>'+
+    '<button class="btn-mini" style="margin-top:10px" onclick="planFromComparison(\''+esc(pais)+'\')">🧠 Pídele a PUM-AI que interprete esta brecha</button>';
+}
+function planFromComparison(pais){
+  showScreen('screen-lab');
+  const q='Compara e interpreta la brecha entre los datos reales de '+pais+' y mi cohorte simulada, y sugiere qué factores del modelo ajustar y qué implicaciones tiene para la salud pública local.';
+  setTimeout(()=>{const inp=document.getElementById('planInput');if(inp)inp.value=q;planSend(q);},300);
+}
+
+/* ── Influenza (CDC ILINet) ── */
+async function loadInfluenza(){
+  const box=document.getElementById('fluChart');if(box.dataset.done)return;
+  try{
+    const r=await fetch('https://disease.sh/v3/influenza/cdc/ILINet');const j=await r.json();
+    const data=(j&&j.data)||[];const last=data.slice(-30);
+    const pts=last.map(d=>+d.percentWeightedILI||0);const labs=last.map(d=>String(d.week||'').split(' - ')[1]||'');
+    lineChart(box,pts,labs,'%ILI');
+    const latest=last[last.length-1]||{};const peak=Math.max.apply(null,pts.concat(0));
+    document.getElementById('fluMeta').innerHTML='Última semana ('+esc(latest.week||'—')+'): <b>'+(latest.percentWeightedILI||0)+'% ILI</b> · pico del periodo: <b>'+peak+'%</b>. Fuente: CDC ILINet vía disease.sh.';
+    box.dataset.done='1';
+  }catch(e){box.innerHTML='<div class="note">No se pudo cargar la serie de influenza ('+(e.message||e)+').</div>';}
+}
+function lineChart(el,vals,labs,unit){
+  if(!el)return;const W=680,H=220,pl=38,pb=34,pt=12,pr=12;const iw=W-pl-pr,ih=H-pt-pb;
+  const mx=Math.max.apply(null,vals.concat(1))*1.15,n=vals.length;
+  const X=i=>pl+(n<=1?0:i/(n-1)*iw),Y=v=>pt+ih-(v/mx)*ih;
+  let g='';for(let k=0;k<=4;k++){const y=pt+ih-ih*k/4;g+='<line x1="'+pl+'" y1="'+y+'" x2="'+(W-pr)+'" y2="'+y+'" stroke="#eceadf"/><text x="'+(pl-4)+'" y="'+(y+3)+'" text-anchor="end" font-size="9" fill="#8593a8">'+(mx*k/4).toFixed(1)+'</text>';}
+  let path='';vals.forEach((v,i)=>{path+=(i?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1)+' ';});
+  let area=path+'L'+X(n-1)+' '+(pt+ih)+' L'+X(0)+' '+(pt+ih)+' Z';
+  let dots=vals.map((v,i)=>'<circle cx="'+X(i).toFixed(1)+'" cy="'+Y(v).toFixed(1)+'" r="2.4" fill="#e0564f"/>').join('');
+  let xl='';const step=Math.ceil(n/8);labs.forEach((L,i)=>{if(i%step===0)xl+='<text x="'+X(i).toFixed(1)+'" y="'+(H-12)+'" text-anchor="middle" font-size="8.5" fill="#5b6b82">'+esc(L)+'</text>';});
+  el.innerHTML='<svg viewBox="0 0 '+W+' '+H+'" width="100%">'+g+'<path d="'+area+'" fill="#e0564f18"/><path d="'+path+'" fill="none" stroke="#e0564f" stroke-width="2"/>'+dots+xl+'<text x="'+pl+'" y="'+(pt+6)+'" font-size="9" fill="#8593a8">'+(unit||'')+'</text></svg>';
+}
+
+/* ── Exportar base capturada a CSV (Excel) ── */
+function csvDownload(filename,headers,rows){
+  const q=v=>{v=(v==null?'':String(v));return /[",\n]/.test(v)?('"'+v.replace(/"/g,'""')+'"'):v;};
+  const csv='﻿'+[headers.map(q).join(',')].concat(rows.map(r=>r.map(q).join(','))).join('\r\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(url),2000);
+}
+function exportEncCSV(){
+  if(!ENC_RESP.length){document.getElementById('encFillStatus').style.color='var(--coral)';document.getElementById('encFillStatus').textContent='No hay respuestas capturadas para exportar.';return;}
+  const headers=ENC_FIELDS.map(f=>f.label);const keys=ENC_FIELDS.map(f=>f.key);
+  const rows=ENC_RESP.map(d=>keys.map(k=>d[k]!=null?d[k]:''));
+  csvDownload('base-'+((document.getElementById('encTitulo').value||'encuesta').toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,30))+'.csv',headers,rows);
+}
+async function exportTableroCSV(id,titulo){
+  try{
+    const enc=await sb.from('iep_encuestas').select('campos').eq('id',id).single();
+    const campos=(enc.data&&enc.data.campos)||[];
+    const resp=await sb.from('iep_respuestas').select('datos').eq('encuesta_id',id);
+    const rs=(resp.data||[]).map(x=>x.datos||{});
+    if(!rs.length){alert('Esta encuesta aún no tiene respuestas.');return;}
+    let headers,keys;
+    if(campos.length){headers=campos.map(f=>f.label||f.key);keys=campos.map(f=>f.key);}
+    else{const set=new Set();rs.forEach(d=>Object.keys(d).forEach(k=>{if(k!=='__labels')set.add(k);}));keys=[...set];headers=keys;}
+    const rows=rs.map(d=>keys.map(k=>d[k]!=null?d[k]:''));
+    csvDownload('base-'+(String(titulo||'encuesta').toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,30))+'.csv',headers,rows);
+  }catch(e){alert('No se pudo exportar: '+(e.message||e));}
+}
+function setVigMetric(m){VIG_METRIC=m;['casosMill','muertesMill','activos','casos'].forEach(k=>{const b=document.getElementById('vm-'+k);if(b)b.classList.toggle('primary',k===m);});document.getElementById('vigMetricName').textContent=VIG_METRICS[m][0];if(VIG_DATA)drawVig();}
+function drawVig(){
+  if(!VIG_DATA||!VIG_MAP)return;
+  const field=VIG_METRICS[VIG_METRIC][1];
+  if(VIG_LAYER){VIG_MAP.removeLayer(VIG_LAYER);}
+  VIG_LAYER=L.layerGroup();
+  const vals=VIG_DATA.map(c=>c[field]||0).filter(v=>v>0);const mx=Math.max.apply(null,vals.concat(1));
+  VIG_DATA.forEach(c=>{
+    const info=c.countryInfo||{};if(info.lat==null||info.long==null)return;
+    const v=c[field]||0;if(v<=0)return;const t=Math.sqrt(v/mx);
+    const col=lerpColor('#ffd08a','#9e1620',Math.max(0,Math.min(1,t)));
+    const mk=L.circleMarker([info.lat,info.long],{radius:3+t*22,fillColor:col,color:'#7a1010',weight:.6,fillOpacity:.62});
+    mk.bindPopup('<b>'+esc(c.country)+'</b><br>Casos: '+(c.cases||0).toLocaleString('es-MX')+'<br>Muertes: '+(c.deaths||0).toLocaleString('es-MX')+'<br>Casos/millón: '+(c.casesPerOneMillion||0).toLocaleString('es-MX')+'<br>Activos: '+(c.active||0).toLocaleString('es-MX'));
+    VIG_LAYER.addLayer(mk);
+  });
+  VIG_LAYER.addTo(VIG_MAP);
+  // Top 10
+  const sorted=VIG_DATA.slice().filter(c=>(c[field]||0)>0).sort((a,b)=>(b[field]||0)-(a[field]||0)).slice(0,10);
+  const mxTop=Math.max.apply(null,sorted.map(c=>c[field]||0).concat(1));
+  document.getElementById('vigTop').innerHTML=sorted.map((c,i)=>{
+    const v=c[field]||0;const flag=(c.countryInfo&&c.countryInfo.flag)||'';
+    return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:7px"><span style="font-size:11px;color:var(--muted);width:16px">'+(i+1)+'</span>'+(flag?'<img src="'+flag+'" style="width:20px;height:13px;border-radius:2px;object-fit:cover" onerror="this.style.display=\'none\'">':'')+'<div style="flex:1"><div style="display:flex;justify-content:space-between;font-size:12.5px;color:#26364e;font-weight:600"><span>'+esc(c.country)+'</span><b>'+v.toLocaleString('es-MX')+'</b></div><div style="height:6px;background:#eceadf;border-radius:4px;margin-top:2px;overflow:hidden"><div style="height:100%;width:'+Math.round(v/mxTop*100)+'%;background:linear-gradient(90deg,var(--gold),var(--coral))"></div></div></div></div>';
+  }).join('');
+}
+
+/* ───────── PERSISTENCIA DEL PROGRESO ───────── */
+window.PROGRESO=null;let _saveT=null;
+function saveProgressDebounced(){clearTimeout(_saveT);_saveT=setTimeout(saveProgress,1200);}
+async function saveProgress(){
+  if(!sb||!MY_PROFILE)return;
+  try{await sb.from('iep_progreso').upsert({user_id:MY_PROFILE.user_id,protocolo:collectProtocolo(),updated_at:new Date().toISOString()},{onConflict:'user_id'});}catch(e){}
+}
+async function saveCohorteProgress(source){
+  if(!sb||!MY_PROFILE||typeof COHORT==='undefined'||!COHORT)return;
+  try{await sb.from('iep_progreso').upsert({user_id:MY_PROFILE.user_id,cohorte:COHORT,cohorte_source:source||'demo',simstate:window.SIMSTATE||{},updated_at:new Date().toISOString()},{onConflict:'user_id'});}catch(e){}
+}
+async function loadProgress(){
+  if(!sb||!MY_PROFILE)return;
+  try{
+    const {data}=await sb.from('iep_progreso').select('*').eq('user_id',MY_PROFILE.user_id).maybeSingle();
+    if(!data)return;window.PROGRESO=data;
+    const hasCoh=data.cohorte&&data.cohorte.stats;const P=data.protocolo||{};
+    const notasHechas=(P.notas||[]).filter(x=>x&&x.trim()).length;
+    if(hasCoh||notasHechas){
+      const parts=[];
+      if(hasCoh)parts.push('cohorte de '+(data.cohorte.stats.n||'—').toLocaleString('es-MX')+' personas'+(data.cohorte_source==='encuesta'?' (de tu encuesta)':data.cohorte_source==='upload'?' (subida)':' (demo)'));
+      if(notasHechas)parts.push(notasHechas+' sección(es) de tu protocolo');
+      document.getElementById('restoreInfo').textContent='Guardamos '+parts.join(' y ')+'. Puedes continuar donde te quedaste.';
+      const bn=document.getElementById('restoreBanner');bn.style.display='flex';
+      if(!hasCoh){/* solo protocolo: el botón lleva al protocolo */}
+    }
+  }catch(e){}
+}
+function restaurarSesion(){
+  const d=window.PROGRESO;if(!d){document.getElementById('restoreBanner').style.display='none';return;}
+  document.getElementById('restoreBanner').style.display='none';
+  if(d.cohorte&&d.cohorte.stats){
+    COHORT=d.cohorte;usedDemo=(d.cohorte_source==='demo');window.SIMSTATE=d.simstate||{};
+    buildLab();buildModeScreen();buildAna();showScreen('screen-mode');
+  }else{showProtocolo();}
+}
+
+/* ───────── RECORRIDO GUIADO (TOUR) ───────── */
+let TOUR_I=0;const TOUR=[
+  {sel:'.brand',t:'Bienvenido/a a SAPIENS 👋',x:'Tu laboratorio de análisis poblacional e inteligencia epidemiológica. Te muestro lo esencial en 30 segundos.'},
+  {sel:'.drops',t:'1 · Carga tus datos',x:'Sube tu base y tus guías clínicas, o usa la cohorte de demostración para explorar todo sin subir nada.'},
+  {sel:'#linkVigilancia',t:'🌍 Vigilancia mundial',x:'Un mapa interactivo con datos reales del mundo (OMS/JHU) y un botón para comparar la realidad con tu cohorte.'},
+  {sel:'#linkProto',t:'🎓 Modo protocolo',x:'Arma tu protocolo de investigación guiado por la rúbrica de la FESI; PUM-AI resuelve tus dudas y descargas el documento.'},
+  {sel:'#linkGestion',t:'⚙ Gestión',x:'Profesores y administradores dan de alta usuarios, crean grupos y ven el tablero de respuestas.',optional:true},
+  {sel:'.brand',t:'Todo se guarda solo 💾',x:'Tus notas del protocolo y tu cohorte se guardan en la nube; al volver, retomas donde te quedaste. ¡Explora con confianza!'}
+];
+function ensureTourDom(){
+  if(document.getElementById('tourOv'))return;
+  const ov=document.createElement('div');ov.id='tourOv';ov.style.cssText='display:none;position:fixed;inset:0;z-index:9998;pointer-events:auto';
+  const hl=document.createElement('div');hl.id='tourHl';hl.style.cssText='position:fixed;border-radius:12px;box-shadow:0 0 0 9999px rgba(12,35,64,.62);transition:.25s var(--ease);pointer-events:none;border:2.5px solid var(--gold)';
+  const tp=document.createElement('div');tp.id='tourTip';tp.style.cssText='position:fixed;z-index:9999;max-width:320px;background:#fff;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.35);padding:16px 18px';
+  ov.appendChild(hl);ov.appendChild(tp);document.body.appendChild(ov);
+}
+function startTour(manual){
+  ensureTourDom();TOUR_I=0;document.getElementById('tourOv').style.display='block';tourShow();
+  if(manual)try{localStorage.removeItem('iep_tour_v1');}catch(e){}
+}
+function endTour(){const ov=document.getElementById('tourOv');if(ov)ov.style.display='none';try{localStorage.setItem('iep_tour_v1','1');}catch(e){}}
+function tourShow(){
+  let step=TOUR[TOUR_I];
+  // salta pasos opcionales cuyo elemento no está visible (p.ej. Gestión para alumnos)
+  while(step&&step.optional){const e=document.querySelector(step.sel);if(e&&e.offsetParent!==null&&getComputedStyle(e).display!=='none')break;TOUR_I++;step=TOUR[TOUR_I];}
+  if(!step){endTour();return;}
+  const el=document.querySelector(step.sel);const hl=document.getElementById('tourHl');const tip=document.getElementById('tourTip');
+  let r={left:window.innerWidth/2-60,top:80,width:120,height:40};
+  if(el){try{el.scrollIntoView({block:'center',behavior:'instant'});}catch(e){}r=el.getBoundingClientRect();}
+  const pad=6;hl.style.left=(r.left-pad)+'px';hl.style.top=(r.top-pad)+'px';hl.style.width=(r.width+pad*2)+'px';hl.style.height=(r.height+pad*2)+'px';
+  hl.style.display=el?'block':'none';
+  tip.innerHTML='<div style="font-weight:800;color:var(--navy);font-size:16px;margin-bottom:4px" class="serif">'+step.t+'</div><div style="font-size:13.5px;color:#33445e;line-height:1.55">'+step.x+'</div>'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:14px"><span style="font-size:11px;color:var(--muted)">'+(TOUR_I+1)+' / '+TOUR.length+'</span><div style="display:flex;gap:8px"><button class="btn-mini" onclick="endTour()">Saltar</button>'+(TOUR_I>0?'<button class="btn-mini" onclick="tourNav(-1)">◀</button>':'')+'<button class="btn-mini primary" onclick="tourNav(1)">'+(TOUR_I>=TOUR.length-1?'Listo':'Siguiente ▶')+'</button></div></div>';
+  // posiciona el tooltip cerca del elemento
+  let tx=Math.min(Math.max(12,r.left),window.innerWidth-332),ty=r.top+r.height+14;
+  if(ty+150>window.innerHeight)ty=Math.max(12,r.top-160);
+  tip.style.left=tx+'px';tip.style.top=ty+'px';
+}
+function tourNav(d){TOUR_I+=d;if(TOUR_I>=TOUR.length){endTour();return;}if(TOUR_I<0)TOUR_I=0;tourShow();}
+window.addEventListener('resize',()=>{const ov=document.getElementById('tourOv');if(ov&&ov.style.display==='block')tourShow();});
+
+/* ───────── EXPORTAR INFORME A WORD ───────── */
+function exportWord(){
+  const node=document.getElementById('reportDoc');
+  if(!node){alert('Genera el informe primero.');return;}
+  try{
+    const clone=node.cloneNode(true);
+    const liveImgs=node.querySelectorAll('img');
+    clone.querySelectorAll('img').forEach((im,k)=>{if(liveImgs[k]&&liveImgs[k].src)im.setAttribute('src',liveImgs[k].src);});
+    const header='<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40"><head><meta charset="utf-8"><title>Informe Epidemiológico</title></head><body style="font-family:Arial,sans-serif">';
+    const blob=new Blob(['﻿'+header+clone.outerHTML+'</body></html>'],{type:'application/msword'});
+    const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='informe-epidemiologico.doc';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(()=>URL.revokeObjectURL(url),2000);
+  }catch(e){alert('No se pudo exportar a Word: '+(e.message||e));}
+}
+
+/* ═══════════ AUTOEVALUACIÓN DEL PROTOCOLO (rúbrica FESI) ═══════════ */
+async function autoevaluarProtocolo(){
+  const P=collectProtocolo();const out=document.getElementById('autoevalOut');
+  const lleno=(P.notas||[]).filter(x=>x&&x.trim()).length;
+  if(lleno<2){out.innerHTML='<div class="card" style="border-color:#e0564f55"><div class="note" style="color:var(--coral)">Escribe al menos 2 secciones de tu protocolo antes de autoevaluar.</div></div>';return;}
+  out.innerHTML='<div class="card"><div class="thinking"><div class="sp"></div><div>PUM-AI está evaluando tu protocolo con la rúbrica…</div></div></div>';
+  const secLines=PROTO_STEPS.map((s,i)=>s.t+' (máx '+(s.w==='—'?'0%':s.w)+'): '+((P.notas&&P.notas[i])||'(vacío)').slice(0,600)).join('\n\n');
+  const ctx='Eres evaluador del Módulo de Métodos de Investigación Epidemiológica (FES Iztacala). Evalúa el protocolo del alumno con esta RÚBRICA y sus porcentajes máximos: Título 5, Introducción 20, Planteamiento del problema 10, Objetivos 10, Diseño metodológico 25, Definición operacional de variables 10, Diseño estadístico 15, Referencias 5 (Autores, Consideraciones éticas y Cronograma no puntúan pero coméntalos). Para cada sección asigna el porcentaje OBTENIDO (0..máx) y un comentario breve de mejora. Sé exigente pero constructivo.\n\nPROTOCOLO DEL ALUMNO:\n'+secLines+'\n\nResponde SOLO con JSON válido: {"secciones":[{"nombre":"Título","max":5,"obtenido":4,"comentario":"..."}],"total":72,"resumen":"1-2 frases"}';
+  try{
+    const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'protocolo',messages:[{role:'user',content:ctx}]})});
+    const data=await res.json();let raw=(data.reply||'').trim();const m=raw.match(/\{[\s\S]*\}/);
+    if(!m)throw new Error('respuesta no estructurada');
+    const r=JSON.parse(m[0]);const secs=r.secciones||[];
+    const total=r.total!=null?r.total:secs.reduce((a,s)=>a+(+s.obtenido||0),0);
+    const color=total>=80?'#1f9d6b':total>=60?'#d99413':'#e0564f';
+    let rows=secs.map(s=>{const pct=s.max?Math.round((+s.obtenido||0)/s.max*100):0;const c=pct>=80?'#1f9d6b':pct>=50?'#d99413':'#e0564f';return '<tr><td style="font-weight:600">'+esc(s.nombre)+'</td><td style="text-align:center">'+(+s.obtenido||0)+' / '+(s.max||0)+'</td><td style="min-width:120px"><div style="height:7px;background:#eceadf;border-radius:5px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+c+'"></div></div></td><td style="font-size:12px;color:#5b6b82">'+esc(s.comentario||'')+'</td></tr>';}).join('');
+    out.innerHTML='<div class="card"><div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:10px"><div style="width:88px;height:88px;border-radius:50%;display:grid;place-items:center;background:conic-gradient('+color+' '+(total*3.6)+'deg,#eceadf 0);flex-shrink:0"><div style="width:66px;height:66px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:22px;font-weight:800;color:'+color+'">'+total+'%</div></div><div style="flex:1;min-width:200px"><div class="chart-title">🎓 Autoevaluación con rúbrica</div><div class="note" style="margin-top:3px">'+esc(r.resumen||'')+'</div></div></div><table class="gtable"><thead><tr><th>Sección</th><th style="text-align:center">Obtenido</th><th></th><th>Comentario</th></tr></thead><tbody>'+rows+'</tbody></table><div class="note" style="margin-top:8px">Evaluación orientativa generada por IA; la calificación final la determina tu profesor.</div></div>';
+  }catch(e){out.innerHTML='<div class="card"><div class="note" style="color:var(--coral)">No se pudo autoevaluar ('+(e.message||e)+'). Intenta de nuevo.</div></div>';}
+}
+
+/* ═══════════ ANÁLISIS AVANZADO ═══════════ */
+function showAvanzado(){
+  if(typeof COHORT==='undefined'||!COHORT||!COHORT.stats){alert('Primero carga o construye una cohorte.');showScreen('screen-onb');return;}
+  const cols=COHORT.stats.colonias||[];
+  document.getElementById('brSelCol').innerHTML='<option value="__all">Toda la cohorte</option>'+cols.map((c,i)=>'<option value="'+i+'">'+esc(c.name)+' ('+esc(c.muni)+')</option>').join('');
+  impDefaults();genHeatData();drawHeat(0);
+  showScreen('screen-avanzado');
+}
+// —— Detector de brotes (EARS C1) ——
+function seriesFor(idx){
+  const cols=COHORT.stats.colonias||[];const base=idx==='__all'?{marg:.4,n:COHORT.stats.n}:cols[+idx]||{marg:.4,n:300};
+  const lambda=1.5+base.marg*4;const wks=26;const out=[];
+  for(let w=0;w<wks;w++){let v=Math.max(0,Math.round(lambda*(1+0.25*Math.sin(w/3))+ (Math.random()-.5)*2));if(w>=14&&w<=18)v+=Math.round((6+base.marg*10)*Math.exp(-Math.pow(w-16,2)/2));out.push(v);}
+  return out;
+}
+function runDetector(){
+  const idx=document.getElementById('brSelCol').value;const s=seriesFor(idx);const win=7,k=3;const alerts=[];const thr=[];
+  for(let t=0;t<s.length;t++){if(t<win){thr.push(null);continue;}const base=s.slice(t-win,t);const mean=base.reduce((a,b)=>a+b,0)/win;const sd=Math.sqrt(base.reduce((a,b)=>a+(b-mean)*(b-mean),0)/win)||1;const u=mean+k*sd;thr.push(u);if(s[t]>u&&s[t]>=3)alerts.push({wk:t,val:s[t],umbral:+u.toFixed(1)});}
+  document.getElementById('detectorOut').innerHTML=detectorChart(s,thr,alerts)+
+    (alerts.length?'<div class="note" style="margin-top:8px;color:#9e1620"><b>⚠ '+alerts.length+' alerta(s) de brote:</b> '+alerts.map(a=>'semana '+a.wk+' ('+a.val+' casos > umbral '+a.umbral+')').join('; ')+'.</div>':'<div class="note" style="margin-top:8px;color:#1f9d6b">✓ Sin aberraciones: ninguna semana superó su umbral esperado.</div>');
+}
+function detectorChart(s,thr,alerts){
+  const W=680,H=220,pl=34,pb=26,pt=12,pr=12,iw=W-pl-pr,ih=H-pt-pb;const mx=Math.max.apply(null,s.concat(thr.filter(x=>x!=null)).concat(1))*1.15,n=s.length;
+  const X=i=>pl+i/(n-1)*iw,Y=v=>pt+ih-(v/mx)*ih;let g='';
+  for(let kk=0;kk<=4;kk++){const y=pt+ih-ih*kk/4;g+='<line x1="'+pl+'" y1="'+y+'" x2="'+(W-pr)+'" y2="'+y+'" stroke="#eceadf"/><text x="'+(pl-3)+'" y="'+(y+3)+'" text-anchor="end" font-size="8.5" fill="#8593a8">'+Math.round(mx*kk/4)+'</text>';}
+  let bars=s.map((v,i)=>{const al=alerts.find(a=>a.wk===i);const x=X(i)-5,y=Y(v);return '<rect x="'+x+'" y="'+y+'" width="10" height="'+(pt+ih-y)+'" rx="2" fill="'+(al?'#e0564f':'#9fb3cc')+'"/>';}).join('');
+  let tl='';thr.forEach((u,i)=>{if(u==null)return;const x=X(i),y=Y(u);tl+='<circle cx="'+x+'" cy="'+y+'" r="1.6" fill="#6b4fd6"/>';});
+  let tpath='';let started=false;thr.forEach((u,i)=>{if(u==null)return;tpath+=(started?'L':'M')+X(i)+' '+Y(u)+' ';started=true;});
+  return '<svg viewBox="0 0 '+W+' '+H+'" width="100%">'+g+bars+'<path d="'+tpath+'" fill="none" stroke="#6b4fd6" stroke-width="1.5" stroke-dasharray="4 3"/>'+tl+'<text x="'+(W-pr)+'" y="'+(pt+8)+'" text-anchor="end" font-size="9" fill="#6b4fd6">— umbral (media+3σ)</text></svg>';
+}
+// —— Equidad ——
+function runEquidad(){
+  const cols=(COHORT.stats.colonias||[]).slice();
+  if(cols.length<3){document.getElementById('equidadOut').innerHTML='<div class="note">Se necesitan datos por colonia (usa la cohorte demo o sube una base con columna colonia).</div>';return;}
+  cols.sort((a,b)=>a.marg-b.marg);
+  const totN=cols.reduce((a,c)=>a+c.n,0);
+  // tertiles por población
+  const grp=[[],[],[]];let acc=0;cols.forEach(c=>{const t=Math.min(2,Math.floor(acc/totN*3));grp[t].push(c);acc+=c.n;});
+  const prev=(g,key)=>{const n=g.reduce((a,c)=>a+c.n,0)||1;return g.reduce((a,c)=>a+c[key]*c.n,0)/n;};
+  const rr=(key)=>{const lo=prev(grp[0],key),hi=prev(grp[2],key);return {lo:lo.toFixed(1),hi:hi.toFixed(1),rr:(lo?hi/lo:0).toFixed(2)};};
+  const rh=rr('hta'),rd=rr('dm2');
+  // índice de concentración (HTA), ordenado por marginación asc
+  const muH=cols.reduce((a,c)=>a+c.hta*c.n,0)/totN;let cum=0,ci=0;cols.forEach(c=>{const w=c.n/totN;const R=cum+w/2;ci+=w*c.hta*R;cum+=w;});ci=(2/muH)*ci-1;
+  // scatter marg vs hta
+  const sc=(()=>{const W=320,H=200,pl=34,pb=26,pt=10,iw=W-pl-12,ih=H-pt-pb;const mxY=Math.max.apply(null,cols.map(c=>c.hta).concat(1))*1.1;let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%">';for(let k=0;k<=3;k++){const y=pt+ih-ih*k/3;s+='<line x1="'+pl+'" y1="'+y+'" x2="'+(W-12)+'" y2="'+y+'" stroke="#eceadf"/><text x="'+(pl-3)+'" y="'+(y+3)+'" text-anchor="end" font-size="8" fill="#8593a8">'+Math.round(mxY*k/3)+'</text>';}cols.forEach(c=>{const x=pl+c.marg*iw,y=pt+ih-(c.hta/mxY)*ih;s+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+(3+Math.sqrt(c.n)/6)+'" fill="#e0564f88" stroke="#b93b34"/>';});s+='<text x="'+(pl+iw/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="9" fill="#5b6b82">marginación →</text></svg>';return s;})();
+  // curva de concentración
+  const cc=(()=>{const W=320,H=200,pl=34,pb=26,pt=10,iw=W-pl-12,ih=H-pt-pb;const ordered=cols.slice().sort((a,b)=>b.marg-a.marg);let cp=0,cd=0;const tD=ordered.reduce((a,c)=>a+c.hta*c.n,0);let pts='M'+pl+' '+(pt+ih)+' ';ordered.forEach(c=>{cp+=c.n/totN;cd+=c.hta*c.n/tD;pts+='L'+(pl+cp*iw)+' '+(pt+ih-cd*ih)+' ';});let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%"><line x1="'+pl+'" y1="'+(pt+ih)+'" x2="'+(pl+iw)+'" y2="'+pt+'" stroke="#c9cfd8" stroke-dasharray="4 3"/><path d="'+pts+'" fill="none" stroke="#1f9d6b" stroke-width="2"/><text x="'+(pl+iw/2)+'" y="'+(H-4)+'" text-anchor="middle" font-size="9" fill="#5b6b82">% población (más marginada →)</text></svg>';return s;})();
+  const interp=(+rh.rr>1.15||+rd.rr>1.15)?'La carga de enfermedad es <b>mayor en las colonias más marginadas</b>: existe una brecha de equidad que una intervención debería priorizar.':'La distribución es relativamente <b>homogénea</b> entre niveles de marginación.';
+  document.getElementById('equidadOut').innerHTML=
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:10px">'+
+      '<div style="background:#f7f5f0;border:1px solid #ece8de;border-radius:10px;padding:12px"><div class="note">Razón de tasas HTA (más vs menos marginada)</div><div style="font-size:24px;font-weight:800;color:#e0564f">'+rh.rr+'×</div><div class="note">'+rh.hi+'% vs '+rh.lo+'%</div></div>'+
+      '<div style="background:#f7f5f0;border:1px solid #ece8de;border-radius:10px;padding:12px"><div class="note">Razón de tasas DM2 (más vs menos marginada)</div><div style="font-size:24px;font-weight:800;color:#d99413">'+rd.rr+'×</div><div class="note">'+rd.hi+'% vs '+rd.lo+'%</div></div>'+
+    '</div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><div class="chart-title" style="font-size:12px;margin-bottom:4px">Marginación vs prevalencia de HTA</div>'+sc+'</div><div><div class="chart-title" style="font-size:12px;margin-bottom:4px">Curva de concentración (HTA)</div>'+cc+'</div></div>'+
+    '<div style="margin-top:10px;background:#eef6fb;border-left:3px solid var(--cyan);border-radius:0 10px 10px 0;padding:11px 13px;font-size:13px;color:#26364e;line-height:1.5"><b>Índice de concentración (HTA): '+ci.toFixed(3)+'.</b> '+interp+'</div>';
+}
+// —— Impacto ——
+const IMP={vac:{ef:70,label:'personas en riesgo COVID alto',risk:0.28,ev:'complicaciones graves'},hta:{ef:40,label:'personas con HTA',risk:0.15,ev:'eventos cardiovasculares'},dm2:{ef:50,label:'personas con DM2',risk:0.20,ev:'complicaciones diabéticas'}};
+function impDefaults(){const t=document.getElementById('impTipo').value;document.getElementById('impEf').value=IMP[t].ef;document.getElementById('impEfL').textContent=IMP[t].ef+'%';runImpacto();}
+function runImpacto(){
+  const s=COHORT.stats;const t=document.getElementById('impTipo').value;const cob=+document.getElementById('impCob').value/100,ef=+document.getElementById('impEf').value/100;
+  const cfg=IMP[t];let elig;
+  if(t==='vac')elig=Math.round(s.n*((s.riesgoCovid&&s.riesgoCovid[2])||20)/100);
+  else if(t==='hta')elig=Math.round(s.n*(s.hta||0)/100);
+  else elig=Math.round(s.n*(s.dm2||0)/100);
+  const base=elig*cfg.risk;const conInt=base*(1-ef*cob);const evit=Math.max(0,base-conInt);const tratados=Math.round(elig*cob);const nnt=evit>0?Math.round(tratados/evit):null;
+  const mx=Math.max(base,1);const bar=(v,c)=>'<div style="height:16px;width:'+Math.round(v/mx*100)+'%;background:'+c+';border-radius:4px;min-width:2px"></div>';
+  document.getElementById('impactoOut').innerHTML=
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:8px 0 12px">'+
+      kpiTile('Población objetivo',elig.toLocaleString('es-MX'),'#0C2340')+
+      kpiTile(cfg.ev+' evitados',Math.round(evit).toLocaleString('es-MX'),'#1f9d6b')+
+      kpiTile('NNT (tratar para evitar 1)',nnt!=null?nnt:'—','#6b4fd6')+
+    '</div>'+
+    '<div style="font-size:12px;color:#5b6b82;margin-bottom:4px">Sin intervención: '+Math.round(base).toLocaleString('es-MX')+' '+cfg.ev+'</div>'+bar(base,'#e0564f')+
+    '<div style="font-size:12px;color:#5b6b82;margin:8px 0 4px">Con intervención ('+Math.round(cob*100)+'% cobertura · '+Math.round(ef*100)+'% efectividad): '+Math.round(conInt).toLocaleString('es-MX')+'</div>'+bar(conInt,'#1f9d6b')+
+    '<div class="note" style="margin-top:8px">Cálculo educativo sobre '+cfg.label+' de tu cohorte; riesgo base asumido '+Math.round(cfg.risk*100)+'%.</div>';
+}
+// —— Mapa de calor temporal ——
+let HEAT=null,HEAT_WK=0,HEAT_TIMER=null;
+function genHeatData(){
+  const cols=(COHORT.stats.colonias||[]);const WKS=26;HEAT={wks:WKS,cols:cols.map(c=>{const peak=Math.round(4+(1-c.marg)*16);const amp=0.5+c.marg;const arr=[];for(let w=0;w<WKS;w++)arr.push(+(amp*Math.exp(-Math.pow(w-peak,2)/8)).toFixed(3));return {name:c.name,muni:c.muni,arr:arr};})};
+  const sl=document.getElementById('htSlider');if(sl)sl.max=WKS-1;
+}
+function drawHeat(wk){
+  HEAT_WK=wk;const el=document.getElementById('heatOut');if(!el||!HEAT)return;document.getElementById('htWk').textContent=wk;const sl=document.getElementById('htSlider');if(sl&&+sl.value!==wk)sl.value=wk;
+  const munis=['Coacalco','Naucalpan','Ecatepec'];let html='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">';
+  munis.forEach(mu=>{const cc=HEAT.cols.filter(c=>(c.muni||'').indexOf(mu)>=0);if(!cc.length)return;html+='<div><div style="font-weight:800;color:var(--navy);font-size:13px;margin-bottom:8px;text-align:center">'+mu+'</div><div style="display:flex;flex-direction:column;gap:6px">';cc.forEach(c=>{const v=Math.max(0,Math.min(1,c.arr[wk]||0));const col=lerpColor('#fff7e6','#9e1620',v);const tc=v>0.5?'#fff':'#0C2340';html+='<div style="background:'+col+';border-radius:8px;padding:8px 10px;display:flex;justify-content:space-between;align-items:center"><span style="font-size:11.5px;color:'+tc+';font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(c.name)+'</span><b style="font-size:11px;color:'+tc+'">'+Math.round(v*100)+'</b></div>';});html+='</div></div>';});
+  html+='</div><div style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:11px;color:#5b6b82"><span>baja</span><div style="height:10px;flex:1;max-width:200px;border-radius:5px;background:linear-gradient(90deg,#fff7e6,#9e1620)"></div><span>alta intensidad de contagio</span></div>';
+  el.innerHTML=html;
+}
+function toggleHeat(){const btn=document.getElementById('htPlay');if(HEAT_TIMER){clearInterval(HEAT_TIMER);HEAT_TIMER=null;btn.textContent='▶ Reproducir';return;}btn.textContent='⏸ Pausar';HEAT_TIMER=setInterval(()=>{let w=HEAT_WK+1;if(w>=(HEAT?HEAT.wks:26)){w=0;}drawHeat(w);},550);}
+
+/* ═══════════ BROTE EN VIVO ═══════════ */
+let BROTE=null,BROTE_TIMER=null;
+const BROTE_ACC=[{k:'vacunar',t:'💉 Vacunar',d:'Campaña de vacunación'},{k:'confinar',t:'🚧 Confinar',d:'Reducir el contacto social'},{k:'comunicar',t:'📣 Comunicar',d:'Informar a la población'},{k:'tratar',t:'🏥 Reforzar hospitales',d:'Reducir la gravedad'},{k:'nada',t:'⏸ No actuar',d:'Solo observar'}];
+function showBrote(){
+  const rol=(MY_PROFILE&&MY_PROFILE.rol)||'alumno';
+  document.getElementById('broteProfCard').style.display=(rol==='profesor'||rol==='admin')?'block':'none';
+  document.getElementById('broteHome').style.display='grid';document.getElementById('broteRoom').style.display='none';
+  showScreen('screen-brote');
+}
+function salirBrote(){if(BROTE_TIMER){clearInterval(BROTE_TIMER);BROTE_TIMER=null;}BROTE=null;showScreen('screen-mode');}
+function broteInitSim(){
+  const N=(COHORT&&COHORT.stats&&COHORT.stats.n)||5000;const rAlto=((COHORT&&COHORT.stats&&COHORT.stats.riesgoCovid&&COHORT.stats.riesgoCovid[2])||20)/100;
+  return {N:N,S:N-8,I:8,R:0,V:0,sev:0,rAlto:rAlto,curve:[{wk:0,newI:8,I:8,sev:0}]};
+}
+function genCodigo(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<5;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
+async function crearBrote(){
+  const msg=document.getElementById('broteProfMsg');msg.style.color='var(--muted)';msg.textContent='Creando sala…';
+  const titulo=document.getElementById('broteTitulo').value.trim()||'Brote respiratorio';
+  try{
+    const codigo=genCodigo();
+    const {data,error}=await sb.from('iep_brote_sesion').insert({codigo:codigo,profesor_id:MY_PROFILE.user_id,titulo:titulo,estado:'activa',semana:0,estado_sim:broteInitSim()}).select().single();
+    if(error)throw error;
+    BROTE={sesionId:data.id,codigo:codigo,role:'prof',lastWk:-1};
+    entrarSalaBrote();
+  }catch(e){msg.style.color='var(--coral)';msg.textContent='No se pudo crear: '+(e.message||e);}
+}
+async function unirseBrote(){
+  const msg=document.getElementById('broteAlMsg');msg.style.color='var(--muted)';msg.textContent='Buscando sala…';
+  const codigo=(document.getElementById('broteCodigo').value||'').trim().toUpperCase();
+  if(!codigo){msg.style.color='var(--coral)';msg.textContent='Escribe el código.';return;}
+  try{
+    const {data,error}=await sb.from('iep_brote_sesion').select('*').eq('codigo',codigo).maybeSingle();
+    if(error)throw error;if(!data){msg.style.color='var(--coral)';msg.textContent='No existe una sala con ese código.';return;}
+    BROTE={sesionId:data.id,codigo:codigo,role:'alumno',lastWk:-1};
+    entrarSalaBrote();
+  }catch(e){msg.style.color='var(--coral)';msg.textContent='Error: '+(e.message||e);}
+}
+function entrarSalaBrote(){
+  document.getElementById('broteHome').style.display='none';document.getElementById('broteRoom').style.display='block';
+  document.getElementById('broteRoomCode').textContent=BROTE.codigo;
+  document.getElementById('broteProfControls').style.display=BROTE.role==='prof'?'block':'none';
+  document.getElementById('broteDecisionBox').style.display=BROTE.role==='alumno'?'block':'none';
+  pollBrote();if(BROTE_TIMER)clearInterval(BROTE_TIMER);BROTE_TIMER=setInterval(pollBrote,2500);
+}
+async function pollBrote(){
+  if(!BROTE)return;
+  try{
+    const {data}=await sb.from('iep_brote_sesion').select('*').eq('id',BROTE.sesionId).single();
+    if(!data)return;renderBrote(data);
+    if(BROTE.role==='prof'){const {data:decs}=await sb.from('iep_brote_decision').select('accion').eq('sesion_id',BROTE.sesionId).eq('semana',data.semana);renderTally(decs||[]);}
+  }catch(e){}
+}
+function renderBrote(ses){
+  const sim=ses.estado_sim||{};document.getElementById('broteWk').textContent=ses.semana;
+  document.getElementById('broteRoomState').textContent=ses.estado==='fin'?'Simulacro terminado':(ses.titulo||'Escenario en curso');
+  drawBroteChart(sim);
+  const inf=sim.N?Math.round((sim.N-sim.S-(sim.V||0))/sim.N*100):0;
+  document.getElementById('broteMetrics').innerHTML=
+    '<div class="kpi"><div class="n" style="color:#f87171">'+ (sim.N?Math.round(sim.I/sim.N*100):0) +'%</div><div class="l">Activos</div></div>'+
+    '<div class="kpi"><div class="n" style="color:#c0392b">'+ (sim.N?Math.round((sim.sev||0)/sim.N*100):0) +'%</div><div class="l">Graves acum.</div></div>'+
+    '<div class="kpi"><div class="n" style="color:#34d399">'+ (sim.N?Math.round((sim.V||0)/sim.N*100):0) +'%</div><div class="l">Vacunados</div></div>'+
+    '<div class="kpi"><div class="n" style="color:#38bdf8">'+ (sim.N?Math.round(sim.R/sim.N*100):0) +'%</div><div class="l">Recuperados</div></div>';
+  // decisión del alumno
+  if(BROTE.role==='alumno'){
+    const box=document.getElementById('broteAcciones');const dmsg=document.getElementById('broteDecMsg');
+    if(ses.estado==='fin'){box.innerHTML='';dmsg.textContent='El simulacro terminó. ¡Gracias por participar!';}
+    else if(BROTE.lastWk!==ses.semana){
+      box.innerHTML=BROTE_ACC.map(a=>'<button class="btn-mini" style="justify-content:flex-start;text-align:left" onclick="decidirBrote(\''+a.k+'\','+ses.semana+')"><b>'+a.t+'</b> — '+a.d+'</button>').join('');
+      dmsg.textContent='Elige tu acción para la semana '+ses.semana+'.';
+    }
+  }
+  if(ses.estado==='fin')renderDebrief(sim);
+}
+function drawBroteChart(sim){
+  const cv=document.getElementById('broteChart');if(!cv)return;const ctx=cv.getContext('2d');const DPR=Math.min(devicePixelRatio||1,2);
+  const W=cv.clientWidth||600,H=240;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);ctx.clearRect(0,0,W,H);
+  const cur=sim.curve||[];const pl=34,pb=24,pt=10,iw=W-pl-12,ih=H-pt-pb;const mx=Math.max.apply(null,cur.map(p=>p.newI).concat(1))*1.2,n=Math.max(cur.length,1);
+  ctx.strokeStyle='#eceadf';ctx.fillStyle='#8593a8';ctx.font='9px Inter';
+  for(let k=0;k<=4;k++){const y=pt+ih-ih*k/4;ctx.beginPath();ctx.moveTo(pl,y);ctx.lineTo(W-12,y);ctx.stroke();ctx.fillText(Math.round(mx*k/4),4,y+3);}
+  // barras de nuevos casos
+  const bw=iw/Math.max(n,12)*0.7;
+  cur.forEach((p,i)=>{const x=pl+(n<=1?iw/2:i/(Math.max(n-1,1))*iw)-bw/2;const bh=ih*(p.newI/mx);ctx.fillStyle='#e0564f';ctx.fillRect(x,pt+ih-bh,bw,bh);});
+  ctx.fillStyle='#0C2340';ctx.font='700 11px Inter';ctx.fillText('Nuevos contagios por semana',pl,pt+2);
+}
+function renderTally(decs){
+  const box=document.getElementById('broteTally');const tot=decs.length;const cnt={};BROTE_ACC.forEach(a=>cnt[a.k]=0);decs.forEach(d=>{if(cnt[d.accion]!=null)cnt[d.accion]++;});
+  box.innerHTML='<b>'+tot+'</b> decisión(es) esta semana:<br>'+BROTE_ACC.map(a=>a.t.split(' ')[0]+' '+cnt[a.k]).join(' · ');
+}
+async function decidirBrote(accion,semana){
+  try{
+    await sb.from('iep_brote_decision').upsert({sesion_id:BROTE.sesionId,user_id:MY_PROFILE.user_id,nombre:(MY_PROFILE.nombre||'Alumno'),semana:semana,accion:accion},{onConflict:'sesion_id,user_id,semana'});
+    BROTE.lastWk=semana;document.getElementById('broteAcciones').innerHTML='';document.getElementById('broteDecMsg').textContent='✓ Registraste: '+(BROTE_ACC.find(a=>a.k===accion)||{}).t+'. Espera a que el profesor avance la semana.';
+  }catch(e){document.getElementById('broteDecMsg').textContent='No se pudo registrar: '+(e.message||e);}
+}
+async function avanzarBrote(){
+  try{
+    const {data:ses}=await sb.from('iep_brote_sesion').select('*').eq('id',BROTE.sesionId).single();
+    if(!ses||ses.estado==='fin')return;
+    const {data:decs}=await sb.from('iep_brote_decision').select('accion').eq('sesion_id',ses.id).eq('semana',ses.semana);
+    const d=decs||[];const tot=d.length||1;const share=k=>d.filter(x=>x.accion===k).length/tot;
+    const sV=share('vacunar'),sC=share('confinar'),sM=share('comunicar'),sT=share('tratar');
+    let sim=ses.estado_sim||broteInitSim();
+    let beta=0.9*(1-0.6*sC), gamma=0.42;
+    let dV=Math.min(sim.S,sim.S*0.30*(sV+0.4*sM));sim.S-=dV;sim.V=(sim.V||0)+dV;
+    let newI=Math.min(sim.S,beta*sim.S*sim.I/sim.N);sim.S-=newI;sim.I+=newI;
+    let rec=gamma*sim.I;sim.I-=rec;sim.R+=rec;
+    let sevNew=newI*(0.03+0.12*sim.rAlto)*(1-0.5*sT);sim.sev=(sim.sev||0)+sevNew;
+    const semana=ses.semana+1;sim.curve=(sim.curve||[]).concat([{wk:semana,newI:Math.round(newI),I:Math.round(sim.I),sev:Math.round(sim.sev)}]);
+    const estado=semana>=12?'fin':'activa';
+    await sb.from('iep_brote_sesion').update({semana:semana,estado_sim:sim,estado:estado,updated_at:new Date().toISOString()}).eq('id',ses.id);
+    pollBrote();
+  }catch(e){alert('No se pudo avanzar: '+(e.message||e));}
+}
+async function terminarBrote(){try{await sb.from('iep_brote_sesion').update({estado:'fin',updated_at:new Date().toISOString()}).eq('id',BROTE.sesionId);pollBrote();}catch(e){}}
+function renderDebrief(sim){
+  const el=document.getElementById('broteDebrief');if(el.dataset.done)return;el.dataset.done='1';
+  const infPct=sim.N?Math.round((sim.N-sim.S-(sim.V||0))/sim.N*100):0;const sevPct=sim.N?Math.round((sim.sev||0)/sim.N*100):0;const vacPct=sim.N?Math.round((sim.V||0)/sim.N*100):0;
+  el.innerHTML='<div class="results-banner"><div class="rb-head"><span class="rb-badge">Cierre</span> Resultado del simulacro</div><div class="note" style="margin-top:6px">El grupo alcanzó <b>'+vacPct+'%</b> de vacunación; al final <b>'+infPct+'%</b> de la población se contagió y <b>'+sevPct+'%</b> desarrolló cuadros graves. Discutan: ¿qué decisiones tempranas habrían aplanado la curva? ¿Vacunar antes, confinar en el pico, o comunicar para elevar la aceptación?</div></div>';
+}
+
+/* init chips de artículos cuando exista el contenedor */
+document.addEventListener('DOMContentLoaded',()=>{setTimeout(initArtChips,400);});
 </script>
 </body>
 </html>
