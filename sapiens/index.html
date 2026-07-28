@@ -247,6 +247,38 @@ body.appon .sidebar{display:flex}
 .btn-gold::after{content:'';position:absolute;top:0;left:-120%;width:60%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent);transform:skewX(-18deg);transition:left .6s var(--ease)}
 .btn-gold:hover::after{left:140%}
 h1,h2{letter-spacing:-.3px}
+
+/* ═══ DINÁMICAS / JUEGOS ═══ */
+.dyngrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.dyncard{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:16px;padding:18px;cursor:pointer;transition:.25s var(--ease);position:relative;overflow:hidden}
+.dyncard:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(12,35,64,.14)}
+.dyncard .ic{font-size:34px}.dyncard h3{font-size:16px;color:var(--navy);margin:8px 0 4px}
+.dyncard p{font-size:12.5px;color:var(--muted);line-height:1.5}
+.dyncard .bar{position:absolute;left:0;top:0;width:100%;height:5px}
+.badge-chip{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#fff7e6,#fff);border:1px solid var(--gold3);border-radius:100px;padding:6px 12px;font-size:12.5px;font-weight:700;color:var(--navy);margin:0 8px 8px 0}
+.badge-chip.locked{opacity:.4;filter:grayscale(1)}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;background:var(--navy);color:#fff;padding:12px 20px;border-radius:12px;z-index:9999;box-shadow:0 12px 30px rgba(0,0,0,.3);transition:.4s var(--ease);font-weight:700;display:flex;align-items:center;gap:10px}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.vf-item{background:rgba(255,255,255,.92);border:1.5px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:12px}
+.vf-btns{display:flex;gap:10px;margin-top:10px}
+.gbtn{flex:1;padding:12px;border-radius:11px;border:none;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit;transition:.2s}
+.gbtn.v{background:#1f9d6b;color:#fff}.gbtn.f{background:#e0564f;color:#fff}.gbtn:disabled{opacity:.5;cursor:default}
+.opt-btn{display:block;width:100%;text-align:left;padding:13px 16px;border:1.5px solid var(--line);border-radius:12px;background:#fff;margin-bottom:9px;cursor:pointer;font-size:14px;font-family:inherit;color:var(--navy);font-weight:600;transition:.18s}
+.opt-btn:hover{border-color:var(--gold);background:#fbf9f4}
+.opt-btn.ok{border-color:#1f9d6b;background:#f0faf5}.opt-btn.bad{border-color:#e0564f;background:#fdecea}
+/* Órganos y cartas del juego ¡Virus! */
+.organ-board{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.organ{width:64px;height:84px;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;border:2px dashed #cfc9ba;font-size:11px;color:var(--muted);position:relative}
+.organ.has{border-style:solid}
+.organ .em{font-size:26px}
+.organ.inf{box-shadow:0 0 0 3px rgba(224,72,62,.5)}
+.organ.vac{box-shadow:0 0 0 3px rgba(31,157,107,.55)}
+.organ.imm{box-shadow:0 0 0 3px rgba(196,162,78,.7)}
+.organ .stat{position:absolute;top:-8px;right:-8px;font-size:14px}
+.vcard{width:78px;height:104px;border-radius:11px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:700;box-shadow:0 6px 16px rgba(0,0,0,.15);transition:.18s;text-align:center;padding:6px}
+.vcard:hover{transform:translateY(-5px)}
+.vcard.sel{outline:3px solid var(--gold);transform:translateY(-6px)}
+.vcard .em{font-size:26px}
 </style>
 </head>
 <body>
@@ -263,11 +295,13 @@ h1,h2{letter-spacing:-.3px}
     <a class="sb-item" data-scr="screen-misanalisis" onclick="showMisAnalisis()"><span>🗂️</span> Mis análisis</a>
     <div class="sb-group">Aprender</div>
     <a class="sb-item sb-edu" data-scr="screen-protocolo" onclick="showProtocolo()"><span>🎓</span> Modo educativo</a>
+    <a class="sb-item" data-scr="screen-jugar" onclick="showJugar()"><span>🎮</span> Aprende jugando</a>
     <a class="sb-item" data-scr="screen-reto" onclick="showReto()"><span>🎯</span> Reto epidemiológico</a>
     <a class="sb-item" data-scr="screen-brote" onclick="showBrote()"><span>🎥</span> Brote en vivo</a>
     <div class="sb-group">Vigilancia</div>
     <a class="sb-item" data-scr="screen-vigilancia" onclick="showVigilancia()"><span>🌍</span> Vigilancia mundial</a>
     <div class="sb-group" id="sbGestGroup" style="display:none">Docente</div>
+    <a class="sb-item" id="sbTablero" data-scr="screen-tablero" style="display:none" onclick="showTablero()"><span>📊</span> Tablero docente</a>
     <a class="sb-item" id="sbGestion" data-scr="screen-gestion" style="display:none" onclick="showGestion()"><span>⚙️</span> Gestión</a>
   </nav>
   <div class="sb-foot">
@@ -779,6 +813,41 @@ h1,h2{letter-spacing:-.3px}
   </div>
 </div></div>
 
+<!-- ══ SCREEN: APRENDE JUGANDO (dinámicas) ══ -->
+<div class="screen pagebg" id="screen-jugar"><div class="wrap pad">
+  <button class="btn btn-ghost" style="margin-bottom:10px" onclick="showScreen('screen-onb')">◀ Volver</button>
+  <div class="sec-tag" style="color:var(--violet)"><span class="dot" style="background:var(--violet)"></span> Aprende jugando</div>
+  <h2 class="serif">Dinámicas <span class="gold">de epidemiología</span></h2>
+  <p class="sub">Aprende jugando: cada dinámica pone a prueba un concepto clave. Gana puntos y desbloquea insignias.</p>
+  <div id="jugarBadges" style="margin:16px 0"></div>
+  <div id="jugarHub" style="margin-top:6px"></div>
+  <div id="jugarPlay" style="display:none;margin-top:6px"></div>
+</div></div>
+
+<!-- ══ SCREEN: TABLERO DOCENTE ══ -->
+<div class="screen pagebg" id="screen-tablero"><div class="wrap pad">
+  <button class="btn btn-ghost" style="margin-bottom:10px" onclick="showScreen('screen-onb')">◀ Volver</button>
+  <div class="sec-tag"><span class="dot"></span> Panel del profesor</div>
+  <h2 class="serif">Tablero <span class="gold">docente</span></h2>
+  <p class="sub">Progreso de tus alumnos: análisis, retos, dinámicas e insignias. Genera con IA un plan de reforzamiento por alumno.</p>
+
+  <div class="card" style="margin-top:18px">
+    <div class="chart-title" style="margin-bottom:2px">🎛️ Dinámicas habilitadas para mis alumnos</div>
+    <div class="note" style="margin:2px 0 10px">Activa o desactiva las dinámicas que verán tus alumnos en «Aprende jugando».</div>
+    <div id="dynToggles" style="display:flex;flex-wrap:wrap;gap:10px"></div>
+    <div id="dynCfgMsg" class="note" style="margin-top:8px"></div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div class="chart-title">👥 Progreso por alumno</div>
+      <button class="btn-mini" onclick="cargarTablero()">↻ Actualizar</button>
+    </div>
+    <div id="tableroOut" style="margin-top:10px;overflow:auto"><div class="note">Cargando…</div></div>
+  </div>
+  <div id="planIAout" style="margin-top:14px"></div>
+</div></div>
+
 <!-- ══ SCREEN: MIS ANÁLISIS ══ -->
 <div class="screen pagebg" id="screen-misanalisis"><div class="wrap pad">
   <button class="btn btn-ghost" style="margin-bottom:10px" onclick="showScreen('screen-onb')">◀ Volver</button>
@@ -880,6 +949,7 @@ function enterApp(){
   const showGest=(rol==='admin'||rol==='profesor');
   document.getElementById('sbGestGroup').style.display=showGest?'block':'none';
   document.getElementById('sbGestion').style.display=showGest?'flex':'none';
+  document.getElementById('sbTablero').style.display=showGest?'flex':'none';
   showScreen('screen-onb');
   loadProgress();
   setTimeout(()=>{try{if(!localStorage.getItem('iep_tour_v1'))startTour(false);}catch(e){}},900);
@@ -2445,6 +2515,124 @@ function renderDebrief(sim){
   const infPct=sim.N?Math.round((sim.N-sim.S-(sim.V||0))/sim.N*100):0;const sevPct=sim.N?Math.round((sim.sev||0)/sim.N*100):0;const vacPct=sim.N?Math.round((sim.V||0)/sim.N*100):0;
   el.innerHTML='<div class="results-banner"><div class="rb-head"><span class="rb-badge">Cierre</span> Resultado del simulacro</div><div class="note" style="margin-top:6px">El grupo alcanzó <b>'+vacPct+'%</b> de vacunación; al final <b>'+infPct+'%</b> de la población se contagió y <b>'+sevPct+'%</b> desarrolló cuadros graves. Discutan: ¿qué decisiones tempranas habrían aplanado la curva? ¿Vacunar antes, confinar en el pico, o comunicar para elevar la aceptación?</div></div>';
 }
+
+/* ═══════════════════════ DINÁMICAS / JUEGOS EDUCATIVOS ═══════════════════════ */
+const DYN=[
+ {k:'mitos',n:'Verdadero o Falso',ic:'🩺',col:'#e0564f',d:'Desmonta mitos de salud y epidemias.'},
+ {k:'pcero',n:'Paciente Cero',ic:'🕵️',col:'#6b4fd6',d:'Descubre el origen de un brote con las pistas.'},
+ {k:'curva',n:'Constructor de Curva',ic:'📈',col:'#2f7fb8',d:'Toma decisiones y aplana la curva epidémica.'},
+ {k:'rastreo',n:'Rastreo de Contactos',ic:'🔗',col:'#1f9d6b',d:'Aísla contactos y corta la transmisión.'},
+ {k:'caso',n:'Caso Clínico',ic:'🧑‍⚕️',col:'#d99413',d:'Diagnostica un caso paso a paso.'},
+ {k:'virus',n:'¡Virus! por equipos',ic:'🦠',col:'#c0392b',d:'Protege tus órganos y contagia al rival.'}
+];
+const BADGES={
+ primer_juego:['🎮','Primer juego','Completaste tu primera dinámica'],
+ mitos_master:['🩺','Cazamitos','8+ aciertos en Verdadero/Falso'],
+ detective:['🕵️','Detective','Resolviste Paciente Cero'],
+ salvavidas:['📈','Salvavidas','Aplanaste la curva epidémica'],
+ rastreador:['🔗','Rastreador','Cortaste la cadena de transmisión'],
+ clinico:['🧑‍⚕️','Ojo clínico','Diagnóstico correcto en el caso'],
+ inmune:['🦠','Inmunidad','Ganaste una partida de ¡Virus!']
+};
+const AWARDED=new Set();
+function toast(html){let t=document.getElementById('gToast');if(!t){t=document.createElement('div');t.id='gToast';t.className='toast';document.body.appendChild(t);}t.innerHTML=html;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove('on');},3200);}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));const t=a[i];a[i]=a[j];a[j]=t;}return a;}
+function hdr(t){return '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div class="chart-title" style="font-size:16px">'+t+'</div><button class="btn-mini" onclick="backHub()">✕ Salir</button></div>';}
+function gresult(msg,pts){return '<div class="card" style="text-align:center"><div style="font-size:40px">🎉</div><div style="font-size:20px;font-weight:800;color:var(--navy);margin:6px 0">'+esc(msg)+'</div><div class="note">'+pts+' puntos</div><button class="btn btn-gold" style="margin-top:12px" onclick="backHub()">Volver a dinámicas</button></div>';}
+async function saveDinResultado(din,pts,detalle){if(!sb||!MY_PROFILE)return;try{await sb.from('iep_dinamica_resultado').insert({user_id:MY_PROFILE.user_id,dinamica:din,puntos:pts,detalle:detalle||{}});}catch(e){}}
+async function awardBadge(key){if(AWARDED.has(key))return;AWARDED.add(key);try{await sb.from('iep_badge_user').upsert({user_id:MY_PROFILE.user_id,badge_key:key},{onConflict:'user_id,badge_key'});}catch(e){}const b=BADGES[key];if(b)toast('🏅 Insignia desbloqueada: <b>'+b[1]+'</b>');loadBadges();}
+async function loadBadges(){const box=document.getElementById('jugarBadges');if(!box)return;let earned=[];try{const {data}=await sb.from('iep_badge_user').select('badge_key').eq('user_id',MY_PROFILE.user_id);earned=(data||[]).map(x=>x.badge_key);earned.forEach(k=>AWARDED.add(k));}catch(e){}box.innerHTML='<div style="font-weight:800;color:var(--navy);font-size:13px;margin-bottom:8px">🏅 Mis insignias ('+earned.length+'/'+Object.keys(BADGES).length+')</div>'+Object.keys(BADGES).map(function(k){const b=BADGES[k];const has=earned.indexOf(k)>=0;return '<span class="badge-chip '+(has?'':'locked')+'" title="'+esc(b[2])+'">'+b[0]+' '+esc(b[1])+'</span>';}).join('');}
+
+// —— Config de dinámicas ——
+let DYN_CFG=null;
+async function loadDynConfig(){try{const {data}=await sb.from('iep_dinamicas_config').select('*').order('updated_at',{ascending:false}).limit(1);DYN_CFG=(data&&data[0])?data[0]:null;}catch(e){DYN_CFG=null;}return (DYN_CFG&&DYN_CFG.enabled)?DYN_CFG.enabled:DYN.map(d=>d.k);}
+function renderDynToggles(){const en=(DYN_CFG&&DYN_CFG.enabled)||DYN.map(d=>d.k);document.getElementById('dynToggles').innerHTML=DYN.map(function(d){return '<label class="badge-chip" style="cursor:pointer"><input type="checkbox" '+(en.indexOf(d.k)>=0?'checked':'')+' onchange="toggleDyn(\''+d.k+'\',this.checked)"> '+d.ic+' '+d.n+'</label>';}).join('');}
+async function toggleDyn(k,on){let en=(DYN_CFG&&DYN_CFG.enabled)?DYN_CFG.enabled.slice():DYN.map(d=>d.k);if(on){if(en.indexOf(k)<0)en.push(k);}else{en=en.filter(x=>x!==k);}try{await sb.from('iep_dinamicas_config').upsert({prof_id:MY_PROFILE.user_id,enabled:en,updated_at:new Date().toISOString()},{onConflict:'prof_id'});DYN_CFG={prof_id:MY_PROFILE.user_id,enabled:en};document.getElementById('dynCfgMsg').textContent='✓ Guardado';}catch(e){document.getElementById('dynCfgMsg').textContent='No se pudo guardar: '+(e.message||e);}}
+
+// —— Hub del alumno ——
+async function showJugar(){showScreen('screen-jugar');document.getElementById('jugarPlay').style.display='none';document.getElementById('jugarHub').style.display='block';const en=await loadDynConfig();loadBadges();renderJugarHub(en);}
+function renderJugarHub(en){const box=document.getElementById('jugarHub');const list=DYN.filter(d=>(en||[]).indexOf(d.k)>=0);box.innerHTML=list.length?('<div class="dyngrid">'+list.map(function(d){return '<div class="dyncard" onclick="openDyn(\''+d.k+'\')"><div class="bar" style="background:'+d.col+'"></div><div class="ic">'+d.ic+'</div><h3>'+d.n+'</h3><p>'+d.d+'</p></div>';}).join('')+'</div>'):'<div class="note">Tu profesor aún no ha habilitado dinámicas.</div>';}
+function openDyn(k){document.getElementById('jugarHub').style.display='none';const p=document.getElementById('jugarPlay');p.style.display='block';if(k==='mitos')playMitos(p);else if(k==='pcero')playPcero(p);else if(k==='curva')playCurva(p);else if(k==='rastreo')playRastreo(p);else if(k==='caso')playCaso(p);else if(k==='virus')playVirus(p);p.scrollIntoView({behavior:'smooth',block:'start'});}
+function backHub(){if(VIRUS_TIMER){clearInterval(VIRUS_TIMER);VIRUS_TIMER=null;}VIRUS=null;document.getElementById('jugarPlay').style.display='none';document.getElementById('jugarHub').style.display='block';loadBadges();}
+
+// —— 1) Verdadero o Falso ——
+const MITOS=[['Las vacunas causan la enfermedad que previenen.',false,'Usan fragmentos o versiones inactivadas; no causan la enfermedad.'],['Lavarse las manos reduce la transmisión de muchas infecciones.',true,'Es una de las medidas más costo-efectivas.'],['Los antibióticos curan los resfriados causados por virus.',false,'Los antibióticos actúan sobre bacterias, no virus.'],['La inmunidad de rebaño protege a quienes no pueden vacunarse.',true,'Al reducir la circulación del patógeno protege a los vulnerables.'],['Un brote y una epidemia son exactamente lo mismo.',false,'El brote es localizado; la epidemia abarca una región mayor.'],['El distanciamiento social puede aplanar la curva epidémica.',true,'Reduce los contactos y el pico de casos simultáneos.'],['Sin síntomas es imposible transmitir una infección.',false,'Existen portadores asintomáticos que sí transmiten.'],['La vigilancia epidemiológica ayuda a detectar brotes a tiempo.',true,'Permite actuar antes de que el brote crezca.'],['Obesidad y diabetes aumentan el riesgo de complicaciones por COVID-19.',true,'Son comorbilidades asociadas a mayor gravedad.'],['Compartir información no verificada en redes ayuda a la salud pública.',false,'La desinformación puede aumentar conductas de riesgo.']];
+function playMitos(p){let i=0,score=0;const bank=shuffle(MITOS.slice()).slice(0,8);
+ function render(){if(i>=bank.length){finish();return;}const it=bank[i];p.innerHTML=hdr('🩺 Verdadero o Falso')+'<div class="vf-item"><div style="font-size:12px;color:var(--muted)">Afirmación '+(i+1)+' / '+bank.length+' · Puntos: '+score+'</div><div style="font-size:17px;font-weight:600;color:var(--navy);margin-top:6px">'+esc(it[0])+'</div><div class="vf-btns"><button class="gbtn v" onclick="__mitos(true)">Verdadero</button><button class="gbtn f" onclick="__mitos(false)">Falso</button></div><div id="vfFb" class="note" style="margin-top:10px"></div></div>';}
+ window.__mitos=function(ans){const it=bank[i];const ok=ans===it[1];if(ok)score++;document.querySelectorAll('.vf-btns .gbtn').forEach(b=>b.disabled=true);document.getElementById('vfFb').innerHTML='<b style="color:'+(ok?'#1f9d6b':'#e0564f')+'">'+(ok?'✓ Correcto':'✗ Incorrecto')+'</b> — '+esc(it[2]);setTimeout(function(){i++;render();},1700);};
+ function finish(){const pts=Math.round(score/bank.length*100);p.innerHTML=hdr('🩺 Verdadero o Falso')+gresult('Acertaste '+score+' de '+bank.length,pts);saveDinResultado('mitos',score,{total:bank.length});awardBadge('primer_juego');if(score>=8)awardBadge('mitos_master');}
+ render();}
+
+// —— 2) Paciente Cero ——
+const PCERO={intro:'Brote de enfermedad gastrointestinal (diarrea y vómito): 40 casos en 3 días en una colonia.',clues:['La mayoría de los enfermos bebió agua de la llave comunitaria esta semana.','Los casos se concentran en las manzanas cercanas al pozo.','No todos comieron en la taquería, pero casi todos usaron el agua.','El laboratorio detectó contaminación fecal en una muestra de agua.'],op:['Agua del pozo comunitario','Taquería de la esquina','Alberca pública','Aire acondicionado del mercado'],c:0,exp:'La evidencia (agua compartida, cercanía al pozo y contaminación fecal) apunta a una fuente hídrica común: el pozo.'};
+function playPcero(p){let picked=false;p.innerHTML=hdr('🕵️ Paciente Cero')+'<div class="card"><div style="font-size:15px;color:var(--navy);font-weight:600">'+PCERO.intro+'</div><div style="margin:12px 0"><div class="note" style="font-weight:800;color:var(--gold2);text-transform:uppercase;font-size:11px">Pistas del caso</div>'+PCERO.clues.map(c=>'<div style="background:#fff7e6;border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:8px 12px;margin-top:6px;font-size:13.5px">🔎 '+esc(c)+'</div>').join('')+'</div><div class="note" style="font-weight:800;color:var(--navy)">¿Cuál es la fuente del brote?</div><div id="pcOpts" style="margin-top:8px">'+PCERO.op.map((o,i)=>'<button class="opt-btn" onclick="__pc('+i+')">'+esc(o)+'</button>').join('')+'</div><div id="pcFb"></div></div>';
+ window.__pc=function(i){if(picked)return;picked=true;const ok=i===PCERO.c;document.querySelectorAll('#pcOpts .opt-btn').forEach(function(b,j){if(j===PCERO.c)b.classList.add('ok');if(j===i&&!ok)b.classList.add('bad');b.disabled=true;});document.getElementById('pcFb').innerHTML='<div class="note" style="margin-top:10px"><b style="color:'+(ok?'#1f9d6b':'#e0564f')+'">'+(ok?'¡Correcto, detective!':'No exactamente')+'</b> — '+esc(PCERO.exp)+'</div><button class="btn btn-gold" style="margin-top:10px" onclick="backHub()">Volver</button>';saveDinResultado('pcero',ok?100:40,{});awardBadge('primer_juego');if(ok)awardBadge('detective');};}
+
+// —— 3) Constructor de Curva ——
+function playCurva(p){let wk=0,S=980,I=20,V=0,peak=20;const curve=[20],WKS=8;
+ function render(){p.innerHTML=hdr('📈 Constructor de Curva')+'<div class="card"><div class="note">Semana '+wk+' / '+WKS+' · Pico de contagios: <b>'+Math.round(peak)+'</b></div><div id="curvaChart" style="margin:10px 0"></div>'+(wk<WKS?'<div class="note" style="font-weight:700;color:var(--navy)">Elige tu medida para la semana '+(wk+1)+':</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px"><button class="btn-mini primary" onclick="__curva(\'vac\')">💉 Vacunar</button><button class="btn-mini" onclick="__curva(\'conf\')">🚧 Confinar</button><button class="btn-mini" onclick="__curva(\'com\')">📣 Comunicar</button><button class="btn-mini" onclick="__curva(\'nada\')">⏸ No actuar</button></div>':'')+'</div>';if(typeof lineChart==='function')lineChart(document.getElementById('curvaChart'),curve,curve.map((_,i)=>'S'+i),'Contagios');if(wk>=WKS)setTimeout(finish,300);}
+ window.__curva=function(a){let beta=0.9;if(a==='conf')beta=0.45;if(a==='com')beta=0.68;if(a==='vac'){const dv=Math.min(S,S*0.18);S-=dv;V+=dv;}const newI=Math.min(S,beta*S*I/1000);S-=newI;I+=newI;I-=0.35*I;peak=Math.max(peak,I);curve.push(Math.round(I));wk++;render();};
+ function finish(){const pts=Math.max(0,Math.round(100-peak/5));p.innerHTML=hdr('📈 Constructor de Curva')+'<div id="curvaChart" style="margin-bottom:10px"></div>'+gresult('Pico de '+Math.round(peak)+' contagios simultáneos',pts);if(typeof lineChart==='function')lineChart(document.getElementById('curvaChart'),curve,curve.map((_,i)=>'S'+i),'Contagios');saveDinResultado('curva',pts,{peak:Math.round(peak)});awardBadge('primer_juego');if(peak<130)awardBadge('salvavidas');}
+ render();}
+
+// —— 4) Rastreo de Contactos ——
+function playRastreo(p){const contacts=[{n:'Compañero de trabajo',sec:1},{n:'Concierto masivo',sec:5},{n:'Familiar en casa',sec:2},{n:'Vecino',sec:0},{n:'Fiesta familiar',sec:4},{n:'Compra en tienda',sec:1},{n:'Reunión religiosa',sec:3},{n:'Paseo en parque',sec:0}];const budget=3;let chosen=[];
+ function render(){p.innerHTML=hdr('🔗 Rastreo de Contactos')+'<div class="card"><div class="note">El caso índice tuvo 8 contactos. Tienes recursos para <b>aislar '+budget+'</b>. Elige a quién aislar para evitar más contagios (pista: los eventos masivos generan más casos secundarios).</div><div id="rastreoNet" style="margin:12px 0"></div><div class="note">Seleccionados: '+chosen.length+' / '+budget+'</div>'+(chosen.length>=budget?'<button class="btn btn-gold" style="margin-top:10px" onclick="__rgo()">Ver resultado</button>':'')+'</div>';drawNet();}
+ function drawNet(){const el=document.getElementById('rastreoNet');const W=560,H=290,cx=W/2,cy=H/2;let s='<svg viewBox="0 0 '+W+' '+H+'" width="100%">';contacts.forEach(function(c,i){const a=i/contacts.length*6.2832,x=cx+Math.cos(a)*115,y=cy+Math.sin(a)*100;const sel=chosen.indexOf(i)>=0;s+='<line x1="'+cx+'" y1="'+cy+'" x2="'+x+'" y2="'+y+'" stroke="'+(sel?'#1f9d6b':'#d8cfae')+'" stroke-width="'+(sel?3:1.4)+'"/>';});contacts.forEach(function(c,i){const a=i/contacts.length*6.2832,x=cx+Math.cos(a)*115,y=cy+Math.sin(a)*100;const sel=chosen.indexOf(i)>=0;s+='<g style="cursor:pointer" onclick="__rpick('+i+')"><circle cx="'+x+'" cy="'+y+'" r="17" fill="'+(sel?'#1f9d6b':'#e0564f')+'"/><text x="'+x+'" y="'+(y+5)+'" text-anchor="middle" font-size="14">'+(sel?'🛡️':'😷')+'</text><text x="'+x+'" y="'+(y+32)+'" text-anchor="middle" font-size="8.5" fill="#26364e">'+esc(c.n).slice(0,18)+'</text></g>';});s+='<circle cx="'+cx+'" cy="'+cy+'" r="23" fill="#0C2340"/><text x="'+cx+'" y="'+(cy+6)+'" text-anchor="middle" font-size="17">🦠</text></svg>';el.innerHTML=s;}
+ window.__rpick=function(i){const k=chosen.indexOf(i);if(k>=0)chosen.splice(k,1);else if(chosen.length<budget)chosen.push(i);render();};
+ window.__rgo=function(){const prevented=chosen.reduce((a,i)=>a+contacts[i].sec,0);const total=contacts.reduce((a,c)=>a+c.sec,0);const pts=Math.round(prevented/total*100);const ok=prevented>=total*0.6;p.innerHTML=hdr('🔗 Rastreo de Contactos')+'<div class="card" style="text-align:center"><div style="font-size:38px">🛡️</div><div style="font-size:19px;font-weight:800;color:var(--navy);margin:6px 0">Evitaste '+prevented+' de '+total+' contagios secundarios</div><div class="note">'+(ok?'¡Buen rastreo! Aislaste a los superpropagadores.':'Se escaparon superpropagadores. Prioriza los eventos masivos.')+'</div><div class="note" style="margin-top:4px">'+pts+' puntos</div><button class="btn btn-gold" style="margin-top:12px" onclick="backHub()">Volver</button></div>';saveDinResultado('rastreo',pts,{prevented:prevented});awardBadge('primer_juego');if(ok)awardBadge('rastreador');};
+ render();}
+
+// —— 5) Caso Clínico ramificado ——
+const CASO={start:{txt:'Adulto de 55 años llega a urgencias con fiebre, tos seca y falta de aire de 5 días. ¿Qué haces primero?',op:[['Tomar signos vitales y saturación de O₂','s2'],['Dar el alta con paracetamol','malAlta'],['Iniciar antibiótico de inmediato','s2b']]},s2:{txt:'Saturación 88%, fiebre 38.7°C. ¿Siguiente paso?',op:[['Solicitar prueba respiratoria y radiografía','s3'],['Enviar a casa a reposo','malAlta']]},s2b:{txt:'Sin diagnóstico, el antibiótico no ayuda a un virus y el paciente empeora. Reevalúa.',op:[['Tomar signos y prueba respiratoria','s3']]},s3:{txt:'Prueba positiva a virus respiratorio; radiografía con infiltrados. ¿Diagnóstico y conducta?',op:[['Neumonía viral: oxígeno y vigilancia','fin_ok'],['Gastroenteritis: sueros y alta','malDx']]},fin_ok:{end:true,ok:true,txt:'Diagnóstico correcto: neumonía viral. Manejo con oxígeno y vigilancia. ¡Bien hecho!'},malAlta:{end:true,ok:false,txt:'Dar de alta a un paciente con hipoxia (SatO₂ baja) es peligroso.'},malDx:{end:true,ok:false,txt:'El cuadro respiratorio con infiltrados no corresponde a gastroenteritis.'}};
+function playCaso(p){let node='start';function render(){const nd=CASO[node];if(nd.end){p.innerHTML=hdr('🧑‍⚕️ Caso Clínico')+'<div class="card" style="text-align:center"><div style="font-size:36px">'+(nd.ok?'🎉':'⚠️')+'</div><div style="font-size:16px;font-weight:700;color:'+(nd.ok?'#1f9d6b':'#e0564f')+';margin:8px 0">'+esc(nd.txt)+'</div><div><button class="btn btn-gold" onclick="backHub()">Volver</button> '+(nd.ok?'':'<button class="btn btn-ghost" onclick="playCaso(document.getElementById(\'jugarPlay\'))">Reintentar</button>')+'</div></div>';saveDinResultado('caso',nd.ok?100:40,{});awardBadge('primer_juego');if(nd.ok)awardBadge('clinico');return;}p.innerHTML=hdr('🧑‍⚕️ Caso Clínico')+'<div class="card"><div style="font-size:15px;color:var(--navy);font-weight:600;margin-bottom:10px">'+esc(nd.txt)+'</div>'+nd.op.map((o,i)=>'<button class="opt-btn" onclick="__caso('+i+')">'+esc(o[0])+'</button>').join('')+'</div>';window.__caso=function(i){node=nd.op[i][1];render();};}render();}
+
+// —— 6) ¡Virus! por equipos (multijugador) ——
+const ORG=[{k:'corazon',n:'Corazón',em:'❤️',c:'#e0564f'},{k:'pulmon',n:'Pulmón',em:'🫁',c:'#ec7fa9'},{k:'cerebro',n:'Cerebro',em:'🧠',c:'#7c5cff'},{k:'hueso',n:'Hueso',em:'🦴',c:'#b8912f'},{k:'rinon',n:'Riñón',em:'🫘',c:'#2f9d6b'}];
+let VIRUS=null,VIRUS_TIMER=null;
+function playVirus(p){const rol=(MY_PROFILE&&MY_PROFILE.rol)||'alumno';
+ p.innerHTML=hdr('🦠 ¡Virus! por equipos')+'<p class="note" style="margin-bottom:10px">Cada equipo arma un cuerpo de 5 órganos. Coloca órganos, ataca al rival con virus y defiéndete con medicinas y vacunas. Gana el equipo que tenga sus 5 órganos sanos.</p><div class="dyngrid">'+((rol==='profesor'||rol==='admin')?'<div class="card"><div class="chart-title">👩‍🏫 Abrir mesa</div><p class="note" style="margin:4px 0 10px">Crea la partida entre dos equipos y comparte el código.</p><button class="btn btn-gold" onclick="crearVirus()">Crear partida</button><div id="vHostMsg" class="note" style="margin-top:8px"></div></div>':'')+'<div class="card"><div class="chart-title">🙋 Unirme</div><p class="note" style="margin:4px 0 10px">Escribe el código de la mesa.</p><div style="display:flex;gap:8px"><input id="vCod" placeholder="CÓDIGO" style="flex:1;padding:11px;border:1.5px solid var(--line);border-radius:11px;text-transform:uppercase;letter-spacing:2px;font-family:inherit"><button class="btn btn-navy" onclick="unirseVirus()">Entrar</button></div><div id="vJoinMsg" class="note" style="margin-top:8px"></div></div></div><div id="vRoom" style="margin-top:16px"></div>';}
+function genDeck(){const d=[];ORG.forEach(function(o){let i;for(i=0;i<5;i++)d.push({k:'organo',t:o.k});for(i=0;i<4;i++)d.push({k:'virus',t:o.k});for(i=0;i<4;i++)d.push({k:'med',t:o.k});});return shuffle(d);}
+function emptyBody(){const b={};ORG.forEach(function(o){b[o.k]=null;});return b;}
+async function crearVirus(){const code=genCodigoReto();const state={teams:{A:{organs:emptyBody()},B:{organs:emptyBody()}},deck:[],discard:[],hands:{A:[],B:[]},turn:'A',activeId:null,log:['Sala creada. Esperando jugadores…'],winner:null};
+ try{const {data,error}=await sb.from('iep_virus_sesion').insert({codigo:code,host_id:MY_PROFILE.user_id,estado:'lobby',state:state}).select().single();if(error)throw error;VIRUS={id:data.id,code:code,role:'host',team:null};salaVirus();}catch(e){document.getElementById('vHostMsg').textContent='No se pudo crear: '+(e.message||e);}}
+async function unirseVirus(){const code=(document.getElementById('vCod').value||'').trim().toUpperCase();if(!code)return;
+ try{const {data:ses}=await sb.from('iep_virus_sesion').select('*').eq('codigo',code).maybeSingle();if(!ses){document.getElementById('vJoinMsg').textContent='No existe esa mesa.';return;}await sb.from('iep_virus_jugador').upsert({sesion_id:ses.id,user_id:MY_PROFILE.user_id,nombre:(MY_PROFILE.nombre||'Alumno'),equipo:null},{onConflict:'sesion_id,user_id'});VIRUS={id:ses.id,code:code,role:'player',team:null};salaVirus();}catch(e){document.getElementById('vJoinMsg').textContent='Error: '+(e.message||e);}}
+function salaVirus(){document.getElementById('vRoom').style.display='block';pollVirus();if(VIRUS_TIMER)clearInterval(VIRUS_TIMER);VIRUS_TIMER=setInterval(pollVirus,1800);}
+async function pollVirus(){if(!VIRUS)return;try{const r=await sb.from('iep_virus_sesion').select('*').eq('id',VIRUS.id).single();const j=await sb.from('iep_virus_jugador').select('*').eq('sesion_id',VIRUS.id);renderVirus(r.data,j.data||[]);}catch(e){}}
+function pickTeam(t){sb.from('iep_virus_jugador').update({equipo:t}).eq('sesion_id',VIRUS.id).eq('user_id',MY_PROFILE.user_id).then(function(){pollVirus();});}
+async function iniciarVirus(){const r=await sb.from('iep_virus_sesion').select('*').eq('id',VIRUS.id).single();const j=await sb.from('iep_virus_jugador').select('*').eq('sesion_id',VIRUS.id);const js=j.data||[];const A=js.filter(x=>x.equipo==='A'),B=js.filter(x=>x.equipo==='B');if(!A.length||!B.length){toast('Se necesitan jugadores en ambos equipos.');return;}const st=r.data.state;st.deck=genDeck();st.hands={A:[],B:[]};for(let i=0;i<3;i++){st.hands.A.push(st.deck.pop());st.hands.B.push(st.deck.pop());}st.turn='A';st.activeId=A[Math.floor(Math.random()*A.length)].user_id;st.log=['¡Comienza la partida! Turno del equipo A.'];await sb.from('iep_virus_sesion').update({estado:'juego',state:st,updated_at:new Date().toISOString()}).eq('id',VIRUS.id);pollVirus();}
+function vApply(state,team,card){const opp=team==='A'?'B':'A';const mine=state.teams[team].organs,their=state.teams[opp].organs,t=card.t;
+ if(card.k==='organo'){if(mine[t])return {ok:false,msg:'Ya tienes ese órgano.'};mine[t]={s:'healthy'};return {ok:true,msg:'Colocó un órgano ('+t+')'};}
+ if(card.k==='med'){if(!mine[t])return {ok:false,msg:'No tienes ese órgano.'};const s=mine[t].s;if(s==='infected'){mine[t].s='healthy';return{ok:true,msg:'Curó su '+t};}if(s==='healthy'){mine[t].s='vaccinated';return{ok:true,msg:'Vacunó su '+t};}if(s==='vaccinated'){mine[t].s='immunized';return{ok:true,msg:'Inmunizó su '+t+' 🛡️'};}return{ok:false,msg:'Ese órgano ya está inmunizado.'};}
+ if(card.k==='virus'){if(!their[t])return{ok:false,msg:'El rival no tiene ese órgano.'};const s=their[t].s;if(s==='immunized')return{ok:false,msg:'Órgano inmunizado: no le afecta.'};if(s==='vaccinated'){their[t].s='healthy';return{ok:true,msg:'Quitó la vacuna del rival ('+t+')'};}if(s==='healthy'){their[t].s='infected';return{ok:true,msg:'Infectó el '+t+' del rival 🦠'};}if(s==='infected'){their[t]=null;return{ok:true,msg:'¡Destruyó el '+t+' del rival!'};}}
+ return {ok:false,msg:'Jugada inválida.'};}
+function vWin(organs){return ORG.every(function(o){const x=organs[o.k];return x&&x.s!=='infected';});}
+async function jugarCartaVirus(idx){const r=await sb.from('iep_virus_sesion').select('*').eq('id',VIRUS.id).single();const ses=r.data;const st=ses.state;if(ses.estado!=='juego'||st.activeId!==MY_PROFILE.user_id||!VIRUS.team)return;const hand=st.hands[VIRUS.team];const card=hand[idx];if(!card)return;const res=vApply(st,VIRUS.team,card);if(!res.ok){toast('⚠ '+res.msg);return;}hand.splice(idx,1);st.discard.push(card);st.log.unshift(res.msg);while(hand.length<3&&st.deck.length)hand.push(st.deck.pop());let estado=ses.estado;if(vWin(st.teams[VIRUS.team].organs)){st.winner=VIRUS.team;estado='fin';}else{const opp=VIRUS.team==='A'?'B':'A';st.turn=opp;const j=await sb.from('iep_virus_jugador').select('*').eq('sesion_id',VIRUS.id).eq('equipo',opp);const arr=j.data||[];st.activeId=arr.length?arr[Math.floor(Math.random()*arr.length)].user_id:null;}await sb.from('iep_virus_sesion').update({state:st,estado:estado,updated_at:new Date().toISOString()}).eq('id',VIRUS.id);if(st.winner&&st.winner===VIRUS.team){awardBadge('inmune');saveDinResultado('virus',100,{win:true});}pollVirus();}
+function vOrgan(o,x){let cls='organ',stat='';if(x){cls+=' has';if(x.s==='infected'){cls+=' inf';stat='🦠';}else if(x.s==='vaccinated'){cls+=' vac';stat='💉';}else if(x.s==='immunized'){cls+=' imm';stat='🛡️';}}return '<div class="'+cls+'" style="'+(x?'border-color:'+o.c+';background:'+o.c+'18':'')+'"><div class="em">'+o.em+'</div>'+o.n+(stat?'<div class="stat">'+stat+'</div>':'')+'</div>';}
+function vBoards(st){return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">'+['A','B'].map(function(t){return '<div class="card" style="padding:12px"><div style="font-weight:800;color:var(--navy);text-align:center;margin-bottom:8px">Equipo '+t+'</div><div class="organ-board">'+ORG.map(function(o){return vOrgan(o,(st.teams[t].organs||{})[o.k]);}).join('')+'</div></div>';}).join('')+'</div>';}
+function vCard(c,i){const o=ORG.find(x=>x.k===c.t)||{em:'❓',c:'#888',n:''};const label=c.k==='organo'?'ÓRGANO':c.k==='virus'?'VIRUS':'MEDICINA';const bg=c.k==='virus'?'#c0392b':c.k==='med'?'#1f9d6b':o.c;return '<div class="vcard" style="background:'+bg+'" onclick="jugarCartaVirus('+i+')"><div style="font-size:9px;opacity:.9">'+label+'</div><div class="em">'+(c.k==='virus'?'🦠':c.k==='med'?'💊':o.em)+'</div><div>'+o.n+'</div></div>';}
+function vTeamCol(t,arr){return '<div style="border:1px solid var(--line);border-radius:10px;padding:10px"><div style="font-weight:800;color:var(--navy)">Equipo '+t+'</div><div class="note">'+(arr.length?arr.map(x=>esc(x.nombre||'Alumno')).join(', '):'sin jugadores')+'</div></div>';}
+function renderVirus(ses,players){const box=document.getElementById('vRoom');if(!box||!ses)return;const me=players.find(x=>x.user_id===MY_PROFILE.user_id);if(me)VIRUS.team=me.equipo;const st=ses.state||{};
+ if(ses.estado==='lobby'){const A=players.filter(x=>x.equipo==='A'),B=players.filter(x=>x.equipo==='B');box.innerHTML='<div class="card" style="text-align:center"><div class="note">Código de mesa</div><div style="font-size:40px;font-weight:900;letter-spacing:6px;color:var(--navy)">'+esc(VIRUS.code)+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">'+vTeamCol('A',A)+vTeamCol('B',B)+'</div>'+(VIRUS.role==='player'?'<div style="margin-top:12px"><button class="btn-mini primary" onclick="pickTeam(\'A\')">Unirme al equipo A</button> <button class="btn-mini" style="background:#2f7fb8;color:#fff;border:none" onclick="pickTeam(\'B\')">Unirme al equipo B</button><div class="note" style="margin-top:6px">Tu equipo: '+(VIRUS.team||'—')+'</div></div>':'')+(VIRUS.role==='host'?'<button class="btn btn-gold" style="margin-top:12px" onclick="iniciarVirus()">▶ Iniciar partida</button>':'<div class="note" style="margin-top:8px">Esperando a que el profesor inicie…</div>')+'</div>';return;}
+ if(ses.estado==='fin'){box.innerHTML='<div class="card" style="text-align:center"><div style="font-size:44px">🏆</div><div style="font-size:22px;font-weight:800;color:var(--navy)">¡Ganó el equipo '+esc(st.winner)+'!</div></div>'+vBoards(st)+'<button class="btn btn-gold" style="margin-top:12px" onclick="backHub()">Volver</button>';return;}
+ const myTurn=st.activeId===MY_PROFILE.user_id;const an=(players.find(x=>x.user_id===st.activeId)||{}).nombre||'…';
+ box.innerHTML='<div class="results-banner" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><div><b>Turno equipo '+esc(st.turn)+'</b> · juega: '+esc(an)+'</div><div class="note">Tu equipo: '+(VIRUS.team||'—')+'</div></div>'+vBoards(st)+(myTurn&&VIRUS.team?('<div class="card" style="margin-top:12px"><div class="chart-title" style="margin-bottom:8px">Tu mano — toca una carta para jugarla</div><div class="organ-board" style="justify-content:flex-start">'+(st.hands[VIRUS.team]||[]).map((c,i)=>vCard(c,i)).join('')+'</div><div class="note" style="margin-top:6px">Órgano → tu cuerpo · Virus → ataca al rival · Medicina → cura/vacuna lo tuyo.</div></div>'):'<div class="card" style="margin-top:12px;text-align:center"><div class="note">Espera tu turno… juega '+esc(an)+' (equipo '+esc(st.turn)+')</div></div>')+'<div class="note" style="margin-top:8px">📜 '+esc((st.log||[])[0]||'')+'</div>';}
+
+// —— Tablero docente ——
+async function showTablero(){await loadDynConfig();renderDynToggles();cargarTablero();showScreen('screen-tablero');}
+async function cargarTablero(){const box=document.getElementById('tableroOut');box.innerHTML='<div class="note">Cargando…</div>';
+ try{const rol=MY_PROFILE.rol;let q=sb.from('iep_perfiles').select('user_id,nombre,apellido,rol');if(rol==='profesor')q=q.eq('profesor_id',MY_PROFILE.user_id);else if(rol==='admin')q=q.eq('rol','alumno');const {data:al}=await q;const ids=(al||[]).map(a=>a.user_id);if(!ids.length){box.innerHTML='<div class="note" style="margin-top:8px">Aún no tienes alumnos registrados.</div>';return;}
+  const rr=await Promise.all([sb.from('iep_analisis').select('user_id').in('user_id',ids),sb.from('iep_dinamica_resultado').select('user_id,puntos').in('user_id',ids),sb.from('iep_badge_user').select('user_id').in('user_id',ids)]);
+  const anD=rr[0].data||[],drD=rr[1].data||[],buD=rr[2].data||[];
+  box.innerHTML='<table class="gtable"><thead><tr><th>Alumno</th><th style="text-align:center">Análisis</th><th style="text-align:center">Dinámicas</th><th style="text-align:center">Insignias</th><th>Plan IA</th></tr></thead><tbody>'+al.map(function(a){const na=anD.filter(x=>x.user_id===a.user_id).length,nd=drD.filter(x=>x.user_id===a.user_id).length,nb=buD.filter(x=>x.user_id===a.user_id).length;const nm=((a.nombre||'')+' '+(a.apellido||'')).replace(/'/g,'');return '<tr><td style="font-weight:600">'+esc(a.nombre||'')+' '+esc(a.apellido||'')+'</td><td style="text-align:center">'+na+'</td><td style="text-align:center">'+nd+'</td><td style="text-align:center">'+nb+' 🏅</td><td><button class="btn-mini" onclick="planReforzamiento(\''+a.user_id+'\',\''+nm+'\')">🧠 Generar</button></td></tr>';}).join('')+'</tbody></table>';
+ }catch(e){box.innerHTML='<div class="note">Error: '+(e.message||e)+'</div>';}}
+async function planReforzamiento(uid,name){const out=document.getElementById('planIAout');out.innerHTML='<div class="card"><div class="thinking"><div class="sp"></div><div>PUM-AI arma el plan de reforzamiento de '+esc(name)+'…</div></div></div>';
+ try{const rr=await Promise.all([sb.from('iep_analisis').select('tipo,titulo,resumen').eq('user_id',uid).limit(30),sb.from('iep_dinamica_resultado').select('dinamica,puntos').eq('user_id',uid).limit(50)]);const anD=rr[0].data||[],drD=rr[1].data||[];
+  const ctx='Eres tutor de epidemiología. Con base en el desempeño del alumno '+name+', arma un PLAN DE REFORZAMIENTO personalizado. Análisis realizados: '+(anD.map(x=>x.tipo+' ('+(x.titulo||'')+')').join('; ')||'ninguno')+'. Resultados de dinámicas/juegos: '+(drD.map(x=>x.dinamica+' '+x.puntos+'pts').join('; ')||'ninguno')+'. Identifica fortalezas y debilidades y propón 3-5 acciones concretas de reforzamiento (temas a repasar, dinámicas a repetir, lecturas). Breve y accionable, en Markdown.';
+  const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'protocolo',messages:[{role:'user',content:ctx}]})});const d=await res.json();
+  out.innerHTML='<div class="card"><div class="chart-title" style="margin-bottom:6px">🧠 Plan de reforzamiento — '+esc(name)+'</div><div style="font-size:13.5px;color:#26364e;line-height:1.55">'+mdToHtml(d.reply||'Sin respuesta.')+'</div></div>';out.scrollIntoView({behavior:'smooth',block:'start'});saveAnalisis('reto_docente','Plan de reforzamiento — '+name,String(d.reply||'').replace(/[#*]/g,''),{alumno:uid});
+ }catch(e){out.innerHTML='<div class="card"><div class="note">No se pudo generar: '+(e.message||e)+'</div></div>';}}
 
 /* ═══════════════ MIS ANÁLISIS (guardado + visibilidad por rol) ═══════════════ */
 async function saveAnalisis(tipo,titulo,resumen,payload){
