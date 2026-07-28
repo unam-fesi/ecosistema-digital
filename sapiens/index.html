@@ -198,9 +198,10 @@ body{background:#fff;overflow-x:hidden}
 body.appon{padding-left:252px}
 body.appon .sidebar{display:flex}
 .sb-brand{display:flex;align-items:center;gap:11px;padding:18px 18px 14px;border-bottom:1px solid var(--line)}
-.sb-brand .brand-logo{height:40px}
-.sb-name{font-weight:900;font-size:19px;color:var(--navy);letter-spacing:.5px;line-height:1}
-.sb-brand small{display:block;font-size:9.5px;color:var(--gold2);font-weight:600;margin-top:3px}
+.sb-brand{padding:20px 16px 16px}
+.sb-brand .brand-logo{height:58px}
+.sb-name{font-weight:900;font-size:27px;color:var(--navy);letter-spacing:.8px;line-height:1}
+.sb-brand small{display:block;font-size:10px;color:var(--gold2);font-weight:700;margin-top:4px}
 .sb-brand .mark{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--gold),var(--gold3));display:grid;place-items:center;color:var(--navy);font-weight:900}
 .sb-nav{flex:1;overflow-y:auto;padding:8px 0}
 .sb-group{font-size:10px;letter-spacing:1.3px;text-transform:uppercase;color:var(--gold2);font-weight:800;padding:14px 20px 5px}
@@ -208,6 +209,8 @@ body.appon .sidebar{display:flex}
 .sb-item span{font-size:15px;width:20px;text-align:center;flex-shrink:0}
 .sb-item:hover{background:rgba(196,162,78,.10);border-left-color:var(--gold3)}
 .sb-item.active{background:linear-gradient(90deg,rgba(196,162,78,.18),rgba(196,162,78,0));border-left-color:var(--gold);color:var(--navy)}
+.sb-item.locked{opacity:.38;pointer-events:none;filter:grayscale(.5)}
+.sb-item.locked::after{content:'🔒';margin-left:auto;font-size:11px}
 .sb-edu{position:relative}
 .sb-edu::after{content:'GUÍA';position:absolute;right:16px;font-size:8.5px;font-weight:800;letter-spacing:.5px;color:#fff;background:var(--emerald);padding:2px 6px;border-radius:100px}
 .sb-foot{border-top:1px solid var(--line);padding:12px 18px;display:flex;flex-direction:column;gap:8px}
@@ -254,11 +257,13 @@ h1,h2{letter-spacing:-.3px}
   <nav class="sb-nav">
     <div class="sb-group">Datos y análisis</div>
     <a class="sb-item" data-scr="screen-onb" onclick="showScreen('screen-onb')"><span>📥</span> Cargar datos</a>
-    <a class="sb-item" data-scr="screen-lab" onclick="navSim()"><span>🦠</span> Simulación 3D</a>
-    <a class="sb-item" data-scr="screen-analisis" onclick="navAna()"><span>🧠</span> Análisis con IA</a>
-    <a class="sb-item" data-scr="screen-avanzado" onclick="showAvanzado()"><span>🔬</span> Análisis avanzado</a>
+    <a class="sb-item" data-scr="screen-lab" data-need="cohort" onclick="navSim()"><span>🦠</span> Simulación 3D</a>
+    <a class="sb-item" data-scr="screen-analisis" data-need="cohort" onclick="navAna()"><span>🧠</span> Análisis con IA</a>
+    <a class="sb-item" data-scr="screen-avanzado" data-need="cohort" onclick="showAvanzado()"><span>🔬</span> Análisis avanzado</a>
+    <a class="sb-item" data-scr="screen-misanalisis" onclick="showMisAnalisis()"><span>🗂️</span> Mis análisis</a>
     <div class="sb-group">Aprender</div>
     <a class="sb-item sb-edu" data-scr="screen-protocolo" onclick="showProtocolo()"><span>🎓</span> Modo educativo</a>
+    <a class="sb-item" data-scr="screen-reto" onclick="showReto()"><span>🎯</span> Reto epidemiológico</a>
     <a class="sb-item" data-scr="screen-brote" onclick="showBrote()"><span>🎥</span> Brote en vivo</a>
     <div class="sb-group">Vigilancia</div>
     <a class="sb-item" data-scr="screen-vigilancia" onclick="showVigilancia()"><span>🌍</span> Vigilancia mundial</a>
@@ -275,18 +280,19 @@ h1,h2{letter-spacing:-.3px}
 
 <!-- ══ SCREEN 0: AUTH + INTRO EDUCATIVA ══ -->
 <div class="screen active" id="screen-auth">
-  <div class="auth-hero"><div class="auth-grid">
+  <div class="auth-hero">
+    <div style="text-align:center;padding:34px 20px 4px;position:relative;z-index:1"><img src="../public/assets/fesi-logo.png" alt="Facultad de Estudios Superiores Iztacala" style="height:clamp(130px,19vh,180px);width:auto;filter:drop-shadow(0 12px 30px rgba(12,35,64,.20))" onerror="this.style.display='none'"></div>
+    <div class="auth-grid">
     <div>
-      <div class="badge">🔒 Acceso por rol · Alumno · Profesor · Administrador</div>
       <h1 class="serif"><span class="g">SAPIENS</span></h1>
-      <p class="serif" style="font-size:16px;color:var(--navy);font-weight:600;margin-top:6px;line-height:1.35">Sistema de Análisis Poblacional e Inteligencia Epidemiológica mediante Nodos de Simulación</p>
-      <p class="sub">Convierte los datos de salud de <b>cualquier población</b> en un laboratorio vivo. Alumnos y profesores conversan con inteligencia artificial para <b>obtener, analizar y simular</b> el comportamiento epidemiológico de comunidades enteras: modelan brotes con <b>enjambres de miles de agentes</b>, exploran el <b>gemelo digital</b> de cada persona, detectan aberraciones, miden desigualdades en salud y diseñan intervenciones sustentadas en evidencia científica real. <b>Del dato individual a la decisión poblacional</b>, en un solo lugar.</p>
+      <p class="serif" style="font-size:19px;color:var(--navy);font-weight:600;margin-top:8px;line-height:1.35">Sistema de Análisis Poblacional e Inteligencia Epidemiológica mediante Nodos de Simulación</p>
+      <p class="sub" style="font-size:18.5px;line-height:1.75;max-width:600px">Convierte los datos de salud de <b>cualquier población</b> en un laboratorio vivo. Alumnos y profesores conversan con inteligencia artificial para <b>obtener, analizar y simular</b> el comportamiento epidemiológico de comunidades enteras: modelan brotes con <b>enjambres de miles de agentes</b>, exploran el <b>gemelo digital</b> de cada persona, detectan aberraciones, miden desigualdades en salud y diseñan intervenciones sustentadas en evidencia científica real. <b>Del dato individual a la decisión poblacional</b>, en un solo lugar.</p>
       <div class="edu-points">
         <div class="p"><span class="ico">🧠</span><div>Pregunta en español a PUM-AI y obtén análisis, gráficas e informes con fundamento clínico.</div></div>
         <div class="p"><span class="ico">🦠</span><div>Simula campañas de vacunación y observa, arquetipo por arquetipo, cómo responde la población.</div></div>
         <div class="p"><span class="ico">📄</span><div>Genera un informe epidemiológico con IA y expórtalo a PDF.</div></div>
       </div>
-      <p class="note" style="margin-top:20px">Con fines educativos · datos ficticios · no constituye consejo médico.</p>
+      <p class="note" style="margin-top:20px;font-size:14px">Herramienta con <b>fines educativos</b> para la formación en epidemiología.</p>
     </div>
     <div class="login-card">
       <h3 class="serif">Inicia sesión</h3>
@@ -599,7 +605,15 @@ h1,h2{letter-spacing:-.3px}
     <div id="fluMeta" class="note" style="margin-top:6px"></div>
   </div>
 
-  <p class="note" style="margin-top:10px">Fuente: <a href="https://disease.sh" target="_blank" rel="noopener" style="color:var(--gold2);font-weight:700">disease.sh</a> · API pública abierta (OMS / Johns Hopkins CSSE · CDC ILINet). Cifras acumuladas de referencia.</p>
+  <div class="card" style="margin-top:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div><div class="chart-title">📰 Noticias epidemiológicas — fuentes fiables</div><div class="note" style="margin-top:2px">Titulares recientes sobre brotes, vacunación y salud pública, de agencias y medios de referencia. Se actualiza al abrir la sección.</div></div>
+      <button class="btn-mini" onclick="cargarNoticias()">↻ Actualizar</button>
+    </div>
+    <div id="newsFeed" style="margin-top:12px"><div class="note">Cargando noticias…</div></div>
+  </div>
+
+  <p class="note" style="margin-top:10px">Fuentes: <a href="https://disease.sh" target="_blank" rel="noopener" style="color:var(--gold2);font-weight:700">disease.sh</a> (OMS / Johns Hopkins · CDC ILINet) · Noticias vía Google News de fuentes como OMS, OPS, CDC, ECDC y medios de referencia.</p>
 </div></div>
 
 <!-- ══ SCREEN: MODO EDUCATIVO · PROTOCOLO DE INVESTIGACIÓN ══ -->
@@ -765,7 +779,73 @@ h1,h2{letter-spacing:-.3px}
   </div>
 </div></div>
 
-<footer class="wrap" style="max-width:none"><div class="wrap">SAPIENS — Sistema de Análisis Poblacional e Inteligencia Epidemiológica mediante Nodos de Simulación · Ecosistema Digital, FES Iztacala UNAM · datos ficticios / cargados localmente · con fines educativos.</div></footer>
+<!-- ══ SCREEN: MIS ANÁLISIS ══ -->
+<div class="screen pagebg" id="screen-misanalisis"><div class="wrap pad">
+  <button class="btn btn-ghost" style="margin-bottom:10px" onclick="showScreen('screen-onb')">◀ Volver</button>
+  <div class="sec-tag" style="color:var(--cyan)"><span class="dot" style="background:var(--cyan)"></span> Historial de resultados</div>
+  <h2 class="serif">Mis <span class="gold">análisis</span></h2>
+  <p class="sub" id="misAnSub">Aquí quedan guardados los informes, autoevaluaciones y análisis que generas. Se guardan automáticamente al producirlos.</p>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:14px 0"><button class="btn-mini" onclick="cargarMisAnalisis()">↻ Actualizar</button><span class="note" id="misAnCount"></span></div>
+  <div id="misAnList"><div class="note">Cargando…</div></div>
+</div></div>
+
+<!-- ══ SCREEN: RETO EPIDEMIOLÓGICO (juego tipo Kahoot) ══ -->
+<div class="screen pagebg" id="screen-reto"><div class="wrap pad">
+  <button class="btn btn-ghost" style="margin-bottom:10px" onclick="salirReto()">◀ Volver</button>
+  <div class="sec-tag" style="color:var(--violet)"><span class="dot" style="background:var(--violet)"></span> Aprendizaje en vivo</div>
+  <h2 class="serif">Reto <span class="gold">epidemiológico</span></h2>
+  <p class="sub">Un juego de preguntas en tiempo real, estilo concurso. El profesor lanza el reto y los alumnos compiten desde su dispositivo; PUM-AI ayuda a crear las preguntas y a analizar los resultados.</p>
+
+  <div id="retoHome" style="margin-top:18px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px" id="retoHomeGrid">
+      <div class="card" id="retoProfCard" style="display:none">
+        <div class="chart-title">👩‍🏫 Profesor — mis retos</div>
+        <p class="note" style="margin:4px 0 10px">Crea cuestionarios (con ayuda de PUM-AI) y lánzalos en vivo.</p>
+        <button class="btn btn-gold" onclick="nuevoReto()">➕ Crear reto</button>
+        <div id="retoMisQuizzes" style="margin-top:12px"></div>
+      </div>
+      <div class="card">
+        <div class="chart-title">🙋 Alumno — unirme a un reto</div>
+        <p class="note" style="margin:4px 0 10px">Escribe el código que proyecta tu profesor.</p>
+        <div style="display:flex;gap:8px"><input id="retoCodigo" placeholder="CÓDIGO" style="flex:1;padding:11px 13px;border:1.5px solid var(--line);border-radius:11px;font-size:16px;font-family:inherit;text-transform:uppercase;letter-spacing:2px"><button class="btn btn-navy" onclick="unirseReto()">Entrar</button></div>
+        <div id="retoAlMsg" class="note" style="margin-top:8px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="retoBuilder" style="display:none;margin-top:18px">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+        <div class="chart-title">Diseña tu reto</div>
+        <button class="btn-mini" onclick="cerrarBuilder()">✕ Cerrar</button>
+      </div>
+      <input id="retoTitulo" placeholder="Título del reto (ej. Conceptos de vigilancia epidemiológica)" style="width:100%;margin-top:10px;padding:11px 13px;border:1.5px solid var(--line);border-radius:11px;font-size:15px;font-weight:700;font-family:inherit;color:var(--navy)">
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:10px">
+        <input id="retoTema" placeholder="Tema para que PUM-AI genere preguntas (ej. cadena epidemiológica, tipos de estudio)" style="flex:1;min-width:220px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:13.5px;font-family:inherit">
+        <input id="retoNum" type="number" min="3" max="12" value="6" style="width:70px;padding:10px;border:1.5px solid var(--line);border-radius:10px;font-family:inherit">
+        <button class="btn-mini primary" id="retoGenBtn" onclick="generarPreguntasIA()">✨ Generar con PUM-AI</button>
+        <button class="btn-mini" onclick="addRetoPregunta()">+ Pregunta manual</button>
+      </div>
+      <div id="retoGenMsg" class="note" style="margin-top:8px"></div>
+      <div id="retoPreguntas" style="margin-top:12px"></div>
+      <div style="display:flex;gap:10px;margin-top:12px;flex-wrap:wrap">
+        <button class="btn btn-gold" onclick="guardarReto()">💾 Guardar reto</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="retoRoom" style="display:none;margin-top:18px">
+    <div class="results-banner" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div><div class="rb-head" style="margin-bottom:0">Sala <span id="retoRoomCode" style="color:var(--gold2)"></span></div><div class="note" id="retoRoomState"></div></div>
+      <div class="week-badge" style="position:static;background:var(--violet)">Pregunta <span id="retoQNum">—</span></div>
+    </div>
+    <div id="retoStage" style="margin-top:14px"></div>
+    <div id="retoProfControls" style="display:none;margin-top:12px;display:flex;gap:10px;flex-wrap:wrap"></div>
+    <div id="retoLeaderboard" style="margin-top:14px"></div>
+  </div>
+</div></div>
+
+<footer class="wrap" style="max-width:none"><div class="wrap" style="text-align:center">SAPIENS · Ecosistema Digital<br><b>Facultad de Estudios Superiores Iztacala · UNAM © 2026 — Todos los derechos reservados.</b></div></footer>
 
 <script>
 /* ============ CONFIG + AUTH ============ */
@@ -830,8 +910,10 @@ let COHORT=null,usedDemo=true,pyReady=false,lastReport='';
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=document.getElementById(id);if(el)el.classList.add('active');
   document.querySelectorAll('.sb-item').forEach(a=>a.classList.toggle('active',a.getAttribute('data-scr')===id));
   const sb=document.getElementById('sidebar');if(sb)sb.classList.remove('open');
+  if(typeof refreshNav==='function')refreshNav();
   window.scrollTo(0,0);}
 function toggleSidebar(){const sb=document.getElementById('sidebar');if(sb)sb.classList.toggle('open');}
+function refreshNav(){const has=(typeof COHORT!=='undefined'&&!!COHORT);document.querySelectorAll('.sb-item[data-need="cohort"]').forEach(a=>a.classList.toggle('locked',!has));}
 function navSim(){if(typeof COHORT!=='undefined'&&COHORT){goSim();}else{showScreen('screen-onb');}}
 function navAna(){if(typeof COHORT!=='undefined'&&COHORT){showScreen('screen-analisis');}else{showScreen('screen-onb');}}
 
@@ -1457,6 +1539,7 @@ async function generateReport(){
     const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'report',messages:[{role:'user',content:prompt}]})});
     const data=await res.json();lastReport=data.reply||'No se recibió respuesta.';
     out.innerHTML=buildReportDoc(lastReport);renderReportCharts();
+    try{saveAnalisis('informe','Informe epidemiológico'+(usedDemo?' (demo)':''),lastReport,{});}catch(e){}
     document.getElementById('pdfBtn').disabled=false;document.getElementById('wordBtn').disabled=false;out.scrollIntoView({behavior:'smooth',block:'start'});
   }catch(e){out.innerHTML='<div class="report-body">No se pudo generar el informe: '+(e.message||e)+'</div>';}
   finally{if(btn)btn.disabled=false;}
@@ -1914,6 +1997,7 @@ async function initVigilancia(){
     }catch(e){document.getElementById('vigStatus').textContent='No se pudieron descargar los datos mundiales ('+(e.message||e)+'). Revisa tu conexión.';return;}
   }
   VIG_MAP.invalidateSize();drawVig();populateCmpPais();loadInfluenza();
+  if(!document.getElementById('newsFeed').dataset.loaded){document.getElementById('newsFeed').dataset.loaded='1';cargarNoticias();}
 }
 function populateCmpPais(){
   if(!VIG_DATA)return;const sel=document.getElementById('cmpPais');const cur=sel.value;
@@ -2144,6 +2228,7 @@ async function autoevaluarProtocolo(){
     const color=total>=80?'#1f9d6b':total>=60?'#d99413':'#e0564f';
     let rows=secs.map(s=>{const pct=s.max?Math.round((+s.obtenido||0)/s.max*100):0;const c=pct>=80?'#1f9d6b':pct>=50?'#d99413':'#e0564f';return '<tr><td style="font-weight:600">'+esc(s.nombre)+'</td><td style="text-align:center">'+(+s.obtenido||0)+' / '+(s.max||0)+'</td><td style="min-width:120px"><div style="height:7px;background:#eceadf;border-radius:5px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:'+c+'"></div></div></td><td style="font-size:12px;color:#5b6b82">'+esc(s.comentario||'')+'</td></tr>';}).join('');
     out.innerHTML='<div class="card"><div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:10px"><div style="width:88px;height:88px;border-radius:50%;display:grid;place-items:center;background:conic-gradient('+color+' '+(total*3.6)+'deg,#eceadf 0);flex-shrink:0"><div style="width:66px;height:66px;border-radius:50%;background:#fff;display:grid;place-items:center;font-size:22px;font-weight:800;color:'+color+'">'+total+'%</div></div><div style="flex:1;min-width:200px"><div class="chart-title">🎓 Autoevaluación con rúbrica</div><div class="note" style="margin-top:3px">'+esc(r.resumen||'')+'</div></div></div><table class="gtable"><thead><tr><th>Sección</th><th style="text-align:center">Obtenido</th><th></th><th>Comentario</th></tr></thead><tbody>'+rows+'</tbody></table><div class="note" style="margin-top:8px">Evaluación orientativa generada por IA; la calificación final la determina tu profesor.</div></div>';
+    try{saveAnalisis('autoevaluacion','Autoevaluación de protocolo — '+total+'%',r.resumen||'',{total:total,secciones:secs});}catch(e){}
   }catch(e){out.innerHTML='<div class="card"><div class="note" style="color:var(--coral)">No se pudo autoevaluar ('+(e.message||e)+'). Intenta de nuevo.</div></div>';}
 }
 
@@ -2167,6 +2252,7 @@ function runDetector(){
   for(let t=0;t<s.length;t++){if(t<win){thr.push(null);continue;}const base=s.slice(t-win,t);const mean=base.reduce((a,b)=>a+b,0)/win;const sd=Math.sqrt(base.reduce((a,b)=>a+(b-mean)*(b-mean),0)/win)||1;const u=mean+k*sd;thr.push(u);if(s[t]>u&&s[t]>=3)alerts.push({wk:t,val:s[t],umbral:+u.toFixed(1)});}
   document.getElementById('detectorOut').innerHTML=detectorChart(s,thr,alerts)+
     (alerts.length?'<div class="note" style="margin-top:8px;color:#9e1620"><b>⚠ '+alerts.length+' alerta(s) de brote:</b> '+alerts.map(a=>'semana '+a.wk+' ('+a.val+' casos > umbral '+a.umbral+')').join('; ')+'.</div>':'<div class="note" style="margin-top:8px;color:#1f9d6b">✓ Sin aberraciones: ninguna semana superó su umbral esperado.</div>');
+  try{const cn=(idx==='__all'?'toda la cohorte':((COHORT.stats.colonias||[])[+idx]||{}).name||'');saveAnalisis('detector','Detector de brotes — '+cn,(alerts.length?alerts.length+' alerta(s): semanas '+alerts.map(a=>a.wk).join(', '):'Sin aberraciones detectadas'),{alerts:alerts});}catch(e){}
 }
 function detectorChart(s,thr,alerts){
   const W=680,H=220,pl=34,pb=26,pt=12,pr=12,iw=W-pl-pr,ih=H-pt-pb;const mx=Math.max.apply(null,s.concat(thr.filter(x=>x!=null)).concat(1))*1.15,n=s.length;
@@ -2202,6 +2288,7 @@ function runEquidad(){
     '</div>'+
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div><div class="chart-title" style="font-size:12px;margin-bottom:4px">Marginación vs prevalencia de HTA</div>'+sc+'</div><div><div class="chart-title" style="font-size:12px;margin-bottom:4px">Curva de concentración (HTA)</div>'+cc+'</div></div>'+
     '<div style="margin-top:10px;background:#eef6fb;border-left:3px solid var(--cyan);border-radius:0 10px 10px 0;padding:11px 13px;font-size:13px;color:#26364e;line-height:1.5"><b>Índice de concentración (HTA): '+ci.toFixed(3)+'.</b> '+interp+'</div>';
+  try{saveAnalisis('equidad','Análisis de equidad en salud','Razón de tasas HTA '+rh.rr+'× ('+rh.hi+'% vs '+rh.lo+'%), DM2 '+rd.rr+'×; índice de concentración '+ci.toFixed(3)+'.',{rh:rh,rd:rd,ci:ci});}catch(e){}
 }
 // —— Impacto ——
 const IMP={vac:{ef:70,label:'personas en riesgo COVID alto',risk:0.28,ev:'complicaciones graves'},hta:{ef:40,label:'personas con HTA',risk:0.15,ev:'eventos cardiovasculares'},dm2:{ef:50,label:'personas con DM2',risk:0.20,ev:'complicaciones diabéticas'}};
@@ -2359,27 +2446,284 @@ function renderDebrief(sim){
   el.innerHTML='<div class="results-banner"><div class="rb-head"><span class="rb-badge">Cierre</span> Resultado del simulacro</div><div class="note" style="margin-top:6px">El grupo alcanzó <b>'+vacPct+'%</b> de vacunación; al final <b>'+infPct+'%</b> de la población se contagió y <b>'+sevPct+'%</b> desarrolló cuadros graves. Discutan: ¿qué decisiones tempranas habrían aplanado la curva? ¿Vacunar antes, confinar en el pico, o comunicar para elevar la aceptación?</div></div>';
 }
 
-/* ═══════════ FONDO DE PARTÍCULAS (nodos azul marino · conexiones doradas) ═══════════ */
-(function(){
-  const canvas=document.getElementById('bgParticles');if(!canvas)return;const ctx=canvas.getContext('2d');
-  let W=0,H=0,dpr=Math.min(devicePixelRatio||1,2),nodes=[],raf=0;const mouse={x:-9999,y:-9999};
-  const reduce=matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* ═══════════════ MIS ANÁLISIS (guardado + visibilidad por rol) ═══════════════ */
+async function saveAnalisis(tipo,titulo,resumen,payload){
+  if(!sb||!MY_PROFILE)return;
+  try{await sb.from('iep_analisis').insert({user_id:MY_PROFILE.user_id,tipo:tipo,titulo:titulo,resumen:(resumen||'').replace(/\s+/g,' ').slice(0,4000),payload:payload||{}});}catch(e){}
+}
+function showMisAnalisis(){cargarMisAnalisis();showScreen('screen-misanalisis');}
+const AN_TIPO={informe:['📄','Informe'],autoevaluacion:['🎓','Autoevaluación'],equidad:['⚖️','Equidad'],detector:['🚨','Detector de brotes'],reto:['🎯','Reto'],reto_docente:['🧠','Análisis de reto']};
+async function cargarMisAnalisis(){
+  const box=document.getElementById('misAnList');box.innerHTML='<div class="note">Cargando…</div>';
+  const rol=(MY_PROFILE&&MY_PROFILE.rol)||'alumno';
+  document.getElementById('misAnSub').textContent=rol==='alumno'?'Aquí quedan guardados los informes, autoevaluaciones y análisis que generas.':rol==='profesor'?'Ves los análisis que generan tus alumnos, además de los tuyos.':'Como administrador ves los análisis de todos los alumnos y profesores.';
+  try{
+    const {data,error}=await sb.from('iep_analisis').select('*').order('created_at',{ascending:false}).limit(200);
+    if(error)throw error;
+    if(!data||!data.length){box.innerHTML='<div class="note" style="margin-top:8px">Todavía no hay análisis guardados. Genera un informe, una autoevaluación o un análisis y aparecerán aquí.</div>';document.getElementById('misAnCount').textContent='';return;}
+    // nombres
+    const ids=[...new Set(data.map(a=>a.user_id))];let names={};
+    try{const {data:ps}=await sb.from('iep_perfiles').select('user_id,nombre,apellido,rol').in('user_id',ids);(ps||[]).forEach(p=>names[p.user_id]=(p.nombre||'')+' '+(p.apellido||'')+(p.rol?(' · '+p.rol):''));}catch(e){}
+    document.getElementById('misAnCount').textContent=data.length+' análisis'+(rol!=='alumno'?' de '+ids.length+' usuario(s)':'');
+    box.innerHTML=data.map(a=>{
+      const ic=AN_TIPO[a.tipo]||['🗂️',a.tipo];let f='';try{f=new Date(a.created_at).toLocaleString('es-MX',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});}catch(e){}
+      const who=rol!=='alumno'?('<span class="rolbadge" style="background:var(--cyan);color:#fff;margin-left:6px">'+esc(names[a.user_id]||'usuario')+'</span>'):'';
+      return '<div style="border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:9px;background:rgba(255,255,255,.7)"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><div style="font-weight:700;color:var(--navy);font-size:14px">'+ic[0]+' '+esc(a.titulo)+who+'</div><div class="note">'+ic[1]+' · '+f+'</div></div>'+(a.resumen?('<div class="note" style="margin-top:6px;color:#26364e;line-height:1.5">'+esc(a.resumen).slice(0,320)+(a.resumen.length>320?'…':'')+'</div>'):'')+'</div>';
+    }).join('');
+  }catch(e){box.innerHTML='<div class="note">No se pudieron cargar: '+(e.message||e)+'</div>';}
+}
+
+/* ═══════════════ NOTICIAS EPIDEMIOLÓGICAS (Vigilancia) ═══════════════ */
+async function cargarNoticias(){
+  const box=document.getElementById('newsFeed');if(!box)return;box.innerHTML='<div class="thinking"><div class="sp"></div><div>Buscando noticias de fuentes fiables…</div></div>';
+  const rss='https://news.google.com/rss/search?q='+encodeURIComponent('(epidemiología OR brote OR vacunación OR "salud pública" OR OMS OR OPS) when:14d')+'&hl=es-419&gl=MX&ceid=MX:es-419';
+  const proxies=['https://api.allorigins.win/raw?url=','https://corsproxy.io/?url='];
+  for(const p of proxies){
+    try{
+      const res=await fetch(p+encodeURIComponent(rss));if(!res.ok)continue;const txt=await res.text();
+      const xml=new DOMParser().parseFromString(txt,'text/xml');const items=Array.prototype.slice.call(xml.querySelectorAll('item')).slice(0,10);
+      if(items.length){renderNoticias(items);return;}
+    }catch(e){}
+  }
+  box.innerHTML=noticiasFallback();
+}
+function renderNoticias(items){
+  const box=document.getElementById('newsFeed');
+  box.innerHTML=items.map(function(it){
+    const g=s=>{const el=it.querySelector(s);return el?el.textContent:'';};
+    let t=g('title'),link=g('link'),src=g('source'),pd=g('pubDate');let fecha='';try{if(pd)fecha=new Date(pd).toLocaleDateString('es-MX',{day:'2-digit',month:'short'});}catch(e){}
+    if(src&&t.indexOf(' - '+src)>0)t=t.replace(' - '+src,'');
+    return '<div class="artcard"><a href="'+esc(link)+'" target="_blank" rel="noopener">'+esc(t)+'</a><div class="meta">'+esc(src||'Fuente')+(fecha?(' · '+fecha):'')+'</div></div>';
+  }).join('')+'<div class="note" style="margin-top:8px">Titulares agregados por Google News de fuentes de salud y medios de referencia.</div>';
+}
+function noticiasFallback(){
+  const src=[['Organización Mundial de la Salud — Brotes','https://www.who.int/emergencies/disease-outbreak-news'],['OPS/OMS — Noticias','https://www.paho.org/es/noticias'],['CDC — Newsroom','https://www.cdc.gov/media/index.html'],['ECDC — Noticias y eventos','https://www.ecdc.europa.eu/en/news-events'],['Secretaría de Salud (México)','https://www.gob.mx/salud/archivo/prensa']];
+  return '<div class="note" style="margin-bottom:8px">No se pudo cargar el feed en vivo ahora mismo. Consulta directamente estas fuentes fiables:</div>'+src.map(function(s){return '<div class="artcard"><a href="'+s[1]+'" target="_blank" rel="noopener">'+s[0]+'</a><div class="meta">Fuente oficial · abrir ↗</div></div>';}).join('');
+}
+
+/* ═══════════════ RETO EPIDEMIOLÓGICO (juego tipo Kahoot) ═══════════════ */
+let RETO=null,RETO_TIMER=null,RETO_QS=[];
+function showReto(){
+  const rol=(MY_PROFILE&&MY_PROFILE.rol)||'alumno';
+  document.getElementById('retoProfCard').style.display=(rol==='profesor'||rol==='admin')?'block':'none';
+  document.getElementById('retoHome').style.display='block';document.getElementById('retoBuilder').style.display='none';document.getElementById('retoRoom').style.display='none';
+  if(rol==='profesor'||rol==='admin')cargarMisQuizzes();
+  showScreen('screen-reto');
+}
+function salirReto(){if(RETO_TIMER){clearInterval(RETO_TIMER);RETO_TIMER=null;}RETO=null;showScreen('screen-onb');}
+// —— Builder ——
+function nuevoReto(){RETO_QS=[];document.getElementById('retoTitulo').value='';document.getElementById('retoTema').value='';document.getElementById('retoGenMsg').textContent='';document.getElementById('retoBuilder').dataset.edit='';document.getElementById('retoBuilder').style.display='block';document.getElementById('retoHome').style.display='none';renderRetoEditor();}
+function cerrarBuilder(){document.getElementById('retoBuilder').style.display='none';document.getElementById('retoHome').style.display='block';}
+function addRetoPregunta(){RETO_QS.push({q:'',op:['','','',''],c:0,seg:20});renderRetoEditor();}
+function renderRetoEditor(){
+  const box=document.getElementById('retoPreguntas');
+  if(!RETO_QS.length){box.innerHTML='<div class="note">Sin preguntas aún. Genera con PUM-AI o agrega manualmente.</div>';return;}
+  box.innerHTML=RETO_QS.map(function(p,i){
+    return '<div style="border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-bottom:9px"><div style="display:flex;gap:8px;align-items:center"><span style="font-weight:800;color:var(--gold2)">'+(i+1)+'</span><input value="'+esc(p.q)+'" oninput="RETO_QS['+i+'].q=this.value" placeholder="Pregunta" style="flex:1;padding:8px 10px;border:1.5px solid var(--line);border-radius:9px;font-size:13.5px;font-family:inherit;font-weight:600"><button class="btn-mini" style="padding:4px 8px" onclick="RETO_QS.splice('+i+',1);renderRetoEditor()">✕</button></div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px">'+p.op.map(function(o,j){return '<label style="display:flex;align-items:center;gap:6px;font-size:12.5px"><input type="radio" name="rc'+i+'" '+(p.c===j?'checked':'')+' onclick="RETO_QS['+i+'].c='+j+'"><input value="'+esc(o)+'" oninput="RETO_QS['+i+'].op['+j+']=this.value" placeholder="Opción '+(j+1)+'" style="flex:1;padding:6px 8px;border:1.5px solid var(--line);border-radius:8px;font-size:12.5px;font-family:inherit"></label>';}).join('')+'</div>'+
+      '<div class="note" style="margin-top:6px">⏱ <input type="number" min="5" max="60" value="'+(p.seg||20)+'" oninput="RETO_QS['+i+'].seg=+this.value" style="width:56px;padding:4px 6px;border:1.5px solid var(--line);border-radius:7px;font-family:inherit"> segundos · marca el círculo de la opción correcta</div></div>';
+  }).join('');
+}
+async function generarPreguntasIA(){
+  const tema=document.getElementById('retoTema').value.trim()||'conceptos generales de epidemiología';
+  const n=Math.max(3,Math.min(12,+document.getElementById('retoNum').value||6));
+  const msg=document.getElementById('retoGenMsg');const btn=document.getElementById('retoGenBtn');btn.disabled=true;msg.style.color='var(--muted)';msg.textContent='PUM-AI está creando las preguntas…';
+  const ctx='Crea '+n+' preguntas de opción múltiple (4 opciones cada una) para un concurso educativo de epidemiología, nivel licenciatura, sobre: "'+tema+'". Variadas y con una sola respuesta correcta. Responde SOLO con JSON válido: [{"q":"pregunta","op":["a","b","c","d"],"c":0,"seg":20}] donde c es el índice (0-3) de la opción correcta.';
+  try{
+    const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'protocolo',messages:[{role:'user',content:ctx}]})});
+    const data=await res.json();const m=(data.reply||'').match(/\[[\s\S]*\]/);
+    if(!m)throw new Error('respuesta no estructurada');
+    const arr=JSON.parse(m[0]);RETO_QS=arr.filter(function(x){return x&&x.q&&Array.isArray(x.op);}).map(function(x){return {q:x.q,op:(x.op.concat(['','','','']).slice(0,4)),c:Math.max(0,Math.min(3,+x.c||0)),seg:Math.max(5,Math.min(60,+x.seg||20))};});
+    if(!document.getElementById('retoTitulo').value.trim())document.getElementById('retoTitulo').value='Reto: '+tema;
+    msg.style.color='var(--emerald)';msg.textContent='✓ '+RETO_QS.length+' preguntas generadas. Revísalas y guarda.';renderRetoEditor();
+  }catch(e){msg.style.color='var(--coral)';msg.textContent='No se pudo generar ('+(e.message||e)+'). Agrega preguntas manualmente.';}
+  finally{btn.disabled=false;}
+}
+async function guardarReto(){
+  const titulo=document.getElementById('retoTitulo').value.trim()||'Reto epidemiológico';
+  const preguntas=RETO_QS.filter(function(p){return p.q&&p.op.some(function(o){return o;});});
+  if(preguntas.length<2){alert('Agrega al menos 2 preguntas con opciones.');return;}
+  try{
+    const ed=document.getElementById('retoBuilder').dataset.edit;
+    if(ed){await sb.from('iep_quiz').update({titulo:titulo,preguntas:preguntas}).eq('id',ed);}
+    else{await sb.from('iep_quiz').insert({autor_id:MY_PROFILE.user_id,titulo:titulo,preguntas:preguntas});}
+    cerrarBuilder();cargarMisQuizzes();
+  }catch(e){alert('No se pudo guardar: '+(e.message||e));}
+}
+async function cargarMisQuizzes(){
+  const box=document.getElementById('retoMisQuizzes');box.innerHTML='<div class="note">Cargando…</div>';
+  try{
+    const {data,error}=await sb.from('iep_quiz').select('*').eq('autor_id',MY_PROFILE.user_id).order('created_at',{ascending:false});
+    if(error)throw error;
+    if(!data||!data.length){box.innerHTML='<div class="note" style="margin-top:6px">Aún no tienes retos. Crea el primero.</div>';return;}
+    box.innerHTML=data.map(function(q){return '<div style="border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><div><div style="font-weight:700;color:var(--navy);font-size:13.5px">'+esc(q.titulo)+'</div><div class="note">'+((q.preguntas||[]).length)+' preguntas</div></div><div style="display:flex;gap:6px"><button class="btn-mini" onclick="editarReto(\''+q.id+'\')">Editar</button><button class="btn-mini primary" onclick="lanzarReto(\''+q.id+'\')">▶ Lanzar</button></div></div>';}).join('');
+  }catch(e){box.innerHTML='<div class="note">Error: '+(e.message||e)+'</div>';}
+}
+async function editarReto(id){
+  try{const {data}=await sb.from('iep_quiz').select('*').eq('id',id).single();RETO_QS=(data.preguntas||[]).map(function(p){return {q:p.q,op:p.op.slice(0,4),c:p.c,seg:p.seg||20};});document.getElementById('retoTitulo').value=data.titulo;document.getElementById('retoBuilder').dataset.edit=id;document.getElementById('retoBuilder').style.display='block';document.getElementById('retoHome').style.display='none';renderRetoEditor();}catch(e){alert('No se pudo abrir: '+(e.message||e));}
+}
+function genCodigoReto(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<5;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
+async function lanzarReto(quizId){
+  try{
+    const {data:quiz}=await sb.from('iep_quiz').select('*').eq('id',quizId).single();
+    const codigo=genCodigoReto();
+    const {data:ses,error}=await sb.from('iep_quiz_sesion').insert({quiz_id:quizId,codigo:codigo,host_id:MY_PROFILE.user_id,estado:'lobby',pregunta_idx:-1}).select().single();
+    if(error)throw error;
+    RETO={sesionId:ses.id,quizId:quizId,codigo:codigo,role:'prof',quiz:quiz,lastIdx:-2,saved:false};
+    entrarSalaReto();
+  }catch(e){alert('No se pudo lanzar: '+(e.message||e));}
+}
+async function unirseReto(){
+  const msg=document.getElementById('retoAlMsg');msg.style.color='var(--muted)';msg.textContent='Buscando reto…';
+  const codigo=(document.getElementById('retoCodigo').value||'').trim().toUpperCase();if(!codigo){msg.style.color='var(--coral)';msg.textContent='Escribe el código.';return;}
+  try{
+    const {data:ses}=await sb.from('iep_quiz_sesion').select('*').eq('codigo',codigo).maybeSingle();
+    if(!ses){msg.style.color='var(--coral)';msg.textContent='No existe un reto con ese código.';return;}
+    const {data:quiz}=await sb.from('iep_quiz').select('*').eq('id',ses.quiz_id).single();
+    RETO={sesionId:ses.id,quizId:ses.quiz_id,codigo:codigo,role:'alumno',quiz:quiz,lastIdx:-2,saved:false};
+    entrarSalaReto();
+  }catch(e){msg.style.color='var(--coral)';msg.textContent='Error: '+(e.message||e);}
+}
+function entrarSalaReto(){
+  document.getElementById('retoHome').style.display='none';document.getElementById('retoBuilder').style.display='none';document.getElementById('retoRoom').style.display='block';
+  document.getElementById('retoRoomCode').textContent=RETO.codigo;
+  pollReto();if(RETO_TIMER)clearInterval(RETO_TIMER);RETO_TIMER=setInterval(pollReto,1500);
+}
+async function pollReto(){
+  if(!RETO)return;
+  try{const {data:ses}=await sb.from('iep_quiz_sesion').select('*').eq('id',RETO.sesionId).single();if(!ses)return;retoRender(ses);}catch(e){}
+}
+async function retoRender(ses){
+  const q=(RETO.quiz.preguntas||[]);const idx=ses.pregunta_idx;const total=q.length;
+  document.getElementById('retoQNum').textContent=(ses.estado==='lobby')?'lobby':(ses.estado==='fin')?'fin':((idx+1)+' / '+total);
+  document.getElementById('retoRoomState').textContent=RETO.quiz.titulo+' · '+(ses.estado==='lobby'?'esperando inicio':ses.estado==='fin'?'terminado':ses.estado==='revelado'?'respuesta revelada':'respondiendo');
+  const stage=document.getElementById('retoStage');
+  // Controles del profesor
+  if(RETO.role==='prof'){
+    const c=document.getElementById('retoProfControls');c.style.display='flex';
+    if(ses.estado==='lobby')c.innerHTML='<button class="btn btn-gold" onclick="retoAvanzar(\'start\')">▶ Empezar</button>';
+    else if(ses.estado==='pregunta')c.innerHTML='<button class="btn btn-navy" onclick="retoAvanzar(\'reveal\')">Revelar respuesta</button>';
+    else if(ses.estado==='revelado')c.innerHTML=(idx+1<total?'<button class="btn btn-gold" onclick="retoAvanzar(\'next\')">Siguiente ▶</button>':'<button class="btn btn-gold" onclick="retoAvanzar(\'end\')">🏁 Terminar</button>');
+    else c.innerHTML='';
+  }
+  // Escenario
+  if(ses.estado==='lobby'){stage.innerHTML='<div class="card" style="text-align:center"><div style="font-size:13px;color:var(--muted)">Comparte el código</div><div style="font-size:44px;font-weight:900;letter-spacing:6px;color:var(--navy);margin:6px 0">'+esc(RETO.codigo)+'</div><div class="note">'+(RETO.role==='alumno'?'Espera a que el profesor inicie el reto.':'Cuando tu grupo esté listo, pulsa Empezar.')+'</div></div>';}
+  else if(ses.estado==='fin'){await retoFinal(ses);}
+  else{
+    const p=q[idx]||{op:[]};const pal=['#e0564f','#2f7fb8','#d99413','#6b4fd6'];
+    if(RETO.role==='alumno'){
+      const answered=RETO['ans'+idx];
+      if(ses.estado==='pregunta'&&answered===undefined){
+        if(RETO.lastIdx!==idx){RETO.lastIdx=idx;RETO.qStart=Date.parse(ses.updated_at)||Date.now();}
+        stage.innerHTML='<div class="card"><div style="font-weight:700;color:var(--navy);font-size:17px;margin-bottom:12px">'+esc(p.q)+'</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'+p.op.map(function(o,j){return o?('<button class="btn" style="background:'+pal[j]+';color:#fff;justify-content:flex-start;padding:16px" onclick="retoResponder('+idx+','+j+')">'+esc(o)+'</button>'):'';}).join('')+'</div></div>';
+      }else if(ses.estado==='pregunta'){
+        stage.innerHTML='<div class="card" style="text-align:center"><div class="note">Respuesta registrada ✓. Espera a que se revele…</div></div>';
+      }else{ // revelado
+        const mine=RETO['ans'+idx];const ok=mine===p.c;
+        stage.innerHTML='<div class="card" style="text-align:center;border:2px solid '+(ok?'#1f9d6b':'#e0564f')+'"><div style="font-size:20px;font-weight:800;color:'+(ok?'#1f9d6b':'#e0564f')+'">'+(mine===undefined?'Sin responder':ok?'¡Correcto! 🎉':'Incorrecto')+'</div><div class="note" style="margin-top:6px">Respuesta correcta: <b>'+esc(p.op[p.c]||'')+'</b></div></div>';
+      }
+    }else{ // profesor: muestra pregunta + conteo
+      const {data:resp}=await sb.from('iep_quiz_respuesta').select('opcion,correcta').eq('sesion_id',RETO.sesionId).eq('pregunta_idx',idx);
+      const rs=resp||[];const cnt=[0,0,0,0];rs.forEach(function(r){if(r.opcion!=null&&cnt[r.opcion]!=null)cnt[r.opcion]++;});const tot=rs.length||1;
+      stage.innerHTML='<div class="card"><div style="font-weight:700;color:var(--navy);font-size:18px;margin-bottom:10px">'+esc(p.q)+'</div>'+p.op.map(function(o,j){if(!o)return '';const isC=(ses.estado==='revelado'&&j===p.c);return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:7px"><div style="width:14px;height:14px;border-radius:4px;background:'+pal[j]+'"></div><div style="flex:1;font-size:14px;color:'+(isC?'#1f9d6b':'#26364e')+';font-weight:'+(isC?'800':'500')+'">'+esc(o)+(isC?' ✓':'')+'</div><div style="min-width:120px;height:16px;background:#eceadf;border-radius:5px;overflow:hidden"><div style="height:100%;width:'+Math.round(cnt[j]/tot*100)+'%;background:'+pal[j]+'"></div></div><b style="font-size:12px;width:24px;text-align:right">'+cnt[j]+'</b></div>';}).join('')+'<div class="note" style="margin-top:6px">'+rs.length+' respuesta(s)</div></div>';
+    }
+  }
+  await retoLeaderboard();
+}
+async function retoResponder(idx,op){
+  const p=(RETO.quiz.preguntas||[])[idx];const ok=(op===p.c);
+  const seg=(p.seg||20)*1000;const el=Math.max(0,Date.now()-(RETO.qStart||Date.now()));
+  const pts=ok?Math.max(200,Math.round(1000-(Math.min(el,seg)/seg)*600)):0;
+  RETO['ans'+idx]=op;
+  try{await sb.from('iep_quiz_respuesta').upsert({sesion_id:RETO.sesionId,quiz_id:RETO.quizId,user_id:MY_PROFILE.user_id,nombre:(MY_PROFILE.nombre||'Alumno'),pregunta_idx:idx,opcion:op,correcta:ok,puntos:pts},{onConflict:'sesion_id,user_id,pregunta_idx'});}catch(e){}
+  pollReto();
+}
+async function retoAvanzar(accion){
+  try{
+    const {data:ses}=await sb.from('iep_quiz_sesion').select('*').eq('id',RETO.sesionId).single();
+    const total=(RETO.quiz.preguntas||[]).length;let upd={updated_at:new Date().toISOString()};
+    if(accion==='start'){upd.estado='pregunta';upd.pregunta_idx=0;}
+    else if(accion==='reveal'){upd.estado='revelado';}
+    else if(accion==='next'){upd.estado='pregunta';upd.pregunta_idx=Math.min(total-1,ses.pregunta_idx+1);}
+    else if(accion==='end'){upd.estado='fin';}
+    await sb.from('iep_quiz_sesion').update(upd).eq('id',RETO.sesionId);pollReto();
+  }catch(e){alert('No se pudo avanzar: '+(e.message||e));}
+}
+async function retoLeaderboard(){
+  try{
+    const {data}=await sb.from('iep_quiz_respuesta').select('user_id,nombre,puntos').eq('sesion_id',RETO.sesionId);
+    const rs=data||[];const agg={};rs.forEach(function(r){if(!agg[r.user_id])agg[r.user_id]={n:r.nombre||'Alumno',p:0};agg[r.user_id].p+=(r.puntos||0);});
+    const arr=Object.keys(agg).map(function(k){return agg[k];}).sort(function(a,b){return b.p-a.p;}).slice(0,8);
+    const box=document.getElementById('retoLeaderboard');
+    if(!arr.length){box.innerHTML='';return;}
+    box.innerHTML='<div class="card"><div class="chart-title" style="margin-bottom:8px">🏆 Tabla de posiciones</div>'+arr.map(function(x,i){return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span style="width:22px;font-weight:800;color:'+(i===0?'#C4A24E':'var(--muted)')+'">'+(i+1)+'</span><div style="flex:1;font-weight:600;color:#26364e">'+esc(x.n)+'</div><b style="color:var(--navy)">'+x.p+'</b></div>';}).join('')+'</div>';
+  }catch(e){}
+}
+async function retoFinal(ses){
+  const stage=document.getElementById('retoStage');
+  // guardar resultado del alumno una vez
+  if(RETO.role==='alumno'&&!RETO.saved){RETO.saved=true;
+    try{const {data}=await sb.from('iep_quiz_respuesta').select('puntos,correcta').eq('sesion_id',RETO.sesionId).eq('user_id',MY_PROFILE.user_id);const pts=(data||[]).reduce(function(a,r){return a+(r.puntos||0);},0);const ok=(data||[]).filter(function(r){return r.correcta;}).length;saveAnalisis('reto','Reto: '+RETO.quiz.titulo+' — '+pts+' pts','Obtuviste '+pts+' puntos con '+ok+'/'+(RETO.quiz.preguntas||[]).length+' aciertos.',{pts:pts,aciertos:ok});}catch(e){}
+  }
+  let profBtn='';
+  if(RETO.role==='prof')profBtn='<button class="btn btn-gold" onclick="analizarRetoIA()">🧠 Analizar resultados con IA</button>';
+  stage.innerHTML='<div class="card" style="text-align:center"><div style="font-size:26px">🏁</div><div class="chart-title" style="margin:4px 0">Reto terminado</div><div class="note">Revisa la tabla de posiciones abajo.</div><div style="margin-top:10px">'+profBtn+'</div><div id="retoIAout" style="margin-top:12px;text-align:left"></div></div>';
+  await retoLeaderboard();
+}
+async function analizarRetoIA(){
+  const out=document.getElementById('retoIAout');out.innerHTML='<div class="thinking"><div class="sp"></div><div>PUM-AI analiza los resultados…</div></div>';
+  try{
+    const {data}=await sb.from('iep_quiz_respuesta').select('*').eq('sesion_id',RETO.sesionId);
+    const rs=data||[];const q=(RETO.quiz.preguntas||[]);
+    const porPreg=q.map(function(p,i){const sub=rs.filter(function(r){return r.pregunta_idx===i;});const ok=sub.filter(function(r){return r.correcta;}).length;return {q:p.q,ok:ok,n:sub.length,pct:sub.length?Math.round(ok/sub.length*100):0};});
+    const alumnos={};rs.forEach(function(r){if(!alumnos[r.user_id])alumnos[r.user_id]={n:r.nombre,ok:0,t:0};alumnos[r.user_id].t++;if(r.correcta)alumnos[r.user_id].ok++;});
+    const ctx='Eres tutor de epidemiología. Resultados de un reto "'+RETO.quiz.titulo+'". Aciertos por pregunta: '+porPreg.map(function(x){return '"'+x.q+'" '+x.pct+'% ('+x.ok+'/'+x.n+')';}).join('; ')+'. Desempeño por alumno: '+Object.keys(alumnos).map(function(k){return alumnos[k].n+' '+alumnos[k].ok+'/'+alumnos[k].t;}).join('; ')+'. Identifica los temas más débiles y propón estrategias concretas de reforzamiento del conocimiento para el grupo y para quienes van rezagados. Sé breve y accionable, en Markdown.';
+    const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'protocolo',messages:[{role:'user',content:ctx}]})});
+    const d=await res.json();out.innerHTML='<div style="background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:13.5px;color:#26364e;line-height:1.55">'+mdToHtml(d.reply||'Sin respuesta.')+'</div>';
+    saveAnalisis('reto_docente','Análisis IA del reto: '+RETO.quiz.titulo,String(d.reply||'').replace(/[#*]/g,''),{porPreg:porPreg});
+  }catch(e){out.innerHTML='<div class="note" style="color:var(--coral)">No se pudo analizar ('+(e.message||e)+').</div>';}
+}
+
+/* ═══════════ FONDO DE PARTÍCULAS · nodos azul marino, conexiones doradas + virus traviesos ═══════════ */
+function sapiensParticles(canvasId){
+  const canvas=document.getElementById(canvasId);if(!canvas)return;const ctx=canvas.getContext('2d');
+  let W=0,H=0,dpr=Math.min(devicePixelRatio||1,2),nodes=[],virus=[],raf=0,tick=0;const mouse={x:-9999,y:-9999};
+  const reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function count(){return Math.min(120,Math.max(42,Math.floor(W*H/16000)));}
-  function resize(){W=innerWidth;H=innerHeight;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.floor(W*dpr);canvas.height=Math.floor(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);nodes=Array.from({length:count()},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.32,vy:(Math.random()-.5)*.32,r:Math.random()*1.5+.8}));}
+  function vcount(){return Math.max(3,Math.min(7,Math.floor(W*H/230000)));}
+  function resize(){W=innerWidth;H=innerHeight;dpr=Math.min(devicePixelRatio||1,2);canvas.width=Math.floor(W*dpr);canvas.height=Math.floor(H*dpr);ctx.setTransform(dpr,0,0,dpr,0,0);
+    nodes=Array.from({length:count()},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.32,vy:(Math.random()-.5)*.32,r:Math.random()*1.5+.8,inf:false,it:0}));
+    virus=Array.from({length:vcount()},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*1.3,vy:(Math.random()-.5)*1.3,r:7,spin:Math.random()*6.28}));}
+  function drawVirus(v){
+    const r=v.r;ctx.save();ctx.translate(v.x,v.y);ctx.rotate(v.spin*0.15);
+    ctx.strokeStyle='rgba(190,40,40,.92)';ctx.lineWidth=1.4;ctx.fillStyle='rgba(190,40,40,.92)';
+    for(let k=0;k<8;k++){const a=k/8*6.2832;ctx.beginPath();ctx.moveTo(Math.cos(a)*r,Math.sin(a)*r);ctx.lineTo(Math.cos(a)*(r+3),Math.sin(a)*(r+3));ctx.stroke();ctx.beginPath();ctx.arc(Math.cos(a)*(r+3.4),Math.sin(a)*(r+3.4),1.05,0,6.2832);ctx.fill();}
+    ctx.beginPath();ctx.arc(0,0,r,0,6.2832);ctx.fillStyle='rgba(224,72,62,.96)';ctx.fill();
+    ctx.strokeStyle='rgba(60,10,10,.85)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(-r*0.62,-r*0.5);ctx.lineTo(-r*0.12,-r*0.28);ctx.moveTo(r*0.62,-r*0.5);ctx.lineTo(r*0.12,-r*0.28);ctx.stroke();
+    ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-r*0.30,-r*0.05,r*0.27,0,6.2832);ctx.arc(r*0.30,-r*0.05,r*0.27,0,6.2832);ctx.fill();
+    ctx.fillStyle='#2a0606';ctx.beginPath();ctx.arc(-r*0.22,0,r*0.13,0,6.2832);ctx.arc(r*0.40,0,r*0.13,0,6.2832);ctx.fill();
+    ctx.strokeStyle='#2a0606';ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(r*0.06,r*0.30,r*0.34,0.15,Math.PI-0.55);ctx.stroke();
+    ctx.restore();
+  }
   function step(){
-    ctx.clearRect(0,0,W,H);const link=Math.min(165,Math.max(120,W/9));
-    for(const n of nodes){n.x+=n.vx;n.y+=n.vy;if(n.x<0||n.x>W)n.vx*=-1;if(n.y<0||n.y>H)n.vy*=-1;const dx=n.x-mouse.x,dy=n.y-mouse.y,dm=Math.hypot(dx,dy);if(dm<130){const f=(130-dm)/130;n.x+=dx/(dm||1)*f*1.3;n.y+=dy/(dm||1)*f*1.3;}}
+    tick++;ctx.clearRect(0,0,W,H);const link=Math.min(165,Math.max(120,W/9));
+    for(const n of nodes){n.x+=n.vx;n.y+=n.vy;if(n.x<0||n.x>W)n.vx*=-1;if(n.y<0||n.y>H)n.vy*=-1;const dx=n.x-mouse.x,dy=n.y-mouse.y,dm=Math.hypot(dx,dy);if(dm<130){const f=(130-dm)/130;n.x+=dx/(dm||1)*f*1.3;n.y+=dy/(dm||1)*f*1.3;}if(n.inf&&tick-n.it>320)n.inf=false;}
+    // virus: vuelo aleatorio + contagio
+    for(const v of virus){v.vx+=(Math.random()-.5)*.16;v.vy+=(Math.random()-.5)*.16;const sp=Math.hypot(v.vx,v.vy);if(sp>1.7){v.vx*=1.7/sp;v.vy*=1.7/sp;}v.x+=v.vx;v.y+=v.vy;v.spin+=.05;if(v.x<8||v.x>W-8)v.vx*=-1;if(v.y<8||v.y>H-8)v.vy*=-1;v.x=Math.max(8,Math.min(W-8,v.x));v.y=Math.max(8,Math.min(H-8,v.y));
+      for(const n of nodes){if(!n.inf){const d=Math.hypot(n.x-v.x,n.y-v.y);if(d<v.r+n.r+5){n.inf=true;n.it=tick;}}}}
     for(let i=0;i<nodes.length;i++){const a=nodes[i];
-      for(let j=i+1;j<nodes.length;j++){const b=nodes[j];const dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);if(d<link){const al=(1-d/link)*.55;ctx.strokeStyle='rgba(196,162,78,'+al.toFixed(3)+')';ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}
+      for(let j=i+1;j<nodes.length;j++){const b=nodes[j];const dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);if(d<link){const al=(1-d/link)*.55;ctx.strokeStyle=(a.inf&&b.inf)?('rgba(200,50,45,'+al.toFixed(3)+')'):('rgba(196,162,78,'+al.toFixed(3)+')');ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}
       const dma=Math.hypot(a.x-mouse.x,a.y-mouse.y);if(dma<150){const al=(1-dma/150)*.5;ctx.strokeStyle='rgba(196,162,78,'+al.toFixed(3)+')';ctx.lineWidth=.9;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(mouse.x,mouse.y);ctx.stroke();}}
-    for(const n of nodes){ctx.fillStyle='rgba(12,35,64,.82)';ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,6.2832);ctx.fill();}
+    for(const n of nodes){ctx.fillStyle=n.inf?'rgba(214,52,44,.95)':'rgba(12,35,64,.82)';ctx.beginPath();ctx.arc(n.x,n.y,n.inf?n.r+.8:n.r,0,6.2832);ctx.fill();}
+    for(const v of virus)drawVirus(v);
     raf=requestAnimationFrame(step);
   }
   addEventListener('resize',resize);
   addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
   addEventListener('mouseout',()=>{mouse.x=-9999;mouse.y=-9999;});
   resize();if(reduce){step();cancelAnimationFrame(raf);}else raf=requestAnimationFrame(step);
-})();
+}
+sapiensParticles('bgParticles');
 
 /* init chips de artículos cuando exista el contenedor */
 document.addEventListener('DOMContentLoaded',()=>{setTimeout(initArtChips,400);});
