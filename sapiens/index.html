@@ -13,6 +13,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
@@ -132,7 +133,7 @@ h2{font-size:clamp(22px,3vw,34px);font-weight:700;color:var(--navy)}
 .proc-step.done .k{color:var(--emerald)}
 .proc-step .pbar{position:absolute;left:0;bottom:0;height:3px;width:0;background:linear-gradient(90deg,var(--gold),var(--cyan))}
 .stage-wrap{position:relative;border-radius:14px;overflow:hidden}
-#procStage,#swarmCanvas{display:block;width:100%}
+#procStage,#swarmCanvas{display:block;width:100%;background:radial-gradient(circle at 50% 32%,#0d2444,#060f1e)}
 #procStage{height:400px}#swarmCanvas{height:500px;cursor:grab}#swarmCanvas:active{cursor:grabbing}
 .stage-badge{position:absolute;top:12px;left:12px;background:rgba(7,16,34,.75);border:1px solid rgba(255,255,255,.14);border-radius:10px;padding:6px 12px;font-size:12px;font-weight:700;color:#fff}
 .stage-badge b{color:var(--gold3)}
@@ -184,7 +185,7 @@ footer{padding:34px 0 48px;color:var(--muted);font-size:12.5px;border-top:1px so
 /* ═══════════════ REDISEÑO SAPIENS · partículas · sidebar · cinemático ═══════════════ */
 html{scroll-behavior:smooth}
 body{background:#fff;overflow-x:hidden}
-#bgParticles{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none}
+#bgParticles{position:fixed;inset:0;width:100vw;height:100vh;z-index:0;pointer-events:none;transform:translateZ(0);-webkit-transform:translateZ(0);will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .screen{position:relative;z-index:1}
 .pagebg{background:transparent}
 .auth-hero{background:transparent}
@@ -218,6 +219,13 @@ body.appon .sidebar{display:flex}
 .sb-mini{font-size:12.5px;color:var(--muted);font-weight:600;cursor:pointer;text-decoration:none;transition:.2s}
 .sb-mini:hover{color:var(--gold2)}
 .sb-toggle{position:fixed;top:14px;left:14px;z-index:61;display:none;width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.9);backdrop-filter:blur(8px);color:var(--navy);font-size:20px;cursor:pointer;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(12,35,64,.12)}
+.sidebar{transition:transform .3s var(--ease)}
+.sb-collapse{position:absolute;top:22px;right:12px;width:26px;height:26px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--navy);font-size:15px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}
+.sb-collapse:hover{background:var(--gold);color:#fff;border-color:var(--gold)}
+body.sbcol{padding-left:0}
+body.sbcol .sidebar{transform:translateX(-100%)}
+body.appon.sbcol .sb-toggle{display:flex}
+@media(max-width:900px){.sb-collapse{display:none}}
 @media(max-width:900px){
   body.appon{padding-left:0}
   .sidebar{transform:translateX(-100%);transition:transform .32s var(--ease);width:270px}
@@ -275,6 +283,10 @@ h1,h2{letter-spacing:-.3px}
 .organ.vac{box-shadow:0 0 0 3px rgba(31,157,107,.55)}
 .organ.imm{box-shadow:0 0 0 3px rgba(196,162,78,.7)}
 .organ .stat{position:absolute;top:-8px;right:-8px;font-size:14px}
+.organ.explode{animation:orgBoom .78s var(--ease) forwards;position:relative;z-index:2}
+.organ.explode::after{content:'💥';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:40px;animation:boomPop .5s ease}
+@keyframes orgBoom{0%{transform:scale(1)}18%{background:#c0392b !important;box-shadow:0 0 0 5px rgba(192,57,43,.55)}34%{transform:scale(1.22) rotate(-5deg);filter:brightness(1.5) saturate(1.4)}62%{transform:scale(.85) rotate(3deg)}100%{transform:scale(0);opacity:0}}
+@keyframes boomPop{0%{transform:scale(.2);opacity:0}45%{transform:scale(1.3);opacity:1}100%{transform:scale(1.6);opacity:0}}
 .vcard{width:78px;height:104px;border-radius:11px;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;font-size:11px;font-weight:700;box-shadow:0 6px 16px rgba(0,0,0,.15);transition:.18s;text-align:center;padding:6px}
 .vcard:hover{transform:translateY(-5px)}
 .vcard.sel{outline:3px solid var(--gold);transform:translateY(-6px)}
@@ -319,8 +331,8 @@ h1,h2{letter-spacing:-.3px}
 .cs-kpis>div{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px 6px;text-align:center}
 .cs-kpis b{display:block;font-family:'Playfair Display',serif;font-size:20px;color:var(--gold);line-height:1}
 .cs-kpis span{font-size:9.5px;color:#9fb3cc;display:block;margin-top:3px}
-.cs-logos{display:flex;gap:34px;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:26px}
-.cs-logos img{height:74px;width:auto;filter:drop-shadow(0 8px 20px rgba(12,35,64,.16))}
+.cs-logos{display:flex;gap:46px;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:30px}
+.cs-logos img{height:112px;width:auto;filter:drop-shadow(0 10px 24px rgba(12,35,64,.18))}
 .cs-portada{text-align:center;align-items:center}
 .cs-title{font-family:'Playfair Display',serif;font-size:clamp(60px,13vw,148px);font-weight:900;letter-spacing:3px;line-height:1;margin:4px 0}
 .cs-stats{display:flex;gap:18px;flex-wrap:wrap;margin-top:8px}
@@ -367,7 +379,7 @@ h1,h2{letter-spacing:-.3px}
 <canvas id="bgParticles" aria-hidden="true"></canvas>
 
 <aside class="sidebar" id="sidebar">
-  <div class="sb-brand"><img class="brand-logo" src="../public/assets/InteligenciaEpi-logo.png" alt="SAPIENS" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><div class="mark" style="display:none">S</div><div><div class="sb-name">SAPIENS</div><small>Nodos de Simulación · FESI</small></div></div>
+  <div class="sb-brand"><img class="brand-logo" src="../public/assets/InteligenciaEpi-logo.png" alt="SAPIENS" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><div class="mark" style="display:none">S</div><div><div class="sb-name">SAPIENS</div><small>Nodos de Simulación · FESI</small></div><button class="sb-collapse" onclick="collapseSidebar()" title="Colapsar menú">«</button></div>
   <nav class="sb-nav">
     <div class="sb-group">Datos y análisis</div>
     <a class="sb-item" data-scr="screen-onb" onclick="showScreen('screen-onb')"><span>📥</span> Cargar datos</a>
@@ -394,7 +406,7 @@ h1,h2{letter-spacing:-.3px}
     <a class="sb-mini" onclick="doLogout()">Cerrar sesión ↪</a>
   </div>
 </aside>
-<button class="sb-toggle" id="sbToggle" onclick="toggleSidebar()">☰</button>
+<button class="sb-toggle" id="sbToggle" onclick="sbBtn()" title="Mostrar menú">☰</button>
 
 <!-- ══ SCREEN 0: AUTH + INTRO EDUCATIVA ══ -->
 <div class="screen active" id="screen-auth">
@@ -529,7 +541,7 @@ h1,h2{letter-spacing:-.3px}
       <span class="cs-kicker cs-reveal"><span class="n">06</span> Un recorrido por sus apartados</span>
       <h2 class="cs-h cs-reveal d1">Todo lo que necesitas, <span class="gold">en un menú</span></h2>
       <div class="cs-two" style="margin-top:22px;align-items:start">
-        <div class="cs-reveal d1"><div class="cs-shot"><img src="assets/cs-menu.jpg" alt="Menú lateral de SAPIENS" loading="lazy"><div class="cap">El menú agrupa datos, aprendizaje, vigilancia y herramientas docentes.</div></div></div>
+        <div class="cs-reveal d1" style="display:flex;justify-content:center"><div class="cs-shot" style="max-width:250px"><img src="assets/cs-menu.jpg" alt="Menú lateral de SAPIENS" loading="lazy"><div class="cap">El menú agrupa datos, aprendizaje, vigilancia y herramientas docentes.</div></div></div>
         <div class="cs-grid cs-txt" style="margin-top:0">
           <div class="cs-feat cs-reveal d1"><div class="ic">🧠</div><h4>Análisis con IA</h4><p>Pregunta en español y obtén cifras, gráficas e informes con fundamento clínico.</p></div>
           <div class="cs-feat cs-reveal d1"><div class="ic">📊</div><h4>Bioestadística</h4><p>Nueve herramientas clásicas y avanzadas sobre tu cohorte.</p></div>
@@ -714,6 +726,7 @@ h1,h2{letter-spacing:-.3px}
         </div>
         <div style="display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap">
           <input id="artInput" placeholder="Ej. deworming schoolchildren intervention, o COVID metabolic syndrome risk" style="flex:1;min-width:220px;padding:11px 13px;border:1.5px solid var(--line);border-radius:11px;font-size:13.5px;font-family:inherit;outline:none" onkeydown="if(event.key==='Enter')buscarArticulos(this.value)">
+          <select id="artLang" title="Idioma de los artículos" style="padding:11px 10px;border:1.5px solid var(--line);border-radius:11px;font-size:13px;font-family:inherit"><option value="">🌐 Todos</option><option value="es">🇲🇽 Español</option><option value="en">🇬🇧 Inglés</option></select>
           <button class="btn-mini primary" onclick="buscarArticulos(document.getElementById('artInput').value)">🔎 Buscar artículos</button>
           <button class="btn-mini" onclick="openEncuesta()">🧾 Generar encuesta / construir BD</button>
         </div>
@@ -936,6 +949,7 @@ h1,h2{letter-spacing:-.3px}
     </div>
     <input id="encTitulo" placeholder="Título de la encuesta" style="width:100%;margin-top:10px;padding:11px 13px;border:1.5px solid var(--line);border-radius:11px;font-size:15px;font-weight:700;font-family:inherit;color:var(--navy)">
     <div id="encFields" style="margin-top:12px"></div>
+    <div id="encShareBox" style="display:none;margin-top:14px"></div>
   </div>
 
   <div class="card" id="encFillCard" style="margin-top:16px;display:none">
@@ -1219,6 +1233,7 @@ function enterApp(){
   document.getElementById('sbGestGroup').style.display=showGest?'block':'none';
   document.getElementById('sbGestion').style.display=showGest?'flex':'none';
   document.getElementById('sbTablero').style.display=showGest?'flex':'none';
+  try{if(localStorage.getItem('sap_sbcol')==='1'&&window.innerWidth>900)document.body.classList.add('sbcol');}catch(e){}
   showScreen('screen-onb');
   loadProgress();
   setTimeout(()=>{try{if(!localStorage.getItem('iep_tour_v1'))startTour(false);}catch(e){}},900);
@@ -1242,17 +1257,20 @@ async function doLogin(){
   finally{btn.textContent='Iniciar sesión';btn.disabled=false;}
 }
 async function doLogout(){try{await sb.auth.signOut();}catch(e){}location.reload();}
-gate();
+if(/^#\/e\/[0-9a-fA-F-]{16,}$/.test(location.hash||'')){window.PUBLIC_MODE=true;}else{gate();}
 
 /* ============ estado ============ */
 let COHORT=null,usedDemo=true,pyReady=false,lastReport='';
-function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=document.getElementById(id);if(el)el.classList.add('active');
+function showScreen(id){if(window.PUBLIC_MODE)return;document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));const el=document.getElementById(id);if(el)el.classList.add('active');
   document.querySelectorAll('.sb-item').forEach(a=>a.classList.toggle('active',a.getAttribute('data-scr')===id));
   const sb=document.getElementById('sidebar');if(sb)sb.classList.remove('open');
   if(typeof refreshNav==='function')refreshNav();
   if(typeof stopNet3D==='function'&&id!=='screen-redes'){stopNet3D();if(typeof stopAnims==='function')stopAnims();if(typeof stopGraph3D==='function')stopGraph3D();}
   window.scrollTo(0,0);}
 function toggleSidebar(){const sb=document.getElementById('sidebar');if(sb)sb.classList.toggle('open');}
+function collapseSidebar(){document.body.classList.add('sbcol');try{localStorage.setItem('sap_sbcol','1');}catch(e){}}
+function expandSidebar(){document.body.classList.remove('sbcol');try{localStorage.removeItem('sap_sbcol');}catch(e){}}
+function sbBtn(){const b=document.body;if(b.classList.contains('sbcol')){expandSidebar();return;}if(window.innerWidth<=900){toggleSidebar();return;}collapseSidebar();}
 function refreshNav(){const has=(typeof COHORT!=='undefined'&&!!COHORT);document.querySelectorAll('.sb-item[data-need="cohort"]').forEach(a=>a.classList.toggle('locked',!has));}
 function navSim(){if(typeof COHORT!=='undefined'&&COHORT){goSim();}else{showScreen('screen-onb');}}
 function irEnjambreRed(){if(typeof COHORT==='undefined'||!COHORT||!COHORT.agents||!COHORT.agents.length){showScreen('screen-onb');return;}if(typeof showRedes==='function'){showRedes();setTimeout(function(){if(typeof openRed==='function')openRed('net3d');},80);}}
@@ -1275,9 +1293,9 @@ async function startAnalysis(demo){
   const s=COHORT.stats;
   plog('<span class="ok">✓</span> '+s.n.toLocaleString('es-MX')+' individuos · HTA '+s.hta+'% · DM2 '+s.dm2+'%','ok');
   plog('<span class="ok">✓</span> Arquetipos: Prov '+s.arq[0]+'% · Indec '+s.arq[1]+'% · Renu '+s.arq[2]+'% · Vuln '+s.arq[3]+'%','ok');
-  if(!usedDemo && guiaFiles.length){
+  if(guiaFiles.length){
     plog('<span class="run">▶</span> Leyendo el texto de las guías (pdf.js)…','run');
-    try{await extractGuides();plog('<span class="ok">✓</span> Guías leídas ('+Math.round(guideText.length/1000)+'k caracteres) — PUM-AI las usará','ok');}
+    try{await extractGuides();plog('<span class="ok">✓</span> Guías leídas ('+Math.round(guideText.length/1000)+'k caracteres)'+(GUIDE_TOPICS?(' — temas: '+GUIDE_TOPICS):'')+' — TODA la plataforma se adaptará a este contenido','ok');}
     catch(e){plog('<span style="color:#f8b4b4">⚠ No se pudo leer el PDF ('+e.message+'). El análisis usará principios generales.</span>');}
   }
   plog('<span class="ok">✓</span> Listo. Elige cómo trabajar.','ok');
@@ -1297,6 +1315,29 @@ async function extractGuides(){
     all+='\n';
   }
   guideText=all.replace(/\s+/g,' ').slice(0,9000);
+  detectGuideTopics();
+}
+/* ====== adaptación por guías: detección de temas + contexto para la IA ====== */
+let GUIDE_TOPICS='';
+function guideTopics(){return GUIDE_TOPICS||'';}
+function detectGuideTopics(){
+  const txt=((guideText||'')+' '+((typeof guiaFiles!=='undefined'?guiaFiles:[]).map(function(f){return f.name;}).join(' '))).toLowerCase();
+  const map=[['depresión',['depresi','phq','antidepres','estado de ánimo','suicid']],['ansiedad',['ansiedad','gad-7','ansiol','pánico']],['COVID-19',['covid','sars-cov','coronavirus']],['diabetes',['diabet','glucemia','hba1c','insulina']],['hipertensión',['hipertensi','presión arterial','antihipertens','tensión arterial']],['obesidad',['obesidad','sobrepeso']],['influenza',['influenza','gripe','ilinet']],['dengue',['dengue','aedes']],['tuberculosis',['tuberculosis','bacilo','baciloscop']],['VIH/sida',['vih','antirretrov','sida']],['cáncer',['cáncer','oncolog','tumor','neoplas','carcinom']],['asma',['asma','broncodilatad']],['EPOC',['epoc','enfermedad pulmonar obstructiva']],['salud materna',['embarazo','gestaci','prenatal','obstet','materno']],['nutrición',['nutrici','desnutrici']],['salud mental',['salud mental','psiquiátr','psicológ']],['adicciones',['adicci','consumo de sustancias','tabaquismo','alcoholismo']],['enfermedad renal',['renal','nefro','diálisis']],['cardiovascular',['cardiovascular','infarto','cardiopat']]];
+  const found=[];map.forEach(function(m){if(m[1].some(function(k){return txt.indexOf(k)>=0;}))found.push(m[0]);});
+  GUIDE_TOPICS=found.join(', ');
+  return GUIDE_TOPICS;
+}
+function guideAIContext(){
+  if(!GUIDE_TOPICS&&!guideText)return '';
+  var c='CONTEXTO OBLIGATORIO — esta actividad educativa está basada en las guías clínicas que cargó el usuario';
+  if(GUIDE_TOPICS)c+=' sobre: '+GUIDE_TOPICS;
+  c+='. TODO tu contenido (análisis, ejemplos, preguntas, hipótesis, recomendaciones) debe girar en torno a ESTOS temas y fundamentarse en esas guías, no en temas genéricos. ';
+  if(guideText)c+='Extracto de las guías cargadas: "'+guideText.slice(0,1600)+'". ';
+  return c;
+}
+function guideBadge(){
+  if(!GUIDE_TOPICS)return '';
+  return '<div class="note" style="display:inline-flex;align-items:center;gap:6px;background:#fff7e6;border:1px solid var(--gold3);border-radius:100px;padding:5px 12px;color:var(--navy);font-weight:700;font-size:12px">📚 Análisis adaptado a: '+esc(GUIDE_TOPICS)+'</div>';
 }
 /* ============ modos ============ */
 function buildModeScreen(){const s=COHORT.stats;document.getElementById('modeN').textContent=s.n.toLocaleString('es-MX');document.getElementById('modeG').textContent=(!usedDemo&&guiaFiles.length)?(' y '+guiaFiles.length+' guía(s)'):(usedDemo?' (cohorte demo)':'');}
@@ -1539,7 +1580,7 @@ async function planSend(q){q=(q||'').trim();if(!q)return;const inp=document.getE
   const s=COHORT.stats,sim=window.SIMSTATE||{},c=s.cascada||{},f=s.factores||{},dg=s.desglose||{};
   const pseg=arr=>(arr||[]).map(x=>x.k+' (n='+x.n+'): HTA '+x.hta+'%, DM2 '+x.dm2+'%, obesidad '+x.obes+'%, COVID alto '+x.covidAlto+'%').join(' | ');
   const pdesTxt=' Desgloses — sexo: '+pseg(dg.sexo)+'; edad: '+pseg(dg.edad)+'; comorbilidad: '+pseg(dg.comorbilidad)+'.';
-  const ctx='Contexto (cohorte, N='+s.n+'). HTA '+s.hta+'%, DM2 '+s.dm2+'%, obesidad '+(f.obes||'?')+'%, síndrome metabólico '+(s.smetab||'?')+'%, comorbilidad HTA+DM2 '+(s.comorbilidad||'?')+'%, casos silentes DM2 '+c.silent+'%, riesgo CV alto '+((s.riesgo||[])[2]||0)+'%. Arquetipos ante la vacuna: Provacuna '+s.arq[0]+'%, Indeciso '+s.arq[1]+'%, Renuente '+s.arq[2]+'%, Vulnerable '+s.arq[3]+'%. Riesgo de complicación COVID (bajo/mod/alto): '+((s.riesgoCovid||[]).join('/')||'?')+'. Última simulación COVID: cobertura '+(sim.vac||0)+'%, contagios '+(sim.inf||0)+'%, graves '+(sim.sev||0)+'%.'+pdesTxt+'\n\nSOLICITUD: '+q;
+  const ctx=guideAIContext()+'Contexto (cohorte, N='+s.n+'). HTA '+s.hta+'%, DM2 '+s.dm2+'%, obesidad '+(f.obes||'?')+'%, síndrome metabólico '+(s.smetab||'?')+'%, comorbilidad HTA+DM2 '+(s.comorbilidad||'?')+'%, casos silentes DM2 '+c.silent+'%, riesgo CV alto '+((s.riesgo||[])[2]||0)+'%. Arquetipos ante la vacuna: Provacuna '+s.arq[0]+'%, Indeciso '+s.arq[1]+'%, Renuente '+s.arq[2]+'%, Vulnerable '+s.arq[3]+'%. Riesgo de complicación COVID (bajo/mod/alto): '+((s.riesgoCovid||[]).join('/')||'?')+'. Última simulación COVID: cobertura '+(sim.vac||0)+'%, contagios '+(sim.inf||0)+'%, graves '+(sim.sev||0)+'%.'+pdesTxt+'\n\nSOLICITUD: '+q;
   try{const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'plan',messages:[{role:'user',content:ctx}]})});const data=await res.json();load.style.whiteSpace='normal';load.innerHTML=mdToHtml(data.reply||'Sin respuesta.');}
   catch(e){load.textContent='No se pudo planear ('+(e.message||e)+').';}
 }
@@ -1763,7 +1804,7 @@ function buildAna(){
     '<div class="kpi"><div class="n" style="color:var(--emerald)">'+((s.cascada&&s.cascada.silent)||0)+'%</div><div class="l">Casos silentes DM2</div></div>'+
     '<div class="kpi"><div class="n" style="color:var(--violet)">'+((s.riesgo&&s.riesgo[2])||0)+'%</div><div class="l">Riesgo CV alto</div></div>';
   document.getElementById('anaChips').innerHTML=ANA_CHIPS.map(q=>'<button class="btn-mini" onclick="anaSend(this.textContent)">'+q+'</button>').join('');
-  document.getElementById('anaGuideNote').textContent=(!usedDemo&&guideText)?('PUM-AI está usando el texto de: '+guiaFiles.map(f=>f.name).join(', ')+'.'):'Sin guías cargadas: PUM-AI usa principios generales de HTA y diabetes. Carga PDFs para un análisis basado en tus guías.';
+  document.getElementById('anaGuideNote').innerHTML=guideText?('PUM-AI está usando el texto de: '+esc(guiaFiles.map(function(f){return f.name;}).join(', '))+'.'+(GUIDE_TOPICS?(' Toda la plataforma está <b>adaptada a: '+esc(GUIDE_TOPICS)+'</b>.'):'')):'Sin guías cargadas: PUM-AI usa principios generales de HTA y diabetes. Carga PDFs para adaptar TODO el análisis a tus guías.';
   drawCascada();renderDashboard();
 }
 function drawCascada(elId){
@@ -1842,7 +1883,7 @@ async function anaSend(q){
   const s=COHORT.stats;const muniTxt=(s.muni||[]).map(m=>m.name+': HTA '+m.hta+'%, DM2 '+m.dm2+'%').join(' | ');const c=s.cascada||{};const r=s.riesgo||[0,0,0];const dg=s.desglose||{};
   const segLine=arr=>(arr||[]).map(x=>x.k+' (n='+x.n+'): HTA '+x.hta+'%, DM2 '+x.dm2+'%, obesidad '+x.obes+'%, riesgo COVID alto '+x.covidAlto+'%').join(' | ');
   const desTxt='DESGLOSES para SEGMENTAR — por sexo: '+segLine(dg.sexo)+' || por grupo de edad: '+segLine(dg.edad)+' || por comorbilidad: '+segLine(dg.comorbilidad)+'. ';
-  const ctx=`Contexto (cohorte, N=${s.n}). Prevalencia HTA ${s.hta}%, DM2 ${s.dm2}%. Por municipio: ${muniTxt}. ${desTxt} Arquetipos: Provacuna ${s.arq[0]}%, Indeciso ${s.arq[1]}%, Renuente ${s.arq[2]}%, Vulnerable ${s.arq[3]}%. Cascada DM2: tiene ${c.tiene}%, dx ${c.dx}%, tratamiento ${c.trat}%, control ${c.ctrl}%, silentes ${c.silent}%. Riesgo CV: bajo ${r[0]}%, intermedio ${r[1]}%, alto ${r[2]}%. ${guideText?('TEXTO DE GUÍAS:\n'+guideText):'Sin guías cargadas; usa principios generales.'}\n\nFormatea tu respuesta en Markdown (negritas con **, listas con -, subtítulos con ##). Si tu respuesta compara cifras, añade AL FINAL UNA gráfica con este marcador en una sola línea (JSON válido): [[VIZ]]{"tipo":"barras","titulo":"Título corto","datos":[["Etiqueta",10],["Etiqueta2",20]]}[[/VIZ]] — tipo puede ser "barras" o "dona"; usa solo cifras del contexto.\n\nPREGUNTA: ${q}`;
+  const ctx=guideAIContext()+`Contexto (cohorte, N=${s.n}). Prevalencia HTA ${s.hta}%, DM2 ${s.dm2}%. Por municipio: ${muniTxt}. ${desTxt} Arquetipos: Provacuna ${s.arq[0]}%, Indeciso ${s.arq[1]}%, Renuente ${s.arq[2]}%, Vulnerable ${s.arq[3]}%. Cascada DM2: tiene ${c.tiene}%, dx ${c.dx}%, tratamiento ${c.trat}%, control ${c.ctrl}%, silentes ${c.silent}%. Riesgo CV: bajo ${r[0]}%, intermedio ${r[1]}%, alto ${r[2]}%. ${guideText?('TEXTO DE GUÍAS:\n'+guideText):'Sin guías cargadas; usa principios generales.'}\n\nFormatea tu respuesta en Markdown (negritas con **, listas con -, subtítulos con ##). Si tu respuesta compara cifras, añade AL FINAL UNA gráfica con este marcador en una sola línea (JSON válido): [[VIZ]]{"tipo":"barras","titulo":"Título corto","datos":[["Etiqueta",10],["Etiqueta2",20]]}[[/VIZ]] — tipo puede ser "barras" o "dona"; usa solo cifras del contexto.\n\nPREGUNTA: ${q}`;
   try{
     const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'analisis',messages:[{role:'user',content:ctx}]})});
     const data=await res.json();const raw=data.reply||'Sin respuesta.';const ex=extractViz(raw);
@@ -1853,12 +1894,11 @@ async function anaSend(q){
 }
 let REPORT_REFS=[];
 async function fetchReportRefs(){
-  // Consulta real a Europe PMC con términos derivados de la cohorte y las guías
+  // Consulta real a Europe PMC con términos derivados de las guías cargadas y la cohorte
   const terms=[];const s=(COHORT&&COHORT.stats)||{};
-  if((s.hta||0)>0)terms.push('hypertension');
-  if((s.dm2||0)>0)terms.push('"type 2 diabetes"');
-  if((s.smetab||0)>0)terms.push('"metabolic syndrome"');
-  terms.push('COVID-19 risk');
+  const T2E={'depresión':'depression','ansiedad':'anxiety disorder','COVID-19':'COVID-19','diabetes':'"type 2 diabetes"','hipertensión':'hypertension','obesidad':'obesity','influenza':'influenza','dengue':'dengue','tuberculosis':'tuberculosis','VIH/sida':'HIV','cáncer':'cancer','asma':'asthma','EPOC':'COPD','salud materna':'maternal health','nutrición':'nutrition','salud mental':'mental health','adicciones':'substance use disorder','enfermedad renal':'chronic kidney disease','cardiovascular':'cardiovascular disease'};
+  if(GUIDE_TOPICS){GUIDE_TOPICS.split(', ').forEach(function(t){if(T2E[t])terms.push(T2E[t]);});}
+  if(!terms.length){if((s.hta||0)>0)terms.push('hypertension');if((s.dm2||0)>0)terms.push('"type 2 diabetes"');if((s.smetab||0)>0)terms.push('"metabolic syndrome"');terms.push('COVID-19 risk');}
   const base=terms.join(' OR ');
   const q='('+base+') AND (primary care OR "community intervention" OR prevention OR epidemiology)';
   try{
@@ -1874,7 +1914,7 @@ async function generateReport(){
   if(btn)btn.disabled=true;out.innerHTML='<div class="thinking"><div class="sp"></div><div>Buscando evidencia científica y redactando el informe…</div></div>';
   try{
     await fetchReportRefs();
-    let prompt=buildReportPrompt();
+    let prompt=guideAIContext()+buildReportPrompt();
     if(anaHistory.length)prompt+='\n\nIntegra también estas consultas previas del usuario a PUM-AI (menciona sus hallazgos donde aporten):\n'+anaHistory.slice(-6).map((h,i)=>(i+1)+'. P: '+h.q+' | R: '+String(h.a).replace(/\s+/g,' ').slice(0,400)).join('\n');
     if(REPORT_REFS.length)prompt+='\n\nREFERENCIAS CIENTÍFICAS REALES disponibles (Europe PMC). Cítalas en el texto con corchetes [1], [2]… donde respalden una afirmación, sin inventar otras:\n'+REPORT_REFS.map((r,i)=>'['+(i+1)+'] '+r.title+' ('+r.journal+(r.year?(', '+r.year):'')+')').join('\n');
     const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'report',messages:[{role:'user',content:prompt}]})});
@@ -2026,12 +2066,14 @@ function initArtChips(){const c=document.getElementById('artChips');if(c&&!c.dat
 async function buscarArticulos(q){
   q=(q||'').trim();if(!q){return;}
   const box=document.getElementById('artResults');
-  box.innerHTML='<div class="thinking"><div class="sp"></div><div>Buscando en Europe PMC / PubMed…</div></div>';
+  const langSel=document.getElementById('artLang');const lang=langSel?langSel.value:'';
+  let query=q;if(lang==='es')query='('+q+') AND (LANG:spa)';else if(lang==='en')query='('+q+') AND (LANG:eng)';
+  box.innerHTML='<div class="thinking"><div class="sp"></div><div>Buscando en Europe PMC / PubMed'+(lang==='es'?' (en español)':'')+'…</div></div>';
   try{
-    const url='https://www.ebi.ac.uk/europepmc/webservices/rest/search?query='+encodeURIComponent(q)+'&format=json&pageSize=8&resultType=lite&sort=CITED%20desc';
+    const url='https://www.ebi.ac.uk/europepmc/webservices/rest/search?query='+encodeURIComponent(query)+'&format=json&pageSize=8&resultType=lite&sort=CITED%20desc';
     const res=await fetch(url);const data=await res.json();
     const list=(data&&data.resultList&&data.resultList.result)||[];
-    if(!list.length){box.innerHTML='<div class="note" style="margin-top:10px">Sin resultados para “'+esc(q)+'”. Prueba términos en inglés o más generales.</div>';return;}
+    if(!list.length){box.innerHTML='<div class="note" style="margin-top:10px">Sin resultados para “'+esc(q)+'”'+(lang==='es'?' en español. Muchos artículos científicos están en inglés: prueba la opción «Todos» o «Inglés».':'. Prueba términos en inglés o más generales.')+'</div>';return;}
     box.innerHTML='<div class="note" style="margin:10px 0 4px">🔗 '+list.length+' artículos reales (enlaces verificables). Ordenados por citas.</div>'+list.map(a=>{
       let link=a.doi?('https://doi.org/'+a.doi):(a.pmid?('https://pubmed.ncbi.nlm.nih.gov/'+a.pmid+'/'):('https://europepmc.org/article/'+(a.source||'MED')+'/'+a.id));
       const auth=(a.authorString||'').length>90?(a.authorString.slice(0,90)+'…'):(a.authorString||'');
@@ -2076,15 +2118,22 @@ async function generarEncuesta(){
   document.getElementById('encFillCard').style.display='block';
   btn.disabled=false;btn.textContent='Generar encuesta';
 }
+function setEncType(i,v){if(ENC_FIELDS[i]){ENC_FIELDS[i].type=v;if(v==='choice'&&!(ENC_FIELDS[i].opts||[]).length)ENC_FIELDS[i].opts=['Opción 1','Opción 2'];}renderEncEditor();renderEncForm();}
+function setEncOpts(i,v){if(ENC_FIELDS[i]){ENC_FIELDS[i].opts=v.split(',').map(function(s){return s.trim();}).filter(Boolean);}renderEncForm();}
 function renderEncEditor(){
   const box=document.getElementById('encFields');
+  const TYP=[['text','Texto'],['number','Número'],['choice','Opción múltiple']];
   box.innerHTML=ENC_FIELDS.map((f,i)=>{
     const base=f.csv?' <span style="font-size:10px;color:var(--emerald);font-weight:800">CLÍNICA</span>':'';
-    const rm=f.csv?'':'<button class="btn-mini" style="padding:4px 8px" onclick="rmEncField('+i+')">✕</button>';
-    return '<div style="display:flex;gap:8px;align-items:center;margin-bottom:7px"><span style="font-size:11px;color:var(--muted);width:20px">'+(i+1)+'</span><input value="'+esc(f.label)+'" oninput="ENC_FIELDS['+i+'].label=this.value" style="flex:1;padding:8px 10px;border:1.5px solid var(--line);border-radius:9px;font-size:13px;font-family:inherit"><span style="font-size:11px;color:var(--muted)">'+f.type+base+'</span>'+rm+'</div>';
+    const rm=f.csv?'':'<button class="btn-mini" style="padding:5px 8px" onclick="rmEncField('+i+')">✕</button>';
+    const dis=f.csv?' disabled title="Campo clínico: tipo fijo"':'';
+    const sel='<select onchange="setEncType('+i+',this.value)"'+dis+' style="padding:7px 8px;border:1.5px solid var(--line);border-radius:9px;font-size:12px;font-family:inherit;background:#fff">'+TYP.map(function(o){return '<option value="'+o[0]+'"'+(f.type===o[0]?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';
+    let optsRow='';
+    if(f.type==='choice')optsRow='<div style="margin:5px 0 0 28px"><input value="'+esc((f.opts||[]).join(', '))+'" oninput="setEncOpts('+i+',this.value)" placeholder="Opciones separadas por coma (ej. Sí, No, A veces)" style="width:100%;padding:7px 10px;border:1.5px dashed var(--gold3);border-radius:9px;font-size:12.5px;font-family:inherit"></div>';
+    return '<div style="margin-bottom:9px;padding-bottom:8px;border-bottom:1px dashed var(--line)"><div style="display:flex;gap:8px;align-items:center"><span style="font-size:11px;color:var(--muted);width:20px">'+(i+1)+'</span><input value="'+esc(f.label)+'" oninput="ENC_FIELDS['+i+'].label=this.value" style="flex:1;padding:8px 10px;border:1.5px solid var(--line);border-radius:9px;font-size:13px;font-family:inherit">'+sel+base+rm+'</div>'+optsRow+'</div>';
   }).join('');
 }
-function addEncField(){ENC_FIELDS.push({key:'x'+ENC_FIELDS.length,label:'Nueva pregunta',type:'text',opts:[],csv:null});renderEncEditor();renderEncForm();}
+function addEncField(){ENC_FIELDS.push({key:'x'+ENC_FIELDS.length+'_'+Date.now().toString(36),label:'Nueva pregunta',type:'text',opts:[],csv:null});renderEncEditor();renderEncForm();}
 function rmEncField(i){if(ENC_FIELDS[i]&&ENC_FIELDS[i].csv){return;}ENC_FIELDS.splice(i,1);renderEncEditor();renderEncForm();}
 function renderEncForm(){
   const box=document.getElementById('encForm');
@@ -2112,14 +2161,99 @@ async function guardarRespuesta(){
 async function guardarEncuesta(){
   const titulo=document.getElementById('encTitulo').value.trim()||'Encuesta sin título';
   try{
-    const {data,error}=await sb.from('iep_encuestas').insert({autor_id:MY_PROFILE.user_id,titulo:titulo,campos:ENC_FIELDS}).select().single();
+    const expira=new Date(Date.now()+7*864e5).toISOString();
+    const {data,error}=await sb.from('iep_encuestas').insert({autor_id:MY_PROFILE.user_id,titulo:titulo,campos:ENC_FIELDS,expira_at:expira,revocada:false}).select().single();
     if(error)throw error;
     ENC_SAVED_ID=data.id;
     // sube respuestas locales pendientes
     if(ENC_RESP.length){const rows=ENC_RESP.map(d=>({encuesta_id:ENC_SAVED_ID,capturado_por:MY_PROFILE.user_id,datos:d}));try{await sb.from('iep_respuestas').insert(rows);}catch(e){}}
-    document.getElementById('encStatus').style.color='var(--emerald)';document.getElementById('encStatus').textContent='✓ Encuesta guardada. Ya puedes compartirla y capturar respuestas.';
+    document.getElementById('encStatus').style.color='var(--emerald)';document.getElementById('encStatus').textContent='✓ Encuesta guardada. Comparte el link para recibir respuestas automáticamente.';
+    renderEncShare();
     buildEncListSaved();
   }catch(e){alert('No se pudo guardar la encuesta: '+(e.message||e));}
+}
+function encPublicLink(id){id=id||ENC_SAVED_ID;if(!id)return '';return location.origin+location.pathname+'#/e/'+id;}
+let ENC_META=null;
+function encEstado(meta){if(!meta)return {k:'activo',t:'Activo',c:'#1f9d6b'};if(meta.revocada)return {k:'revocado',t:'Revocado',c:'#e0564f'};if(meta.expira_at&&Date.parse(meta.expira_at)<Date.now())return {k:'expirado',t:'Expirado',c:'#8593a8'};return {k:'activo',t:'Activo',c:'#1f9d6b'};}
+function encExpiraTxt(meta){if(!meta||!meta.expira_at)return '';const d=Date.parse(meta.expira_at),now=Date.now();if(d<now)return 'expiró el '+new Date(d).toLocaleDateString('es-MX');const dias=Math.ceil((d-now)/864e5);return 'expira en '+dias+' día'+(dias===1?'':'s')+' ('+new Date(d).toLocaleDateString('es-MX')+')';}
+async function renderEncShare(){
+  const box=document.getElementById('encShareBox');if(!box||!ENC_SAVED_ID)return;
+  const link=encPublicLink();box.style.display='block';
+  box.innerHTML='<div style="background:linear-gradient(135deg,#f0faf5,#eef6fb);border:1px solid #cfe8dc;border-radius:14px;padding:16px 18px">'+
+    '<div style="font-weight:800;color:var(--navy);font-size:14px">🔗 Link público del cuestionario <span class="note" id="encEstadoChip"></span></div>'+
+    '<p class="note" style="margin:4px 0 10px">Cualquiera con este link responde sin cuenta desde su celular; <b>las respuestas se guardan solas</b>. El link <b>expira a los 7 días</b>.</p>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input id="encLinkInput" readonly value="'+esc(link)+'" onclick="this.select()" style="flex:1;min-width:240px;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:12.5px;font-family:monospace;background:#fff;color:var(--navy)">'+
+    '<button class="btn-mini primary" onclick="copiarEncLink()">📋 Copiar</button>'+
+    '<button class="btn-mini" onclick="window.open(encPublicLink(),\'_blank\')">👁 Previsualizar</button></div>'+
+    '<div class="note" id="encCopyMsg" style="margin-top:6px"></div>'+
+    '<div id="encProgress" style="margin-top:12px"></div>'+
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;border-top:1px dashed var(--line);padding-top:10px"><button class="btn-mini" onclick="verRespuestasEnc()">🔄 Actualizar avance</button><button class="btn-mini" onclick="exportEncExcel()">⬇ Exportar a Excel</button><button class="btn-mini" onclick="guardarBaseMisAnalisis()">🗂️ Guardar en Mis análisis</button><button class="btn-mini" style="border-color:#e0564f;color:#e0564f" onclick="revocarEnc()">🚫 Revocar link</button></div>'+
+    '</div>';
+  verRespuestasEnc();
+}
+function copiarEncLink(){const i=document.getElementById('encLinkInput');const msg=document.getElementById('encCopyMsg');try{i.select();if(navigator.clipboard)navigator.clipboard.writeText(i.value);else document.execCommand('copy');if(msg){msg.style.color='var(--emerald)';msg.textContent='✓ Link copiado. Compártelo con tus encuestados.';}}catch(e){if(msg)msg.textContent='Selecciona y copia el link manualmente.';}}
+async function verRespuestasEnc(){if(!ENC_SAVED_ID)return;
+  try{
+    const meta=await sb.from('iep_encuestas').select('expira_at,revocada,titulo').eq('id',ENC_SAVED_ID).maybeSingle();ENC_META=meta.data||ENC_META;
+    const r=await sb.from('iep_respuestas').select('datos').eq('encuesta_id',ENC_SAVED_ID);ENC_RESP=(r.data||[]).map(function(x){return x.datos;});
+    let visitas=ENC_RESP.length;try{const v=await sb.from('iep_encuesta_visita').select('id',{count:'exact',head:true}).eq('encuesta_id',ENC_SAVED_ID);if(v.count!=null)visitas=v.count;}catch(e){}
+    const compl=ENC_RESP.length;const sinConcluir=Math.max(0,visitas-compl);const tasa=visitas?Math.round(compl/visitas*100):0;
+    const est=encEstado(ENC_META);const chip=document.getElementById('encEstadoChip');if(chip)chip.innerHTML='<span style="background:'+est.c+'22;color:'+est.c+';border-radius:100px;padding:2px 9px;font-weight:800;font-size:11px">● '+est.t+'</span> <span style="color:var(--muted)">'+esc(encExpiraTxt(ENC_META))+'</span>';
+    const pg=document.getElementById('encProgress');
+    if(pg)pg.innerHTML='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">'+
+      kpiTile('Entraron al link',String(visitas),'#2f7fb8')+
+      kpiTile('Concluyeron',compl+' ('+tasa+'%)','#1f9d6b')+
+      kpiTile('Entraron sin responder',String(sinConcluir),'#d99413')+
+      '</div><div class="note" style="margin-top:6px">'+(compl===0?'Aún nadie ha respondido.':'Tasa de conclusión: <b>'+tasa+'%</b>. '+(sinConcluir>0?(sinConcluir+' persona(s) abrieron el link pero no enviaron respuesta.'):'Todas las personas que entraron concluyeron.'))+'</div>';
+    const c=document.getElementById('encRespCount');if(c)c.textContent=ENC_RESP.length+' respuesta(s) capturada(s)';
+  }catch(e){}}
+async function revocarEnc(){if(!ENC_SAVED_ID)return;if(!confirm('¿Revocar este link? Dejará de funcionar de inmediato y nadie más podrá responder. Las respuestas ya recibidas se conservan.'))return;
+  try{const {error}=await sb.from('iep_encuestas').update({revocada:true}).eq('id',ENC_SAVED_ID);if(error)throw error;const msg=document.getElementById('encCopyMsg');if(msg){msg.style.color='#e0564f';msg.textContent='🚫 Link revocado. Ya no acepta respuestas.';}verRespuestasEnc();buildEncListSaved();}catch(e){alert('No se pudo revocar: '+(e.message||e));}}
+function encExcelRows(){const headers=ENC_FIELDS.map(function(f){return f.label;});const keys=ENC_FIELDS.map(function(f){return f.key;});const rows=ENC_RESP.map(function(d){return keys.map(function(k){return d[k]!=null?d[k]:'';});});return {headers:headers,keys:keys,rows:rows};}
+function exportEncExcel(){
+  if(!ENC_RESP.length){alert('Aún no hay respuestas para exportar.');return;}
+  const t=encExcelRows();const name=(document.getElementById('encTitulo').value||'encuesta').toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,30);
+  if(window.XLSX){try{const ws=XLSX.utils.aoa_to_sheet([t.headers].concat(t.rows));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Respuestas');XLSX.writeFile(wb,'cuestionario-'+name+'.xlsx');return;}catch(e){}}
+  csvDownload('cuestionario-'+name+'.csv',t.headers,t.rows);
+}
+async function guardarBaseMisAnalisis(){
+  await verRespuestasEnc();
+  if(!ENC_RESP.length){alert('Aún no hay respuestas para guardar.');return;}
+  const titulo=document.getElementById('encTitulo').value.trim()||'Cuestionario';const t=encExcelRows();
+  try{saveAnalisis('encuesta','🗂️ Cuestionario: '+titulo,ENC_RESP.length+' respuesta(s) · '+ENC_FIELDS.length+' preguntas',{carpeta:'cuestionario',encuesta_id:ENC_SAVED_ID,titulo:titulo,headers:t.headers,keys:t.keys,rows:t.rows,link:encPublicLink()});
+    const msg=document.getElementById('encCopyMsg');if(msg){msg.style.color='var(--emerald)';msg.textContent='✓ Base guardada en «Mis análisis» → carpeta Cuestionario ('+ENC_RESP.length+' respuestas).';}
+  }catch(e){alert('No se pudo guardar en Mis análisis: '+(e.message||e));}
+}
+/* ===== Vista pública del cuestionario (link ofuscado, sin login) ===== */
+function isPublicSurveyRoute(){const m=(location.hash||'').match(/^#\/e\/([0-9a-fA-F-]{16,})$/);return m?m[1]:null;}
+function checkPublicSurvey(){const id=isPublicSurveyRoute();if(id){window.PUBLIC_MODE=true;renderPublicSurvey(id);return true;}return false;}
+function pubMsg(t,s){return '<div class="card" style="max-width:520px;width:100%;text-align:center;margin-top:40px"><div style="font-size:40px">🔒</div><div class="serif" style="font-size:20px;color:var(--navy);font-weight:800;margin:8px 0">'+esc(t)+'</div><div class="note">'+esc(s)+'</div></div>';}
+function pubField(f,i){let inp;if(f.type==='choice'&&(f.opts||[]).length)inp='<select id="pf_'+i+'" style="width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit"><option value="">— Selecciona —</option>'+f.opts.map(function(o){return '<option>'+esc(o)+'</option>';}).join('')+'</select>';else inp='<input id="pf_'+i+'" '+(f.type==='number'?'type="number" inputmode="decimal"':'')+' style="width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;font-size:14px;font-family:inherit">';return '<div class="field" style="margin-bottom:12px"><label style="font-size:13px;font-weight:600;color:var(--navy)">'+esc(f.label)+'</label>'+inp+'</div>';}
+async function renderPublicSurvey(id){
+  document.body.classList.remove('appon');document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});
+  let host=document.getElementById('pubSurvey');if(!host){host=document.createElement('div');host.id='pubSurvey';document.body.appendChild(host);}
+  host.style.cssText='position:relative;z-index:2;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:28px 16px';
+  host.innerHTML='<div class="card" style="max-width:640px;width:100%;margin-top:30px"><div class="thinking"><div class="sp"></div> Cargando cuestionario…</div></div>';
+  try{
+    if(!sb)throw new Error('sin conexión');
+    const {data,error}=await sb.from('iep_encuestas').select('titulo,campos').eq('id',id).maybeSingle();
+    if(error)throw error;
+    if(!data){host.innerHTML=pubMsg('Este cuestionario no está disponible','El link no existe, fue revocado o ya expiró (los links duran 7 días). Solicita uno nuevo a quien te lo compartió.');return;}
+    try{await sb.from('iep_encuesta_visita').insert({encuesta_id:id});}catch(e){}
+    const fields=data.campos||[];window.__PUB_FIELDS=fields;
+    host.innerHTML='<div style="max-width:640px;width:100%"><div style="text-align:center;margin-bottom:16px"><img src="../public/assets/fesi-logo.png" style="height:60px" onerror="this.style.display=\'none\'"><div class="serif" style="font-size:22px;color:var(--navy);font-weight:800;margin-top:8px">'+esc(data.titulo||'Cuestionario')+'</div><div class="note">Tus respuestas son anónimas y se registran automáticamente.</div></div><div class="card" id="pubCard">'+fields.map(function(f,i){return pubField(f,i);}).join('')+'<button class="btn btn-gold" style="width:100%;justify-content:center;margin-top:8px" onclick="enviarPublicSurvey(\''+id+'\')">Enviar respuestas</button><div class="note" id="pubMsg" style="margin-top:8px;text-align:center"></div></div><div class="note" style="text-align:center;margin-top:14px">SAPIENS · FES Iztacala UNAM</div></div>';
+  }catch(e){host.innerHTML=pubMsg('No se pudo cargar','Intenta de nuevo más tarde. ('+((e&&e.message)||e)+')');}
+}
+async function enviarPublicSurvey(id){
+  const fields=window.__PUB_FIELDS||[];const datos={};let any=false;
+  fields.forEach(function(f,i){const el=document.getElementById('pf_'+i);if(el&&el.value!==''){datos[f.key]=el.value;any=true;}});
+  const msg=document.getElementById('pubMsg');
+  if(!any){if(msg){msg.style.color='#e0564f';msg.textContent='Responde al menos una pregunta.';}return;}
+  datos.__labels=fields.map(function(f){return {key:f.key,csv:f.csv,label:f.label,type:f.type};});
+  if(msg){msg.style.color='var(--muted)';msg.textContent='Enviando…';}
+  try{const {error}=await sb.from('iep_respuestas').insert({encuesta_id:id,capturado_por:null,datos:datos});if(error)throw error;
+    document.getElementById('pubCard').innerHTML='<div style="text-align:center;padding:22px"><div style="font-size:44px">✅</div><div class="serif" style="font-size:20px;color:var(--navy);font-weight:800;margin:8px 0">¡Gracias por participar!</div><div class="note">Tu respuesta se registró correctamente.</div></div>';
+  }catch(e){if(msg){msg.style.color='#e0564f';msg.textContent='No se pudo enviar. El link pudo expirar o ser revocado.';}}
 }
 async function buildEncListSaved(){
   const box=document.getElementById('encList');
@@ -2127,7 +2261,7 @@ async function buildEncListSaved(){
     const {data,error}=await sb.from('iep_encuestas').select('*').order('created_at',{ascending:false}).limit(20);
     if(error)throw error;
     if(!data||!data.length){box.innerHTML='<div class="note" style="margin-top:8px">Aún no has guardado encuestas.</div>';return;}
-    box.innerHTML=data.map(e=>'<div style="border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:10px"><div><div style="font-weight:700;color:var(--navy);font-size:13.5px">'+esc(e.titulo)+'</div><div class="note">'+((e.campos||[]).length)+' preguntas</div></div><button class="btn-mini" onclick="cargarEncuesta(\''+e.id+'\')">Usar</button></div>').join('');
+    box.innerHTML=data.map(function(e){const est=encEstado(e);return '<div style="border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;gap:10px"><div><div style="font-weight:700;color:var(--navy);font-size:13.5px">'+esc(e.titulo)+' <span style="background:'+est.c+'22;color:'+est.c+';border-radius:100px;padding:1px 8px;font-weight:800;font-size:10px">'+est.t+'</span></div><div class="note">'+((e.campos||[]).length)+' preguntas · '+esc(encExpiraTxt(e)||'sin caducidad')+'</div></div><button class="btn-mini" onclick="cargarEncuesta(\''+e.id+'\')">Abrir</button></div>';}).join('');
   }catch(err){box.innerHTML='<div class="note" style="margin-top:8px">No se pudieron cargar: '+(err.message||err)+'</div>';}
 }
 async function cargarEncuesta(id){
@@ -2142,6 +2276,7 @@ async function cargarEncuesta(id){
     try{const r=await sb.from('iep_respuestas').select('datos').eq('encuesta_id',id);if(r.data)ENC_RESP=r.data.map(x=>x.datos);}catch(e){}
     document.getElementById('encRespCount').textContent=ENC_RESP.length+' respuesta(s) capturada(s)';
     document.getElementById('encStatus').style.color='var(--emerald)';document.getElementById('encStatus').textContent='✓ Encuesta cargada.';
+    renderEncShare();
   }catch(e){alert('No se pudo cargar: '+(e.message||e));}
 }
 function exportEncuestaPDF(){
@@ -2271,15 +2406,18 @@ async function protoAsk(i){
   const inp=document.getElementById('pq'+i);const q=(inp.value||'').trim();if(!q)return;inp.value='';
   PROTO_ASKS[i]=(PROTO_ASKS[i]||0)+1;const nth=PROTO_ASKS[i];
   const out=document.getElementById('pa'+i);const load=document.createElement('div');load.className='note';load.innerHTML='<span class="thinking" style="padding:6px 0"><span class="sp"></span> PUM-AI está respondiendo… <span style="opacity:.7">(consulta #'+nth+' de esta etapa)</span></span>';out.appendChild(load);
-  let ctx='Eres PUM-AI, tutor de metodología de investigación de la FES Iztacala. Tu misión es FORMAR al alumno para que aprenda a redactar su protocolo, NO hacerle el trabajo. Etapa del protocolo: "'+PROTO_STEPS[i][0]+'". ';
-  if(typeof COHORT!=='undefined'&&COHORT&&COHORT.stats){const s=COHORT.stats;ctx+='La cohorte del alumno tiene N='+s.n+', HTA '+s.hta+'%, DM2 '+s.dm2+'%. ';}
-  if(guideText)ctx+='Guías/rúbrica de referencia (extracto): '+guideText.slice(0,1200)+'. ';
+  const step=PROTO_STEPS[i]||{};const secTitle=step.t||('Etapa '+(i+1));const crit=(step.crit||[]).join('; ');
+  let ctx='Eres PUM-AI, tutor de metodología de investigación de la FES Iztacala. Tu misión es FORMAR al alumno para que aprenda a redactar su protocolo, NO hacerle el trabajo. ';
+  ctx+='El alumno está trabajando ESPECÍFICAMENTE en el apartado "'+secTitle+'" (peso en la rúbrica: '+(step.w||'—')+') de su protocolo de investigación. ';
+  if(crit)ctx+='Criterios que la rúbrica FESI exige para ESTE apartado: '+crit+'. ';
+  ctx+='REGLA CLAVE: tu respuesta debe centrarse EXCLUSIVAMENTE en cómo redactar y mejorar ESTE apartado ("'+secTitle+'"), no en la enfermedad ni en las guías clínicas en general. Relaciona todo con lo que este apartado del protocolo requiere. ';
+  if(typeof guideTopics==='function'&&guideTopics())ctx+='El tema/enfermedad del protocolo del alumno es: '+guideTopics()+' — úsalo solo como contexto para ejemplos, sin desviarte del apartado. ';
   if(nth<3){
-    ctx+='IMPORTANTE: esta es la consulta #'+nth+' del alumno sobre esta etapa (aún de las dos primeras). NO le redactes la sección ni le entregues el texto final, aunque lo pida. En su lugar: (a) oriéntalo con 2-3 preguntas guía que lo hagan pensar, (b) explícale qué criterios debe cumplir esta sección según la rúbrica y qué elementos incluir, (c) dale un ejemplo GENÉRICO de otro tema (no del suyo) para ilustrar la forma, y (d) anímalo con calidez a que escriba él su propia versión. Si insiste en que se lo escribas, dile amablemente que primero intente su borrador y que si tras un par de intentos sigue atorado, con gusto le darás un modelo. ';
+    ctx+='IMPORTANTE: esta es la consulta #'+nth+' del alumno sobre este apartado (de las dos primeras). NO le redactes la sección ni le entregues el texto final, aunque lo pida. En su lugar: (a) hazle 2-3 preguntas guía sobre ESTE apartado que lo hagan pensar, (b) recuérdale los criterios de la rúbrica para este apartado y qué elementos debe incluir, (c) dale un ejemplo GENÉRICO de otro tema para ilustrar la FORMA de este apartado, y (d) anímalo a escribir su propia versión. Si insiste en que se lo escribas, pídele con calidez que primero intente su borrador. ';
   } else {
-    ctx+='Esta es la consulta #'+nth+' del alumno sobre esta etapa: ya intentó por su cuenta en las consultas previas. Ahora SÍ ayúdalo de forma concreta: si lo pide, ofrécele un BORRADOR redactado de esta sección que pueda adaptar, dejando claro que debe personalizarlo con su propio tema, población y datos, y señalando qué partes debe ajustar. ';
+    ctx+='Esta es la consulta #'+nth+' del alumno sobre este apartado: ya intentó por su cuenta. Ahora SÍ ayúdalo concretamente: ofrécele un BORRADOR redactado de ESTE apartado que pueda adaptar, cumpliendo los criterios de la rúbrica, y dejando claro qué debe personalizar con su tema, población y datos. ';
   }
-  ctx+='Si tu respuesta involucra un cálculo, una tasa o una gráfica, explícale también CÓMO se obtiene (la fórmula o el procedimiento paso a paso) y cómo se interpreta. Responde en Markdown, claro y didáctico. Duda del alumno: '+q;
+  ctx+='Si tu respuesta involucra un cálculo, una tasa o una gráfica, explícale también CÓMO se obtiene y cómo se interpreta. Responde en Markdown, claro y didáctico, siempre enfocado en el apartado "'+secTitle+'". Duda del alumno: '+q;
   try{
     const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'protocolo',messages:[{role:'user',content:ctx}]})});
     const data=await res.json();load.classList.remove('note');load.style.cssText='background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;font-size:13.5px;color:#26364e;line-height:1.55';load.innerHTML=(nth<3?'<div style="font-size:11px;color:#b8912f;font-weight:700;margin-bottom:5px">✎ Modo guía — inténtalo tú primero</div>':'<div style="font-size:11px;color:#1f9d6b;font-weight:700;margin-bottom:5px">📝 Borrador de apoyo — recuerda personalizarlo</div>')+mdToHtml(data.reply||'Sin respuesta.');
@@ -2713,6 +2851,7 @@ async function unirseBrote(){
 }
 function entrarSalaBrote(){
   document.getElementById('broteHome').style.display='none';document.getElementById('broteRoom').style.display='block';
+  const dbf=document.getElementById('broteDebrief');if(dbf){dbf.dataset.done='';dbf.innerHTML='';}
   document.getElementById('broteRoomCode').textContent=BROTE.codigo;
   document.getElementById('broteProfControls').style.display=BROTE.role==='prof'?'block':'none';
   document.getElementById('broteDecisionBox').style.display=BROTE.role==='alumno'?'block':'none';
@@ -2788,10 +2927,39 @@ async function avanzarBrote(){
   }catch(e){alert('No se pudo avanzar: '+(e.message||e));}
 }
 async function terminarBrote(){try{await sb.from('iep_brote_sesion').update({estado:'fin',updated_at:new Date().toISOString()}).eq('id',BROTE.sesionId);pollBrote();}catch(e){}}
-function renderDebrief(sim){
+async function renderDebrief(sim){
   const el=document.getElementById('broteDebrief');if(el.dataset.done)return;el.dataset.done='1';
   const infPct=sim.N?Math.round((sim.N-sim.S-(sim.V||0))/sim.N*100):0;const sevPct=sim.N?Math.round((sim.sev||0)/sim.N*100):0;const vacPct=sim.N?Math.round((sim.V||0)/sim.N*100):0;
-  el.innerHTML='<div class="results-banner"><div class="rb-head"><span class="rb-badge">Cierre</span> Resultado del simulacro</div><div class="note" style="margin-top:6px">El grupo alcanzó <b>'+vacPct+'%</b> de vacunación; al final <b>'+infPct+'%</b> de la población se contagió y <b>'+sevPct+'%</b> desarrolló cuadros graves. Discutan: ¿qué decisiones tempranas habrían aplanado la curva? ¿Vacunar antes, confinar en el pico, o comunicar para elevar la aceptación?</div></div>';
+  BROTE._final={infPct:infPct,sevPct:sevPct,vacPct:vacPct};
+  let html='<div class="results-banner"><div class="rb-head"><span class="rb-badge">Cierre</span> Resultado del simulacro</div><div class="note" style="margin-top:6px">El grupo alcanzó <b>'+vacPct+'%</b> de vacunación; al final <b>'+infPct+'%</b> de la población se contagió y <b>'+sevPct+'%</b> desarrolló cuadros graves.</div></div>';
+  if(BROTE.role==='prof'){
+    try{const {data}=await sb.from('iep_brote_decision').select('*').eq('sesion_id',BROTE.sesionId);const decs=data||[];
+      const byU={};decs.forEach(function(d){(byU[d.user_id]||(byU[d.user_id]={n:d.nombre||'Alumno',acc:{}})).acc[d.semana]=d.accion;});
+      const shortT=function(k){const a=BROTE_ACC.find(function(x){return x.k===k;});return a?a.t.split(' ')[0]:k;};
+      const rows=Object.keys(byU).map(function(u){const s=byU[u];const ws=Object.keys(s.acc).map(Number).sort(function(a,b){return a-b;});const list=ws.map(function(w){return s.acc[w];});const cnt={};list.forEach(function(k){cnt[k]=(cnt[k]||0)+1;});const dom=Object.keys(cnt).sort(function(a,b){return cnt[b]-cnt[a];})[0];return {n:s.n,list:list,dom:dom};});
+      BROTE._students=rows;
+      const stratCnt={};BROTE_ACC.forEach(function(a){stratCnt[a.k]=0;});decs.forEach(function(d){if(stratCnt[d.accion]!=null)stratCnt[d.accion]++;});const totD=decs.length||1;
+      html+='<div class="card" style="margin-top:12px"><div class="chart-title" style="font-size:14px;margin-bottom:8px">👥 Decisiones por alumno ('+rows.length+')</div>';
+      if(rows.length){html+='<table class="gtable"><thead><tr><th>Alumno</th><th>Decisiones semana a semana</th><th>Estrategia dominante</th></tr></thead><tbody>'+rows.map(function(r){return '<tr><td>'+esc(r.n)+'</td><td style="font-size:12px">'+r.list.map(shortT).join(' → ')+'</td><td><b>'+esc(shortT(r.dom))+'</b></td></tr>';}).join('')+'</tbody></table>';}
+      else html+='<div class="note">No se registraron decisiones de alumnos.</div>';
+      html+='<div class="chart-title" style="font-size:13px;margin:12px 0 6px">Distribución de estrategias del grupo</div>'+BROTE_ACC.map(function(a){const pct=Math.round(stratCnt[a.k]/totD*100);return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><div style="width:120px;font-size:12px;color:#26364e">'+esc(a.t.split(' ')[0])+'</div><div style="flex:1;height:14px;background:#eceadf;border-radius:5px;overflow:hidden"><div style="height:100%;width:'+pct+'%;background:var(--gold)"></div></div><b style="font-size:11px;width:52px;text-align:right">'+stratCnt[a.k]+' ('+pct+'%)</b></div>';}).join('');
+      html+='<button class="btn btn-gold" style="margin-top:12px" onclick="analizarBroteIA()">🧠 Analizar resultados con IA</button><div id="broteIAout" style="margin-top:12px;text-align:left"></div></div>';
+    }catch(e){html+='<div class="note">No se pudieron cargar las decisiones por alumno.</div>';}
+  }else{
+    html+='<div class="note" style="margin-top:8px">Discutan: ¿qué decisiones tempranas habrían aplanado la curva? ¿Vacunar antes, confinar en el pico, o comunicar para elevar la aceptación?</div>';
+  }
+  el.innerHTML=html;
+}
+async function analizarBroteIA(){
+  const out=document.getElementById('broteIAout');if(!out)return;out.innerHTML='<div class="thinking"><div class="sp"></div><div>PUM-AI analiza las decisiones del grupo…</div></div>';
+  try{const rows=BROTE._students||[];const f=BROTE._final||{};
+    const accName=function(k){const a=BROTE_ACC.find(function(x){return x.k===k;});return a?a.t:k;};
+    const ctx=(typeof guideAIContext==='function'?guideAIContext():'')+'Eres tutor de epidemiología (FES Iztacala). En un simulacro de brote en vivo, cada alumno tomó decisiones semanales de control de epidemia (vacunar, confinar, comunicar, tratar). Decisiones por alumno: '+rows.map(function(r){return r.n+': ['+r.list.map(accName).join(', ')+'] (dominante: '+accName(r.dom)+')';}).join(' | ')+'. Resultado final del grupo: '+(f.infPct||0)+'% contagiado, '+(f.sevPct||0)+'% con cuadros graves, '+(f.vacPct||0)+'% vacunado. Analiza los patrones de decisión del grupo: qué estrategias favorecieron el control del brote y cuáles lo empeoraron, qué alumnos muestran buen criterio epidemiológico y quiénes necesitan reforzar, y da 3-4 recomendaciones de reforzamiento concretas para la próxima sesión. Breve y accionable, en Markdown.';
+    const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'protocolo',messages:[{role:'user',content:ctx}]})});
+    const d=await res.json();const reply=d.reply||d.text||d.message;if(!reply)throw new Error('respuesta vacía');
+    out.innerHTML='<div style="background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:13.5px;color:#26364e;line-height:1.55">'+mdToHtml(reply)+'</div>';
+    saveAnalisis('brote_docente','Análisis IA del brote en vivo',String(reply).replace(/[#*]/g,'').slice(0,300),{students:rows.length});
+  }catch(e){out.innerHTML='<div class="note" style="color:#b4442f">No se pudo analizar ('+((e&&e.message)||e)+'). <button class="btn-mini" onclick="analizarBroteIA()">↻ Reintentar</button></div>';}
 }
 
 /* ═══════════════════════ LABORATORIO DE REDES (nodos) ═══════════════════════ */
@@ -3053,7 +3221,7 @@ function calcQual(){const ag=COHORT.agents,n=ag.length;const el=document.getElem
  el.innerHTML='<div class="note" style="margin-bottom:6px"><b>'+n.toLocaleString('es-MX')+'</b> registros · '+BNUM.length+' variables numéricas · 0% de datos faltantes.</div><table class="gtable"><thead><tr><th>Variable</th><th>Media</th><th>DE</th><th>Rango</th><th>Faltantes</th></tr></thead><tbody>'+rows+'</tbody></table><div class="chart-title" style="font-size:13px;margin:14px 0 4px">Matriz de correlación</div><div id="corrC"></div>'+bioAI('Calidad y correlación','Matriz de correlación de '+BNUM.map(v=>v[1]).join(', '));
  corrHeat(document.getElementById('corrC'),mat,BNUM.map(v=>v[1]));saveAnalisis('bioest','Calidad de datos y correlación','Perfil de '+n+' registros, matriz de correlación',{});}
 // —— capa IA: preguntar / hipótesis ——
-function bioCtx(){const s=COHORT.stats;const dg=s.desglose||{};const seg=arr=>(arr||[]).map(x=>x.k+' (n='+x.n+'): HTA '+x.hta+'%, DM2 '+x.dm2+'%, obes '+x.obes+'%, COVID alto '+x.covidAlto+'%').join(' | ');return 'Cohorte N='+s.n+'. HTA '+s.hta+'%, DM2 '+s.dm2+'%, síndrome metabólico '+(s.smetab||'?')+'%. Por sexo: '+seg(dg.sexo)+'. Por edad: '+seg(dg.edad)+'. Por comorbilidad: '+seg(dg.comorbilidad)+'. Riesgo COVID (bajo/mod/alto): '+((s.riesgoCovid||[]).join('/'))+'.';}
+function bioCtx(){const s=COHORT.stats;const dg=s.desglose||{};const seg=arr=>(arr||[]).map(x=>x.k+' (n='+x.n+'): HTA '+x.hta+'%, DM2 '+x.dm2+'%, obes '+x.obes+'%, COVID alto '+x.covidAlto+'%').join(' | ');return guideAIContext()+'Cohorte N='+s.n+'. HTA '+s.hta+'%, DM2 '+s.dm2+'%, síndrome metabólico '+(s.smetab||'?')+'%. Por sexo: '+seg(dg.sexo)+'. Por edad: '+seg(dg.edad)+'. Por comorbilidad: '+seg(dg.comorbilidad)+'. Riesgo COVID (bajo/mod/alto): '+((s.riesgoCovid||[]).join('/'))+'.';}
 async function bioPreguntar(){const q=document.getElementById('bioNL').value.trim();if(!q)return;const out=document.getElementById('bioNLout');out.innerHTML='<div class="thinking" style="padding:6px 0"><div class="sp"></div> PUM-AI analiza…</div>';try{const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'analisis',messages:[{role:'user',content:bioCtx()+'\n\nResponde con cifras de esta cohorte. Pregunta: '+q}]})});const d=await res.json();out.innerHTML='<div style="background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:13.5px;color:#26364e;line-height:1.55">'+mdToHtml(d.reply||'')+'</div>';}catch(e){out.innerHTML='<div class="note">No se pudo responder.</div>';}}
 async function bioHipotesis(){const out=document.getElementById('bioNLout');out.innerHTML='<div class="thinking" style="padding:6px 0"><div class="sp"></div> PUM-AI genera hipótesis…</div>';try{const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'analisis',messages:[{role:'user',content:bioCtx()+'\n\nA partir de estos datos, propón 3-4 hipótesis de investigación epidemiológica comprobables (con exposición y desenlace claros) y qué análisis usarías para probarlas. Markdown.'}]})});const d=await res.json();out.innerHTML='<div style="background:#fff7e6;border:1px solid var(--gold3);border-radius:10px;padding:12px 14px;font-size:13.5px;color:#26364e;line-height:1.55">'+mdToHtml(d.reply||'')+'</div>';}catch(e){out.innerHTML='<div class="note">No se pudo generar.</div>';}}
 
@@ -3105,9 +3273,19 @@ function playMitos(p){let i=0,score=0;const bank=shuffle(MITOS.slice()).slice(0,
  render();}
 
 // —— 2) Paciente Cero ——
-const PCERO={intro:'Brote de enfermedad gastrointestinal (diarrea y vómito): 40 casos en 3 días en una colonia.',clues:['La mayoría de los enfermos bebió agua de la llave comunitaria esta semana.','Los casos se concentran en las manzanas cercanas al pozo.','No todos comieron en la taquería, pero casi todos usaron el agua.','El laboratorio detectó contaminación fecal en una muestra de agua.'],op:['Agua del pozo comunitario','Taquería de la esquina','Alberca pública','Aire acondicionado del mercado'],c:0,exp:'La evidencia (agua compartida, cercanía al pozo y contaminación fecal) apunta a una fuente hídrica común: el pozo.'};
-function playPcero(p){let picked=false;p.innerHTML=hdr('🕵️ Paciente Cero')+'<div class="card"><div style="font-size:15px;color:var(--navy);font-weight:600">'+PCERO.intro+'</div><div style="margin:12px 0"><div class="note" style="font-weight:800;color:var(--gold2);text-transform:uppercase;font-size:11px">Pistas del caso</div>'+PCERO.clues.map(c=>'<div style="background:#fff7e6;border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:8px 12px;margin-top:6px;font-size:13.5px">🔎 '+esc(c)+'</div>').join('')+'</div><div class="note" style="font-weight:800;color:var(--navy)">¿Cuál es la fuente del brote?</div><div id="pcOpts" style="margin-top:8px">'+PCERO.op.map((o,i)=>'<button class="opt-btn" onclick="__pc('+i+')">'+esc(o)+'</button>').join('')+'</div><div id="pcFb"></div></div>';
- window.__pc=function(i){if(picked)return;picked=true;const ok=i===PCERO.c;document.querySelectorAll('#pcOpts .opt-btn').forEach(function(b,j){if(j===PCERO.c)b.classList.add('ok');if(j===i&&!ok)b.classList.add('bad');b.disabled=true;});document.getElementById('pcFb').innerHTML='<div class="note" style="margin-top:10px"><b style="color:'+(ok?'#1f9d6b':'#e0564f')+'">'+(ok?'¡Correcto, detective!':'No exactamente')+'</b> — '+esc(PCERO.exp)+'</div><button class="btn btn-gold" style="margin-top:10px" onclick="backHub()">Volver</button>';saveDinResultado('pcero',ok?100:40,{});awardBadge('primer_juego');if(ok)awardBadge('detective');};}
+const PCERO_CASES=[
+ {intro:'Brote de enfermedad gastrointestinal (diarrea y vómito): 40 casos en 3 días en una colonia.',clues:['La mayoría de los enfermos bebió agua de la llave comunitaria esta semana.','Los casos se concentran en las manzanas cercanas al pozo.','No todos comieron en la taquería, pero casi todos usaron el agua.','El laboratorio detectó contaminación fecal en una muestra de agua.'],op:['Agua del pozo comunitario','Taquería de la esquina','Alberca pública','Aire acondicionado del mercado'],c:0,exp:'Agua compartida + cercanía al pozo + contaminación fecal = fuente hídrica común: el pozo.'},
+ {intro:'12 personas con fiebre y diarrea 8–12 h después de una fiesta de XV años.',clues:['Todos los enfermos comieron del mismo platillo de pollo.','El pollo estuvo horas a temperatura ambiente.','Quienes solo comieron ensalada no enfermaron.','El periodo de incubación fue corto (horas).'],op:['Pollo mal refrigerado','El pastel','Los refrescos','El salón de fiestas'],c:0,exp:'Alimento común, incubación corta y ausencia de casos en quienes no lo comieron: toxiinfección por el pollo.'},
+ {intro:'Aumento de casos respiratorios en un asilo durante 5 días.',clues:['Los primeros casos fueron cuidadores del turno nocturno.','Un cuidador trabajó con síntomas leves.','Los residentes contagiados comparten comedor.','La transmisión fue de persona a persona.'],op:['Un cuidador enfermo (caso índice)','El sistema de agua','La comida del comedor','El aire acondicionado'],c:0,exp:'Cronología (cuidador sintomático primero) + transmisión persona a persona: el cuidador es el caso índice.'},
+ {intro:'Casos de hepatitis A en estudiantes de una escuela.',clues:['Todos comieron en la cooperativa escolar.','Un manipulador de alimentos no se lavaba las manos.','Hepatitis A se transmite por vía fecal-oral.','El agua de garrafón estaba sellada y sin contaminación.'],op:['Manipulador de alimentos infectado','Los pupitres','El agua de garrafón','El transporte escolar'],c:0,exp:'Vía fecal-oral + fuente alimentaria común + manipulador sin higiene: la fuente es el manipulador de alimentos.'}
+];
+function playPcero(p){let i=0,score=0;const cases=shuffle(PCERO_CASES.slice());
+ function render(){if(i>=cases.length){finish();return;}const cs=cases[i];let picked=false;
+  p.innerHTML=hdr('🕵️ Paciente Cero')+'<div class="card"><div class="note" style="font-size:12px">Caso '+(i+1)+' / '+cases.length+' · Aciertos: '+score+'</div><div style="font-size:15px;color:var(--navy);font-weight:600;margin-top:6px">'+esc(cs.intro)+'</div><div style="margin:12px 0"><div class="note" style="font-weight:800;color:var(--gold2);text-transform:uppercase;font-size:11px">Pistas del caso</div>'+cs.clues.map(c=>'<div style="background:#fff7e6;border-left:3px solid var(--gold);border-radius:0 8px 8px 0;padding:8px 12px;margin-top:6px;font-size:13.5px">🔎 '+esc(c)+'</div>').join('')+'</div><div class="note" style="font-weight:800;color:var(--navy)">¿Cuál es la fuente del brote?</div><div id="pcOpts" style="margin-top:8px">'+cs.op.map((o,k)=>'<button class="opt-btn" onclick="__pc('+k+')">'+esc(o)+'</button>').join('')+'</div><div id="pcFb"></div></div>';
+  window.__pc=function(k){if(picked)return;picked=true;const ok=k===cs.c;if(ok)score++;document.querySelectorAll('#pcOpts .opt-btn').forEach(function(b,j){if(j===cs.c)b.classList.add('ok');if(j===k&&!ok)b.classList.add('bad');b.disabled=true;});document.getElementById('pcFb').innerHTML='<div class="note" style="margin-top:10px"><b style="color:'+(ok?'#1f9d6b':'#e0564f')+'">'+(ok?'¡Correcto, detective!':'No exactamente')+'</b> — '+esc(cs.exp)+'</div><button class="btn btn-gold" style="margin-top:10px" onclick="__pcNext()">'+(i+1<cases.length?'Siguiente caso →':'Ver resultado')+'</button>';};
+  window.__pcNext=function(){i++;render();};}
+ function finish(){const pts=Math.round(score/cases.length*100);p.innerHTML=hdr('🕵️ Paciente Cero')+gresult('Resolviste '+score+' de '+cases.length+' casos',pts);saveDinResultado('pcero',pts,{total:cases.length});awardBadge('primer_juego');if(score===cases.length)awardBadge('detective');}
+ render();}
 
 // —— 3) Constructor de Curva ——
 function playCurva(p){let wk=0,S=980,I=20,V=0,peak=20;const curve=[20],WKS=8;
@@ -3142,16 +3320,17 @@ async function unirseVirus(){const code=(document.getElementById('vCod').value||
 function salaVirus(){document.getElementById('vRoom').style.display='block';pollVirus();if(VIRUS_TIMER)clearInterval(VIRUS_TIMER);VIRUS_TIMER=setInterval(pollVirus,1800);}
 async function pollVirus(){if(!VIRUS)return;try{const r=await sb.from('iep_virus_sesion').select('*').eq('id',VIRUS.id).single();const j=await sb.from('iep_virus_jugador').select('*').eq('sesion_id',VIRUS.id);renderVirus(r.data,j.data||[]);}catch(e){}}
 function pickTeam(t){sb.from('iep_virus_jugador').update({equipo:t}).eq('sesion_id',VIRUS.id).eq('user_id',MY_PROFILE.user_id).then(function(){pollVirus();});}
-async function iniciarVirus(){const r=await sb.from('iep_virus_sesion').select('*').eq('id',VIRUS.id).single();const j=await sb.from('iep_virus_jugador').select('*').eq('sesion_id',VIRUS.id);const js=j.data||[];const A=js.filter(x=>x.equipo==='A'),B=js.filter(x=>x.equipo==='B');if(!A.length||!B.length){toast('Se necesitan jugadores en ambos equipos.');return;}const st=r.data.state;st.deck=genDeck();st.hands={A:[],B:[]};for(let i=0;i<3;i++){st.hands.A.push(st.deck.pop());st.hands.B.push(st.deck.pop());}st.turn='A';st.activeId=A[Math.floor(Math.random()*A.length)].user_id;st.log=['¡Comienza la partida! Turno del equipo A.'];await sb.from('iep_virus_sesion').update({estado:'juego',state:st,updated_at:new Date().toISOString()}).eq('id',VIRUS.id);pollVirus();}
+async function iniciarVirus(){const r=await sb.from('iep_virus_sesion').select('*').eq('id',VIRUS.id).single();const j=await sb.from('iep_virus_jugador').select('*').eq('sesion_id',VIRUS.id);const js=j.data||[];const A=js.filter(x=>x.equipo==='A'),B=js.filter(x=>x.equipo==='B');if(!A.length||!B.length){toast('Se necesitan jugadores en ambos equipos.');return;}const st=r.data.state;st.deck=genDeck();function dealHand(){const h=[];const orgs=shuffle(ORG.slice()).slice(0,2);orgs.forEach(function(o){h.push({k:'organo',t:o.k});});while(h.length<5&&st.deck.length)h.push(st.deck.pop());return h;}st.hands={A:dealHand(),B:dealHand()};st.turn='A';st.activeId=A[Math.floor(Math.random()*A.length)].user_id;st.log=['¡Comienza la partida! Turno del equipo A.'];await sb.from('iep_virus_sesion').update({estado:'juego',state:st,updated_at:new Date().toISOString()}).eq('id',VIRUS.id);pollVirus();}
 function vApply(state,team,card){const opp=team==='A'?'B':'A';const mine=state.teams[team].organs,their=state.teams[opp].organs,t=card.t;
  if(card.k==='organo'){if(mine[t])return {ok:false,msg:'Ya tienes ese órgano.'};mine[t]={s:'healthy'};return {ok:true,msg:'Colocó un órgano ('+t+')'};}
  if(card.k==='med'){if(!mine[t])return {ok:false,msg:'No tienes ese órgano.'};const s=mine[t].s;if(s==='infected'){mine[t].s='healthy';return{ok:true,msg:'Curó su '+t};}if(s==='healthy'){mine[t].s='vaccinated';return{ok:true,msg:'Vacunó su '+t};}if(s==='vaccinated'){mine[t].s='immunized';return{ok:true,msg:'Inmunizó su '+t+' 🛡️'};}return{ok:false,msg:'Ese órgano ya está inmunizado.'};}
  if(card.k==='virus'){if(!their[t])return{ok:false,msg:'El rival no tiene ese órgano.'};const s=their[t].s;if(s==='immunized')return{ok:false,msg:'Órgano inmunizado: no le afecta.'};if(s==='vaccinated'){their[t].s='healthy';return{ok:true,msg:'Quitó la vacuna del rival ('+t+')'};}if(s==='healthy'){their[t].s='infected';return{ok:true,msg:'Infectó el '+t+' del rival 🦠'};}if(s==='infected'){their[t]=null;return{ok:true,msg:'¡Destruyó el '+t+' del rival!'};}}
  return {ok:false,msg:'Jugada inválida.'};}
 function vWin(organs){return ORG.every(function(o){const x=organs[o.k];return x&&x.s!=='infected';});}
-async function jugarCartaVirus(idx){const r=await sb.from('iep_virus_sesion').select('*').eq('id',VIRUS.id).single();const ses=r.data;const st=ses.state;if(ses.estado!=='juego'||st.activeId!==MY_PROFILE.user_id||!VIRUS.team)return;const hand=st.hands[VIRUS.team];const card=hand[idx];if(!card)return;const res=vApply(st,VIRUS.team,card);if(!res.ok){toast('⚠ '+res.msg);return;}hand.splice(idx,1);st.discard.push(card);st.log.unshift(res.msg);while(hand.length<3&&st.deck.length)hand.push(st.deck.pop());let estado=ses.estado;if(vWin(st.teams[VIRUS.team].organs)){st.winner=VIRUS.team;estado='fin';}else{const opp=VIRUS.team==='A'?'B':'A';st.turn=opp;const j=await sb.from('iep_virus_jugador').select('*').eq('sesion_id',VIRUS.id).eq('equipo',opp);const arr=j.data||[];st.activeId=arr.length?arr[Math.floor(Math.random()*arr.length)].user_id:null;}await sb.from('iep_virus_sesion').update({state:st,estado:estado,updated_at:new Date().toISOString()}).eq('id',VIRUS.id);if(st.winner&&st.winner===VIRUS.team){awardBadge('inmune');saveDinResultado('virus',100,{win:true});}pollVirus();}
-function vOrgan(o,x){let cls='organ',stat='';if(x){cls+=' has';if(x.s==='infected'){cls+=' inf';stat='🦠';}else if(x.s==='vaccinated'){cls+=' vac';stat='💉';}else if(x.s==='immunized'){cls+=' imm';stat='🛡️';}}return '<div class="'+cls+'" style="'+(x?'border-color:'+o.c+';background:'+o.c+'18':'')+'"><div class="em">'+o.em+'</div>'+o.n+(stat?'<div class="stat">'+stat+'</div>':'')+'</div>';}
-function vBoards(st){return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">'+['A','B'].map(function(t){return '<div class="card" style="padding:12px"><div style="font-weight:800;color:var(--navy);text-align:center;margin-bottom:8px">Equipo '+t+'</div><div class="organ-board">'+ORG.map(function(o){return vOrgan(o,(st.teams[t].organs||{})[o.k]);}).join('')+'</div></div>';}).join('')+'</div>';}
+async function jugarCartaVirus(idx){const r=await sb.from('iep_virus_sesion').select('*').eq('id',VIRUS.id).single();const ses=r.data;const st=ses.state;if(ses.estado!=='juego'||st.activeId!==MY_PROFILE.user_id||!VIRUS.team)return;const hand=st.hands[VIRUS.team];const card=hand[idx];if(!card)return;const opp0=VIRUS.team==='A'?'B':'A';const before=(card.k==='virus'&&st.teams[opp0].organs[card.t])?st.teams[opp0].organs[card.t].s:null;const res=vApply(st,VIRUS.team,card);if(!res.ok){toast('⚠ '+res.msg);return;}if(card.k==='virus'&&before==='infected'){explodeOrgan(opp0,card.t);}hand.splice(idx,1);st.discard.push(card);st.log.unshift(res.msg);while(hand.length<5&&st.deck.length)hand.push(st.deck.pop());let estado=ses.estado;if(vWin(st.teams[VIRUS.team].organs)){st.winner=VIRUS.team;estado='fin';}else{const opp=VIRUS.team==='A'?'B':'A';st.turn=opp;const j=await sb.from('iep_virus_jugador').select('*').eq('sesion_id',VIRUS.id).eq('equipo',opp);const arr=j.data||[];st.activeId=arr.length?arr[Math.floor(Math.random()*arr.length)].user_id:null;}await sb.from('iep_virus_sesion').update({state:st,estado:estado,updated_at:new Date().toISOString()}).eq('id',VIRUS.id);if(st.winner&&st.winner===VIRUS.team){awardBadge('inmune');saveDinResultado('virus',100,{win:true});}if(card.k==='virus'&&before==='infected'){setTimeout(pollVirus,780);}else pollVirus();}
+function explodeOrgan(team,org){try{var el=document.querySelector('.organ-board [data-team="'+team+'"][data-org="'+org+'"]');if(el){el.classList.add('explode');toast('💥 ¡'+org+' destruido!');}}catch(e){}}
+function vOrgan(o,x,team){let cls='organ',stat='';if(x){cls+=' has';if(x.s==='infected'){cls+=' inf';stat='🦠';}else if(x.s==='vaccinated'){cls+=' vac';stat='💉';}else if(x.s==='immunized'){cls+=' imm';stat='🛡️';}}return '<div class="'+cls+'" data-team="'+(team||'')+'" data-org="'+o.k+'" style="'+(x?'border-color:'+o.c+';background:'+o.c+'18':'')+'"><div class="em">'+o.em+'</div>'+o.n+(stat?'<div class="stat">'+stat+'</div>':'')+'</div>';}
+function vBoards(st){return '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px">'+['A','B'].map(function(t){return '<div class="card" style="padding:12px"><div style="font-weight:800;color:var(--navy);text-align:center;margin-bottom:8px">Equipo '+t+'</div><div class="organ-board">'+ORG.map(function(o){return vOrgan(o,(st.teams[t].organs||{})[o.k],t);}).join('')+'</div></div>';}).join('')+'</div>';}
 function vCard(c,i){const o=ORG.find(x=>x.k===c.t)||{em:'❓',c:'#888',n:''};const label=c.k==='organo'?'ÓRGANO':c.k==='virus'?'VIRUS':'MEDICINA';const bg=c.k==='virus'?'#c0392b':c.k==='med'?'#1f9d6b':o.c;return '<div class="vcard" style="background:'+bg+'" onclick="jugarCartaVirus('+i+')"><div style="font-size:9px;opacity:.9">'+label+'</div><div class="em">'+(c.k==='virus'?'🦠':c.k==='med'?'💊':o.em)+'</div><div>'+o.n+'</div></div>';}
 function vTeamCol(t,arr){return '<div style="border:1px solid var(--line);border-radius:10px;padding:10px"><div style="font-weight:800;color:var(--navy)">Equipo '+t+'</div><div class="note">'+(arr.length?arr.map(x=>esc(x.nombre||'Alumno')).join(', '):'sin jugadores')+'</div></div>';}
 function renderVirus(ses,players){const box=document.getElementById('vRoom');if(!box||!ses)return;const me=players.find(x=>x.user_id===MY_PROFILE.user_id);if(me)VIRUS.team=me.equipo;const st=ses.state||{};
@@ -3162,15 +3341,25 @@ function renderVirus(ses,players){const box=document.getElementById('vRoom');if(
 
 // —— Tablero docente ——
 async function showTablero(){await loadDynConfig();renderDynToggles();cargarTablero();showScreen('screen-tablero');}
+let TABLERO_PROG={};
+function protoEtapasDone(pr){if(!pr||!pr.notas)return 0;return pr.notas.filter(function(t){return t&&String(t).trim().length>5;}).length;}
 async function cargarTablero(){const box=document.getElementById('tableroOut');box.innerHTML='<div class="note">Cargando…</div>';
  try{const rol=MY_PROFILE.rol;let q=sb.from('iep_perfiles').select('user_id,nombre,apellido,rol');if(rol==='profesor')q=q.eq('profesor_id',MY_PROFILE.user_id);else if(rol==='admin')q=q.eq('rol','alumno');const {data:al}=await q;const ids=(al||[]).map(a=>a.user_id);if(!ids.length){box.innerHTML='<div class="note" style="margin-top:8px">Aún no tienes alumnos registrados.</div>';return;}
-  const rr=await Promise.all([sb.from('iep_analisis').select('user_id').in('user_id',ids),sb.from('iep_dinamica_resultado').select('user_id,puntos').in('user_id',ids),sb.from('iep_badge_user').select('user_id').in('user_id',ids)]);
-  const anD=rr[0].data||[],drD=rr[1].data||[],buD=rr[2].data||[];
-  box.innerHTML='<table class="gtable"><thead><tr><th>Alumno</th><th style="text-align:center">Análisis</th><th style="text-align:center">Dinámicas</th><th style="text-align:center">Insignias</th><th>Plan IA</th></tr></thead><tbody>'+al.map(function(a){const na=anD.filter(x=>x.user_id===a.user_id).length,nd=drD.filter(x=>x.user_id===a.user_id).length,nb=buD.filter(x=>x.user_id===a.user_id).length;const nm=((a.nombre||'')+' '+(a.apellido||'')).replace(/'/g,'');return '<tr><td style="font-weight:600">'+esc(a.nombre||'')+' '+esc(a.apellido||'')+'</td><td style="text-align:center">'+na+'</td><td style="text-align:center">'+nd+'</td><td style="text-align:center">'+nb+' 🏅</td><td><button class="btn-mini" onclick="planReforzamiento(\''+a.user_id+'\',\''+nm+'\')">🧠 Generar</button></td></tr>';}).join('')+'</tbody></table>';
+  const rr=await Promise.all([sb.from('iep_analisis').select('user_id').in('user_id',ids),sb.from('iep_dinamica_resultado').select('user_id,puntos').in('user_id',ids),sb.from('iep_badge_user').select('user_id').in('user_id',ids),sb.from('iep_progreso').select('user_id,protocolo').in('user_id',ids)]);
+  const anD=rr[0].data||[],drD=rr[1].data||[],buD=rr[2].data||[],pgD=rr[3].data||[];
+  TABLERO_PROG={};pgD.forEach(function(p){TABLERO_PROG[p.user_id]={pr:p.protocolo,nombre:''};});
+  const TOT=(typeof PROTO_STEPS!=='undefined'?PROTO_STEPS.length:11);
+  box.innerHTML='<table class="gtable"><thead><tr><th>Alumno</th><th style="text-align:center">Protocolo</th><th style="text-align:center">Análisis</th><th style="text-align:center">Dinámicas</th><th style="text-align:center">Insignias</th><th>Plan IA</th></tr></thead><tbody>'+al.map(function(a){const na=anD.filter(x=>x.user_id===a.user_id).length,nd=drD.filter(x=>x.user_id===a.user_id).length,nb=buD.filter(x=>x.user_id===a.user_id).length;const nm=((a.nombre||'')+' '+(a.apellido||'')).replace(/'/g,'');if(TABLERO_PROG[a.user_id])TABLERO_PROG[a.user_id].nombre=nm;const pr=(TABLERO_PROG[a.user_id]||{}).pr;const done=protoEtapasDone(pr);const pct=Math.round(done/TOT*100);const pcol=pct>=70?'#1f9d6b':pct>=30?'#d99413':'#8593a8';const protoCell=pr?('<button class="btn-mini" style="border-color:'+pcol+';color:'+pcol+'" onclick="verProtocoloAlumno(\''+a.user_id+'\')">'+done+'/'+TOT+' ('+pct+'%)</button>'):'<span class="note">—</span>';return '<tr><td style="font-weight:600">'+esc(a.nombre||'')+' '+esc(a.apellido||'')+'</td><td style="text-align:center">'+protoCell+'</td><td style="text-align:center">'+na+'</td><td style="text-align:center">'+nd+'</td><td style="text-align:center">'+nb+' 🏅</td><td><button class="btn-mini" onclick="planReforzamiento(\''+a.user_id+'\',\''+nm+'\')">🧠 Generar</button></td></tr>';}).join('')+'</tbody></table><div class="note" style="margin-top:6px">La columna <b>Protocolo</b> muestra las etapas del protocolo que el alumno ya redactó. Haz clic para ver su avance.</div><div id="protoViewOut" style="margin-top:12px"></div>';
  }catch(e){box.innerHTML='<div class="note">Error: '+(e.message||e)+'</div>';}}
+function verProtocoloAlumno(uid){const rec=TABLERO_PROG[uid];const out=document.getElementById('protoViewOut');if(!out)return;if(!rec||!rec.pr){out.innerHTML='<div class="note">Este alumno aún no ha guardado avance de su protocolo.</div>';return;}
+  const pr=rec.pr,TOT=(typeof PROTO_STEPS!=='undefined'?PROTO_STEPS.length:11),done=protoEtapasDone(pr),pct=Math.round(done/TOT*100);
+  const names=(typeof PROTO_STEPS!=='undefined')?PROTO_STEPS.map(function(s){return s.t;}):[];
+  let rows='';(pr.notas||[]).forEach(function(t,i){const filled=t&&String(t).trim().length>5;rows+='<div style="border-left:3px solid '+(filled?'#1f9d6b':'#e6e2d6')+';padding:6px 12px;margin-bottom:6px;background:'+(filled?'#f4faf6':'#faf9f5')+';border-radius:0 8px 8px 0"><div style="font-size:12px;font-weight:700;color:var(--navy)">'+(filled?'✓':'○')+' '+esc(names[i]||('Etapa '+(i+1)))+'</div>'+(filled?('<div style="font-size:12.5px;color:#26364e;margin-top:3px;white-space:pre-wrap">'+esc(String(t).slice(0,700))+(String(t).length>700?'…':'')+'</div>'):'<div class="note">Sin redactar</div>')+'</div>';});
+  out.innerHTML='<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><div class="chart-title">📄 Protocolo de '+esc(rec.nombre||'alumno')+' — '+done+'/'+TOT+' ('+pct+'%)</div><button class="btn-mini" onclick="document.getElementById(\'protoViewOut\').innerHTML=\'\'">✕ Cerrar</button></div>'+(pr.titulo?'<div class="note" style="margin:6px 0"><b>Título:</b> '+esc(pr.titulo)+'</div>':'')+'<div style="margin-top:8px">'+rows+'</div></div>';
+  out.scrollIntoView({behavior:'smooth',block:'start'});}
 async function planReforzamiento(uid,name){const out=document.getElementById('planIAout');out.innerHTML='<div class="card"><div class="thinking"><div class="sp"></div><div>PUM-AI arma el plan de reforzamiento de '+esc(name)+'…</div></div></div>';
  try{const rr=await Promise.all([sb.from('iep_analisis').select('tipo,titulo,resumen').eq('user_id',uid).limit(30),sb.from('iep_dinamica_resultado').select('dinamica,puntos').eq('user_id',uid).limit(50)]);const anD=rr[0].data||[],drD=rr[1].data||[];
-  const ctx='Eres tutor de epidemiología. Con base en el desempeño del alumno '+name+', arma un PLAN DE REFORZAMIENTO personalizado. Análisis realizados: '+(anD.map(x=>x.tipo+' ('+(x.titulo||'')+')').join('; ')||'ninguno')+'. Resultados de dinámicas/juegos: '+(drD.map(x=>x.dinamica+' '+x.puntos+'pts').join('; ')||'ninguno')+'. Identifica fortalezas y debilidades y propón 3-5 acciones concretas de reforzamiento (temas a repasar, dinámicas a repetir, lecturas). Breve y accionable, en Markdown.';
+  const ctx=guideAIContext()+'Eres tutor de epidemiología. Con base en el desempeño del alumno '+name+', arma un PLAN DE REFORZAMIENTO personalizado. Análisis realizados: '+(anD.map(x=>x.tipo+' ('+(x.titulo||'')+')').join('; ')||'ninguno')+'. Resultados de dinámicas/juegos: '+(drD.map(x=>x.dinamica+' '+x.puntos+'pts').join('; ')||'ninguno')+'. Identifica fortalezas y debilidades y propón 3-5 acciones concretas de reforzamiento (temas a repasar, dinámicas a repetir, lecturas). Breve y accionable, en Markdown.';
   const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'protocolo',messages:[{role:'user',content:ctx}]})});const d=await res.json();
   out.innerHTML='<div class="card"><div class="chart-title" style="margin-bottom:6px">🧠 Plan de reforzamiento — '+esc(name)+'</div><div style="font-size:13.5px;color:#26364e;line-height:1.55">'+mdToHtml(d.reply||'Sin respuesta.')+'</div></div>';out.scrollIntoView({behavior:'smooth',block:'start'});saveAnalisis('reto_docente','Plan de reforzamiento — '+name,String(d.reply||'').replace(/[#*]/g,''),{alumno:uid});
  }catch(e){out.innerHTML='<div class="card"><div class="note">No se pudo generar: '+(e.message||e)+'</div></div>';}}
@@ -3254,10 +3443,10 @@ function renderRetoEditor(){
   }).join('');
 }
 async function generarPreguntasIA(){
-  const tema=document.getElementById('retoTema').value.trim()||'conceptos generales de epidemiología';
+  const tema=document.getElementById('retoTema').value.trim()||(guideTopics()||'conceptos generales de epidemiología');
   const n=Math.max(3,Math.min(12,+document.getElementById('retoNum').value||6));
   const msg=document.getElementById('retoGenMsg');const btn=document.getElementById('retoGenBtn');btn.disabled=true;msg.style.color='var(--muted)';msg.textContent='PUM-AI está creando las preguntas…';
-  const ctx='Crea '+n+' preguntas de opción múltiple (4 opciones cada una) para un concurso educativo de epidemiología, nivel licenciatura, sobre: "'+tema+'". Variadas y con una sola respuesta correcta. Responde SOLO con JSON válido: [{"q":"pregunta","op":["a","b","c","d"],"c":0,"seg":20}] donde c es el índice (0-3) de la opción correcta.';
+  const ctx=guideAIContext()+'Crea '+n+' preguntas de opción múltiple (4 opciones cada una) para un concurso educativo de epidemiología, nivel licenciatura, sobre: "'+tema+'". Variadas y con una sola respuesta correcta. Responde SOLO con JSON válido: [{"q":"pregunta","op":["a","b","c","d"],"c":0,"seg":20}] donde c es el índice (0-3) de la opción correcta.';
   try{
     const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'protocolo',messages:[{role:'user',content:ctx}]})});
     const data=await res.json();const m=(data.reply||'').match(/\[[\s\S]*\]/);
@@ -3388,15 +3577,27 @@ async function retoLeaderboard(){
     box.innerHTML='<div class="card"><div class="chart-title" style="margin-bottom:8px">🏆 Tabla de posiciones</div>'+arr.map(function(x,i){return '<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><span style="width:22px;font-weight:800;color:'+(i===0?'#C4A24E':'var(--muted)')+'">'+(i+1)+'</span><div style="flex:1;font-weight:600;color:#26364e">'+esc(x.n)+'</div><b style="color:var(--navy)">'+x.p+'</b></div>';}).join('')+'</div>';
   }catch(e){}
 }
+function retoAccuracyChart(porPreg){const el=document.getElementById('retoBars');if(!el)return;el.innerHTML='<div class="chart-title" style="font-size:13px;margin-bottom:6px">Aciertos por pregunta</div>'+porPreg.map(function(x,i){const col=x.pct>=70?'#1f9d6b':x.pct>=40?'#d99413':'#e0564f';return '<div style="margin-bottom:9px"><div style="font-size:12.5px;color:#26364e;margin-bottom:3px">'+(i+1)+'. '+esc((x.q||'').slice(0,72))+'</div><div style="display:flex;align-items:center;gap:8px"><div style="flex:1;height:16px;background:#eceadf;border-radius:6px;overflow:hidden"><div style="height:100%;width:'+x.pct+'%;background:'+col+';transition:width .7s var(--ease)"></div></div><b style="font-size:12px;width:70px;text-align:right;color:'+col+'">'+x.pct+'% ('+x.ok+'/'+x.n+')</b></div></div>';}).join('');}
 async function retoFinal(ses){
   const stage=document.getElementById('retoStage');
-  // guardar resultado del alumno una vez
   if(RETO.role==='alumno'&&!RETO.saved){RETO.saved=true;
     try{const {data}=await sb.from('iep_quiz_respuesta').select('puntos,correcta').eq('sesion_id',RETO.sesionId).eq('user_id',MY_PROFILE.user_id);const pts=(data||[]).reduce(function(a,r){return a+(r.puntos||0);},0);const ok=(data||[]).filter(function(r){return r.correcta;}).length;saveAnalisis('reto','Reto: '+RETO.quiz.titulo+' — '+pts+' pts','Obtuviste '+pts+' puntos con '+ok+'/'+(RETO.quiz.preguntas||[]).length+' aciertos.',{pts:pts,aciertos:ok});}catch(e){}
   }
-  let profBtn='';
-  if(RETO.role==='prof')profBtn='<button class="btn btn-gold" onclick="analizarRetoIA()">🧠 Analizar resultados con IA</button>';
-  stage.innerHTML='<div class="card" style="text-align:center"><div style="font-size:26px">🏁</div><div class="chart-title" style="margin:4px 0">Reto terminado</div><div class="note">Revisa la tabla de posiciones abajo.</div><div style="margin-top:10px">'+profBtn+'</div><div id="retoIAout" style="margin-top:12px;text-align:left"></div></div>';
+  if(RETO.finalDone){await retoLeaderboard();return;} // no reconstruir en cada poll (borraría gráficas/IA)
+  RETO.finalDone=true;
+  let inner='<div class="card" style="text-align:center"><div style="font-size:26px">🏁</div><div class="chart-title" style="margin:4px 0">Reto terminado — '+esc(RETO.quiz.titulo)+'</div>';
+  if(RETO.role==='prof'){
+    try{const {data}=await sb.from('iep_quiz_respuesta').select('*').eq('sesion_id',RETO.sesionId);const rs=data||[];const q=(RETO.quiz.preguntas||[]);
+      const parts=new Set(rs.map(function(r){return r.user_id;})).size;
+      const porPreg=q.map(function(pp,i){const sub=rs.filter(function(r){return r.pregunta_idx===i;});const ok=sub.filter(function(r){return r.correcta;}).length;return {q:pp.q,ok:ok,n:sub.length,pct:sub.length?Math.round(ok/sub.length*100):0};});
+      RETO._porPreg=porPreg;const avg=porPreg.length?Math.round(porPreg.reduce(function(a,x){return a+x.pct;},0)/porPreg.length):0;
+      inner+='<div class="note">'+parts+' participante(s) · '+q.length+' preguntas · promedio de aciertos <b>'+avg+'%</b></div><div id="retoBars" style="margin-top:12px;text-align:left"></div>';
+    }catch(e){inner+='<div class="note">No se pudieron cargar los resultados.</div>';}
+    inner+='<div style="margin-top:12px"><button class="btn btn-gold" onclick="analizarRetoIA()">🧠 Analizar resultados con IA</button></div>';
+  }else{inner+='<div class="note">Revisa la tabla de posiciones abajo. ¡Buen trabajo!</div>';}
+  inner+='<div id="retoIAout" style="margin-top:12px;text-align:left"></div></div>';
+  stage.innerHTML=inner;
+  if(RETO.role==='prof'&&RETO._porPreg)retoAccuracyChart(RETO._porPreg);
   await retoLeaderboard();
 }
 async function analizarRetoIA(){
@@ -3406,7 +3607,7 @@ async function analizarRetoIA(){
     const rs=data||[];const q=(RETO.quiz.preguntas||[]);
     const porPreg=q.map(function(p,i){const sub=rs.filter(function(r){return r.pregunta_idx===i;});const ok=sub.filter(function(r){return r.correcta;}).length;return {q:p.q,ok:ok,n:sub.length,pct:sub.length?Math.round(ok/sub.length*100):0};});
     const alumnos={};rs.forEach(function(r){if(!alumnos[r.user_id])alumnos[r.user_id]={n:r.nombre,ok:0,t:0};alumnos[r.user_id].t++;if(r.correcta)alumnos[r.user_id].ok++;});
-    const ctx='Eres tutor de epidemiología. Resultados de un reto "'+RETO.quiz.titulo+'". Aciertos por pregunta: '+porPreg.map(function(x){return '"'+x.q+'" '+x.pct+'% ('+x.ok+'/'+x.n+')';}).join('; ')+'. Desempeño por alumno: '+Object.keys(alumnos).map(function(k){return alumnos[k].n+' '+alumnos[k].ok+'/'+alumnos[k].t;}).join('; ')+'. Identifica los temas más débiles y propón estrategias concretas de reforzamiento del conocimiento para el grupo y para quienes van rezagados. Sé breve y accionable, en Markdown.';
+    const ctx=guideAIContext()+'Eres tutor de epidemiología. Resultados de un reto "'+RETO.quiz.titulo+'". Aciertos por pregunta: '+porPreg.map(function(x){return '"'+x.q+'" '+x.pct+'% ('+x.ok+'/'+x.n+')';}).join('; ')+'. Desempeño por alumno: '+Object.keys(alumnos).map(function(k){return alumnos[k].n+' '+alumnos[k].ok+'/'+alumnos[k].t;}).join('; ')+'. Identifica los temas más débiles y propón estrategias concretas de reforzamiento del conocimiento para el grupo y para quienes van rezagados. Sé breve y accionable, en Markdown.';
     const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'protocolo',messages:[{role:'user',content:ctx}]})});
     const d=await res.json();out.innerHTML='<div style="background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:13.5px;color:#26364e;line-height:1.55">'+mdToHtml(d.reply||'Sin respuesta.')+'</div>';
     saveAnalisis('reto_docente','Análisis IA del reto: '+RETO.quiz.titulo,String(d.reply||'').replace(/[#*]/g,''),{porPreg:porPreg});
@@ -3448,9 +3649,13 @@ function sapiensParticles(canvasId){
     raf=requestAnimationFrame(step);
   }
   addEventListener('resize',resize);
+  addEventListener('orientationchange',()=>setTimeout(resize,250));
+  if(window.visualViewport)visualViewport.addEventListener('resize',resize);
   addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;});
   addEventListener('mouseout',()=>{mouse.x=-9999;mouse.y=-9999;});
-  resize();if(reduce){step();cancelAnimationFrame(raf);}else raf=requestAnimationFrame(step);
+  // reanuda si iOS/iPad pausa el rAF al volver a la pestaña
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!raf)raf=requestAnimationFrame(step);});
+  resize();raf=requestAnimationFrame(step);
 }
 sapiensParticles('bgParticles');
 
@@ -3523,6 +3728,9 @@ function csSimInit(){
     else items.forEach(function(el){el.classList.add('on');});
   })();
 })();
+/* Vista pública del cuestionario: se renderiza aquí (definida en este bloque) */
+if(window.PUBLIC_MODE&&typeof checkPublicSurvey==='function'){try{checkPublicSurvey();}catch(e){}}
+window.addEventListener('hashchange',function(){if(isPublicSurveyRoute()&&!window.PUBLIC_MODE){location.reload();}});
 </script>
 </body>
 </html>

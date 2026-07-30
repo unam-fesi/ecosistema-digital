@@ -26,7 +26,7 @@
      LANDING SCREEN — Logo + Ingresar (no menu, no footer)
      ═══════════════════════════════════════════════════════════════════ -->
 <div id="landing-screen">
-  <canvas id="edParticles" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none"></canvas>
+  <canvas id="edParticles" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;transform:translateZ(0);-webkit-transform:translateZ(0);backface-visibility:hidden"></canvas>
   <div class="hero-blob hero-blob-1"></div>
   <div class="hero-blob hero-blob-2"></div>
   <div class="hero-blob hero-blob-3"></div>
@@ -1874,9 +1874,12 @@ function enterMainApp(instant) {
       for(var m2=0;m2<nodes.length;m2++){var p=nodes[m2];ctx.fillStyle='rgba(12,35,64,.82)';ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,6.2832);ctx.fill();}
       raf=requestAnimationFrame(step);}
     window.addEventListener('resize',resize);
+    window.addEventListener('orientationchange',function(){setTimeout(resize,250);});
+    if(window.visualViewport)window.visualViewport.addEventListener('resize',resize);
     window.addEventListener('mousemove',function(e){mouse.x=e.clientX;mouse.y=e.clientY;});
     window.addEventListener('mouseout',function(){mouse.x=-9999;mouse.y=-9999;});
-    resize();if(reduce){step();cancelAnimationFrame(raf);}else raf=requestAnimationFrame(step);
+    document.addEventListener('visibilitychange',function(){if(!document.hidden&&!raf)raf=requestAnimationFrame(step);});
+    resize();raf=requestAnimationFrame(step);
   })();
   </script>
 </body>
