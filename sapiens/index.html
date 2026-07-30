@@ -1264,6 +1264,13 @@ body.appon #pumaMascot{display:none}
     </div>
     <div id="tableroOut" style="margin-top:10px;overflow:auto"><div class="note">Cargando…</div></div>
   </div>
+  <div class="card" style="margin-top:16px">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+      <div><div class="chart-title">🛡️ Integridad de PUM-AI — intentos de mal uso</div><div class="note" style="margin-top:2px">Intentos de manipular al asistente, ofuscar o pedir cosas fuera de su función. PUM-AI los bloquea y quedan registrados.</div></div>
+      <button class="btn-mini" onclick="cargarIncidentesIA()">↻ Actualizar</button>
+    </div>
+    <div id="incidentesOut" style="margin-top:10px"><div class="note">Pulsa «Actualizar» para revisar.</div></div>
+  </div>
   <div id="planIAout" style="margin-top:14px"></div>
 </div></div>
 
@@ -1364,6 +1371,15 @@ const SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 const ADMIN_EMAIL='admin@ecosistemadigital.unam.mx';
 let sb=null, sessionToken=SUPABASE_ANON_KEY;
 try{ sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY); }catch(e){}
+/* Inyecta identidad del alumno en las llamadas a PUM-AI (para vincular incidentes de seguridad). */
+(function(){ if(window.__gemWrap)return; window.__gemWrap=true; const _f=window.fetch;
+  window.fetch=function(u,o){ try{
+    if(typeof u==='string'&&u.indexOf('/functions/v1/gemini-epi')>=0&&o&&typeof o.body==='string'&&typeof MY_PROFILE!=='undefined'&&MY_PROFILE){
+      const b=JSON.parse(o.body);
+      if(b&&typeof b==='object'&&b.uid===undefined){ b.uid=MY_PROFILE.user_id||null; b.nombre=((MY_PROFILE.nombre||'')+' '+(MY_PROFILE.apellido||'')).trim()||null; o=Object.assign({},o,{body:JSON.stringify(b)}); }
+    }
+  }catch(e){} return _f.call(this,u,o); };
+})();
 
 async function checkSession(){
   if(!sb)return null;
@@ -3652,7 +3668,17 @@ function renderVirus(ses,players){const box=document.getElementById('vRoom');if(
  box.innerHTML='<div class="results-banner" style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><div><b>Turno equipo '+esc(st.turn)+'</b> · juega: '+esc(an)+'</div><div class="note">Tu equipo: '+(VIRUS.team||'—')+'</div></div>'+vBoards(st)+(myTurn&&VIRUS.team?('<div class="card" style="margin-top:12px"><div class="chart-title" style="margin-bottom:8px">Tu mano — toca una carta para jugarla</div><div class="organ-board" style="justify-content:flex-start">'+(st.hands[VIRUS.team]||[]).map((c,i)=>vCard(c,i)).join('')+'</div><div class="note" style="margin-top:6px">Órgano → tu cuerpo · Virus → ataca al rival · Medicina → cura/vacuna lo tuyo.</div></div>'):'<div class="card" style="margin-top:12px;text-align:center"><div class="note">Espera tu turno… juega '+esc(an)+' (equipo '+esc(st.turn)+')</div></div>')+'<div class="note" style="margin-top:8px">📜 '+esc((st.log||[])[0]||'')+'</div>';}
 
 // —— Tablero docente ——
-async function showTablero(){await loadDynConfig();renderDynToggles();initFlashPerm();cargarTablero();showScreen('screen-tablero');}
+async function showTablero(){await loadDynConfig();renderDynToggles();initFlashPerm();cargarTablero();cargarIncidentesIA();showScreen('screen-tablero');}
+async function cargarIncidentesIA(){
+  const box=document.getElementById('incidentesOut');if(!box)return;box.innerHTML='<div class="thinking"><div class="sp"></div> Cargando…</div>';
+  try{
+    const {data,error}=await sb.from('iep_ai_incidentes').select('created_at,nombre,ip,motivo,extracto,modo').order('created_at',{ascending:false}).limit(80);
+    if(error)throw error;
+    const rows=data||[];
+    if(!rows.length){box.innerHTML='<div class="note" style="color:#1f9d6b">✓ Sin intentos de mal uso registrados.</div>';return;}
+    box.innerHTML='<div class="note" style="margin-bottom:6px">'+rows.length+' intento(s) que PUM-AI bloqueó'+(MY_PROFILE&&MY_PROFILE.rol==='admin'?' (todos los alumnos)':' (tus alumnos)')+'.</div><div style="overflow:auto"><table class="gtable"><thead><tr><th>Fecha</th><th>Alumno</th><th>Motivo</th><th>Intento</th></tr></thead><tbody>'+rows.map(function(r){var fecha='';try{var f=new Date(r.created_at);fecha=f.toLocaleDateString("es-MX")+" "+f.toLocaleTimeString("es-MX",{hour:"2-digit",minute:"2-digit"});}catch(e){}var quien=r.nombre?esc(r.nombre):('<span class="note">anónimo</span>');return '<tr><td style="white-space:nowrap;font-size:11.5px">'+fecha+'</td><td style="font-weight:600;font-size:12.5px">'+quien+'</td><td style="font-size:11.5px;color:#b4442f">'+esc(r.motivo||'')+'</td><td style="font-size:11px;color:#8593a8;max-width:300px">'+esc((r.extracto||'').slice(0,120))+'</td></tr>';}).join('')+'</tbody></table></div>';
+  }catch(e){box.innerHTML='<div class="note" style="color:#e0564f">No se pudo cargar: '+((e&&e.message)||e)+'</div>';}
+}
 function initFlashPerm(){const wrap=document.getElementById('flashRealWrap');const cb=document.getElementById('flashReal');const msg=document.getElementById('flashPermMsg');if(!wrap||!cb)return;const ok=!!(MY_PROFILE&&MY_PROFILE.permite_img);cb.disabled=!ok;wrap.style.opacity=ok?'1':'.5';wrap.style.cursor=ok?'pointer':'not-allowed';if(!ok){cb.checked=false;wrap.title='Requiere permiso del administrador';if(msg)msg.innerHTML='🎨 Las <b>imágenes reales con IA</b> están deshabilitadas; el administrador puede habilitarlas para tu cuenta. Mientras, cada tarjeta usa una ilustración SVG.';}else{wrap.title='Genera una imagen real con PUM-AI por tarjeta';if(msg)msg.textContent='';}}
 /* ===== Armado de dinámicas: PUM-AI genera banco desde texto / PDF / URL ===== */
 let DYN_SRC_TEXT='';
