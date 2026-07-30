@@ -305,6 +305,20 @@ h1,h2{letter-spacing:-.3px}
 .cs-shot:hover{transform:translateY(-6px) scale(1.012)}
 .cs-shot img{display:block;width:100%}
 .cs-shot .cap{padding:10px 14px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);background:#fbfaf7}
+.cs-live{background:linear-gradient(180deg,#0a1f3d,#071324);border:1px solid #0a1a30;border-radius:18px;overflow:hidden;box-shadow:0 26px 60px rgba(12,35,64,.30)}
+.cs-live-head{display:flex;align-items:center;gap:8px;padding:11px 15px;color:#cdd8e8;font-size:12px;font-weight:700;letter-spacing:.3px;border-bottom:1px solid rgba(255,255,255,.06)}
+.cs-live-head .dot{width:9px;height:9px;border-radius:50%;background:#e0564f;animation:cspulse 1.6s infinite}
+@keyframes cspulse{0%{box-shadow:0 0 0 0 rgba(224,86,79,.55)}70%{box-shadow:0 0 0 9px rgba(224,86,79,0)}100%{box-shadow:0 0 0 0 rgba(224,86,79,0)}}
+.cs-live-cv{display:block;width:100%;height:300px;background:radial-gradient(circle at 50% 32%,#123a63,#06101f);cursor:grab}
+.cs-live-cv:active{cursor:grabbing}
+.cs-live-foot{padding:12px 15px 15px;background:linear-gradient(180deg,#0b1e39,#0a172b)}
+.cs-pum-row{display:flex;align-items:center;gap:8px;color:#eaf1fb;font-size:12.5px;font-weight:600;min-height:18px}
+.cs-pum-ic{font-size:15px;flex-shrink:0}
+.cs-curve{width:100%;height:74px;margin-top:8px;display:block}
+.cs-kpis{display:flex;gap:9px;margin-top:8px}
+.cs-kpis>div{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:8px 6px;text-align:center}
+.cs-kpis b{display:block;font-family:'Playfair Display',serif;font-size:20px;color:var(--gold);line-height:1}
+.cs-kpis span{font-size:9.5px;color:#9fb3cc;display:block;margin-top:3px}
 .cs-logos{display:flex;gap:34px;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:26px}
 .cs-logos img{height:74px;width:auto;filter:drop-shadow(0 8px 20px rgba(12,35,64,.16))}
 .cs-portada{text-align:center;align-items:center}
@@ -324,6 +338,20 @@ h1,h2{letter-spacing:-.3px}
 .cs-step .num{position:absolute;top:-15px;left:18px;width:34px;height:34px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;box-shadow:0 6px 16px rgba(184,145,47,.4)}
 .cs-step h4{color:var(--navy);margin:6px 0 5px;font-size:15px}
 .cs-step p{font-size:13px;color:var(--muted);line-height:1.55}
+.cs-steps{flex-wrap:nowrap;align-items:stretch}
+.cs-steps .cs-step{min-width:170px}
+.cs-arrow{flex:0 0 48px;display:flex;align-items:center;justify-content:center;color:var(--gold2);align-self:center}
+.cs-arrow svg{width:44px;height:26px;overflow:visible}
+.cs-seq{opacity:0;transform:translateY(28px) scale(.95);transition:opacity .55s var(--ease),transform .55s var(--ease);will-change:opacity,transform}
+.cs-seq.on{opacity:1;transform:none}
+.cs-arrow.cs-seq{transform:scale(.5)}
+.cs-arrow.cs-seq.on{transform:none}
+.cs-arrow .ln{stroke-dasharray:32;stroke-dashoffset:32;transition:stroke-dashoffset .55s ease .1s}
+.cs-arrow .hd{opacity:0;transition:opacity .3s ease .42s}
+.cs-arrow.on .ln{stroke-dashoffset:0}
+.cs-arrow.on .hd{opacity:1}
+@media(max-width:860px){.cs-steps{flex-direction:column;align-items:stretch}.cs-arrow{flex:0 0 36px}.cs-arrow svg{transform:rotate(90deg)}}
+@media(prefers-reduced-motion:reduce){.cs-seq{opacity:1;transform:none;transition:none}.cs-arrow .ln{stroke-dashoffset:0}.cs-arrow .hd{opacity:1}}
 .cs-cta{text-align:center;align-items:center}
 .cs-cta .btn{font-size:18px;padding:16px 42px}
 .cs-quote{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(21px,3vw,31px);color:var(--navy);line-height:1.42;max-width:770px;margin:0 auto;text-align:center}
@@ -437,7 +465,15 @@ h1,h2{letter-spacing:-.3px}
             <div class="cs-stat"><div class="num" data-count="6">0</div><div class="lab">dinámicas para aprender jugando</div></div>
           </div>
         </div>
-        <div class="cs-reveal d1"><div class="cs-shot"><img src="assets/cs-hero.jpg" alt="Pantalla principal de SAPIENS" loading="lazy"><div class="cap">La portada de SAPIENS dentro del Ecosistema Digital de la FES Iztacala.</div></div></div>
+        <div class="cs-reveal d1"><div class="cs-live">
+          <div class="cs-live-head"><span class="dot"></span> Simulación en vivo · red de contagio <span style="margin-left:auto;font-weight:600;color:#8fa8c8">gira ↻ · el scroll la anima</span></div>
+          <canvas id="csSim" class="cs-live-cv" aria-label="Simulación 3D de un brote"></canvas>
+          <div class="cs-live-foot">
+            <div class="cs-pum-row"><span class="cs-pum-ic">🧠</span><span id="csPumTxt">PUM-AI está analizando la propagación…</span></div>
+            <svg id="csCurve" class="cs-curve" viewBox="0 0 300 90" preserveAspectRatio="none"></svg>
+            <div class="cs-kpis"><div><b id="csK1">0%</b><span>población afectada</span></div><div><b id="csK2">0</b><span>pico de activos</span></div><div><b id="csK3">0.0</b><span>R₀ estimado</span></div></div>
+          </div>
+        </div></div>
       </div>
     </div>
 
@@ -446,10 +482,12 @@ h1,h2{letter-spacing:-.3px}
       <div class="cs-reveal" style="text-align:center"><span class="cs-kicker"><span class="n">03</span> Lo que la hace distinta</span></div>
       <h2 class="cs-h cs-reveal d1" style="text-align:center;max-width:900px;margin:0 auto">IA que <span class="gold">te forma</span>, no que te hace la tarea</h2>
       <p class="cs-p cs-reveal d1" style="text-align:center;margin:16px auto 0">Cuando pides ayuda para redactar tu protocolo, PUM-AI <b>no te da la respuesta de inmediato</b>. Te reta a pensar y a escribir tu propia versión; solo si ya lo intentaste te ofrece un borrador para adaptar. Así aprendes de verdad.</p>
-      <div class="cs-steps">
-        <div class="cs-step cs-reveal d1"><div class="num">1</div><h4>Te pregunta a ti</h4><p>Primero te devuelve preguntas guía y los criterios de la rúbrica FESI para que tú construyas la idea.</p></div>
-        <div class="cs-step cs-reveal d2"><div class="num">2</div><h4>Te deja intentarlo</h4><p>Escribes tu propia versión. La IA te orienta con ejemplos genéricos, sin resolvértelo.</p></div>
-        <div class="cs-step cs-reveal d3"><div class="num">3</div><h4>Te da un modelo</h4><p>Si tras intentarlo sigues atorado, te entrega un borrador que debes personalizar con tu tema y datos.</p></div>
+      <div class="cs-steps" id="cs4steps">
+        <div class="cs-step cs-seq"><div class="num">1</div><h4>Te pregunta a ti</h4><p>Primero te devuelve preguntas guía y los criterios de la rúbrica FESI para que tú construyas la idea.</p></div>
+        <div class="cs-arrow cs-seq"><svg viewBox="0 0 44 26"><line class="ln" x1="4" y1="13" x2="33" y2="13" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path class="hd" d="M29 6 L40 13 L29 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="cs-step cs-seq"><div class="num">2</div><h4>Te deja intentarlo</h4><p>Escribes tu propia versión. La IA te orienta con ejemplos genéricos, sin resolvértelo.</p></div>
+        <div class="cs-arrow cs-seq"><svg viewBox="0 0 44 26"><line class="ln" x1="4" y1="13" x2="33" y2="13" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path class="hd" d="M29 6 L40 13 L29 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="cs-step cs-seq"><div class="num">3</div><h4>Te da un modelo</h4><p>Si tras intentarlo sigues atorado, te entrega un borrador que debes personalizar con tu tema y datos.</p></div>
       </div>
       <p class="cs-p sm cs-reveal d3" style="text-align:center;margin:22px auto 0">Y en cada cálculo o gráfica, PUM-AI te explica <b>cómo se obtiene</b> el resultado, no solo qué significa.</p>
     </div>
@@ -3423,6 +3461,35 @@ document.addEventListener('DOMContentLoaded',()=>{setTimeout(initArtChips,400);}
 function csScrollTo(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
 function csToLogin(){window.scrollTo({top:0,behavior:'smooth'});setTimeout(function(){const e=document.getElementById('loginEmail');if(e)e.focus();},600);}
 function csAnimCount(el){if(el.dataset.done)return;el.dataset.done='1';const target=+el.dataset.count,plus=el.dataset.plus?'+':'';const dur=1100,t0=performance.now();function fmt(v){return v>=1000?v.toLocaleString('es-MX'):(''+v);}function tick(now){const p=Math.min(1,(now-t0)/dur);const e=1-Math.pow(1-p,3);el.textContent=fmt(Math.round(target*e))+(p>=1?plus:'');if(p<1)requestAnimationFrame(tick);}requestAnimationFrame(tick);}
+/* Simulación 3D en vivo del landing (canvas puro, se anima con el scroll) */
+function csSimInit(){
+  const cv=document.getElementById('csSim');if(!cv||cv._init)return;cv._init=1;const ctx=cv.getContext('2d');
+  const N=170,R=95;const pts=[];for(let i=0;i<N;i++){const y=1-(i/(N-1))*2,rr=Math.sqrt(Math.max(0,1-y*y)),th=Math.PI*(1+Math.sqrt(5))*i,rad=R*(0.62+((i*97)%50)/100);pts.push([Math.cos(th)*rr*rad,y*rad,Math.sin(th)*rr*rad]);}
+  const adj=pts.map(()=>[]);for(let i=0;i<N;i++){const d=[];for(let j=0;j<N;j++)if(j!==i){const dx=pts[i][0]-pts[j][0],dy=pts[i][1]-pts[j][1],dz=pts[i][2]-pts[j][2];d.push([dx*dx+dy*dy+dz*dz,j]);}d.sort((a,b)=>a[0]-b[0]);for(let k=0;k<3;k++)adj[i].push(d[k][1]);}
+  const eset={},edges=[];for(let i=0;i<N;i++)adj[i].forEach(j=>{const a=Math.min(i,j),b=Math.max(i,j),key=a+'-'+b;if(!eset[key]){eset[key]=1;edges.push([a,b]);}});
+  const T=64;let st=new Array(N).fill('S');st[0]='I';const tl=[st.slice()],act=[1];for(let t=0;t<T;t++){const nx=st.slice();for(let i=0;i<N;i++)if(st[i]==='I'){if(Math.random()<0.12)nx[i]='R';adj[i].forEach(j=>{if(st[j]==='S'&&Math.random()<0.17)nx[j]='I';});}st=nx;let a=0;for(let i=0;i<N;i++)if(st[i]==='I')a++;tl.push(st.slice());act.push(a);}
+  const maxAct=Math.max.apply(null,act),finalR=tl[tl.length-1].filter(s=>s!=='S').length/N,r0=(1.9+finalR*1.3);
+  const colOf={S:'#3f7fc4',I:'#e0564f',R:'#37b98a'};
+  let yaw=0.6,pitch=-0.25,drag=false,lx=0,dragYaw=0,shown=0,dimW=0,dimH=300;
+  cv.onmousedown=e=>{drag=true;lx=e.clientX;};cv.onmousemove=e=>{if(drag){dragYaw+=(e.clientX-lx)*0.008;lx=e.clientX;}};cv.onmouseup=cv.onmouseleave=()=>{drag=false;};
+  function sizeCv(){const w=cv.clientWidth||420;dimW=w;dimH=300;const DPR=Math.min(2,devicePixelRatio||1);cv.width=w*DPR;cv.height=dimH*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);}
+  sizeCv();
+  const curve=document.getElementById('csCurve'),k1=document.getElementById('csK1'),k2=document.getElementById('csK2'),k3=document.getElementById('csK3'),pum=document.getElementById('csPumTxt'),slide=document.getElementById('cs3');
+  function prog(){const r=slide.getBoundingClientRect();return Math.max(0,Math.min(1,(innerHeight-r.top)/(innerHeight+r.height)));}
+  function pumMsg(p,inf){if(p<0.12)return 'PUM-AI: localizando el caso índice…';if(p<0.32)return 'PUM-AI: el brote crece de forma exponencial en la red.';if(p<0.55)return 'PUM-AI: mapeando superpropagadores y comunidades.';if(p<0.78)return 'PUM-AI: la curva se acerca al pico; evaluando intervenciones.';return 'PUM-AI: brote contenido · ataque final ≈ '+inf+'%.';}
+  function drawCurve(idx){const W=300,H=90,pad=6;let d='';for(let i=0;i<=idx&&i<act.length;i++){const x=pad+i/T*(W-2*pad),y=H-pad-(act[i]/(maxAct||1))*(H-2*pad);d+=(i?'L':'M')+x.toFixed(1)+' '+y.toFixed(1)+' ';}const xn=pad+Math.min(idx,T)/T*(W-2*pad);const area=d?d+'L'+xn.toFixed(1)+' '+(H-pad)+' L'+pad+' '+(H-pad)+' Z':'';curve.innerHTML='<defs><linearGradient id="csCg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e0564f" stop-opacity="0.42"/><stop offset="1" stop-color="#e0564f" stop-opacity="0"/></linearGradient></defs><line x1="6" y1="84" x2="294" y2="84" stroke="rgba(255,255,255,.12)"/>'+(area?'<path d="'+area+'" fill="url(#csCg)"/>':'')+(d?'<path d="'+d+'" fill="none" stroke="#f4a58f" stroke-width="2"/>':'')+'<text x="8" y="13" fill="#9fb3cc" font-size="9">curva epidémica · activos en el tiempo</text>';}
+  function frame(now){requestAnimationFrame(frame);if(!cv.offsetParent)return;if(cv.clientWidth&&Math.abs(cv.clientWidth-dimW)>4)sizeCv();
+    yaw+=0.0032;const Y=yaw+dragYaw,p=prog(),it=p*T;shown+=(it-shown)*0.08;const idx=Math.max(0,Math.min(T,Math.round(shown))),state=tl[idx];
+    const w=dimW,h=dimH;ctx.clearRect(0,0,w,h);const cy=Math.cos(Y),sy=Math.sin(Y),cp=Math.cos(pitch),sp=Math.sin(pitch);
+    const P=pts.map(pt=>{let x=pt[0]*cy-pt[2]*sy,z=pt[0]*sy+pt[2]*cy,y=pt[1]*cp-z*sp;z=pt[1]*sp+z*cp;const f=260/(260+z);return {x:w/2+x*f,y:h/2+y*f,z,f};});
+    ctx.lineWidth=0.6;edges.forEach(e=>{const ia=state[e[0]]==='I',ib=state[e[1]]==='I';ctx.strokeStyle=(ia&&ib)?'rgba(224,86,79,0.5)':'rgba(159,179,204,0.12)';ctx.beginPath();ctx.moveTo(P[e[0]].x,P[e[0]].y);ctx.lineTo(P[e[1]].x,P[e[1]].y);ctx.stroke();});
+    const order=[];for(let i=0;i<N;i++)order.push(i);order.sort((a,b)=>P[a].z-P[b].z);
+    order.forEach(i=>{const q=P[i],s=state[i];const rd=(s==='I'?3.3:2.4)*q.f;if(s==='I'){ctx.shadowColor='rgba(224,86,79,.9)';ctx.shadowBlur=8;}else ctx.shadowBlur=0;ctx.fillStyle=colOf[s];ctx.beginPath();ctx.arc(q.x,q.y,rd,0,6.2832);ctx.fill();});ctx.shadowBlur=0;
+    drawCurve(idx);const infPct=Math.round(state.filter(s=>s!=='S').length/N*100),peak=Math.max.apply(null,act.slice(0,idx+1));
+    k1.textContent=infPct+'%';k2.textContent=peak;k3.textContent=(Math.min(1,idx/10)*r0).toFixed(1);pum.textContent=pumMsg(p,infPct);
+  }
+  requestAnimationFrame(frame);
+}
 (function(){
   const sec=document.getElementById('conoceSapiens');if(!sec)return;
   const slides=[].slice.call(sec.querySelectorAll('.cs-slide'));
@@ -3447,6 +3514,14 @@ function csAnimCount(el){if(el.dataset.done)return;el.dataset.done='1';const tar
   const prog=document.getElementById('scrollProg');
   function onScroll(){if(!prog)return;const h=document.documentElement.scrollHeight-window.innerHeight;prog.style.width=(h>0?Math.min(100,window.scrollY/h*100):0)+'%';}
   window.addEventListener('scroll',onScroll,{passive:true});onScroll();
+  try{csSimInit();}catch(e){}
+  // secuencia "vanish" de los pasos del punto 3
+  (function(){var slide=document.getElementById('cs4'),cont=document.getElementById('cs4steps');if(!slide||!cont)return;var items=[].slice.call(cont.querySelectorAll('.cs-seq')),timers=[];
+    function clear(){timers.forEach(clearTimeout);timers=[];items.forEach(function(el){el.classList.remove('on');});}
+    function play(){clear();items.forEach(function(el,k){timers.push(setTimeout(function(){el.classList.add('on');},180+k*360));});}
+    if('IntersectionObserver' in window){new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)play();else clear();});},{threshold:0.4}).observe(slide);}
+    else items.forEach(function(el){el.classList.add('on');});
+  })();
 })();
 </script>
 </body>
