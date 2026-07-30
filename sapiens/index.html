@@ -366,6 +366,16 @@ h1,h2{letter-spacing:-.3px}
 @media(prefers-reduced-motion:reduce){.cs-seq{opacity:1;transform:none;transition:none}.cs-arrow .ln{stroke-dashoffset:0}.cs-arrow .hd{opacity:1}}
 .cs-cta{text-align:center;align-items:center}
 .cs-cta .btn{font-size:18px;padding:16px 42px}
+.cs-proto-float{animation:csFloat 5.5s ease-in-out infinite}
+@keyframes csFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.cs-track-card{background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin-top:16px;backdrop-filter:blur(6px);box-shadow:0 14px 34px rgba(12,35,64,.10)}
+.cs-strow{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:12.5px;color:#26364e}
+.cs-strow>span{width:64px;font-weight:600}
+.cs-strow>b{width:40px;text-align:right;color:var(--navy)}
+.cs-track{flex:1;height:13px;background:rgba(12,35,64,.09);border-radius:7px;overflow:hidden}
+.cs-fill{height:100%;width:0;border-radius:7px;transition:width 1.3s var(--ease) .15s}
+.cs-reveal.on .cs-fill{width:var(--w)}
+@media(prefers-reduced-motion:reduce){.cs-proto-float{animation:none}.cs-fill{transition:none;width:var(--w)}}
 .cs-quote{font-family:'Playfair Display',serif;font-style:italic;font-size:clamp(21px,3vw,31px);color:var(--navy);line-height:1.42;max-width:770px;margin:0 auto;text-align:center}
 .cs-quote .mk{color:var(--gold);font-size:1.5em;line-height:0}
 #csDots{position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:60;display:flex;flex-direction:column;gap:11px}
@@ -579,6 +589,28 @@ h1,h2{letter-spacing:-.3px}
         <div class="cs-feat cs-reveal d1"><div class="ic">💾</div><h4>Mis análisis</h4><p>Cada cálculo, gráfica e informe que generas queda guardado y a la mano.</p></div>
         <div class="cs-feat cs-reveal d2"><div class="ic">↩️</div><h4>Continúa después</h4><p>Retoma tu cohorte y tu protocolo en la sesión siguiente, sin empezar de cero.</p></div>
         <div class="cs-feat cs-reveal d3"><div class="ic">🎓</div><h4>Roles y acompañamiento</h4><p>Alumno, profesor y administrador: cada quien ve lo que le corresponde.</p></div>
+      </div>
+    </div>
+
+    <!-- 9b · Para docentes -->
+    <div class="cs-slide" id="cs9b">
+      <span class="cs-kicker cs-reveal"><span class="n">09</span> Para docentes</span>
+      <div class="cs-two rev">
+        <div class="cs-txt">
+          <h2 class="cs-h cs-reveal">Evalúa el protocolo y <span class="gold">da seguimiento</span> a tus alumnos</h2>
+          <p class="cs-p cs-reveal d1">Como <b>profesor</b> o <b>administrador</b>, ves de un vistazo el <b>avance del protocolo</b> de cada alumno: qué etapas de la rúbrica ya redactó, quién va adelantado y quién necesita apoyo. Abre el protocolo de cualquier alumno, revisa su contenido apartado por apartado y genera con IA un <b>plan de reforzamiento</b> personalizado.</p>
+          <p class="cs-p sm cs-reveal d2">El seguimiento es en vivo: conforme tus alumnos avanzan, su progreso se actualiza en tu tablero docente.</p>
+        </div>
+        <div class="cs-reveal d1">
+          <div class="cs-shot cs-proto-float"><img src="assets/cs-protocolo.jpg" alt="Protocolo guiado por la rúbrica FESI" loading="lazy"><div class="cap">Protocolo del alumno, guiado por la rúbrica oficial de la FESI.</div></div>
+          <div class="cs-track-card cs-reveal d2">
+            <div style="font-weight:800;color:var(--navy);font-size:13.5px;margin-bottom:10px">👩‍🏫 Avance de protocolos del grupo</div>
+            <div class="cs-strow"><span>Ana G.</span><div class="cs-track"><div class="cs-fill" style="--w:82%;background:#1f9d6b"></div></div><b>9/11</b></div>
+            <div class="cs-strow"><span>Luis M.</span><div class="cs-track"><div class="cs-fill" style="--w:55%;background:#d99413"></div></div><b>6/11</b></div>
+            <div class="cs-strow"><span>Sofía R.</span><div class="cs-track"><div class="cs-fill" style="--w:27%;background:#e0564f"></div></div><b>3/11</b></div>
+            <div class="cs-strow"><span>Diego P.</span><div class="cs-track"><div class="cs-fill" style="--w:100%;background:#1f9d6b"></div></div><b>11/11</b></div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1683,7 +1715,7 @@ let params={cob:0.4,des:0.3,den:0.5,vel:12};
 const RAD=48,ARCH_COL=[[0.12,0.62,0.42],[0.85,0.58,0.08],[0.42,0.31,0.84],[0.18,0.5,0.72]];
 const COL_S=[0.5,0.6,0.72],COL_I=[0.97,0.55,0.35],COL_R=[0.7,0.58,0.31],COL_V=[0.12,0.7,0.45],COL_SEV=[0.62,0.06,0.12];
 let useThree=false,ctx2d=null,dragRot={x:.3,y:0},dragging=false,lastP=null;
-function seedAgents(){sag=COHORT.agents.map(o=>{const u=Math.random(),v=Math.random(),th=2*Math.PI*u,ph=Math.acos(2*v-1),rr=RAD*Math.cbrt(Math.random());return{x:rr*Math.sin(ph)*Math.cos(th),y:rr*Math.sin(ph)*Math.sin(th),z:rr*Math.cos(ph),vx:(Math.random()-.5),vy:(Math.random()-.5),vz:(Math.random()-.5),arch:o.a,opinion:o.i,baseOp:o.i,conf:o.c,des:o.d,vuln:o.v,edad:o.e,hta:o.h,dm2:o.dd,muni:o.m,sexo:o.s,obes:o.ob,sm:o.sm,gx:o.gx,ta:o.ta,glu:o.gl,cintura:o.ci,rk:(o.rk!=null?o.rk:0.15),peso:o.pw,talla:o.al,imc:o.imc,state:'S',vacc:false,sev:false,tRec:0,cr:0,cg:0,cb:0};});SN=sag.length;}
+function seedAgents(){sag=COHORT.agents.map(o=>{const u=Math.random(),v=Math.random(),th=2*Math.PI*u,ph=Math.acos(2*v-1),rr=RAD*Math.cbrt(Math.random());const ac=ARCH_COL[o.a]||[0.5,0.6,0.72];const ic=[COL_S[0]*.5+ac[0]*.5,COL_S[1]*.5+ac[1]*.5,COL_S[2]*.5+ac[2]*.5];return{x:rr*Math.sin(ph)*Math.cos(th),y:rr*Math.sin(ph)*Math.sin(th),z:rr*Math.cos(ph),vx:(Math.random()-.5),vy:(Math.random()-.5),vz:(Math.random()-.5),arch:o.a,opinion:o.i,baseOp:o.i,conf:o.c,des:o.d,vuln:o.v,edad:o.e,hta:o.h,dm2:o.dd,muni:o.m,sexo:o.s,obes:o.ob,sm:o.sm,gx:o.gx,ta:o.ta,glu:o.gl,cintura:o.ci,rk:(o.rk!=null?o.rk:0.15),peso:o.pw,talla:o.al,imc:o.imc,state:'S',vacc:false,sev:false,tRec:0,cr:ic[0],cg:ic[1],cb:ic[2]};});SN=sag.length;}
 function makeSprite(){const c=document.createElement('canvas');c.width=c.height=64;const g=c.getContext('2d');const gr=g.createRadialGradient(32,32,0,32,32,32);gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.3,'rgba(255,255,255,.9)');gr.addColorStop(1,'rgba(255,255,255,0)');g.fillStyle=gr;g.fillRect(0,0,64,64);return new THREE.CanvasTexture(c);}
 function initSwarm(){if(swarmInit)return;swarmInit=true;const canvas=document.getElementById('swarmCanvas');seedAgents();
   if(typeof THREE!=='undefined'){useThree=true;renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});renderer.setPixelRatio(Math.min(devicePixelRatio,2));scene=new THREE.Scene();cam=new THREE.PerspectiveCamera(55,canvas.clientWidth/500,0.1,1000);cam.position.set(0,0,150);resizeSw();
@@ -1693,9 +1725,9 @@ function initSwarm(){if(swarmInit)return;swarmInit=true;const canvas=document.ge
     scene.add(new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.SphereGeometry(RAD,16,12)),new THREE.LineBasicMaterial({color:0x2a4a7a,transparent:true,opacity:.09})));
     raycaster=new THREE.Raycaster();raycaster.params.Points.threshold=3.4;
     canvas.addEventListener('click',onSwarmClick3D);
-  }else{useThree=false;ctx2d=canvas.getContext('2d');canvas.width=canvas.clientWidth;canvas.height=500;canvas.addEventListener('pointerdown',e=>{dragging=true;lastP={x:e.clientX,y:e.clientY};});addEventListener('pointerup',()=>dragging=false);addEventListener('pointermove',e=>{if(dragging&&lastP){dragRot.y+=(e.clientX-lastP.x)*.006;dragRot.x+=(e.clientY-lastP.y)*.006;lastP={x:e.clientX,y:e.clientY};}});canvas.addEventListener('click',()=>{if(SN)openTwin(Math.floor(Math.random()*SN));});}
+  }else{useThree=false;ctx2d=canvas.getContext('2d');canvas.width=canvas.clientWidth||600;canvas.height=500;canvas.addEventListener('pointerdown',e=>{dragging=true;lastP={x:e.clientX,y:e.clientY};});addEventListener('pointerup',()=>dragging=false);addEventListener('pointermove',e=>{if(dragging&&lastP){dragRot.y+=(e.clientX-lastP.x)*.006;dragRot.x+=(e.clientY-lastP.y)*.006;lastP={x:e.clientX,y:e.clientY};}});canvas.addEventListener('click',()=>{if(SN)openTwin(Math.floor(Math.random()*SN));});}
   animate();}
-function resizeSw(){const c=document.getElementById('swarmCanvas');const w=c.clientWidth,h=500;if(useThree&&renderer){renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}else if(ctx2d){c.width=w;c.height=h;}}
+function resizeSw(){const c=document.getElementById('swarmCanvas');const w=c.clientWidth||600,h=500;if(useThree&&renderer){renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}else if(ctx2d){c.width=w;c.height=h;}}
 addEventListener('resize',()=>{if(renderer||ctx2d)resizeSw();});
 function stepSim(){const cr=6+params.den*10,cr2=cr*cr,cell=cr,grid={};for(let i=0;i<SN;i++){const a=sag[i];const k=Math.floor(a.x/cell)+','+Math.floor(a.y/cell)+','+Math.floor(a.z/cell);(grid[k]||(grid[k]=[])).push(i);}
   const infBase=0.11,recRate=0.06,sp=0.12+params.den*0.35;
