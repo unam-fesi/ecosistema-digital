@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Aval de Diplomados — DEU · FES Iztacala · UNAM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0C2340;--navy-700:#102B4F;--navy-500:#163A64;--gold:#C4A24E;--gold-300:#D4B86A;--gold-100:#EBD9A8;
+  --cream:#FAF8F4;--ink:#0A1A30;--cyan:#38BDF8;--violet:#7C5CFF;--emerald:#34D399;--amber:#F5B841;--red:#EF6461;
+  --glass-border:rgba(255,255,255,.14);--line:rgba(12,35,64,.10);
+  --shadow-1:0 10px 30px rgba(8,20,40,.10);--shadow-2:0 24px 80px rgba(8,20,40,.18);--ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--navy);color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased}
+#deu-bg{position:fixed;inset:0;z-index:0}
+.wrap{position:relative;z-index:1}
+.logo-chip{background:#fff;border-radius:10px;padding:5px 10px;display:flex;align-items:center}
+.logo-chip img{height:34px;display:block}
+.serif{font-family:'Playfair Display',serif}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+h1,h2,h3{line-height:1.2}
+.gold{color:var(--gold)}
+.hidden{display:none!important}
+
+.appbar{position:sticky;top:0;z-index:60;background:var(--navy);color:#fff;display:flex;align-items:center;gap:16px;padding:0 20px;height:60px;box-shadow:var(--shadow-1)}
+.brand{display:flex;align-items:center;gap:11px;font-weight:600}
+.brand-logo{width:38px;height:38px;border-radius:10px;border:1.6px solid var(--gold);display:flex;align-items:center;justify-content:center;background:rgba(196,162,78,.12);color:var(--gold);font-weight:800;font-size:.8rem}
+.brand small{display:block;color:#9db2ce;font-weight:400;font-size:.68rem}
+.appbar-spacer{flex:1}
+.btn-home{color:#c3d2e6;font-size:.85rem;padding:8px 12px;border-radius:8px}
+.btn-home:hover{background:rgba(255,255,255,.08);color:#fff}
+.user-chip{display:flex;align-items:center;gap:9px;padding:5px 10px 5px 6px;border-radius:30px;background:rgba(255,255,255,.06);border:1px solid var(--glass-border)}
+.user-chip .av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-300));color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem}
+.user-chip small{color:#c3d2e6;line-height:1.1}
+
+.wrap{max-width:1060px;margin:0 auto;padding:26px 22px 80px}
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow-1)}
+.card+.card{margin-top:16px}
+.card h2{font-size:1.12rem;margin-bottom:4px}
+.muted{color:#6b7686}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+.grid{display:grid;gap:16px}
+.grid-2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:760px){.grid-2{grid-template-columns:1fr}}
+
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;padding:10px 18px;border-radius:10px;font-weight:600;font-size:.88rem;transition:.2s var(--ease)}
+.btn:hover{background:var(--navy-700);transform:translateY(-1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn.gold{background:var(--gold);color:var(--navy)}.btn.gold:hover{background:var(--gold-300)}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--navy)}
+.btn.ghost:hover{border-color:var(--gold);background:#faf7f0}
+.btn.sm{padding:6px 12px;font-size:.8rem;border-radius:8px}
+
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 11px;border-radius:20px;font-size:.74rem;font-weight:600}
+.pill .dot{width:7px;height:7px;border-radius:50%}
+.pill.borrador{background:#eef1f5;color:#5a6675}.pill.borrador .dot{background:#8a97a8}
+.pill.en_revision_carrera{background:#efe8fb;color:#5b3fc4}.pill.en_revision_carrera .dot{background:var(--violet)}
+.pill.en_revision_deu{background:#e3f4fd;color:#0b6fa4}.pill.en_revision_deu .dot{background:var(--cyan)}
+.pill.avalado{background:#e2f7ee;color:#0d8b5c}.pill.avalado .dot{background:var(--emerald)}
+.pill.condicionado{background:#fdf3dd;color:#a67c14}.pill.condicionado .dot{background:var(--amber)}
+.pill.rechazado{background:#fdeaea;color:#c0392b}.pill.rechazado .dot{background:var(--red)}
+
+.hero{background:radial-gradient(1000px 500px at 12% -20%,rgba(56,189,248,.16),transparent 60%),radial-gradient(900px 600px at 110% 0%,rgba(124,92,255,.14),transparent 55%),linear-gradient(160deg,#0A1A30,#0C2340 45%,#102B4F);color:#fff;border-radius:22px;padding:34px 32px;margin-bottom:18px}
+.hero .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:1px solid var(--glass-border);border-radius:30px;padding:6px 14px;font-size:.76rem;color:var(--gold-100);margin-bottom:14px}
+.hero h1{font-size:1.9rem;max-width:22ch}
+.hero p{color:#c3d2e6;max-width:60ch;margin:12px 0 18px;font-size:.98rem}
+.pulse{width:8px;height:8px;border-radius:50%;background:var(--gold);box-shadow:0 0 0 0 rgba(196,162,78,.6);animation:pulse 2s infinite}
+@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(196,162,78,0)}100%{box-shadow:0 0 0 0 rgba(196,162,78,0)}}
+
+table{width:100%;border-collapse:collapse;font-size:.86rem}
+th{text-align:left;color:#8a97a8;font-weight:600;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;padding:10px 12px;border-bottom:1px solid var(--line)}
+td{padding:11px 12px;border-bottom:1px solid var(--line)}
+.t-folio{font-family:ui-monospace,monospace;font-size:.8rem;color:var(--navy);font-weight:600}
+
+.stepper{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.step{flex:1;min-width:120px;display:flex;align-items:center;gap:9px;padding:10px 11px;border-radius:12px;background:#fff;border:1.5px solid var(--line);font-size:.8rem;color:#6b7686}
+.step .num{width:23px;height:23px;border-radius:50%;background:#eef1f5;color:#6b7686;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.76rem;flex-shrink:0}
+.step.active{border-color:var(--gold);background:#fffdf7;color:var(--navy);font-weight:600}
+.step.active .num{background:var(--gold);color:var(--navy)}
+.step.done .num{background:var(--emerald);color:#fff}.step.done{color:var(--navy)}
+.wizstep{display:none}.wizstep.active{display:block}
+
+.field{margin-bottom:15px}
+.field label{display:block;font-size:.82rem;font-weight:600;color:#3a4557;margin-bottom:5px}
+.field label .req{color:var(--red)}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:10px;font-family:inherit;font-size:.9rem;background:#fff;transition:.15s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(196,162,78,.14)}
+.field .hint{font-size:.74rem;color:#8a97a8;margin-top:4px}
+.field.ok input,.field.ok select,.field.ok textarea{border-color:var(--emerald)}
+.field.warn input,.field.warn select,.field.warn textarea{border-color:var(--amber)}
+.field.err input,.field.err select,.field.err textarea{border-color:var(--red)}
+.val-msg{display:flex;align-items:flex-start;gap:6px;font-size:.76rem;margin-top:5px;font-weight:500}
+.val-msg.ok{color:#0d8b5c}.val-msg.warn{color:#a67c14}.val-msg.err{color:#c0392b}
+
+.notice{display:flex;gap:12px;padding:13px 15px;border-radius:12px;font-size:.83rem;line-height:1.5}
+.notice.legal{background:#f4f0fb;border:1px solid #e0d3f5;color:#4a3a6b}
+.notice.info{background:#eef6fd;border:1px solid #cfe6f7;color:#0b5680}
+.notice.warn{background:#fdf6e3;border:1px solid #f0e0b0;color:#8a6d16}
+.notice .ni{font-size:1.15rem}
+
+.check{display:flex;align-items:flex-start;gap:12px;padding:12px 4px;border-bottom:1px solid var(--line)}
+.check:last-child{border:none}
+.check .ci{width:26px;height:26px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:700}
+.ci.ok{background:#e2f7ee;color:#0d8b5c}.ci.warn{background:#fdf3dd;color:#a67c14}.ci.err{background:#fdeaea;color:#c0392b}
+.check .ct{font-weight:600;font-size:.87rem}.check .cd{font-size:.79rem;color:#6b7686;margin-top:2px}
+
+.upload{border:2px dashed var(--line);border-radius:14px;padding:24px;text-align:center;color:#6b7686;background:#faf8f4;transition:.2s;cursor:pointer}
+.upload:hover{border-color:var(--gold);background:#fffdf7}
+.file-item{display:flex;align-items:center;gap:12px;padding:10px 13px;border:1px solid var(--line);border-radius:11px;margin-top:10px;background:#fff}
+.file-item .fic{width:34px;height:34px;border-radius:8px;background:#fdeaea;color:#c0392b;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.7rem}
+.file-item .fmeta{flex:1}.file-item .fn{font-weight:600;font-size:.83rem}.file-item .fs{font-size:.73rem;color:#8a97a8}
+
+.tl{position:relative;padding-left:26px;margin-top:6px}
+.tl::before{content:"";position:absolute;left:8px;top:4px;bottom:4px;width:2px;background:var(--line)}
+.tl-item{position:relative;padding-bottom:16px}
+.tl-item::before{content:"";position:absolute;left:-22px;top:3px;width:12px;height:12px;border-radius:50%;background:#fff;border:2.5px solid var(--line)}
+.tl-item.done::before{background:var(--emerald);border-color:var(--emerald)}
+.tl-item.active::before{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 4px rgba(196,162,78,.2)}
+.tl-item .tt{font-weight:600;font-size:.88rem}.tl-item .td{font-size:.77rem;color:#8a97a8}
+
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(10,26,48,.55);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.modal.active{display:flex}
+.modal-card{background:#fff;border-radius:20px;padding:28px;width:100%;max-width:420px;box-shadow:var(--shadow-2)}
+.modal-card h2{font-size:1.3rem;margin-bottom:4px}
+.tabbar{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:14px 0 18px}
+.tabbar button{padding:9px 14px;font-size:.85rem;font-weight:600;color:#6b7686;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabbar button.active{color:var(--navy);border-bottom-color:var(--gold)}
+
+/* PUMAI */
+.pumai-fab{position:fixed;right:20px;bottom:20px;z-index:80;display:flex;align-items:center;gap:9px;background:linear-gradient(120deg,var(--violet),var(--cyan));color:#fff;padding:11px 17px 11px 12px;border-radius:40px;box-shadow:0 12px 40px rgba(124,92,255,.4);font-weight:600;font-size:.86rem}
+.pumai-fab .orb{width:25px;height:25px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center}
+.pumai-panel{position:fixed;right:20px;bottom:76px;width:350px;max-width:calc(100vw-40px);height:480px;max-height:70vh;background:#fff;border-radius:18px;box-shadow:var(--shadow-2);z-index:81;display:none;flex-direction:column;overflow:hidden;border:1px solid var(--line)}
+.pumai-panel.open{display:flex}
+.pumai-head{background:linear-gradient(120deg,var(--violet),var(--cyan));color:#fff;padding:13px 15px;display:flex;align-items:center;gap:10px}
+.pumai-head .orb{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:1rem}
+.pumai-head small{color:rgba(255,255,255,.85)}
+.pumai-body{flex:1;overflow-y:auto;padding:14px;background:#f7f8fa;display:flex;flex-direction:column;gap:9px}
+.msg{max-width:84%;padding:9px 12px;border-radius:13px;font-size:.83rem;line-height:1.45}
+.msg.bot{background:#fff;border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px}
+.msg.user{background:var(--navy);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.msg.bot b{color:var(--navy)}
+.pumai-foot{padding:9px;border-top:1px solid var(--line);display:flex;gap:8px}
+.pumai-foot input{flex:1;padding:9px 12px;border:1.5px solid var(--line);border-radius:20px;font-size:.85rem}
+.pumai-foot button{width:37px;height:37px;border-radius:50%;background:var(--navy);color:#fff;flex-shrink:0}
+
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:#fff;padding:12px 22px;border-radius:30px;font-size:.85rem;font-weight:500;box-shadow:var(--shadow-2);z-index:120;transition:.35s var(--ease);opacity:0;max-width:90vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.spin{display:inline-block;width:15px;height:15px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.empty{padding:26px;text-align:center;color:#8a97a8;font-size:.88rem}
+</style>
+</head>
+<body>
+<div id="deu-bg"></div>
+<div class="appbar">
+  <div class="brand"><div class="logo-chip"><img src="public/assets/Gestion-diplomados-logo.png" alt="Gestión de Diplomados"></div></div>
+  <div class="appbar-spacer"></div>
+  <a href="index.html" class="btn-home">Ir al Ecosistema</a>
+  <div id="userChip" class="user-chip hidden"><div class="av" id="avInit">U</div><div><small id="uName" style="color:#fff;font-weight:600;display:block">Usuario</small><small id="uMail">correo</small></div></div>
+  <button id="perfilBtn" class="btn-home hidden">Mi perfil</button>
+  <button id="logoutBtn" class="btn-home hidden">Salir</button>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="hero-badge"><span class="pulse"></span> DEU · FES Iztacala · UNAM</div>
+    <h1 class="serif">Registra tu diplomado o curso para el <span class="gold">aval de la UNAM</span></h1>
+    <p>Captura el programa académico conforme al Reglamento General de Educación Continua. PUM-AI valida cada rubro en tiempo real antes de enviarlo a dictaminación colegiada.</p>
+    <div class="row">
+      <button class="btn gold" id="btnNueva">+ Nueva actividad</button>
+      <a class="btn ghost" style="color:#fff;border-color:var(--glass-border)" href="#lineamientos" onclick="document.getElementById('lineamientos').scrollIntoView({behavior:'smooth'});return false">Ver lineamientos</a>
+    </div>
+  </div>
+
+  <!-- LISTA -->
+  <div id="viewLista">
+    <div class="card">
+      <h2>Mis actividades registradas</h2>
+      <div id="listaBody"><div class="empty">Cargando…</div></div>
+    </div>
+
+    <div class="card" id="lineamientos">
+      <h2>Lineamientos (Reglamento General de Educación Continua, UNAM)</h2>
+      <div class="grid grid-2" style="margin-top:12px">
+        <div class="notice info"><span class="ni">⏱</span><div><b>Duración.</b> Diplomado ≥ 120 h (Art. 28). 1 crédito = 8 h de trabajo (Art. 23).</div></div>
+        <div class="notice info"><span class="ni">📋</span><div><b>Estructura (Arts. 20, 23).</b> Objetivos, temario por tema/responsable/horas, perfiles, metodología, evaluación y bibliografía.</div></div>
+        <div class="notice info"><span class="ni">🎓</span><div><b>Responsable académico.</b> Cédula profesional y trayectoria; en titulación, título o posgrado (Arts. 11, 13).</div></div>
+        <div class="notice info"><span class="ni">⚖️</span><div><b>Aval.</b> Dos etapas: comité de carrera (pertinencia) → comité DEU → registro REDEC (Art. 25).</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WIZARD -->
+  <div id="viewWizard" class="hidden">
+    <div class="card" style="background:transparent;border:none;box-shadow:none;padding:0 0 6px">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <div><div style="color:var(--gold);font-weight:600;font-size:.74rem;letter-spacing:.12em;text-transform:uppercase" id="wizFolio">Nueva solicitud</div>
+        <h1 class="serif" style="font-size:1.5rem">Registro de actividad</h1></div>
+        <button class="btn ghost sm" id="btnVolverLista">← Mis actividades</button>
+      </div>
+    </div>
+
+    <div class="stepper" id="stepper">
+      <div class="step active" data-step="1"><span class="num">1</span> Datos generales</div>
+      <div class="step" data-step="2"><span class="num">2</span> Estructura</div>
+      <div class="step" data-step="3"><span class="num">3</span> Responsable</div>
+      <div class="step" data-step="4"><span class="num">4</span> Documentos</div>
+      <div class="step" data-step="5"><span class="num">5</span> Revisión</div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="wizstep active" data-wizstep="1">
+      <div class="card">
+        <h2>Datos generales</h2>
+        <div class="grid grid-2" style="margin-top:14px">
+          <div class="field" data-f="tipo"><label>Tipo de actividad <span class="req">*</span></label>
+            <select id="f_tipo"><option value="diplomado">Diplomado</option><option value="curso">Curso</option><option value="taller">Taller</option><option value="diplomado_titulacion">Diplomado con opción a titulación</option></select><div class="vm"></div></div>
+          <div class="field" data-f="carrera"><label>Carrera / área <span class="req">*</span></label>
+            <select id="f_carrera"><option value="medicina">Medicina</option><option value="cirujano_dentista">Cirujano Dentista</option><option value="enfermeria">Enfermería</option><option value="optometria">Optometría</option><option value="psicologia">Psicología</option><option value="biologia">Biología</option><option value="interdisciplinaria">Interdisciplinaria</option></select><div class="vm"></div></div>
+          <div class="field" data-f="titulo" style="grid-column:1/-1"><label>Título de la actividad <span class="req">*</span></label>
+            <input id="f_titulo" placeholder="Ej. Diplomado en Ecografía Clínica de Urgencias"><div class="vm"></div></div>
+          <div class="field" data-f="duracion_horas"><label>Duración total (horas) <span class="req">*</span></label>
+            <input id="f_duracion" type="number" min="1" placeholder="120"><div class="vm"></div></div>
+          <div class="field"><label>Créditos (automático)</label><input id="f_creditos" disabled style="background:#f7f8fa"><div class="hint">1 crédito = 8 h</div></div>
+          <div class="field"><label>Modalidad <span class="req">*</span></label>
+            <select id="f_modalidad"><option value="presencial">Presencial</option><option value="en_linea">En línea</option><option value="mixta">Mixta / híbrida</option></select></div>
+          <div class="field"><label>Cupo máximo</label><input id="f_cupo" type="number" min="1" placeholder="30"></div>
+          <div class="field"><label>Fecha de inicio</label><input id="f_ini" type="date"></div>
+          <div class="field"><label>Fecha de término</label><input id="f_fin" type="date"></div>
+          <div class="field" data-f="objetivo_general" style="grid-column:1/-1"><label>Objetivo general <span class="req">*</span></label>
+            <textarea id="f_objg" rows="3" placeholder="Verbo rector + población objetivo + propósito…"></textarea><div class="vm"></div></div>
+        </div>
+      </div>
+      <div class="row" style="justify-content:space-between;margin-top:14px"><button class="btn ghost" id="s1_guardar">Guardar borrador</button><button class="btn gold" data-next="2">Continuar →</button></div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="wizstep" data-wizstep="2">
+      <div class="card">
+        <h2>Estructura académica</h2>
+        <div class="notice info" style="margin:12px 0"><span class="ni">ℹ</span><div>PUM-AI verifica que la estructura contenga los elementos de los Arts. 20 y 23 antes de permitir el envío.</div></div>
+        <div class="grid grid-2">
+          <div class="field" data-f="objetivos_especificos" style="grid-column:1/-1"><label>Objetivos específicos <span class="req">*</span></label><textarea id="f_obje" rows="3" placeholder="1) … 2) … 3) …"></textarea><div class="vm"></div></div>
+          <div class="field" data-f="perfil_ingreso"><label>Perfil de ingreso <span class="req">*</span></label><textarea id="f_pin" rows="2"></textarea><div class="vm"></div></div>
+          <div class="field" data-f="perfil_egreso"><label>Perfil de egreso <span class="req">*</span></label><textarea id="f_peg" rows="2"></textarea><div class="vm"></div></div>
+          <div class="field" data-f="temario" style="grid-column:1/-1"><label>Temario / módulos — una línea por módulo: <i>tema · responsable · horas</i> <span class="req">*</span></label>
+            <textarea id="f_tem" rows="5" placeholder="Física del ultrasonido · Dra. Herrera · 16&#10;Protocolo eFAST · Dr. Molina · 24"></textarea><div class="vm"></div></div>
+          <div class="field" data-f="metodologia"><label>Metodología <span class="req">*</span></label><textarea id="f_met" rows="2"></textarea><div class="vm"></div></div>
+          <div class="field" data-f="evaluacion"><label>Criterios y forma de evaluación <span class="req">*</span></label><textarea id="f_eva" rows="2" placeholder="Ponderación (%) y % mínimo de asistencia…"></textarea><div class="vm"></div></div>
+          <div class="field" data-f="bibliografia" style="grid-column:1/-1"><label>Bibliografía y recursos didácticos <span class="req">*</span></label><textarea id="f_bib" rows="2"></textarea><div class="vm"></div></div>
+        </div>
+      </div>
+      <div class="row" style="justify-content:space-between;margin-top:14px"><button class="btn ghost" data-prev="1">← Atrás</button><div class="row"><button class="btn ghost" id="s2_guardar">Guardar</button><button class="btn gold" data-next="3">Continuar →</button></div></div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="wizstep" data-wizstep="3">
+      <div class="card">
+        <h2>Responsable académico</h2>
+        <div class="grid grid-2" style="margin-top:12px">
+          <div class="field" data-f="raa_nombre"><label>Nombre completo <span class="req">*</span></label><input id="f_rnom"><div class="vm"></div></div>
+          <div class="field" data-f="raa_cedula"><label>Cédula profesional <span class="req">*</span></label><input id="f_rced" placeholder="7421998"><div class="vm"></div></div>
+          <div class="field"><label>Grado máximo</label><select id="f_rgrado"><option>Doctorado</option><option>Maestría</option><option>Especialidad</option><option>Licenciatura</option></select></div>
+          <div class="field" data-f="raa_correo"><label>Correo <span class="req">*</span></label><input id="f_rmail" type="email"><div class="vm"></div></div>
+          <div class="field"><label>ORCID</label><input id="f_rorcid" placeholder="0000-0000-0000-0000"></div>
+          <div class="field"><label>Adscripción</label><input id="f_radsc" placeholder="FES Iztacala — Carrera de…"></div>
+        </div>
+        <div class="notice legal" style="margin-top:14px"><span class="ni">🔒</span><div><b>Aviso de privacidad (LFPDPPP).</b> Para verificar el perfil del RAA se consultarán registros oficiales (RNP/SEP) y fuentes públicas. Se requiere el consentimiento del titular; los hallazgos son insumo para la dictaminación y quedan en bitácora.
+          <div style="margin-top:9px"><label style="font-size:.82rem;font-weight:600"><input type="checkbox" id="f_consent" style="width:auto;margin-right:6px">El responsable académico autoriza la verificación de su perfil</label></div></div></div>
+        <div class="row" style="margin-top:14px"><button class="btn gold" id="btnVerificar">⚡ Ejecutar verificación de perfil</button></div>
+        <div id="dossier"></div>
+      </div>
+      <div class="row" style="justify-content:space-between;margin-top:14px"><button class="btn ghost" data-prev="2">← Atrás</button><div class="row"><button class="btn ghost" id="s3_guardar">Guardar</button><button class="btn gold" data-next="4">Continuar →</button></div></div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="wizstep" data-wizstep="4">
+      <div class="card">
+        <h2>Documentos en PDF</h2>
+        <p class="muted" style="font-size:.85rem;margin-top:4px">Sube el programa completo y los documentos de soporte (solo PDF, máx. 20 MB).</p>
+        <label class="upload" style="margin-top:14px;display:block">
+          <div style="font-size:1.6rem">📎</div><div style="margin-top:6px;font-weight:600">Haz clic para seleccionar tus PDF</div>
+          <input id="f_files" type="file" accept="application/pdf" multiple hidden>
+        </label>
+        <div id="filesList"></div>
+      </div>
+      <div class="row" style="justify-content:space-between;margin-top:14px"><button class="btn ghost" data-prev="3">← Atrás</button><button class="btn gold" data-next="5">Continuar →</button></div>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="wizstep" data-wizstep="5">
+      <div class="card">
+        <h2>Revisión final de PUM-AI</h2>
+        <p class="muted" style="font-size:.85rem;margin-top:4px">Verificación de completitud y cumplimiento de lineamientos.</p>
+        <div id="reviewList" style="margin-top:12px"></div>
+        <div id="reviewNotice"></div>
+        <div class="row" style="justify-content:flex-end;margin-top:14px">
+          <button class="btn ghost" id="s5_guardar">Guardar borrador</button>
+          <button class="btn gold" id="btnEnviar">Enviar a dictaminación →</button>
+        </div>
+      </div>
+      <div class="row" style="margin-top:14px"><button class="btn ghost" data-prev="4">← Atrás</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal" id="authModal">
+  <div class="modal-card">
+    <h2 class="serif">Acceso al portal</h2>
+    <p class="muted" style="font-size:.85rem">Regístrate o inicia sesión para gestionar tus actividades.</p>
+    <div class="tabbar"><button class="active" id="tabLogin">Iniciar sesión</button><button id="tabSignup">Crear cuenta</button></div>
+    <div id="paneSignup" class="hidden"><div class="field"><label>Nombre completo</label><input id="a_nombre"></div></div>
+    <div class="field"><label>Correo</label><input id="a_email" type="email"></div>
+    <div class="field"><label>Contraseña</label><input id="a_pass" type="password"></div>
+    <div id="authErr" class="val-msg err" style="min-height:18px"></div>
+    <button class="btn gold" id="authSubmit" style="width:100%;justify-content:center">Entrar</button>
+  </div>
+</div>
+
+<!-- PERFIL / CAMBIO DE CONTRASEÑA -->
+<div class="modal" id="perfilModal">
+  <div class="modal-card">
+    <h2 class="serif">Mi perfil</h2>
+    <p class="muted" style="font-size:.84rem;margin-top:2px">Sesión: <span id="perfilCorreo"></span></p>
+    <div class="field" style="margin-top:14px"><label>Nueva contraseña</label><input id="p_pass1" type="password" placeholder="Mínimo 6 caracteres"></div>
+    <div class="field"><label>Confirmar contraseña</label><input id="p_pass2" type="password"></div>
+    <div id="perfilMsg" style="min-height:16px;font-size:.8rem"></div>
+    <div class="row" style="justify-content:flex-end;margin-top:6px"><button class="btn ghost" id="perfilCancel">Cerrar</button><button class="btn gold" id="perfilSave">Guardar contraseña</button></div>
+  </div>
+</div>
+
+<!-- PUMAI -->
+<div class="pumai-fab" onclick="Pumai.toggle()"><div class="orb">🤖</div> PUM-AI</div>
+<div class="pumai-panel" id="pumaiPanel">
+  <div class="pumai-head"><div class="orb">🤖</div><div>PUM-AI<br><small>Valida tu registro · DEU</small></div></div>
+  <div class="pumai-body" id="pumaiBody"></div>
+  <div class="pumai-foot"><input id="pumaiInput" placeholder="Pregúntame sobre los lineamientos…"><button onclick="Pumai.send()">➤</button></div>
+</div>
+
+<div id="toast"></div>
+
+<script src="src/js/deu-background.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ══════════ Config Supabase (esquema deu, aislado de public) ══════════ */
+const SUPABASE_URL='https://risatbuqolklefvjgngb.supabase.co';
+const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpc2F0YnVxb2xrbGVmdmpnbmdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxNjc0MzUsImV4cCI6MjA4OTc0MzQzNX0.PTDGmpihCPd5iz8ZhbcUOMbGNuS4mi1sCD5linrVGvY';
+const SB=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON);
+const DEU=()=>SB.schema('deu');
+const BUCKET='deu-diplomados';
+
+let USER=null, ACT=null;           // ACT = actividad en edición
+let RESP=null, DOCS=[];
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+function toast(m,ms=2400){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),ms);}
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* ══════════ Validador PUM-AI (reglas del Reglamento) ══════════ */
+const Pumai={
+  parseTemario(txt){
+    return (txt||'').split('\n').map(l=>l.trim()).filter(Boolean).map(l=>{
+      const p=l.split(/[·|]/).map(x=>x.trim());
+      const horas=parseInt((p.find(x=>/\d/.test(x)&&p.indexOf(x)===p.length-1)||p[p.length-1]||'').replace(/\D/g,''))||0;
+      return {tema:p[0]||'',responsable:p[1]||'',horas};
+    });
+  },
+  rules:{
+    tipo:(v)=>v?ok():err('Selecciona el tipo de actividad.'),
+    carrera:(v)=>v?ok():err('Selecciona la carrera de pertinencia.'),
+    titulo:(v)=> !v?err('El título es obligatorio.') : v.length<12?warn('Título muy corto; usa un nombre descriptivo sin abreviaturas.'):ok('Título claro ('+v.length+' caracteres).'),
+    duracion_horas:(v,ctx)=>{const h=+v||0; if(!h)return err('Captura la duración en horas.');
+      if((ctx.tipo==='diplomado'||ctx.tipo==='diplomado_titulacion')&&h<120) return warn('Un diplomado requiere ≥ 120 h (Art. 28). Amplía la carga o cámbialo a "Curso".');
+      return ok((h/8|0)+' créditos · cumple duración.');},
+    objetivo_general:(v)=> !v?err('El objetivo general es obligatorio.'): v.length<40?warn('Redacta el objetivo con verbo rector y población objetivo.'):ok('Objetivo bien planteado.'),
+    objetivos_especificos:(v)=>{if(!v)return err('Captura los objetivos específicos.');const n=(v.match(/\d\)|\n|;/g)||[]).length; return n>=2?ok((n+1>3?'Varios':n+1)+' objetivos detectados.'):warn('Incluye al menos 2-3 objetivos específicos.');},
+    perfil_ingreso:(v)=>v?ok():err('Define el perfil de ingreso.'),
+    perfil_egreso:(v)=>v?ok():err('Define el perfil de egreso.'),
+    temario:(v,ctx)=>{const mods=Pumai.parseTemario(v); if(!mods.length)return err('Captura el temario (una línea por módulo).');
+      const sinResp=mods.filter(m=>!m.responsable).length, sinH=mods.filter(m=>!m.horas).length;
+      if(sinResp||sinH)return warn('Cada tema debe indicar responsable y horas (formato: tema · responsable · horas).');
+      const suma=mods.reduce((a,m)=>a+m.horas,0), dur=+ctx.duracion_horas||0;
+      if(dur&&Math.abs(suma-dur)>Math.max(4,dur*0.1)) return warn(mods.length+' módulos suman '+suma+' h, pero la duración es '+dur+' h. Ajusta.');
+      return ok(mods.length+' módulos · '+suma+' h · con responsable y horas.');},
+    metodologia:(v)=>v?ok():err('Describe la metodología.'),
+    evaluacion:(v)=>{if(!v)return err('Define los criterios de evaluación.');
+      const tieneP=/%|porcentaje|pondera/i.test(v), tieneA=/asistenc/i.test(v);
+      if(!tieneP||!tieneA)return warn('Incluye la ponderación (%) y el % mínimo de asistencia para acreditar (Art. 28).');
+      return ok('Evaluación con ponderación y asistencia.');},
+    bibliografia:(v)=> v&&v.length>10?ok('Recursos declarados.'):err('Declara la bibliografía y recursos didácticos.'),
+    raa_nombre:(v)=>v?ok():err('Nombre del responsable obligatorio.'),
+    raa_cedula:(v)=>{const d=(v||'').replace(/\D/g,''); if(!d)return err('Captura la cédula profesional.'); return d.length>=6&&d.length<=8?ok('Formato de cédula válido (se verifica en RNP/SEP).'):warn('La cédula profesional suele tener 7-8 dígitos.');},
+    raa_correo:(v)=> /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v||'')?ok():err('Correo inválido.'),
+  },
+  validar(field,value,ctx){const fn=this.rules[field]; return fn?fn(value,ctx||{}):ok();},
+  /* chat */
+  open:false,
+  toggle(){this.open=!this.open;$('#pumaiPanel').classList.toggle('open',this.open);
+    if(this.open&&!$('#pumaiBody').children.length){this.bot('¡Hola! Soy <b>PUM-AI</b>. Valido cada rubro de tu registro conforme al Reglamento General de Educación Continua. Escríbeme cualquier duda sobre los lineamientos.');}},
+  bot(html){const m=document.createElement('div');m.className='msg bot';m.innerHTML=html;$('#pumaiBody').appendChild(m);$('#pumaiBody').scrollTop=1e6;},
+  usr(t){const m=document.createElement('div');m.className='msg user';m.textContent=t;$('#pumaiBody').appendChild(m);$('#pumaiBody').scrollTop=1e6;},
+  send(){const i=$('#pumaiInput');const t=i.value.trim();if(!t)return;i.value='';this.usr(t);
+    const l=t.toLowerCase();let r;
+    if(/hora|duraci|crédito|credito/.test(l)) r='Un <b>diplomado</b> requiere <b>≥120 h</b> (Art. 28) y <b>1 crédito = 8 h</b> (Art. 23). Los cursos no tienen mínimo pero deben declarar su carga horaria.';
+    else if(/evalua|asistenc|acredit/.test(l)) r='La evaluación debe incluir <b>ponderación (%)</b> y el <b>% mínimo de asistencia</b> para acreditar. El especialista fija los criterios (Art. 16).';
+    else if(/responsab|cédula|cedula|raa/.test(l)) r='El responsable académico debe acreditar <b>cédula profesional</b> y trayectoria (Arts. 11, 13). En diplomados con titulación se exige título o posgrado.';
+    else if(/aval|comité|comite|dictam/.test(l)) r='El aval es en <b>dos etapas</b>: comité de tu <b>carrera</b> (pertinencia) y luego el <b>comité DEU</b>, con registro final en REDEC (Art. 25).';
+    else r='Puedo orientarte sobre duración/créditos, estructura del programa, evaluación, requisitos del responsable académico y el proceso de aval. ¿Sobre cuál quieres detalle?';
+    setTimeout(()=>this.bot(r),350);}
+};
+function ok(m){return{estado:'ok',msg:m||'Correcto.'}}
+function warn(m){return{estado:'warn',msg:m}}
+function err(m){return{estado:'err',msg:m}}
+
+/* ══════════ Auth ══════════ */
+let authMode='login';
+function showAuth(){$('#authModal').classList.add('active');}
+function hideAuth(){$('#authModal').classList.remove('active');}
+$('#tabLogin').onclick=()=>{authMode='login';$('#tabLogin').classList.add('active');$('#tabSignup').classList.remove('active');$('#paneSignup').classList.add('hidden');$('#authSubmit').textContent='Entrar';};
+$('#tabSignup').onclick=()=>{authMode='signup';$('#tabSignup').classList.add('active');$('#tabLogin').classList.remove('active');$('#paneSignup').classList.remove('hidden');$('#authSubmit').textContent='Crear cuenta';};
+$('#authSubmit').onclick=async()=>{
+  const email=$('#a_email').value.trim(), pass=$('#a_pass').value, nombre=$('#a_nombre').value.trim();
+  $('#authErr').textContent='';
+  if(!email||!pass){$('#authErr').textContent='Completa correo y contraseña.';return;}
+  try{
+    if(authMode==='signup'){
+      const {data,error}=await SB.auth.signUp({email,password:pass,options:{data:{nombre}}});
+      if(error)throw error;
+      if(!data.session){toast('Cuenta creada. Revisa tu correo para confirmar y luego inicia sesión.');return;}
+    }else{
+      const {error}=await SB.auth.signInWithPassword({email,password:pass});
+      if(error)throw error;
+    }
+    hideAuth(); await onLogin();
+  }catch(e){$('#authErr').textContent=e.message||'No se pudo autenticar.';}
+};
+$('#logoutBtn').onclick=async()=>{await SB.auth.signOut();location.reload();};
+$('#perfilBtn').onclick=()=>{$('#perfilCorreo').textContent=USER?USER.email:'';$('#p_pass1').value='';$('#p_pass2').value='';$('#perfilMsg').textContent='';$('#perfilModal').classList.add('active');};
+$('#perfilCancel').onclick=()=>$('#perfilModal').classList.remove('active');
+$('#perfilSave').onclick=async()=>{
+  const a=$('#p_pass1').value, b=$('#p_pass2').value; const msg=$('#perfilMsg');
+  if(a.length<6){msg.style.color='#c0392b';msg.textContent='La contraseña debe tener al menos 6 caracteres.';return;}
+  if(a!==b){msg.style.color='#c0392b';msg.textContent='Las contraseñas no coinciden.';return;}
+  try{const {error}=await SB.auth.updateUser({password:a});if(error)throw error;
+    $('#perfilModal').classList.remove('active');toast('Contraseña actualizada ✓');
+  }catch(e){msg.style.color='#c0392b';msg.textContent=e.message||'No se pudo actualizar.';}
+};
+
+async function ensurePerfil(){
+  const {data}=await DEU().from('perfiles').select('id,nombre,rol').eq('user_id',USER.id).maybeSingle();
+  if(data)return data;
+  const nombre=USER.user_metadata?.nombre||USER.email.split('@')[0];
+  const {data:ins,error}=await DEU().from('perfiles').insert({user_id:USER.id,nombre,correo:USER.email,rol:'registrante'}).select('id,nombre,rol').single();
+  if(error){console.warn('perfil',error.message);return {nombre};}
+  return ins;
+}
+async function onLogin(){
+  const {data:{session}}=await SB.auth.getSession();
+  if(!session){showAuth();return;}
+  USER=session.user;
+  const perfil=await ensurePerfil();
+  const nom=perfil?.nombre||USER.email;
+  $('#uName').textContent=nom; $('#uMail').textContent=USER.email;
+  $('#avInit').textContent=(nom[0]||'U').toUpperCase();
+  $('#userChip').classList.remove('hidden'); $('#logoutBtn').classList.remove('hidden'); $('#perfilBtn').classList.remove('hidden');
+  await cargarLista();
+}
+
+/* ══════════ Lista ══════════ */
+const ESTADO_LBL={borrador:'Borrador',en_revision_carrera:'En comité de carrera',en_revision_deu:'En comité DEU',avalado:'Avalado',condicionado:'Condicionado',rechazado:'No avalado'};
+const TIPO_LBL={diplomado:'Diplomado',curso:'Curso',taller:'Taller',diplomado_titulacion:'Diplomado (titulación)'};
+async function cargarLista(){
+  const {data,error}=await DEU().from('actividades').select('id,folio,titulo,tipo,carrera,estado').order('created_at',{ascending:false});
+  const b=$('#listaBody');
+  if(error){b.innerHTML='<div class="empty">Error: '+esc(error.message)+'</div>';return;}
+  if(!data.length){b.innerHTML='<div class="empty">Aún no tienes actividades. Da clic en “+ Nueva actividad”.</div>';return;}
+  b.innerHTML='<table><thead><tr><th>Folio</th><th>Actividad</th><th>Tipo</th><th>Estado</th><th></th></tr></thead><tbody>'+
+    data.map(a=>`<tr><td class="t-folio">${esc(a.folio||'—')}</td><td>${esc(a.titulo)}</td><td>${TIPO_LBL[a.tipo]||a.tipo}</td>
+    <td><span class="pill ${a.estado}"><span class="dot"></span>${ESTADO_LBL[a.estado]||a.estado}</span></td>
+    <td><button class="btn sm ghost" data-open="${a.id}">${a.estado==='borrador'||a.estado==='condicionado'?'Continuar':'Ver'}</button></td></tr>`).join('')+'</tbody></table>';
+  $$('[data-open]').forEach(btn=>btn.onclick=()=>abrirActividad(btn.dataset.open));
+}
+
+/* ══════════ Wizard ══════════ */
+function showLista(){$('#viewLista').classList.remove('hidden');$('#viewWizard').classList.add('hidden');cargarLista();}
+function showWizard(){$('#viewLista').classList.add('hidden');$('#viewWizard').classList.remove('hidden');goStep(1);}
+function goStep(n){$$('.wizstep').forEach(s=>s.classList.toggle('active',s.dataset.wizstep==n));
+  $$('.step').forEach(s=>{const sn=+s.dataset.step;s.classList.toggle('active',sn==n);s.classList.toggle('done',sn<n);});
+  if(n==5)renderReview(); window.scrollTo({top:0,behavior:'smooth'});}
+$('#btnNueva').onclick=()=>{ACT=null;RESP=null;DOCS=[];clearForm();$('#wizFolio').textContent='Nueva solicitud (borrador)';showWizard();};
+$('#btnVolverLista').onclick=showLista;
+$$('[data-next]').forEach(b=>b.onclick=async()=>{await guardar(false);goStep(+b.dataset.next);});
+$$('[data-prev]').forEach(b=>b.onclick=()=>goStep(+b.dataset.prev));
+$('#s1_guardar').onclick=()=>guardar(true);$('#s2_guardar').onclick=()=>guardar(true);$('#s3_guardar').onclick=()=>guardar(true);$('#s5_guardar').onclick=()=>guardar(true);
+
+function clearForm(){['f_titulo','f_duracion','f_creditos','f_cupo','f_ini','f_fin','f_objg','f_obje','f_pin','f_peg','f_tem','f_met','f_eva','f_bib','f_rnom','f_rced','f_rmail','f_rorcid','f_radsc'].forEach(id=>{const e=document.getElementById(id);if(e)e.value='';});
+  $('#f_tipo').value='diplomado';$('#f_carrera').value='medicina';$('#f_modalidad').value='presencial';$('#f_consent').checked=false;$('#filesList').innerHTML='';$$('.vm').forEach(v=>v.innerHTML='');$$('.field').forEach(f=>f.classList.remove('ok','warn','err'));}
+
+function ctx(){return{tipo:$('#f_tipo').value,duracion_horas:$('#f_duracion').value};}
+function paintField(fEl,res){fEl.classList.remove('ok','warn','err');fEl.classList.add(res.estado);
+  const vm=fEl.querySelector('.vm');if(vm)vm.innerHTML=`<div class="val-msg ${res.estado}">${res.estado==='ok'?'✓':res.estado==='warn'?'⚠':'✕'} ${esc(res.msg)}</div>`;}
+function bindValidation(){
+  const map=[['f_titulo','titulo'],['f_duracion','duracion_horas'],['f_objg','objetivo_general'],['f_obje','objetivos_especificos'],['f_pin','perfil_ingreso'],['f_peg','perfil_egreso'],['f_tem','temario'],['f_met','metodologia'],['f_eva','evaluacion'],['f_bib','bibliografia'],['f_rnom','raa_nombre'],['f_rced','raa_cedula'],['f_rmail','raa_correo']];
+  map.forEach(([id,field])=>{const el=document.getElementById(id);if(!el)return;
+    const run=()=>{const fEl=el.closest('.field');paintField(fEl,Pumai.validar(field,el.value,ctx()));};
+    el.addEventListener('input',run);el.addEventListener('blur',run);});
+  $('#f_duracion').addEventListener('input',()=>{$('#f_creditos').value=Math.floor((+$('#f_duracion').value||0)/8);});
+  $('#f_tipo').addEventListener('change',()=>{const el=$('#f_duracion');if(el.value)paintField(el.closest('.field'),Pumai.validar('duracion_horas',el.value,ctx()));});
+}
+
+function collect(){
+  return{
+    tipo:$('#f_tipo').value,carrera:$('#f_carrera').value,titulo:$('#f_titulo').value.trim(),
+    duracion_horas:+$('#f_duracion').value||0,modalidad:$('#f_modalidad').value,
+    cupo:$('#f_cupo').value?+$('#f_cupo').value:null,fecha_inicio:$('#f_ini').value||null,fecha_fin:$('#f_fin').value||null,
+    objetivo_general:$('#f_objg').value.trim(),objetivos_especificos:$('#f_obje').value.trim(),
+    perfil_ingreso:$('#f_pin').value.trim(),perfil_egreso:$('#f_peg').value.trim(),
+    temario:Pumai.parseTemario($('#f_tem').value),metodologia:$('#f_met').value.trim(),
+    evaluacion:$('#f_eva').value.trim(),bibliografia:$('#f_bib').value.trim()
+  };
+}
+function fillForm(a){
+  $('#f_tipo').value=a.tipo;$('#f_carrera').value=a.carrera;$('#f_titulo').value=a.titulo||'';
+  $('#f_duracion').value=a.duracion_horas||'';$('#f_creditos').value=a.creditos??'';$('#f_modalidad').value=a.modalidad||'presencial';
+  $('#f_cupo').value=a.cupo||'';$('#f_ini').value=a.fecha_inicio||'';$('#f_fin').value=a.fecha_fin||'';
+  $('#f_objg').value=a.objetivo_general||'';$('#f_obje').value=a.objetivos_especificos||'';
+  $('#f_pin').value=a.perfil_ingreso||'';$('#f_peg').value=a.perfil_egreso||'';
+  $('#f_tem').value=(a.temario||[]).map(m=>[m.tema,m.responsable,m.horas].filter(x=>x!==''&&x!=null).join(' · ')).join('\n');
+  $('#f_met').value=a.metodologia||'';$('#f_eva').value=a.evaluacion||'';$('#f_bib').value=a.bibliografia||'';
+}
+
+async function guardar(showMsg){
+  if(!USER){showAuth();return;}
+  const payload=collect();
+  const pv=fullValidation(payload);
+  payload.pumai_validacion=pv;
+  try{
+    if(!ACT){
+      const {data,error}=await DEU().from('actividades').insert({...payload,created_by:USER.id}).select().single();
+      if(error)throw error; ACT=data; $('#wizFolio').textContent='Folio '+ACT.folio+' · borrador';
+    }else{
+      const {data,error}=await DEU().from('actividades').update(payload).eq('id',ACT.id).select().single();
+      if(error)throw error; ACT=data;
+    }
+    // responsable
+    const rnom=$('#f_rnom').value.trim();
+    if(rnom){
+      const rp={actividad_id:ACT.id,nombre:rnom,cedula_profesional:$('#f_rced').value.trim()||null,grado:$('#f_rgrado').value,correo:$('#f_rmail').value.trim()||null,orcid:$('#f_rorcid').value.trim()||null,adscripcion:$('#f_radsc').value.trim()||null,consentimiento:$('#f_consent').checked,consentimiento_at:$('#f_consent').checked?new Date().toISOString():null,consentimiento_folio:$('#f_consent').checked?('CONS-'+ACT.folio):null};
+      if(RESP){await DEU().from('responsables').update(rp).eq('id',RESP.id);}
+      else{const {data}=await DEU().from('responsables').insert(rp).select().single();RESP=data;}
+    }
+    if(showMsg)toast('Borrador guardado ✓');
+  }catch(e){toast('Error al guardar: '+(e.message||e));console.error(e);}
+}
+
+async function abrirActividad(id){
+  const {data:a}=await DEU().from('actividades').select('*').eq('id',id).single();
+  ACT=a;fillForm(a);
+  const {data:r}=await DEU().from('responsables').select('*').eq('actividad_id',id).maybeSingle();
+  RESP=r||null;
+  if(r){$('#f_rnom').value=r.nombre||'';$('#f_rced').value=r.cedula_profesional||'';$('#f_rgrado').value=r.grado||'Doctorado';$('#f_rmail').value=r.correo||'';$('#f_rorcid').value=r.orcid||'';$('#f_radsc').value=r.adscripcion||'';$('#f_consent').checked=!!r.consentimiento;}
+  const {data:docs}=await DEU().from('documentos').select('*').eq('actividad_id',id);
+  DOCS=docs||[];renderFiles();
+  $('#wizFolio').textContent='Folio '+a.folio+' · '+(ESTADO_LBL[a.estado]||a.estado);
+  showWizard();
+}
+
+/* ══════════ Documentos ══════════ */
+$('#f_files').addEventListener('change',async e=>{
+  if(!ACT){await guardar(false);} if(!ACT){toast('Guarda el borrador antes de subir.');return;}
+  for(const file of e.target.files){
+    if(file.type!=='application/pdf'){toast('Solo PDF: '+file.name);continue;}
+    if(file.size>20*1024*1024){toast('Máx 20 MB: '+file.name);continue;}
+    const path=`${ACT.id}/${Date.now()}_${file.name.replace(/[^\w.\-]/g,'_')}`;
+    const {error}=await SB.storage.from(BUCKET).upload(path,file,{contentType:'application/pdf'});
+    if(error){toast('Error subiendo '+file.name);continue;}
+    const {data:doc}=await DEU().from('documentos').insert({actividad_id:ACT.id,nombre:file.name,storage_path:path,tipo:'programa',size_bytes:file.size}).select().single();
+    DOCS.push(doc);
+  }
+  renderFiles();toast('Documento(s) subido(s) ✓');
+});
+function renderFiles(){
+  $('#filesList').innerHTML=DOCS.map(d=>`<div class="file-item"><div class="fic">PDF</div><div class="fmeta"><div class="fn">${esc(d.nombre)}</div><div class="fs">${(d.size_bytes/1024/1024).toFixed(2)} MB</div></div><button class="btn sm ghost" data-del="${d.id}">Quitar</button></div>`).join('');
+  $$('[data-del]').forEach(b=>b.onclick=async()=>{const d=DOCS.find(x=>x.id==b.dataset.del);await SB.storage.from(BUCKET).remove([d.storage_path]);await DEU().from('documentos').delete().eq('id',d.id);DOCS=DOCS.filter(x=>x.id!=d.id);renderFiles();});
+}
+
+/* ══════════ Revisión final ══════════ */
+function fullValidation(p){
+  const c={tipo:p.tipo,duracion_horas:p.duracion_horas};
+  const items=[
+    ['Datos generales','titulo',p.titulo,'duracion_horas',p.duracion_horas,'objetivo_general',p.objetivo_general],
+  ];
+  const checks=[];
+  const add=(field,val)=>checks.push({field,res:Pumai.validar(field,typeof val==='object'?$('#f_tem').value:val,c)});
+  add('titulo',p.titulo);add('duracion_horas',p.duracion_horas);add('objetivo_general',p.objetivo_general);
+  add('objetivos_especificos',p.objetivos_especificos);add('perfil_ingreso',p.perfil_ingreso);add('perfil_egreso',p.perfil_egreso);
+  checks.push({field:'temario',res:Pumai.validar('temario',$('#f_tem').value,c)});
+  add('metodologia',p.metodologia);add('evaluacion',p.evaluacion);add('bibliografia',p.bibliografia);
+  add('raa_nombre',$('#f_rnom').value);add('raa_cedula',$('#f_rced').value);
+  return checks;
+}
+const FIELD_LBL={titulo:'Título',duracion_horas:'Duración',objetivo_general:'Objetivo general',objetivos_especificos:'Objetivos específicos',perfil_ingreso:'Perfil de ingreso',perfil_egreso:'Perfil de egreso',temario:'Temario / módulos',metodologia:'Metodología',evaluacion:'Evaluación',bibliografia:'Bibliografía',raa_nombre:'Responsable académico',raa_cedula:'Cédula profesional'};
+function renderReview(){
+  const p=collect();const checks=fullValidation(p);
+  $('#reviewList').innerHTML=checks.map(c=>`<div class="check"><div class="ci ${c.res.estado}">${c.res.estado==='ok'?'✓':c.res.estado==='warn'?'!':'✕'}</div><div><div class="ct">${FIELD_LBL[c.field]||c.field}</div><div class="cd">${esc(c.res.msg)}</div></div></div>`).join('');
+  const errs=checks.filter(c=>c.res.estado==='err').length, warns=checks.filter(c=>c.res.estado==='warn').length;
+  const consent=$('#f_consent').checked;
+  let n='';
+  if(errs) n=`<div class="notice warn" style="margin-top:14px"><span class="ni">✕</span><div>Hay <b>${errs} campo(s) obligatorio(s)</b> sin completar. Corrígelos antes de enviar.</div></div>`;
+  else if(!consent) n=`<div class="notice warn" style="margin-top:14px"><span class="ni">🔒</span><div>Falta el <b>consentimiento del responsable académico</b> (paso 3) para poder verificar su perfil.</div></div>`;
+  else if(warns) n=`<div class="notice warn" style="margin-top:14px"><span class="ni">⚠</span><div><b>${warns} observación(es)</b>. Puedes enviar de todos modos; el comité las verá marcadas, o corregirlas ahora.</div></div>`;
+  else n=`<div class="notice info" style="margin-top:14px"><span class="ni">✓</span><div>Todo en orden. Listo para enviar a dictaminación.</div></div>`;
+  $('#reviewNotice').innerHTML=n;
+  $('#btnEnviar').disabled = errs>0 || !consent;
+}
+$('#btnEnviar').onclick=async()=>{
+  await guardar(false);
+  const btn=$('#btnEnviar');btn.disabled=true;btn.innerHTML='<span class="spin"></span> Enviando…';
+  try{
+    const {error}=await DEU().rpc('enviar_a_dictaminacion',{p_actividad:ACT.id});
+    if(error)throw error;
+    toast('✓ Enviado al comité de carrera');showLista();
+  }catch(e){toast('Error: '+(e.message||e));btn.disabled=false;btn.textContent='Enviar a dictaminación →';}
+};
+
+/* ══════════ Verificación del RAA (edge function) ══════════ */
+const TAB_LBL={oficial:'Oficial',academico:'Académico',web:'Presencia web / OSINT',riesgo:'Reportes y riesgo'};
+$('#btnVerificar').onclick=async()=>{
+  if(!$('#f_rnom').value.trim()){toast('Captura el nombre del responsable primero.');return;}
+  if(!$('#f_consent').checked){toast('Se requiere el consentimiento del responsable (LFPDPPP).');return;}
+  await guardar(false);
+  if(!RESP){toast('No se pudo guardar el responsable.');return;}
+  const btn=$('#btnVerificar');btn.disabled=true;btn.innerHTML='<span class="spin"></span> Verificando (cédula · ORCID · Crossref · OSINT)…';
+  try{
+    const {data,error}=await SB.functions.invoke('verificar-raa',{body:{responsable_id:RESP.id}});
+    if(error)throw error;
+    if(data.error)throw new Error(data.error);
+    renderDossier(data);
+    toast('Verificación completada · confianza '+data.indice_confianza+'/100');
+  }catch(e){toast('Error en verificación: '+(e.message||e));}
+  finally{btn.disabled=false;btn.innerHTML='⚡ Volver a verificar';}
+};
+function renderDossier(d){
+  const r=d.resultado||{};const sc=d.indice_confianza??0;
+  const color=sc>=75?'var(--emerald)':sc>=50?'var(--amber)':'var(--red)';
+  const sec=(key)=>{const arr=r[key]||[];if(!arr.length)return '';
+    return `<div style="margin-top:12px"><div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:#8a97a8;font-weight:700;margin-bottom:4px">${TAB_LBL[key]}</div>`+
+      arr.map(f=>`<div class="check"><div class="ci ${f.estado==='ok'?'ok':f.estado==='err'?'err':'warn'}">${f.estado==='ok'?'✓':f.estado==='err'?'✕':f.estado==='info'?'i':'!'}</div><div><div class="ct">${esc(f.titulo||'')}</div><div class="cd">${esc(f.detalle||'')}</div>${(f.fuentes||[]).map(s=>`<span class="tag" style="font-size:.68rem">${esc(s)}</span>`).join('')}</div></div>`).join('')+`</div>`;};
+  $('#dossier').innerHTML=`<div class="card" style="margin-top:16px;box-shadow:none;border:1.5px solid var(--line)">
+    <div class="row" style="align-items:center;justify-content:space-between">
+      <div><h3 style="margin:0">Dossier de verificación</h3><div class="muted" style="font-size:.78rem">Ref. auditoría ${esc(d.audit_ref||'')}</div></div>
+      <div style="text-align:center"><div style="font-size:1.8rem;font-weight:700;color:${color};line-height:1">${sc}</div><div style="font-size:.66rem;color:#8a97a8">Confianza /100</div></div>
+    </div>
+    <div class="notice legal" style="margin-top:10px"><span class="ni">🔒</span><div>Procesado con consentimiento (LFPDPPP). Insumo para la dictaminación colegiada; <b>no es un veredicto automático</b>. Fuentes públicas u oficiales.</div></div>
+    ${sec('oficial')}${sec('academico')}${sec('web')}${sec('riesgo')}
+  </div>`;
+}
+
+/* ══════════ Init ══════════ */
+bindValidation();
+SB.auth.getSession().then(({data:{session}})=>{ if(session){onLogin();} else {showAuth();} });
+</script>
+</body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Panel interno — Aval de Diplomados · DEU FES Iztacala</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#062B5C;--deep:#031A38;--navy2:#0A4A87;--gold:#D5A021;--gold-l:#F0C75E;
+  --cream:#FAF8F4;--ink:#0A1A30;--emerald:#34D399;--amber:#F5B841;--red:#EF6461;--cyan:#38BDF8;--violet:#7C5CFF;
+  --line:rgba(12,35,64,.10);--shadow-1:0 10px 30px rgba(3,20,40,.18);--shadow-2:0 24px 80px rgba(3,20,40,.30);--ease:cubic-bezier(.22,1,.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh}
+.serif{font-family:'Playfair Display',serif}
+a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+h1,h2,h3{line-height:1.2}.hidden{display:none!important}.muted{color:#6b7686}
+#deu-bg{position:fixed;inset:0;z-index:0}
+.shell{position:relative;z-index:1}
+
+.appbar{position:sticky;top:0;z-index:60;background:rgba(6,43,92,.82);backdrop-filter:blur(10px);color:#fff;display:flex;align-items:center;gap:16px;padding:0 20px;height:62px;border-bottom:1px solid rgba(255,255,255,.1)}
+.logo-chip{background:#fff;border-radius:10px;padding:5px 10px;display:flex;align-items:center}
+.logo-chip img{height:34px;display:block}
+.appbar .title{font-weight:600;font-size:.95rem}.appbar .title small{display:block;color:#9db2ce;font-weight:400;font-size:.68rem}
+.appbar-spacer{flex:1}
+.btn-home{color:#c3d2e6;font-size:.84rem;padding:8px 12px;border-radius:8px}.btn-home:hover{background:rgba(255,255,255,.08);color:#fff}
+.user-chip{display:flex;align-items:center;gap:9px;padding:5px 10px 5px 6px;border-radius:30px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14)}
+.user-chip .av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-l));color:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem}
+.user-chip small{color:#c3d2e6;line-height:1.1}
+
+.wrap{max-width:1180px;margin:0 auto;padding:26px 22px 80px}
+.page-head{margin-bottom:18px;color:#fff}
+.page-head .kick{color:var(--gold-l);font-weight:600;font-size:.74rem;letter-spacing:.14em;text-transform:uppercase}
+.page-head h1{font-size:1.7rem;margin:4px 0 6px}
+.page-head p{color:#c3d2e6;max-width:70ch;font-size:.94rem}
+
+.card{background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:16px;padding:20px;box-shadow:var(--shadow-1)}
+.card+.card{margin-top:16px}
+.card h2{font-size:1.1rem;margin-bottom:4px}.card h3{font-size:.96rem}
+.grid{display:grid;gap:16px}.grid-2{grid-template-columns:repeat(2,1fr)}.grid-4{grid-template-columns:repeat(4,1fr)}
+.row{display:flex;gap:12px;flex-wrap:wrap}
+@media(max-width:860px){.grid-2,.grid-4{grid-template-columns:1fr}}
+
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--navy);color:#fff;padding:10px 17px;border-radius:10px;font-weight:600;font-size:.86rem;transition:.2s var(--ease)}
+.btn:hover{background:#083a72;transform:translateY(-1px)}.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn.gold{background:var(--gold);color:var(--navy)}.btn.gold:hover{background:var(--gold-l)}
+.btn.ghost{background:transparent;border:1.5px solid var(--line);color:var(--navy)}.btn.ghost:hover{border-color:var(--gold);background:#fbf6ea}
+.btn.sm{padding:6px 12px;font-size:.8rem;border-radius:8px}
+
+.stat{background:rgba(255,255,255,.97);border:1px solid var(--line);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow-1)}
+.stat .lbl{font-size:.74rem;color:#8a97a8;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.stat .val{font-size:1.9rem;font-weight:700;color:var(--navy);margin-top:4px;font-variant-numeric:tabular-nums}
+.stat .sub{font-size:.76rem;margin-top:2px;color:#8a97a8}
+.barrow{display:grid;grid-template-columns:150px 1fr 40px;align-items:center;gap:12px;margin:8px 0;font-size:.83rem}
+.bartrack{background:#f0ece3;border-radius:6px;height:15px;overflow:hidden}
+.barfill{height:100%;background:linear-gradient(90deg,var(--gold-l),var(--gold));border-radius:6px}
+.barrow .n{text-align:right;font-weight:600;color:var(--navy)}
+
+.pill{display:inline-flex;align-items:center;gap:6px;padding:3px 11px;border-radius:20px;font-size:.73rem;font-weight:600}
+.pill .dot{width:7px;height:7px;border-radius:50%}
+.pill.borrador{background:#eef1f5;color:#5a6675}.pill.borrador .dot{background:#8a97a8}
+.pill.en_revision_carrera{background:#efe8fb;color:#5b3fc4}.pill.en_revision_carrera .dot{background:var(--violet)}
+.pill.en_revision_deu{background:#e3f4fd;color:#0b6fa4}.pill.en_revision_deu .dot{background:var(--cyan)}
+.pill.avalado{background:#e2f7ee;color:#0d8b5c}.pill.avalado .dot{background:var(--emerald)}
+.pill.condicionado{background:#fdf3dd;color:#a67c14}.pill.condicionado .dot{background:var(--amber)}
+.pill.rechazado{background:#fdeaea;color:#c0392b}.pill.rechazado .dot{background:var(--red)}
+.pill.pendiente{background:#fdf3dd;color:#a67c14}.pill.pendiente .dot{background:var(--amber)}
+
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+th{text-align:left;color:#8a97a8;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.06em;padding:9px 11px;border-bottom:1px solid var(--line)}
+td{padding:10px 11px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:hover td{background:#faf8f4}
+.t-folio{font-family:ui-monospace,monospace;font-size:.79rem;color:var(--navy);font-weight:600}
+
+.field{margin-bottom:13px}
+.field label{display:block;font-size:.8rem;font-weight:600;color:#3a4557;margin-bottom:5px}
+.field input,.field select,.field textarea{width:100%;padding:9px 11px;border:1.5px solid var(--line);border-radius:9px;font-family:inherit;font-size:.88rem}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(213,160,33,.16)}
+.kv{display:grid;grid-template-columns:170px 1fr;gap:7px 14px;font-size:.87rem}
+.kv .k{color:#8a97a8;font-weight:500}
+@media(max-width:560px){.kv{grid-template-columns:1fr}.kv .k{margin-top:6px}}
+.divider{height:1px;background:var(--line);margin:16px 0}
+.tag{display:inline-block;background:#f3f0ea;border:1px solid var(--line);color:#5a6675;border-radius:6px;padding:1px 8px;font-size:.72rem;margin:2px 3px 0 0}
+.empty{padding:24px;text-align:center;color:#8a97a8;font-size:.88rem}
+
+.check{display:flex;align-items:flex-start;gap:11px;padding:11px 3px;border-bottom:1px solid var(--line)}
+.check:last-child{border:none}
+.check .ci{width:25px;height:25px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700}
+.ci.ok{background:#e2f7ee;color:#0d8b5c}.ci.warn{background:#fdf3dd;color:#a67c14}.ci.err{background:#fdeaea;color:#c0392b}.ci.info{background:#e3f4fd;color:#0b6fa4}
+.check .ct{font-weight:600;font-size:.86rem}.check .cd{font-size:.79rem;color:#6b7686;margin-top:2px}
+.notice{display:flex;gap:11px;padding:12px 14px;border-radius:11px;font-size:.82rem;line-height:1.5}
+.notice.legal{background:#f4f0fb;border:1px solid #e0d3f5;color:#4a3a6b}
+.notice.info{background:#eef6fd;border:1px solid #cfe6f7;color:#0b5680}
+.vote-member{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid var(--line)}
+.vote-member:last-child{border:none}
+.vote-member .av{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--navy),var(--navy2));color:#fff;display:flex;align-items:center;justify-content:center;font-weight:600;font-size:.75rem;flex-shrink:0}
+.vote-member .vn{font-weight:600;font-size:.84rem}.vote-member .vr{font-size:.73rem;color:#8a97a8}
+.tabbar{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:12px 0 14px;flex-wrap:wrap}
+.tabbar button{padding:8px 13px;font-size:.83rem;font-weight:600;color:#6b7686;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabbar button.active{color:var(--navy);border-bottom-color:var(--gold)}
+
+.modal{position:fixed;inset:0;background:rgba(3,20,40,.6);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.modal.active{display:flex}
+.modal-card{background:#fff;border-radius:20px;padding:26px;width:100%;max-width:410px;box-shadow:var(--shadow-2)}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--navy);color:#fff;padding:12px 22px;border-radius:30px;font-size:.85rem;font-weight:500;box-shadow:var(--shadow-2);z-index:120;transition:.35s var(--ease);opacity:0}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.val-msg.err{color:#c0392b;font-size:.8rem}
+.tl{position:relative;padding-left:24px;margin-top:6px}
+.tl::before{content:"";position:absolute;left:7px;top:4px;bottom:4px;width:2px;background:var(--line)}
+.tl-item{position:relative;padding-bottom:14px}
+.tl-item::before{content:"";position:absolute;left:-21px;top:3px;width:11px;height:11px;border-radius:50%;background:#fff;border:2.5px solid var(--line)}
+.tl-item.done::before{background:var(--emerald);border-color:var(--emerald)}
+.tl-item.active::before{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 4px rgba(213,160,33,.2)}
+.tl-item .tt{font-weight:600;font-size:.86rem}.tl-item .td{font-size:.76rem;color:#8a97a8}
+</style>
+</head>
+<body>
+<div id="deu-bg"></div>
+<div class="shell">
+  <div class="appbar">
+    <div class="logo-chip"><img src="public/assets/Gestion-diplomados-logo.png" alt="Gestión de Diplomados"></div>
+    <div class="title">Panel interno<small>Comités y Administración · DEU FES Iztacala</small></div>
+    <div class="appbar-spacer"></div>
+    <a href="diplomados.html" class="btn-home">Registro público</a>
+    <div id="userChip" class="user-chip hidden"><div class="av" id="avInit">U</div><div><small id="uName" style="color:#fff;font-weight:600;display:block">Usuario</small><small id="uRole">—</small></div></div>
+    <button id="perfilBtn" class="btn-home hidden">Mi perfil</button>
+    <button id="logoutBtn" class="btn-home hidden">Salir</button>
+  </div>
+
+  <div class="wrap" id="wrap">
+    <div id="mainViews"></div>
+  </div>
+</div>
+
+<!-- AUTH -->
+<div class="modal" id="authModal">
+  <div class="modal-card">
+    <h2 class="serif">Acceso al panel interno</h2>
+    <p class="muted" style="font-size:.85rem;margin-top:2px">Para miembros de comité y administración. Las cuentas las provisiona la DEU.</p>
+    <div class="field" style="margin-top:14px"><label>Correo</label><input id="a_email" type="email"></div>
+    <div class="field"><label>Contraseña</label><input id="a_pass" type="password"></div>
+    <div id="authErr" class="val-msg err" style="min-height:16px"></div>
+    <button class="btn gold" id="authSubmit" style="width:100%;justify-content:center">Entrar</button>
+  </div>
+</div>
+
+<div class="modal" id="perfilModal">
+  <div class="modal-card">
+    <h2 class="serif">Mi perfil</h2>
+    <p class="muted" style="font-size:.84rem;margin-top:2px">Sesión: <span id="perfilCorreo"></span></p>
+    <div class="field" style="margin-top:14px"><label>Nueva contraseña</label><input id="p_pass1" type="password" placeholder="Mínimo 6 caracteres"></div>
+    <div class="field"><label>Confirmar contraseña</label><input id="p_pass2" type="password"></div>
+    <div id="perfilMsg" style="min-height:16px;font-size:.8rem"></div>
+    <div class="row" style="justify-content:flex-end;margin-top:6px"><button class="btn ghost" id="perfilCancel">Cerrar</button><button class="btn gold" id="perfilSave">Guardar contraseña</button></div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="src/js/deu-background.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL='https://risatbuqolklefvjgngb.supabase.co';
+const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpc2F0YnVxb2xrbGVmdmpnbmdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxNjc0MzUsImV4cCI6MjA4OTc0MzQzNX0.PTDGmpihCPd5iz8ZhbcUOMbGNuS4mi1sCD5linrVGvY';
+const SB=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON);
+const DEU=()=>SB.schema('deu');
+let USER=null, PERFIL=null;
+const $=s=>document.querySelector(s), M=()=>document.getElementById('mainViews');
+function esc(s){return (s==null?'':(''+s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function toast(m,ms=2600){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),ms);}
+const CARRERA_LBL={medicina:'Medicina',cirujano_dentista:'Cirujano Dentista',enfermeria:'Enfermería',optometria:'Optometría',psicologia:'Psicología',biologia:'Biología',interdisciplinaria:'Interdisciplinaria'};
+const TIPO_LBL={diplomado:'Diplomado',curso:'Curso',taller:'Taller',diplomado_titulacion:'Diplomado (titulación)'};
+const ESTADO_LBL={borrador:'Borrador',en_revision_carrera:'En comité de carrera',en_revision_deu:'En comité DEU',avalado:'Avalado',condicionado:'Condicionado',rechazado:'No avalado'};
+const ROL_LBL={registrante:'Responsable académico',comite_carrera:'Comité de carrera',comite_deu:'Comité DEU',admin:'Administrador'};
+const SENTIDO_LBL={a_favor:'A favor',a_favor_condiciones:'A favor con condiciones',en_contra:'En contra',abstencion:'Abstención'};
+
+/* ── Auth ── */
+$('#authSubmit').onclick=async()=>{
+  const email=$('#a_email').value.trim(), pass=$('#a_pass').value; $('#authErr').textContent='';
+  if(!email||!pass){$('#authErr').textContent='Completa correo y contraseña.';return;}
+  try{const {error}=await SB.auth.signInWithPassword({email,password:pass});if(error)throw error;
+    $('#authModal').classList.remove('active'); await boot();
+  }catch(e){$('#authErr').textContent=e.message||'No se pudo entrar.';}
+};
+$('#logoutBtn').onclick=async()=>{await SB.auth.signOut();location.reload();};
+$('#perfilBtn').onclick=()=>{$('#perfilCorreo').textContent=USER?USER.email:'';$('#p_pass1').value='';$('#p_pass2').value='';$('#perfilMsg').textContent='';$('#perfilModal').classList.add('active');};
+$('#perfilCancel').onclick=()=>$('#perfilModal').classList.remove('active');
+$('#perfilSave').onclick=async()=>{
+  const a=$('#p_pass1').value, b=$('#p_pass2').value; const msg=$('#perfilMsg');
+  if(a.length<6){msg.style.color='#c0392b';msg.textContent='La contraseña debe tener al menos 6 caracteres.';return;}
+  if(a!==b){msg.style.color='#c0392b';msg.textContent='Las contraseñas no coinciden.';return;}
+  try{const {error}=await SB.auth.updateUser({password:a});if(error)throw error;
+    $('#perfilModal').classList.remove('active');toast('Contraseña actualizada ✓');
+  }catch(e){msg.style.color='#c0392b';msg.textContent=e.message||'No se pudo actualizar.';}
+};
+
+async function boot(){
+  const {data:{session}}=await SB.auth.getSession();
+  if(!session){$('#authModal').classList.add('active');return;}
+  USER=session.user;
+  const {data:perfil}=await DEU().from('perfiles').select('*').eq('user_id',USER.id).maybeSingle();
+  PERFIL=perfil;
+  if(!perfil||perfil.rol==='registrante'){
+    M().innerHTML='<div class="card"><div class="empty">Tu cuenta no tiene un rol interno asignado. Solicita a la administración de la DEU que te dé de alta como miembro de comité o administrador.</div></div>';
+    $('#uName').textContent=USER.email;$('#uRole').textContent='Sin rol interno';$('#avInit').textContent=(USER.email[0]||'U').toUpperCase();
+    $('#userChip').classList.remove('hidden');$('#logoutBtn').classList.remove('hidden');$('#perfilBtn').classList.remove('hidden');return;
+  }
+  $('#uName').textContent=perfil.nombre;$('#uRole').textContent=ROL_LBL[perfil.rol]+(perfil.carrera?(' · '+CARRERA_LBL[perfil.carrera]):'');
+  $('#avInit').textContent=(perfil.nombre[0]||'U').toUpperCase();
+  $('#userChip').classList.remove('hidden');$('#logoutBtn').classList.remove('hidden');$('#perfilBtn').classList.remove('hidden');
+  if(perfil.rol==='admin')adminDashboard(); else bandeja();
+}
+
+/* ═══════════ COMITÉS: bandeja ═══════════ */
+async function bandeja(){
+  const etapa = PERFIL.rol==='comite_deu'?'deu':'carrera';
+  const estado = etapa==='deu'?'en_revision_deu':'en_revision_carrera';
+  const {data,error}=await DEU().from('actividades').select('id,folio,titulo,tipo,carrera,estado,duracion_horas,creditos').eq('estado',estado).order('created_at',{ascending:true});
+  const kick = etapa==='deu'?'Comité DEU · Validación institucional':('Comité de Carrera · '+CARRERA_LBL[PERFIL.carrera]);
+  let rows='';
+  if(error) rows='<div class="empty">Error: '+esc(error.message)+'</div>';
+  else if(!data.length) rows='<div class="empty">No hay solicitudes pendientes en tu bandeja.</div>';
+  else rows='<table><thead><tr><th>Folio</th><th>Actividad</th><th>Tipo</th><th>Carrera</th><th></th></tr></thead><tbody>'+
+    data.map(a=>`<tr><td class="t-folio">${esc(a.folio)}</td><td>${esc(a.titulo)}</td><td>${TIPO_LBL[a.tipo]}</td><td>${CARRERA_LBL[a.carrera]}</td>
+    <td><button class="btn sm gold" data-open="${a.id}">Dictaminar</button></td></tr>`).join('')+'</tbody></table>';
+  M().innerHTML=`<div class="page-head"><div class="kick">${esc(kick)}</div><h1 class="serif">Bandeja de dictaminación</h1><p>Evalúa de forma colegiada la pertinencia de las actividades asignadas. Requiere quórum y mayoría.</p></div>
+    <div class="card">${rows}</div>`;
+  M().querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>detalle(b.dataset.open, etapa));
+}
+
+/* ═══════════ Detalle + dictaminación ═══════════ */
+async function detalle(id, etapa){
+  M().innerHTML='<div class="card"><div class="empty">Cargando expediente…</div></div>';
+  const {data:a}=await DEU().from('actividades').select('*').eq('id',id).single();
+  const {data:resp}=await DEU().from('responsables').select('*').eq('actividad_id',id).maybeSingle();
+  let verif=null;
+  if(resp){const {data:vs}=await DEU().from('verificaciones_raa').select('*').eq('responsable_id',resp.id).order('created_at',{ascending:false}).limit(1);verif=(vs||[])[0];}
+  const {data:docs}=await DEU().from('documentos').select('*').eq('actividad_id',id);
+  const {data:votos}=await DEU().from('votos').select('sentido,pertinencia,justificacion,miembro_id').eq('actividad_id',id).eq('etapa',etapa);
+  let perfMap={};
+  if(votos&&votos.length){const ids=votos.map(v=>v.miembro_id);const {data:ps}=await DEU().from('perfiles').select('id,nombre,rol').in('id',ids);(ps||[]).forEach(p=>perfMap[p.id]=p);}
+  const {data:dict}=await DEU().from('dictamenes').select('*').eq('actividad_id',id).eq('etapa',etapa).maybeSingle();
+  const canResolve = PERFIL.rol==='admin' || (etapa==='carrera'&&PERFIL.rol==='comite_carrera'&&PERFIL.carrera===a.carrera) || (etapa==='deu'&&PERFIL.rol==='comite_deu');
+  const pv=(a.pumai_validacion||[]);
+  const obs=pv.filter(c=>c.res&&c.res.estado!=='ok').map(c=>`<span class="pill pendiente"><span class="dot"></span>${esc((c.res.msg||'').slice(0,42))}</span>`).join(' ')||'<span class="muted" style="font-size:.83rem">Sin observaciones de PUM-AI.</span>';
+
+  const tem=(a.temario||[]).map(m=>`${esc(m.tema||'')} · ${esc(m.responsable||'')} · ${esc(m.horas||'')} h`).join('<br>')||'—';
+  const dossier = verif?dossierHTML(verif):'<div class="notice info"><span>ℹ</span><div>Aún no se ejecuta la verificación del responsable académico.</div></div>';
+
+  M().innerHTML=`<div class="page-head"><div class="kick">${etapa==='deu'?'Comité DEU':('Comité de Carrera · '+CARRERA_LBL[a.carrera])} · ${esc(a.folio)}</div>
+    <h1 class="serif">${esc(a.titulo)}</h1></div>
+  <div class="row" style="margin-bottom:12px"><button class="btn ghost sm" id="volver">← Bandeja</button><span class="pill ${a.estado}"><span class="dot"></span>${ESTADO_LBL[a.estado]}</span></div>
+  <div class="grid grid-2">
+    <div>
+      <div class="card"><h2>Ficha de la actividad</h2>
+        <div class="kv" style="margin-top:10px">
+          <div class="k">Tipo · duración</div><div>${TIPO_LBL[a.tipo]} · ${a.duracion_horas} h · ${a.creditos} créditos</div>
+          <div class="k">Modalidad</div><div>${esc(a.modalidad)}</div>
+          <div class="k">Responsable</div><div>${esc(resp?resp.nombre:'—')}${resp&&resp.cedula_profesional?(' · céd. '+esc(resp.cedula_profesional)):''}</div>
+          <div class="k">Objetivo general</div><div>${esc(a.objetivo_general||'—')}</div>
+          <div class="k">Módulos</div><div>${tem}</div>
+          <div class="k">Evaluación</div><div>${esc(a.evaluacion||'—')}</div>
+          <div class="k">Documentos</div><div>${(docs||[]).map(d=>esc(d.nombre)).join(', ')||'—'}</div>
+        </div>
+        <div class="divider"></div><h3>Observaciones de PUM-AI</h3><div style="margin-top:8px">${obs}</div>
+      </div>
+      <div class="card"><h2>Verificación del responsable académico</h2><div style="margin-top:8px">${dossier}</div></div>
+    </div>
+    <div>
+      <div class="card"><h2>Votación colegiada</h2>
+        <div id="votosBox" style="margin-top:6px">${votosHTML(votos,perfMap)}</div>
+        ${canResolve?voteFormHTML(a,etapa):'<div class="notice info" style="margin-top:10px"><span>ℹ</span><div>Solo los miembros del comité correspondiente pueden votar y resolver.</div></div>'}
+      </div>
+      ${canResolve?resolveHTML(a,etapa,dict):''}
+    </div>
+  </div>`;
+  $('#volver').onclick=()=>bandeja();
+  if(canResolve){
+    $('#btnVoto').onclick=async()=>{
+      const b=$('#btnVoto');b.disabled=true;
+      try{const {error}=await DEU().rpc('emitir_voto',{p_actividad:id,p_etapa:etapa,p_sentido:$('#v_sentido').value,p_pertinencia:$('#v_pert').value||null,p_justificacion:$('#v_just').value||null});
+        if(error)throw error;toast('Voto registrado ✓');detalle(id,etapa);
+      }catch(e){toast('Error: '+(e.message||e));b.disabled=false;}
+    };
+    $('#btnResolver').onclick=async()=>{
+      const b=$('#btnResolver');b.disabled=true;b.innerHTML='<span class="spin"></span> Resolviendo…';
+      try{const {error}=await DEU().rpc('resolver_dictamen',{p_actividad:id,p_etapa:etapa,p_resultado:$('#r_result').value,p_acta:$('#r_acta').value||null});
+        if(error)throw error;toast('Dictamen emitido ✓');bandeja();
+      }catch(e){toast('Error: '+(e.message||e));b.disabled=false;b.textContent='Emitir dictamen';}
+    };
+  }
+}
+function votosHTML(votos,perfMap){
+  if(!votos||!votos.length)return '<div class="muted" style="font-size:.84rem">Aún no hay votos emitidos.</div>';
+  const tally={};votos.forEach(v=>tally[v.sentido]=(tally[v.sentido]||0)+1);
+  const chips=Object.entries(tally).map(([k,n])=>`<span class="tag">${SENTIDO_LBL[k]}: <b>${n}</b></span>`).join(' ');
+  return votos.map(v=>{const p=perfMap[v.miembro_id]||{nombre:'Miembro'};const cls=v.sentido.startsWith('a_favor')?'avalado':v.sentido==='en_contra'?'rechazado':'pendiente';
+    return `<div class="vote-member"><div class="av">${esc((p.nombre[0]||'?').toUpperCase())}</div><div style="flex:1"><div class="vn">${esc(p.nombre)}</div><div class="vr">${ROL_LBL[p.rol]||''}</div></div>
+      <span class="pill ${cls}"><span class="dot"></span>${SENTIDO_LBL[v.sentido]}</span></div>`;}).join('')+`<div style="margin-top:8px">${chips}</div>`;
+}
+function voteFormHTML(a,etapa){
+  return `<div class="divider"></div><h3>Mi voto</h3>
+    <div class="grid grid-2" style="margin-top:8px">
+      <div class="field"><label>Sentido</label><select id="v_sentido"><option value="a_favor">A favor</option><option value="a_favor_condiciones">A favor con condiciones</option><option value="en_contra">En contra</option><option value="abstencion">Abstención</option></select></div>
+      <div class="field"><label>Pertinencia</label><select id="v_pert"><option value="">—</option><option value="alta">Alta</option><option value="media">Media</option><option value="baja">Baja</option></select></div>
+    </div>
+    <div class="field"><label>Justificación</label><textarea id="v_just" rows="2"></textarea></div>
+    <button class="btn gold sm" id="btnVoto">Emitir mi voto</button>`;
+}
+function resolveHTML(a,etapa,dict){
+  const opts = etapa==='carrera'
+    ? `<option value="a_favor">A favor → pasa a Comité DEU</option><option value="a_favor_condiciones">A favor con condiciones → pasa a DEU</option><option value="en_contra">En contra → no avalado</option>`
+    : `<option value="a_favor">Avalar</option><option value="a_favor_condiciones">Avalar con condiciones (devolver)</option><option value="en_contra">No avalar</option>`;
+  return `<div class="card"><h2>Resolución colegiada</h2>
+    <p class="muted" style="font-size:.8rem">${dict&&dict.resuelto?'Este dictamen ya fue resuelto; puedes actualizarlo.':'Registra el resultado colegiado de esta etapa.'}</p>
+    <div class="field" style="margin-top:8px"><label>Resultado</label><select id="r_result">${opts}</select></div>
+    <div class="field"><label>Acta / observaciones</label><textarea id="r_acta" rows="2">${esc(dict?dict.acta||'':'')}</textarea></div>
+    <button class="btn gold" id="btnResolver">Emitir dictamen</button></div>`;
+}
+function dossierHTML(v){
+  const r=v.resultado||{};const sc=v.indice_confianza??0;const color=sc>=75?'#0d8b5c':sc>=50?'#a67c14':'#c0392b';
+  const sec=(key,lbl)=>{const arr=r[key]||[];if(!arr.length)return '';
+    return `<div style="margin-top:10px"><div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:#8a97a8;font-weight:700;margin-bottom:2px">${lbl}</div>`+
+      arr.map(f=>`<div class="check"><div class="ci ${f.estado==='ok'?'ok':f.estado==='err'?'err':f.estado==='info'?'info':'warn'}">${f.estado==='ok'?'✓':f.estado==='err'?'✕':f.estado==='info'?'i':'!'}</div><div><div class="ct">${esc(f.titulo)}</div><div class="cd">${esc(f.detalle)}</div>${(f.fuentes||[]).map(s=>`<span class="tag">${esc(s)}</span>`).join('')}</div></div>`).join('')+`</div>`;};
+  return `<div class="row" style="justify-content:space-between;align-items:center"><div class="muted" style="font-size:.78rem">Ref. ${esc(v.audit_ref||'')}</div><div style="text-align:center"><div style="font-size:1.5rem;font-weight:700;color:${color};line-height:1">${sc}</div><div style="font-size:.64rem;color:#8a97a8">Confianza /100</div></div></div>
+    <div class="notice legal" style="margin-top:8px"><span>🔒</span><div>Insumo para la dictaminación (LFPDPPP). No es veredicto automático; el peso de cada hallazgo lo decide el comité.</div></div>
+    ${sec('oficial','Oficial')}${sec('academico','Académico')}${sec('web','Presencia web / OSINT')}${sec('riesgo','Reportes y riesgo')}`;
+}
+
+/* ═══════════ ADMIN ═══════════ */
+let ADMIN_DATA=[];
+async function adminDashboard(){
+  const {data,error}=await DEU().from('actividades').select('id,folio,titulo,tipo,carrera,estado,duracion_horas,creditos,created_at').order('created_at',{ascending:false});
+  ADMIN_DATA=data||[];
+  const byCarrera={},byEstado={};
+  ADMIN_DATA.forEach(a=>{byCarrera[a.carrera]=(byCarrera[a.carrera]||0)+1;byEstado[a.estado]=(byEstado[a.estado]||0)+1;});
+  const total=ADMIN_DATA.length, avalados=byEstado.avalado||0, enDict=(byEstado.en_revision_carrera||0)+(byEstado.en_revision_deu||0);
+  const maxC=Math.max(1,...Object.values(byCarrera));
+  const bars=Object.entries(byCarrera).sort((a,b)=>b[1]-a[1]).map(([k,n])=>`<div class="barrow"><span>${CARRERA_LBL[k]||k}</span><div class="bartrack"><div class="barfill" style="width:${Math.round(n/maxC*100)}%"></div></div><span class="n">${n}</span></div>`).join('')||'<div class="empty">Sin datos aún.</div>';
+  const estadoList=['avalado','en_revision_carrera','en_revision_deu','condicionado','borrador','rechazado'].map(e=>`<div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0"><span class="pill ${e}"><span class="dot"></span>${ESTADO_LBL[e]}</span><b>${byEstado[e]||0}</b></div>`).join('');
+  M().innerHTML=`<div class="page-head"><div class="kick">Administración · DEU</div><h1 class="serif">Tablero general</h1></div>
+    <div class="grid grid-4" style="margin-bottom:16px">
+      <div class="stat"><div class="lbl">Solicitudes</div><div class="val">${total}</div><div class="sub">total histórico</div></div>
+      <div class="stat"><div class="lbl">Avaladas</div><div class="val">${avalados}</div><div class="sub">${total?Math.round(avalados/total*100):0}% del total</div></div>
+      <div class="stat"><div class="lbl">En dictaminación</div><div class="val">${enDict}</div><div class="sub">carrera + DEU</div></div>
+      <div class="stat"><div class="lbl">Borradores</div><div class="val">${byEstado.borrador||0}</div><div class="sub">sin enviar</div></div>
+    </div>
+    <div class="grid grid-2">
+      <div class="card"><h2>Solicitudes por carrera</h2><div style="margin-top:10px">${bars}</div></div>
+      <div class="card"><h2>Distribución por estado</h2><div style="margin-top:6px">${estadoList}</div>
+        <div class="divider"></div><button class="btn ghost sm" id="verRegistros">Ver registros y exportar →</button></div>
+    </div>`;
+  $('#verRegistros').onclick=adminRegistros;
+}
+function adminRegistros(){
+  const carreras=[...new Set(ADMIN_DATA.map(a=>a.carrera))];
+  M().innerHTML=`<div class="page-head"><div class="kick">Administración · DEU</div><h1 class="serif">Registros de actividades</h1><p>Repositorio central. Exporta el padrón completo o filtrado.</p></div>
+  <div class="card">
+    <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="row" style="gap:8px">
+        <select id="fCarrera" style="padding:8px 11px;border:1.5px solid var(--line);border-radius:9px;font-size:.84rem"><option value="">Todas las carreras</option>${carreras.map(c=>`<option value="${c}">${CARRERA_LBL[c]||c}</option>`).join('')}</select>
+        <select id="fEstado" style="padding:8px 11px;border:1.5px solid var(--line);border-radius:9px;font-size:.84rem"><option value="">Todos los estados</option>${Object.entries(ESTADO_LBL).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select>
+      </div>
+      <div class="row" style="gap:8px">
+        <button class="btn ghost sm" id="expExcel">⬇ Excel</button>
+        <button class="btn ghost sm" id="expPDF">⬇ PDF</button>
+        <button class="btn ghost sm" id="volverDash">← Tablero</button>
+      </div>
+    </div>
+    <div id="regTable"></div>
+  </div>`;
+  const render=()=>{
+    const fc=$('#fCarrera').value, fe=$('#fEstado').value;
+    const rows=ADMIN_DATA.filter(a=>(!fc||a.carrera===fc)&&(!fe||a.estado===fe));
+    $('#regTable').innerHTML = rows.length?('<table><thead><tr><th>Folio</th><th>Actividad</th><th>Tipo</th><th>Carrera</th><th>Horas</th><th>Estado</th><th></th></tr></thead><tbody>'+
+      rows.map(a=>`<tr><td class="t-folio">${esc(a.folio)}</td><td>${esc(a.titulo)}</td><td>${TIPO_LBL[a.tipo]}</td><td>${CARRERA_LBL[a.carrera]}</td><td>${a.duracion_horas}</td>
+      <td><span class="pill ${a.estado}"><span class="dot"></span>${ESTADO_LBL[a.estado]}</span></td>
+      <td><button class="btn sm ghost" data-open="${a.id}">Abrir</button></td></tr>`).join('')+'</tbody></table>'):'<div class="empty">Sin registros para el filtro.</div>';
+    $('#regTable').querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>detalle(b.dataset.open, ADMIN_DATA.find(x=>x.id===b.dataset.open).estado==='en_revision_deu'?'deu':'carrera'));
+  };
+  $('#fCarrera').onchange=render;$('#fEstado').onchange=render;
+  $('#volverDash').onclick=adminDashboard;
+  $('#expExcel').onclick=()=>exportExcel(currentRows());
+  $('#expPDF').onclick=()=>exportPDF(currentRows());
+  function currentRows(){const fc=$('#fCarrera').value,fe=$('#fEstado').value;return ADMIN_DATA.filter(a=>(!fc||a.carrera===fc)&&(!fe||a.estado===fe));}
+  render();
+}
+function rowsForExport(rows){return rows.map(a=>({Folio:a.folio,Actividad:a.titulo,Tipo:TIPO_LBL[a.tipo],Carrera:CARRERA_LBL[a.carrera]||a.carrera,Horas:a.duracion_horas,Creditos:a.creditos,Estado:ESTADO_LBL[a.estado],Registro:(a.created_at||'').slice(0,10)}));}
+function exportExcel(rows){
+  const data=rowsForExport(rows);
+  const done=(XLSX)=>{const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Diplomados');XLSX.writeFile(wb,'padron-diplomados-DEU.xlsx');toast('Excel generado ✓');};
+  if(window.XLSX)return done(window.XLSX);
+  const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+  s.onload=()=>done(window.XLSX);
+  s.onerror=()=>{ // fallback CSV
+    const head=Object.keys(data[0]||{Folio:''});const csv=[head.join(',')].concat(data.map(r=>head.map(h=>'"'+(''+r[h]).replace(/"/g,'""')+'"').join(','))).join('\n');
+    const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='padron-diplomados-DEU.csv';a.click();URL.revokeObjectURL(url);toast('Exportado como CSV (compatible con Excel)');
+  };
+  document.head.appendChild(s);
+}
+function exportPDF(rows){
+  const data=rowsForExport(rows);const fecha=new Date().toISOString().slice(0,10);
+  const w=window.open('','_blank');if(!w){toast('Permite ventanas emergentes para el PDF.');return;}
+  const head=['Folio','Actividad','Tipo','Carrera','Horas','Estado'];
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Padrón de Diplomados — DEU</title>
+    <style>body{font-family:Inter,Arial,sans-serif;color:#0A1A30;padding:26px}h1{color:#062B5C;font-size:18px;margin:0}
+    .sub{color:#6b7686;font-size:12px;margin:2px 0 16px}table{width:100%;border-collapse:collapse;font-size:11px}
+    th{background:#062B5C;color:#fff;text-align:left;padding:7px 8px}td{padding:6px 8px;border-bottom:1px solid #e5e5e5}
+    .head{display:flex;align-items:center;gap:12px;margin-bottom:6px}.gold{height:4px;background:#D5A021;width:60px;border-radius:2px}
+    @media print{.noprint{display:none}}</style></head><body>
+    <div class="head"><div><h1>Padrón de Diplomados y Cursos</h1><div class="gold"></div></div></div>
+    <div class="sub">División de Estudios Universitarios · FES Iztacala, UNAM · Generado ${fecha} · ${data.length} registros</div>
+    <table><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>
+    ${data.map(r=>`<tr><td>${r.Folio}</td><td>${r.Actividad}</td><td>${r.Tipo}</td><td>${r.Carrera}</td><td>${r.Horas}</td><td>${r.Estado}</td></tr>`).join('')}
+    </tbody></table>
+    <p class="noprint" style="margin-top:18px;color:#6b7686;font-size:12px">Usa el diálogo de impresión para guardar como PDF.</p>
+    <script>window.onload=function(){setTimeout(function(){window.print();},250);}<\/script></body></html>`);
+  w.document.close();toast('Abriendo PDF para impresión…');
+}
+
+/* init */
+boot();
+</script>
+</body>
+</html>
