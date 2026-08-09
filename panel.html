@@ -118,6 +118,33 @@ tr:hover td{background:#faf8f4}
 .tl-item.done::before{background:var(--emerald);border-color:var(--emerald)}
 .tl-item.active::before{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 4px rgba(213,160,33,.2)}
 .tl-item .tt{font-weight:600;font-size:.86rem}.tl-item .td{font-size:.76rem;color:#8a97a8}
+/* ── Centro de Inteligencia ── */
+.anav{display:flex;gap:4px;flex-wrap:wrap;margin:0 0 18px;background:rgba(255,255,255,.62);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border:1px solid rgba(6,43,92,.1);border-radius:14px;padding:6px;box-shadow:0 8px 26px rgba(6,43,92,.1)}
+.anav button{padding:9px 14px;border-radius:10px;font-size:.85rem;font-weight:600;color:#54606f;white-space:nowrap;transition:.15s}
+.anav button.active{background:var(--navy);color:#fff}
+.anav button:hover:not(.active){background:#eef1f5}
+.funnel{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.fbar{position:relative;color:#fff;border-radius:9px;padding:10px 13px;font-size:.85rem;font-weight:600;display:flex;justify-content:space-between;min-width:130px;transition:width .5s var(--ease)}
+.chart-svg{width:100%;height:auto;display:block;overflow:visible}
+.heatgrid{display:grid;gap:3px;font-size:.7rem;margin-top:8px}
+.heatcell{padding:9px 3px;border-radius:6px;text-align:center;font-weight:700}
+.slider-row{display:flex;align-items:center;gap:10px;margin:9px 0;font-size:.84rem}
+.slider-row label{width:130px;color:#3a4557;font-weight:600}
+.slider-row input[type=range]{flex:1;accent-color:var(--gold)}
+.slider-row .v{width:54px;text-align:right;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+.nodeinfo{background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:12px;padding:14px;margin-top:10px}
+.flag{display:inline-flex;align-items:center;gap:5px;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:20px;margin:1px 2px 1px 0}
+.flag.red{background:#fdeaea;color:#c0392b}.flag.amber{background:#fdf3dd;color:#a67c14}.flag.ok{background:#e2f7ee;color:#0d8b5c}.flag.info{background:#e3f4fd;color:#0b6fa4}
+.mini{padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;font-size:.84rem;font-family:inherit;background:#fff}
+.dlegend{display:flex;flex-wrap:wrap;gap:10px;font-size:.8rem;margin-top:8px}
+.dlegend i{width:11px;height:11px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:middle}
+.insight{display:flex;gap:10px;padding:11px 13px;border-left:3px solid var(--gold);background:rgba(213,160,33,.07);border-radius:0 10px 10px 0;margin:8px 0;font-size:.86rem}
+.g3d-wrap{position:relative;border-radius:14px;overflow:hidden;border:1px solid rgba(6,43,92,.14);background:radial-gradient(circle at 50% 30%,#0d2444,#071022)}
+.g3d-hint{position:absolute;top:10px;left:12px;background:rgba(7,16,34,.72);border-radius:8px;padding:5px 10px;font-size:11px;color:#cdd8e8}
+.pumai-analyst{display:flex;flex-direction:column;gap:8px}
+.pa-msg{max-width:88%;padding:10px 13px;border-radius:13px;font-size:.86rem;line-height:1.5}
+.pa-msg.bot{background:#f2f5f9;align-self:flex-start;border-bottom-left-radius:4px}
+.pa-msg.user{background:var(--navy);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
 </style>
 </head>
 <body>
@@ -165,6 +192,8 @@ tr:hover td{background:#faf8f4}
 
 <script src="src/js/deu-background.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 <script>
 const SUPABASE_URL='https://risatbuqolklefvjgngb.supabase.co';
 const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpc2F0YnVxb2xrbGVmdmpnbmdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxNjc0MzUsImV4cCI6MjA4OTc0MzQzNX0.PTDGmpihCPd5iz8ZhbcUOMbGNuS4mi1sCD5linrVGvY';
@@ -333,95 +362,398 @@ function dossierHTML(v){
     ${sec('oficial','Oficial')}${sec('academico','Académico')}${sec('web','Presencia web / OSINT')}${sec('riesgo','Reportes y riesgo')}`;
 }
 
-/* ═══════════ ADMIN ═══════════ */
-let ADMIN_DATA=[];
+/* ═══════════ ADMIN · Centro de Inteligencia de Diplomados ═══════════ */
+let ADMIN_DATA=[], DICT=[], VERIF=[], RESP=[], DOCS=[], AUDIT=[], PERFILES=[], CFG=null, META={}, adminSec='inteligencia';
+let TS=null, DEMANDA_RAF=null;
+function stopThree(){ if(TS){ if(TS.raf)cancelAnimationFrame(TS.raf); try{TS.renderer.dispose();}catch(e){} TS=null; } if(DEMANDA_RAF){cancelAnimationFrame(DEMANDA_RAF);DEMANDA_RAF=null;} }
+function semaColor(e){ return e==='avalado'?'#34D399':e==='rechazado'?'#EF6461':e==='condicionado'?'#F5B841':e==='borrador'?'#8a97a8':'#38BDF8'; }
+function daysAgo(d){ if(!d)return null; return Math.round((Date.now()-new Date(d).getTime())/86400000); }
+
 async function adminDashboard(){
-  const {data,error}=await DEU().from('actividades').select('id,folio,titulo,tipo,carrera,estado,duracion_horas,creditos,created_at').order('created_at',{ascending:false});
-  ADMIN_DATA=data||[];
-  const byCarrera={},byEstado={};
-  ADMIN_DATA.forEach(a=>{byCarrera[a.carrera]=(byCarrera[a.carrera]||0)+1;byEstado[a.estado]=(byEstado[a.estado]||0)+1;});
-  const total=ADMIN_DATA.length, avalados=byEstado.avalado||0, enDict=(byEstado.en_revision_carrera||0)+(byEstado.en_revision_deu||0);
-  const maxC=Math.max(1,...Object.values(byCarrera));
-  const bars=Object.entries(byCarrera).sort((a,b)=>b[1]-a[1]).map(([k,n])=>`<div class="barrow"><span>${CARRERA_LBL[k]||k}</span><div class="bartrack"><div class="barfill" style="width:${Math.round(n/maxC*100)}%"></div></div><span class="n">${n}</span></div>`).join('')||'<div class="empty">Sin datos aún.</div>';
-  const estadoList=['avalado','en_revision_carrera','en_revision_deu','condicionado','borrador','rechazado'].map(e=>`<div style="display:flex;justify-content:space-between;align-items:center;margin:8px 0"><span class="pill ${e}"><span class="dot"></span>${ESTADO_LBL[e]}</span><b>${byEstado[e]||0}</b></div>`).join('');
-  M().innerHTML=`<div class="page-head"><div class="kick">Administración · DEU</div><h1 class="serif">Tablero general</h1></div>
-    <div class="grid grid-4" style="margin-bottom:16px">
-      <div class="stat"><div class="lbl">Solicitudes</div><div class="val">${total}</div><div class="sub">total histórico</div></div>
-      <div class="stat"><div class="lbl">Avaladas</div><div class="val">${avalados}</div><div class="sub">${total?Math.round(avalados/total*100):0}% del total</div></div>
-      <div class="stat"><div class="lbl">En dictaminación</div><div class="val">${enDict}</div><div class="sub">carrera + DEU</div></div>
-      <div class="stat"><div class="lbl">Borradores</div><div class="val">${byEstado.borrador||0}</div><div class="sub">sin enviar</div></div>
-    </div>
-    <div class="grid grid-2">
-      <div class="card"><h2>Solicitudes por carrera</h2><div style="margin-top:10px">${bars}</div></div>
-      <div class="card"><h2>Distribución por estado</h2><div style="margin-top:6px">${estadoList}</div>
-        <div class="divider"></div><button class="btn ghost sm" id="verRegistros">Ver registros y exportar →</button></div>
-    </div>`;
-  $('#verRegistros').onclick=adminRegistros;
+  M().innerHTML='<div class="card"><div class="empty">Cargando el Centro de Inteligencia…</div></div>';
+  const [a,d,v,r,doc,cfg,perf,aud]=await Promise.all([
+    DEU().from('actividades').select('*').order('created_at',{ascending:false}),
+    DEU().from('dictamenes').select('actividad_id,etapa,resultado,resuelto,created_at,resuelto_at'),
+    DEU().from('verificaciones_raa').select('responsable_id,indice_confianza,resultado,created_at'),
+    DEU().from('responsables').select('id,actividad_id,nombre,cedula_profesional'),
+    DEU().from('documentos').select('actividad_id'),
+    DEU().from('config').select('*').maybeSingle(),
+    DEU().from('perfiles').select('id,user_id,nombre,correo,rol,carrera,activo,created_at'),
+    DEU().from('auditoria').select('actor,accion,entidad,entidad_id,detalle,created_at').order('created_at',{ascending:false})
+  ]);
+  ADMIN_DATA=a.data||[]; DICT=d.data||[]; VERIF=v.data||[]; RESP=r.data||[]; DOCS=doc.data||[];
+  CFG=(cfg&&cfg.data)||{nivel_analisis:'basico',fuentes:[],umbral_confianza:60,retencion_dias:365};
+  PERFILES=perf.data||[]; AUDIT=aud.data||[];
+  computeMeta(); renderAdminShell();
 }
-function adminRegistros(){
-  const carreras=[...new Set(ADMIN_DATA.map(a=>a.carrera))];
-  M().innerHTML=`<div class="page-head"><div class="kick">Administración · DEU</div><h1 class="serif">Registros de actividades</h1><p>Repositorio central. Exporta el padrón completo o filtrado.</p></div>
-  <div class="card">
-    <div class="row" style="justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div class="row" style="gap:8px">
-        <select id="fCarrera" style="padding:8px 11px;border:1.5px solid var(--line);border-radius:9px;font-size:.84rem"><option value="">Todas las carreras</option>${carreras.map(c=>`<option value="${c}">${CARRERA_LBL[c]||c}</option>`).join('')}</select>
-        <select id="fEstado" style="padding:8px 11px;border:1.5px solid var(--line);border-radius:9px;font-size:.84rem"><option value="">Todos los estados</option>${Object.entries(ESTADO_LBL).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select>
-      </div>
-      <div class="row" style="gap:8px">
-        <button class="btn ghost sm" id="expExcel">⬇ Excel</button>
-        <button class="btn ghost sm" id="expPDF">⬇ PDF</button>
-        <button class="btn ghost sm" id="volverDash">← Tablero</button>
-      </div>
-    </div>
-    <div id="regTable"></div>
+function computeMeta(){
+  const confByResp={}; VERIF.forEach(v=>{ if(!(v.responsable_id in confByResp)) confByResp[v.responsable_id]=v.indice_confianza; });
+  const respByAct={}; RESP.forEach(r=>{ (respByAct[r.actividad_id]=respByAct[r.actividad_id]||[]).push(r); });
+  const docsByAct={}; DOCS.forEach(x=>{ docsByAct[x.actividad_id]=(docsByAct[x.actividad_id]||0)+1; });
+  META={};
+  ADMIN_DATA.forEach(act=>{
+    const rs=respByAct[act.id]||[]; let conf=null;
+    rs.forEach(r=>{ if(r.id in confByResp){ const c=confByResp[r.id]; conf=(conf==null)?c:Math.max(conf,c);} });
+    const pv=act.pumai_validacion||[];
+    const errs=pv.filter(c=>c&&c.res&&c.res.estado==='err').length;
+    const warns=pv.filter(c=>c&&c.res&&c.res.estado==='warn').length;
+    const hasDocs=(docsByAct[act.id]||0)>0;
+    let score=45; const reasons=[];
+    if(act.estado==='avalado'){score+=25;reasons.push('Avalado por los comités');}
+    else if(act.estado==='condicionado'){score-=4;reasons.push('Condicionado: requiere correcciones');}
+    else if(act.estado==='rechazado'){score-=25;reasons.push('No avalado');}
+    if(act.tipo==='diplomado'||act.tipo==='diplomado_titulacion'){ if((act.duracion_horas||0)>=120) score+=8; else {score-=10;reasons.push('Duración < 120 h para diplomado');} }
+    if(conf!=null){ score+=Math.round((conf-50)*0.4); reasons.push('Confianza del RAA: '+conf+'/100'); } else reasons.push('RAA sin verificación');
+    if(errs){score-=errs*8;reasons.push(errs+' error(es) de cumplimiento');}
+    if(warns){score-=warns*3;reasons.push(warns+' observación(es) de PUM-AI');}
+    if(!hasDocs){score-=4;reasons.push('Sin documentos cargados');}
+    score=Math.max(0,Math.min(100,score));
+    META[act.id]={conf,errs,warns,hasDocs,score,reasons,resp:rs[0]};
+  });
+}
+function renderAdminShell(){
+  M().innerHTML=`<div class="page-head"><div class="kick">Administración · DEU · FES Iztacala</div><h1 class="serif">Centro de Inteligencia de Diplomados</h1><p>Vista integral del proceso de aval: estatus, análisis con PUM-AI, comparativas y uso responsable de datos.</p></div>
+  <div class="anav" id="anav">${[['inteligencia','📊 Inteligencia'],['grafo','🕸 Grafo 3D'],['comparativa','⚖ Comparativa'],['demanda','🐟 Demanda'],['auditoria','🔒 Auditoría'],['reportes','📄 Reportes'],['config','⚙ Configuración']].map(([k,l])=>`<button data-sec="${k}" class="${k===adminSec?'active':''}">${l}</button>`).join('')}</div>
+  <div id="adminView"></div>`;
+  $('#anav').querySelectorAll('[data-sec]').forEach(b=>b.onclick=()=>{adminSec=b.dataset.sec;$('#anav').querySelectorAll('button').forEach(x=>x.classList.toggle('active',x.dataset.sec===adminSec));renderSec();});
+  renderSec();
+}
+function renderSec(){ stopThree(); const V=$('#adminView');
+  ({inteligencia:secInteligencia,grafo:secGrafo,comparativa:secComparativa,demanda:secDemanda,auditoria:secAuditoria,reportes:secReportes,config:secConfig}[adminSec]||secInteligencia)(V);
+}
+
+/* ── helpers de gráficas ── */
+function barsHTML(obj,lblFn){ const es=Object.entries(obj).sort((a,b)=>b[1]-a[1]); const mx=Math.max(1,...es.map(e=>e[1]));
+  return es.map(([k,n])=>`<div class="barrow"><span>${esc(lblFn?lblFn(k):k)}</span><div class="bartrack"><div class="barfill" style="width:${Math.round(n/mx*100)}%"></div></div><span class="n">${n}</span></div>`).join('')||'<div class="empty">Sin datos.</div>'; }
+function donutSVG(data){ const total=data.reduce((s,d)=>s+d.val,0)||1,r=52,C=2*Math.PI*r; let off=0;
+  const segs=data.map(d=>{const len=d.val/total*C;const s=`<circle cx="70" cy="70" r="${r}" fill="none" stroke="${d.color}" stroke-width="20" stroke-dasharray="${len.toFixed(2)} ${(C-len).toFixed(2)}" stroke-dashoffset="${(-off).toFixed(2)}" transform="rotate(-90 70 70)"/>`;off+=len;return s;}).join('');
+  const leg=data.filter(d=>d.val).map(d=>`<span><i style="background:${d.color}"></i>${esc(d.label)} <b>${d.val}</b></span>`).join('');
+  return `<svg viewBox="0 0 140 140" class="chart-svg" style="max-width:170px;margin:0 auto"><circle cx="70" cy="70" r="52" fill="none" stroke="#eef1f5" stroke-width="20"/>${segs}<text x="70" y="66" text-anchor="middle" font-size="22" font-weight="800" fill="#062B5C">${total}</text><text x="70" y="84" text-anchor="middle" font-size="9" fill="#8a97a8">TOTAL</text></svg><div class="dlegend">${leg}</div>`; }
+function lineSVG(series){ if(!series.length)return '<div class="empty">Sin datos.</div>'; const W=340,H=130,pad=26,max=Math.max(1,...series.map(s=>s.v));
+  const x=i=>pad+(series.length<=1?(W-pad*2)/2:i/(series.length-1)*(W-pad*2)), y=v=>H-pad-(v/max)*(H-pad*1.5);
+  const line=series.map((s,i)=>`${i?'L':'M'}${x(i).toFixed(1)} ${y(s.v).toFixed(1)}`).join(' ');
+  const area=`M${x(0).toFixed(1)} ${H-pad} `+series.map((s,i)=>`L${x(i).toFixed(1)} ${y(s.v).toFixed(1)}`).join(' ')+` L${x(series.length-1).toFixed(1)} ${H-pad} Z`;
+  const dots=series.map((s,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(s.v).toFixed(1)}" r="3.2" fill="#D5A021"/><text x="${x(i).toFixed(1)}" y="${(y(s.v)-8).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="700" fill="#062B5C">${s.v}</text>`).join('');
+  const labs=series.map((s,i)=>`<text x="${x(i).toFixed(1)}" y="${H-8}" text-anchor="middle" font-size="8" fill="#8a97a8">${esc(s.m)}</text>`).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" class="chart-svg"><path d="${area}" fill="rgba(213,160,33,.12)"/><path d="${line}" fill="none" stroke="#D5A021" stroke-width="2.4"/>${dots}${labs}</svg>`; }
+function radarSVG(a){ const axes=['Contenido','Duración','Costo/acc.','Alcance','Aval'];
+  const unam=[78, Math.min(100,(a.duracion_horas||100)/2), 88, 70, 96];
+  const mkt=[72, 62, 45, 80, 40];
+  const cx=110,cy=105,R=78,n=axes.length; const pt=(i,val)=>{const ang=-Math.PI/2+i/n*2*Math.PI;return [cx+Math.cos(ang)*R*val/100, cy+Math.sin(ang)*R*val/100];};
+  const poly=arr=>arr.map((v,i)=>pt(i,v).map(x=>x.toFixed(1)).join(',')).join(' ');
+  const grid=[25,50,75,100].map(g=>`<polygon points="${axes.map((_,i)=>pt(i,g).map(x=>x.toFixed(1)).join(',')).join(' ')}" fill="none" stroke="#e3e8ef"/>`).join('');
+  const labs=axes.map((ax,i)=>{const p=pt(i,118);return `<text x="${p[0].toFixed(1)}" y="${p[1].toFixed(1)}" text-anchor="middle" font-size="8.5" fill="#54606f">${ax}</text>`;}).join('');
+  return `<svg viewBox="0 0 220 220" class="chart-svg" style="max-width:280px">${grid}<polygon points="${poly(mkt)}" fill="rgba(124,92,255,.18)" stroke="#7C5CFF" stroke-width="1.5"/><polygon points="${poly(unam)}" fill="rgba(213,160,33,.28)" stroke="#D5A021" stroke-width="2"/>${labs}</svg><div class="dlegend"><span><i style="background:#D5A021"></i>Este diplomado</span><span><i style="background:#7C5CFF"></i>Mercado privado</span></div>`; }
+function mdLite(t){ return esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h3>$1</h3>').replace(/\n/g,'<br>'); }
+async function pumaiAsk(promptText){ try{ const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-chat',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPABASE_ANON},body:JSON.stringify({messages:[{role:'user',parts:[{text:promptText}]}]})}); if(!res.ok)return null; const d=await res.json(); return d.reply||d.text||null; }catch(e){ return null; } }
+
+/* ── SECCIÓN: Inteligencia ── */
+function secInteligencia(V){
+  const byC={},byE={},byT={},byM={}; let confSum=0,confN=0;
+  ADMIN_DATA.forEach(a=>{byC[a.carrera]=(byC[a.carrera]||0)+1;byE[a.estado]=(byE[a.estado]||0)+1;byT[a.tipo]=(byT[a.tipo]||0)+1;
+    const m=(a.created_at||'').slice(0,7);if(m)byM[m]=(byM[m]||0)+1; const c=META[a.id]&&META[a.id].conf; if(c!=null){confSum+=c;confN++;}});
+  const total=ADMIN_DATA.length, aval=byE.avalado||0, enDict=(byE.en_revision_carrera||0)+(byE.en_revision_deu||0), cond=byE.condicionado||0, rech=byE.rechazado||0;
+  const confProm=confN?Math.round(confSum/confN):0;
+  const series=Object.keys(byM).sort().map(m=>({m:m.slice(5),v:byM[m]}));
+  // tiempos por etapa (SLA)
+  const tCar=[],tDeu=[]; DICT.forEach(d=>{ if(d.resuelto&&d.resuelto_at&&d.created_at){const dd=(new Date(d.resuelto_at)-new Date(d.created_at))/86400000; if(d.etapa==='carrera')tCar.push(dd); else tDeu.push(dd);} });
+  const avg=a=>a.length?Math.round(a.reduce((s,x)=>s+x,0)/a.length):0;
+  // heatmap carrera x estado
+  const estados=['borrador','en_revision_carrera','en_revision_deu','condicionado','avalado','rechazado'];
+  const carreras=Object.keys(byC);
+  const hm={}; ADMIN_DATA.forEach(a=>{hm[a.carrera+'|'+a.estado]=(hm[a.carrera+'|'+a.estado]||0)+1;});
+  const hmMax=Math.max(1,...Object.values(hm));
+  const heat=`<div class="heatgrid" style="grid-template-columns:120px repeat(${estados.length},1fr)">
+    <div></div>${estados.map(e=>`<div style="font-size:.62rem;color:#8a97a8;text-align:center;font-weight:700">${ESTADO_LBL[e].split(' ')[0]}</div>`).join('')}
+    ${carreras.map(c=>`<div style="font-size:.72rem;font-weight:600;align-self:center">${CARRERA_LBL[c]||c}</div>`+estados.map(e=>{const n=hm[c+'|'+e]||0;const al=n/hmMax;return `<div class="heatcell" style="background:rgba(213,160,33,${(0.12+al*0.8).toFixed(2)});color:${al>0.5?'#fff':'#0a1a30'}">${n||''}</div>`;}).join('')).join('')}
   </div>`;
-  const render=()=>{
-    const fc=$('#fCarrera').value, fe=$('#fEstado').value;
-    const rows=ADMIN_DATA.filter(a=>(!fc||a.carrera===fc)&&(!fe||a.estado===fe));
-    $('#regTable').innerHTML = rows.length?('<table><thead><tr><th>Folio</th><th>Actividad</th><th>Tipo</th><th>Carrera</th><th>Horas</th><th>Estado</th><th></th></tr></thead><tbody>'+
-      rows.map(a=>`<tr><td class="t-folio">${esc(a.folio)}</td><td>${esc(a.titulo)}</td><td>${TIPO_LBL[a.tipo]}</td><td>${CARRERA_LBL[a.carrera]}</td><td>${a.duracion_horas}</td>
-      <td><span class="pill ${a.estado}"><span class="dot"></span>${ESTADO_LBL[a.estado]}</span></td>
-      <td><button class="btn sm ghost" data-open="${a.id}">Abrir</button></td></tr>`).join('')+'</tbody></table>'):'<div class="empty">Sin registros para el filtro.</div>';
-    $('#regTable').querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>detalle(b.dataset.open, ADMIN_DATA.find(x=>x.id===b.dataset.open).estado==='en_revision_deu'?'deu':'carrera'));
+  // insights
+  const topC=Object.entries(byC).sort((a,b)=>b[1]-a[1])[0];
+  const ins=[];
+  if(topC)ins.push(`<b>${CARRERA_LBL[topC[0]]}</b> concentra la mayor oferta (${topC[1]} de ${total} solicitudes).`);
+  ins.push(`Tasa de aval: <b>${total?Math.round(aval/total*100):0}%</b> · tasa de rechazo: <b>${total?Math.round(rech/total*100):0}%</b>.`);
+  ins.push(`Confianza promedio del responsable académico: <b>${confProm}/100</b>.`);
+  if(avg(tDeu)>avg(tCar))ins.push(`El <b>Comité DEU</b> es el cuello de botella (≈${avg(tDeu)} d vs ${avg(tCar)} d de carrera).`); else ins.push(`Tiempo de dictaminación: carrera ≈${avg(tCar)} d, DEU ≈${avg(tDeu)} d.`);
+  if(cond)ins.push(`<b>${cond}</b> con inconsistencias (condicionados) por resolver.`);
+  // alertas
+  const alerts=[];
+  ADMIN_DATA.forEach(a=>{const m=META[a.id]||{};
+    if(a.estado==='condicionado')alerts.push(['amber',a.folio+' · condicionado: requiere correcciones para avanzar']);
+    if(m.conf!=null&&m.conf<(CFG.umbral_confianza||60))alerts.push(['red',a.folio+' · confianza del RAA baja ('+m.conf+'/100)']);
+    if(!m.hasDocs&&a.estado!=='borrador')alerts.push(['amber',a.folio+' · sin documentos cargados']);
+    if((a.estado==='en_revision_carrera'||a.estado==='en_revision_deu')&&daysAgo(a.updated_at)>25)alerts.push(['amber',a.folio+' · estancado '+daysAgo(a.updated_at)+' días en dictaminación']);
+  });
+  // viabilidad
+  const rank=ADMIN_DATA.map(a=>({a,s:(META[a.id]||{}).score||0})).sort((x,y)=>y.s-x.s);
+  const via=(arr)=>arr.map(({a,s})=>{const col=s>=70?'#0d8b5c':s>=45?'#a67c14':'#c0392b';return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)"><span style="font-size:.84rem">${esc(a.titulo.slice(0,42))}</span><b style="color:${col}">${s}</b></div>`;}).join('');
+  // solapamiento
+  const tok=a=>new Set((a.titulo+' '+(a.objetivo_general||'')).toLowerCase().normalize('NFD').replace(/[^a-z ]/g,' ').split(/\s+/).filter(w=>w.length>4));
+  const ov=[]; for(let i=0;i<ADMIN_DATA.length;i++)for(let j=i+1;j<ADMIN_DATA.length;j++){const A=tok(ADMIN_DATA[i]),B=tok(ADMIN_DATA[j]);const inter=[...A].filter(x=>B.has(x)).length;const uni=new Set([...A,...B]).size||1;const jac=inter/uni; if(jac>0.28)ov.push([ADMIN_DATA[i],ADMIN_DATA[j],Math.round(jac*100)]);}
+  ov.sort((a,b)=>b[2]-a[2]);
+
+  V.innerHTML=`
+  <div class="grid grid-4" style="margin-bottom:16px">
+    <div class="stat"><div class="lbl">Solicitudes</div><div class="val">${total}</div><div class="sub">total histórico</div></div>
+    <div class="stat"><div class="lbl">Avaladas</div><div class="val">${aval}</div><div class="sub">${total?Math.round(aval/total*100):0}% del total</div></div>
+    <div class="stat"><div class="lbl">Inconsistencias</div><div class="val">${cond}</div><div class="sub">condicionados</div></div>
+    <div class="stat"><div class="lbl">Confianza RAA</div><div class="val">${confProm}</div><div class="sub">promedio /100</div></div>
+  </div>
+  <div class="card"><h2>Embudo del proceso de aval</h2><div class="funnel">
+    ${[['Borrador',byE.borrador||0,'#8a97a8'],['Comité de carrera',byE.en_revision_carrera||0,'#7C5CFF'],['Comité DEU',byE.en_revision_deu||0,'#38BDF8'],['Avalado',aval,'#34D399']].map((s,i,arr)=>{const w=40+ (arr[0][1]?60*(1-i*0.12):60);return `<div class="fbar" style="width:${Math.max(38,100-i*15)}%;background:linear-gradient(90deg,${s[2]},${s[2]}bb)"><span>${s[0]}</span><b>${s[1]}</b></div>`;}).join('')}
+  </div><div class="row" style="margin-top:10px;gap:8px"><span class="pill condicionado"><span class="dot"></span>Condicionados: ${cond}</span><span class="pill rechazado"><span class="dot"></span>No avalados: ${rech}</span></div></div>
+  <div class="grid grid-2">
+    <div class="card"><h2>Solicitudes por carrera</h2><div style="margin-top:8px">${barsHTML(byC,c=>CARRERA_LBL[c]||c)}</div></div>
+    <div class="card"><h2>Distribución por estado</h2>${donutSVG(estados.map(e=>({label:ESTADO_LBL[e],val:byE[e]||0,color:semaColor(e)})))}</div>
+    <div class="card"><h2>Tendencia mensual</h2>${lineSVG(series)}</div>
+    <div class="card"><h2>Tiempo de dictaminación (SLA)</h2>
+      <div class="grid grid-2" style="margin-top:8px"><div class="stat" style="box-shadow:none;border:1px solid var(--line)"><div class="lbl">Comité carrera</div><div class="val">${avg(tCar)} d</div></div><div class="stat" style="box-shadow:none;border:1px solid var(--line)"><div class="lbl">Comité DEU</div><div class="val">${avg(tDeu)} d</div></div></div>
+      <div class="insight" style="margin-top:10px">${avg(tDeu)>avg(tCar)?'El comité DEU concentra el mayor tiempo; priorizar su bandeja.':'Los tiempos por etapa están balanceados.'}</div></div>
+  </div>
+  <div class="card"><h2>Mapa carrera × estado</h2>${heat}</div>
+  <div class="grid grid-2">
+    <div class="card"><h2>💡 Insights de PUM-AI</h2>${ins.map(i=>`<div class="insight">${i}</div>`).join('')}
+      <div class="divider"></div><h3>Pregúntale a PUM-AI sobre tus datos</h3>
+      <div id="paBody" class="pumai-analyst" style="margin:8px 0;max-height:220px;overflow:auto"><div class="pa-msg bot">Puedo analizar tus diplomados: rechazos por carrera, cuellos de botella, riesgos, etc. ¿Qué quieres saber?</div></div>
+      <div class="row" style="gap:8px"><input id="paIn" class="mini" style="flex:1" placeholder="Ej. ¿qué carrera rechaza más y por qué?"><button class="btn navy sm" id="paSend" style="background:var(--navy);color:#fff">Preguntar</button></div></div>
+    <div class="card"><h2>⚠ Alertas</h2><div style="margin-top:6px">${alerts.length?alerts.slice(0,10).map(([lv,t])=>`<div style="display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-bottom:1px solid var(--line)"><span class="flag ${lv}">${lv==='red'?'Alta':'Media'}</span><span style="font-size:.84rem">${esc(t)}</span></div>`).join(''):'<div class="empty">Sin alertas.</div>'}</div></div>
+    <div class="card"><h2>Índice de viabilidad</h2><div style="font-size:.75rem;color:#8a97a8;margin-bottom:4px">Mayor puntaje</div>${via(rank.slice(0,4))}<div style="font-size:.75rem;color:#8a97a8;margin:10px 0 4px">Menor puntaje (atender)</div>${via(rank.slice(-3).reverse())}</div>
+    <div class="card"><h2>Posible solapamiento</h2>${ov.length?ov.slice(0,5).map(([a,b,p])=>`<div style="padding:7px 0;border-bottom:1px solid var(--line);font-size:.84rem"><span class="flag amber">${p}% similar</span><br>${esc(a.titulo.slice(0,40))} ↔ ${esc(b.titulo.slice(0,40))}</div>`).join(''):'<div class="empty">Sin solapamientos relevantes.</div>'}</div>
+  </div>`;
+  $('#paSend').onclick=analystSend; $('#paIn').addEventListener('keydown',e=>{if(e.key==='Enter')analystSend();});
+}
+function dataSummary(){ const byC={},byE={}; ADMIN_DATA.forEach(a=>{byC[a.carrera]=(byC[a.carrera]||0)+1;byE[a.estado]=(byE[a.estado]||0)+1;});
+  return `Datos DEU (${ADMIN_DATA.length} diplomados). Por estado: ${JSON.stringify(byE)}. Por carrera: ${JSON.stringify(byC)}.`; }
+async function analystSend(){ const inp=$('#paIn'),t=inp.value.trim(); if(!t)return; inp.value='';
+  const body=$('#paBody'); body.insertAdjacentHTML('beforeend',`<div class="pa-msg user">${esc(t)}</div>`); body.scrollTop=1e6;
+  body.insertAdjacentHTML('beforeend','<div class="pa-msg bot" id="paTyping">…</div>');
+  const reply=await pumaiAsk(`Eres PUM-AI, analista de la DEU FES Iztacala. Con base en estos datos agregados, responde breve y accionable en español. ${dataSummary()} Pregunta del administrador: ${t}`);
+  const el=$('#paTyping'); if(el){ el.id=''; el.innerHTML = reply? mdLite(reply) : 'PUM-AI no está disponible ahora. Pista con tus datos: '+esc(dataSummary()); }
+  body.scrollTop=1e6;
+}
+
+/* ── SECCIÓN: Grafo 3D ── */
+function secGrafo(V){
+  V.innerHTML=`<div class="card"><div class="row" style="justify-content:space-between;align-items:flex-start;flex-wrap:wrap"><div><h2>Grafo 3D — semáforo de diplomados</h2><p class="muted" style="font-size:.84rem">Cada nodo es un diplomado; el color indica su estado. Haz clic en un nodo para ver su ficha y el porqué.</p></div>
+    <div>${[['#34D399','Avalado'],['#38BDF8','En revisión'],['#F5B841','Condicionado'],['#EF6461','Rechazado'],['#8a97a8','Borrador']].map(([c,l])=>`<span class="flag" style="background:${c}22;color:#0a1a30"><i style="width:9px;height:9px;border-radius:50%;background:${c};display:inline-block"></i>${l}</span>`).join('')}</div></div>
+    <div class="g3d-wrap" style="margin-top:12px"><div class="g3d-hint">🖱 Arrastra para rotar · rueda para acercar · clic en un nodo</div><canvas id="g3d" style="display:block;width:100%;height:460px"></canvas></div>
+    <div id="g3dInfo"><div class="nodeinfo" style="color:#8a97a8">Selecciona un nodo para ver el diplomado y por qué está marcado así.</div></div></div>`;
+  const items=ADMIN_DATA, canvas=$('#g3d');
+  if(typeof THREE==='undefined'||!THREE.WebGLRenderer||!THREE.OrbitControls){ grafo2D(canvas,items); return; }
+  try{ grafo3D(canvas,items); }catch(e){ grafo2D(canvas,items); }
+}
+function grafo3D(canvas,items){
+  const w=canvas.clientWidth||700,h=460;
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true}); renderer.setPixelRatio(Math.min(2,devicePixelRatio||1)); renderer.setSize(w,h,false);
+  const scene=new THREE.Scene(); scene.add(new THREE.AmbientLight(0x99a7c0,0.95));
+  const key=new THREE.PointLight(0xffffff,0.9);key.position.set(90,130,150);scene.add(key);
+  const cam=new THREE.PerspectiveCamera(55,w/h,0.1,3000);cam.position.set(0,0,240);
+  const controls=new THREE.OrbitControls(cam,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=0.08;controls.autoRotate=true;controls.autoRotateSpeed=0.5;
+  TS={renderer,raf:null};
+  const N=items.length, geo=new THREE.SphereGeometry(1,18,18), meshes=[], pos=[];
+  for(let i=0;i<N;i++){ const y=N<=1?0:1-(i/(N-1))*2; const rad=Math.sqrt(Math.max(0,1-y*y)); const th=i*2.399; const R=110; const p=[Math.cos(th)*rad*R,y*R,Math.sin(th)*rad*R]; pos.push(p);
+    const hx=semaColor(items[i].estado); const m=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:hx,emissive:hx,emissiveIntensity:0.55,roughness:0.4,metalness:0.2}));
+    const rr=4+(items[i].creditos||4)*0.5; m.scale.set(rr,rr,rr); m.position.set(p[0],p[1],p[2]); m.userData={i}; scene.add(m); meshes.push(m); }
+  const byC={}; items.forEach((a,i)=>{(byC[a.carrera]=byC[a.carrera]||[]).push(i);});
+  const lp=[]; Object.values(byC).forEach(ix=>{for(let i=0;i<ix.length;i++)for(let j=i+1;j<ix.length;j++){const a=pos[ix[i]],b=pos[ix[j]];lp.push(a[0],a[1],a[2],b[0],b[1],b[2]);}});
+  const lg=new THREE.BufferGeometry(); lg.setAttribute('position',new THREE.BufferAttribute(new Float32Array(lp),3));
+  scene.add(new THREE.LineSegments(lg,new THREE.LineBasicMaterial({color:0x9fb3cc,transparent:true,opacity:0.16})));
+  const ray=new THREE.Raycaster(),mo=new THREE.Vector2();
+  canvas.addEventListener('click',ev=>{const r=canvas.getBoundingClientRect();mo.x=((ev.clientX-r.left)/r.width)*2-1;mo.y=-((ev.clientY-r.top)/r.height)*2+1;ray.setFromCamera(mo,cam);const hh=ray.intersectObjects(meshes);if(hh.length){controls.autoRotate=false;$('#g3dInfo').innerHTML=nodeInfoHTML(items[hh[0].object.userData.i]);}});
+  (function loop(){TS.raf=requestAnimationFrame(loop);controls.update();renderer.render(scene,cam);})();
+}
+function grafo2D(canvas,items){ const host=canvas.parentElement; const W=760,H=460,cols=Math.max(1,Math.ceil(Math.sqrt(items.length)));
+  const nodes=items.map((a,i)=>{const cx=60+(i%cols)*((W-120)/Math.max(1,cols-1));const cy=60+Math.floor(i/cols)*72;const rr=9+(a.creditos||4)*0.6;return `<g style="cursor:pointer" data-i="${i}"><circle cx="${cx}" cy="${cy}" r="${rr}" fill="${semaColor(a.estado)}" fill-opacity="0.9" stroke="#fff" stroke-width="1.6"/></g>`;}).join('');
+  host.innerHTML=`<div class="g3d-hint">Vista 2D (Three.js no disponible aquí; en producción se ve en 3D) · clic en un nodo</div><svg viewBox="0 0 ${W} ${H}" style="width:100%;height:460px;display:block">${nodes}</svg>`;
+  host.querySelectorAll('[data-i]').forEach(g=>g.onclick=()=>$('#g3dInfo').innerHTML=nodeInfoHTML(items[+g.dataset.i]));
+}
+function nodeInfoHTML(a){ const m=META[a.id]||{},sc=m.score||0,col=sc>=70?'#0d8b5c':sc>=45?'#a67c14':'#c0392b';
+  return `<div class="nodeinfo"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="t-folio">${esc(a.folio)}</div><b>${esc(a.titulo)}</b></div><span class="pill ${a.estado}"><span class="dot"></span>${ESTADO_LBL[a.estado]}</span></div>
+   <div class="kv" style="margin-top:10px"><div class="k">Índice de viabilidad</div><div><b style="color:${col}">${sc}/100</b></div><div class="k">Confianza RAA</div><div>${m.conf!=null?m.conf+'/100':'—'}</div><div class="k">Carrera · tipo</div><div>${CARRERA_LBL[a.carrera]} · ${TIPO_LBL[a.tipo]} · ${a.duracion_horas||'—'} h</div></div>
+   <div style="margin-top:8px;font-size:.72rem;color:#8a97a8;font-weight:700;text-transform:uppercase">Por qué está marcado así</div>
+   <ul style="margin:4px 0 0 18px;font-size:.85rem;color:#3a4557">${(m.reasons||[]).map(r=>`<li>${esc(r)}</li>`).join('')}</ul></div>`; }
+
+/* ── SECCIÓN: Comparativa ── */
+function secComparativa(V){
+  V.innerHTML=`<div class="card"><h2>Comparativa vs escuelas privadas</h2><p class="muted" style="font-size:.84rem">PUM-AI compara el diplomado contra programas similares de instituciones privadas (contenido, duración, alcance, costo, modalidad). Datos <b>indicativos</b> para validación del comité.</p>
+   <div class="row" style="margin-top:10px;gap:8px"><select id="cmpSel" class="mini" style="flex:1">${ADMIN_DATA.map(a=>`<option value="${a.id}">${esc(a.folio)} · ${esc(a.titulo)}</option>`).join('')}</select><button class="btn gold sm" id="cmpRun">⚖ Comparar con PUM-AI</button></div>
+   <div id="cmpOut" style="margin-top:14px"><div class="empty">Elige un diplomado y ejecuta la comparativa.</div></div></div>`;
+  $('#cmpRun').onclick=async()=>{const a=ADMIN_DATA.find(x=>x.id===$('#cmpSel').value);if(!a)return;const out=$('#cmpOut');
+    out.innerHTML='<div class="empty"><span class="spin" style="border-color:rgba(6,43,92,.3);border-top-color:#062B5C"></span> PUM-AI analizando el mercado…</div>';
+    const reply=await pumaiAsk(`Eres PUM-AI, analista académico de la DEU FES Iztacala (UNAM). Compara este diplomado contra programas SIMILARES de universidades PRIVADAS en México (Anáhuac, La Salle, UVM, Westhill, Tecmilenio). Diplomado: "${a.titulo}", tipo ${a.tipo}, ${a.duracion_horas||'?'} horas, carrera ${CARRERA_LBL[a.carrera]}, modalidad ${a.modalidad}. En español y breve: 1) tabla comparativa (contenido, duración, alcance, costo aprox, modalidad) vs 2-3 referentes; 2) posicionamiento del diplomado UNAM; 3) rango de precio sugerido; 4) diferenciadores. Marca los datos de mercado como indicativos.`);
+    const radar=radarSVG(a);
+    out.innerHTML=`<div class="grid grid-2"><div>${reply?mdLite(reply):cmpFallback(a)}</div><div><h3>Posicionamiento (indicativo)</h3>${radar}<div class="insight" style="margin-top:8px">Diferenciador clave: <b>aval institucional UNAM</b> y valor curricular frente a la oferta privada.</div></div></div>`;
   };
-  $('#fCarrera').onchange=render;$('#fEstado').onchange=render;
-  $('#volverDash').onclick=adminDashboard;
-  $('#expExcel').onclick=()=>exportExcel(currentRows());
-  $('#expPDF').onclick=()=>exportPDF(currentRows());
-  function currentRows(){const fc=$('#fCarrera').value,fe=$('#fEstado').value;return ADMIN_DATA.filter(a=>(!fc||a.carrera===fc)&&(!fe||a.estado===fe));}
-  render();
+}
+function cmpFallback(a){ const horas=a.duracion_horas||120; const precio=Math.round(horas*90/1000)*1000;
+  return `<div class="notice info"><span>ℹ</span><div>PUM-AI no está disponible ahora; se muestra una comparativa base <b>indicativa</b>.</div></div>
+  <table style="margin-top:10px"><thead><tr><th>Criterio</th><th>Este diplomado</th><th>Privadas (aprox)</th></tr></thead><tbody>
+  <tr><td>Duración</td><td>${horas} h</td><td>90–180 h</td></tr>
+  <tr><td>Modalidad</td><td>${esc(a.modalidad)}</td><td>Presencial / mixta</td></tr>
+  <tr><td>Costo estimado</td><td>Aval UNAM</td><td>$${precio.toLocaleString()}–$${(precio*2).toLocaleString()}</td></tr>
+  <tr><td>Valor curricular</td><td><b>Aval UNAM</b></td><td>Constancia institucional</td></tr>
+  </tbody></table><div class="insight" style="margin-top:8px">Rango de precio sugerido: <b>$${Math.round(precio*0.6).toLocaleString()}–$${precio.toLocaleString()}</b> (accesible vs mercado privado, capitalizando el aval UNAM).</div>`; }
+
+/* ── SECCIÓN: Demanda (MiroFish) ── */
+function secDemanda(V){
+  V.innerHTML=`<div class="card"><h2>🐟 Simulación de demanda (MiroFish)</h2><p class="muted" style="font-size:.84rem">Simula estudiantes potenciales para estimar el interés en un diplomado según sus características. Modelo <b>what-if</b> (indicativo), afinable con encuestas o analítica real.</p>
+   <div class="grid grid-2" style="margin-top:12px"><div>
+     <div class="slider-row"><label>Afinidad del tema</label><input type="range" id="s_tema" min="0" max="100" value="68"><span class="v" id="v_tema">68</span></div>
+     <div class="slider-row"><label>Precio (accesible→caro)</label><input type="range" id="s_precio" min="0" max="100" value="45"><span class="v" id="v_precio">45</span></div>
+     <div class="slider-row"><label>Difusión</label><input type="range" id="s_dif" min="0" max="100" value="55"><span class="v" id="v_dif">55</span></div>
+     <div class="slider-row"><label>Modalidad flexible</label><input type="range" id="s_mod" min="0" max="100" value="60"><span class="v" id="v_mod">60</span></div>
+     <div id="demStats" style="margin-top:12px"></div></div>
+   <div><canvas id="swarm" style="width:100%;height:360px;display:block;border-radius:12px;background:radial-gradient(circle at 50% 30%,#0d2444,#071022)"></canvas></div></div></div>`;
+  const cv=$('#swarm'),dpr=Math.min(2,devicePixelRatio||1),N=420,ag=[];
+  function size(){cv.width=(cv.clientWidth||600)*dpr;cv.height=360*dpr;}
+  size(); const ctx=cv.getContext('2d');
+  for(let i=0;i<N;i++)ag.push({x:Math.random()*cv.width,y:Math.random()*cv.height,vx:(Math.random()-.5)*0.7*dpr,vy:(Math.random()-.5)*0.7*dpr,seed:Math.random()});
+  const val=id=>+document.getElementById(id).value;
+  function interest(){return Math.max(0,Math.min(100,0.4*val('s_tema')+0.25*(100-val('s_precio'))+0.2*val('s_dif')+0.15*val('s_mod')));}
+  function stats(){const sc=Math.round(interest());
+    document.getElementById('demStats').innerHTML=`<div class="stat" style="box-shadow:none;border:1px solid var(--line)"><div class="lbl">Interés estimado</div><div class="val" style="color:${sc>=65?'#0d8b5c':sc>=45?'#a67c14':'#c0392b'}">${sc}%</div><div class="sub">${Math.round(N*sc/100)} de ${N} potenciales</div></div>
+    <div class="insight" style="margin-top:10px">${sc>=65?'Alta probabilidad de demanda; conviene abrir grupo.':sc>=45?'Demanda moderada; refuerza difusión o ajusta precio/modalidad.':'Baja demanda proyectada; revisar pertinencia, precio y difusión.'}</div>`;}
+  function draw(){const sc=interest()/100;ctx.clearRect(0,0,cv.width,cv.height);
+    for(const a of ag){a.x+=a.vx;a.y+=a.vy;if(a.x<0||a.x>cv.width)a.vx*=-1;if(a.y<0||a.y>cv.height)a.vy*=-1;
+      const c=a.seed<sc?'52,211,153':'239,100,97';ctx.beginPath();ctx.arc(a.x,a.y,2.5*dpr,0,6.2832);ctx.fillStyle='rgba('+c+',0.88)';ctx.fill();}
+    DEMANDA_RAF=requestAnimationFrame(draw);}
+  ['tema','precio','dif','mod'].forEach(k=>document.getElementById('s_'+k).oninput=()=>{document.getElementById('v_'+k).textContent=val('s_'+k);stats();});
+  stats(); if(DEMANDA_RAF)cancelAnimationFrame(DEMANDA_RAF); draw();
+}
+
+/* ── SECCIÓN: Auditoría / Uso responsable ── */
+function secAuditoria(V){
+  const analisis=AUDIT.filter(x=>x.accion==='verificar_raa');
+  const nombre=e=>(e.detalle&&e.detalle.actor_nombre)||e.actor||'—';
+  const persona=e=>(e.detalle&&e.detalle.persona)||'—';
+  const byActor={}; analisis.forEach(e=>{(byActor[nombre(e)]=byActor[nombre(e)]||[]).push(e);});
+  const rep={}; analisis.forEach(e=>{const k=nombre(e)+'|'+persona(e);rep[k]=(rep[k]||0)+1;});
+  const volActores=Object.entries(byActor).filter(([k,a])=>a.length>=6).map(([k])=>k);
+  const flagsFor=e=>{const f=[],d=e.detalle||{};
+    if(d.consentimiento===false||d.violacion)f.push(['red','Sin consentimiento']);
+    if(volActores.includes(nombre(e)))f.push(['amber','Volumen anómalo']);
+    if(rep[nombre(e)+'|'+persona(e)]>=3)f.push(['amber','Repetido']);
+    if(d.nivel==='profundo')f.push(['info','OSINT profundo']);
+    if(new Date(e.created_at).getHours()<6)f.push(['amber','Fuera de horario']);
+    return f;};
+  const sinConsent=analisis.filter(e=>{const d=e.detalle||{};return d.consentimiento===false||d.violacion;}).length;
+  const profundos=analisis.filter(e=>e.detalle&&e.detalle.nivel==='profundo').length;
+  const conFlags=analisis.filter(e=>flagsFor(e).length).length;
+  const rows=analisis.map(e=>({e,f:flagsFor(e)})).sort((a,b)=>b.f.length-a.f.length);
+  window.__AUDIT_ROWS=rows;
+  V.innerHTML=`
+  <div class="notice legal"><span class="ni">🔒</span><div><b>Uso responsable de datos personales (LFPDPPP).</b> Toda verificación de una persona queda registrada aquí con su evaluador, la persona analizada, el consentimiento, el nivel y la fecha. El sistema marca patrones de posible mal uso para su control; los hallazgos no son veredicto.</div></div>
+  <div class="grid grid-4" style="margin:16px 0">
+    <div class="stat"><div class="lbl">Análisis de personas</div><div class="val">${analisis.length}</div><div class="sub">verificaciones registradas</div></div>
+    <div class="stat"><div class="lbl">Sin consentimiento</div><div class="val" style="color:${sinConsent?'#c0392b':'#0d8b5c'}">${sinConsent}</div><div class="sub">violaciones LFPDPPP</div></div>
+    <div class="stat"><div class="lbl">OSINT profundo</div><div class="val">${profundos}</div><div class="sub">mayor sensibilidad</div></div>
+    <div class="stat"><div class="lbl">Con señal de alerta</div><div class="val" style="color:${conFlags?'#a67c14':'#0d8b5c'}">${conFlags}</div><div class="sub">a revisar</div></div>
+  </div>
+  <div class="grid grid-2">
+    <div class="card"><h2>Análisis por evaluador</h2><div style="margin-top:8px">${barsHTML(Object.fromEntries(Object.entries(byActor).map(([k,a])=>[k,a.length])))}</div>
+      ${volActores.length?`<div class="insight" style="margin-top:10px"><b>${esc(volActores.join(', '))}</b> supera el umbral de volumen (≥6). Revisar justificación.</div>`:''}</div>
+    <div class="card"><h2>Controles activos</h2>
+      <div class="check"><div class="ci ${CFG.nivel_analisis==='profundo'?'warn':'ok'}">${CFG.nivel_analisis==='profundo'?'!':'✓'}</div><div><div class="ct">Nivel de análisis: ${CFG.nivel_analisis==='profundo'?'Profundo (OSINT)':'Básico'}</div><div class="cd">Se controla desde Configuración.</div></div></div>
+      <div class="check"><div class="ci ok">✓</div><div><div class="ct">Consentimiento obligatorio</div><div class="cd">La verificación exige consentimiento del titular; las excepciones se marcan como violación.</div></div></div>
+      <div class="check"><div class="ci ok">✓</div><div><div class="ct">Bitácora inmutable + trazabilidad</div><div class="cd">Cada consulta y verificación queda registrada con evaluador, persona y fecha.</div></div></div>
+      <div class="check"><div class="ci ${conFlags?'warn':'ok'}">${conFlags?'!':'✓'}</div><div><div class="ct">Detección de mal uso</div><div class="cd">${conFlags?conFlags+' evento(s) con señal a revisar (volumen, repetición, sin consentimiento, horario).':'Sin patrones sospechosos.'}</div></div></div>
+    </div>
+  </div>
+  <div class="card"><div class="row" style="justify-content:space-between;align-items:center"><h2>Bitácora de análisis de personas</h2><button class="btn ghost sm" id="audPDF">⬇ Exportar auditoría (PDF)</button></div>
+    <div style="overflow:auto;margin-top:10px"><table><thead><tr><th>Fecha</th><th>Evaluador</th><th>Persona analizada</th><th>Nivel</th><th>Consent.</th><th>Señales</th></tr></thead><tbody>
+    ${rows.map(({e,f})=>`<tr style="${f.some(x=>x[0]==='red')?'background:#fdeaea55':''}"><td style="font-size:.8rem">${new Date(e.created_at).toLocaleString('es-MX',{dateStyle:'short',timeStyle:'short'})}</td><td>${esc(nombre(e))}</td><td>${esc(persona(e))}</td><td>${(e.detalle&&e.detalle.nivel)||'básico'}</td><td>${(e.detalle&&e.detalle.consentimiento===false)?'<span class="flag red">No</span>':'<span class="flag ok">Sí</span>'}</td><td>${f.map(x=>`<span class="flag ${x[0]}">${x[1]}</span>`).join('')||'—'}</td></tr>`).join('')}
+    </tbody></table></div></div>`;
+  $('#audPDF').onclick=()=>auditPDF(rows,nombre,persona);
+}
+function auditPDF(rows,nombre,persona){ const w=window.open('','_blank'); if(!w){toast('Permite ventanas emergentes.');return;}
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Auditoría de análisis de personas — DEU</title><style>body{font-family:Inter,Arial,sans-serif;color:#0A1A30;padding:26px}h1{color:#062B5C;font-size:17px;margin:0}.sub{color:#6b7686;font-size:12px;margin:2px 0 14px}table{width:100%;border-collapse:collapse;font-size:10.5px}th{background:#062B5C;color:#fff;text-align:left;padding:6px 7px}td{padding:5px 7px;border-bottom:1px solid #e5e5e5}.gold{height:4px;background:#D5A021;width:60px;border-radius:2px;margin:4px 0 0}</style></head><body>
+  <h1>Auditoría de uso responsable — Análisis de personas</h1><div class="gold"></div>
+  <div class="sub">DEU · FES Iztacala, UNAM · Conforme a la LFPDPPP · Generado ${new Date().toLocaleString('es-MX')} · ${rows.length} eventos</div>
+  <table><thead><tr><th>Fecha</th><th>Evaluador</th><th>Persona</th><th>Nivel</th><th>Consentimiento</th><th>Señales</th></tr></thead><tbody>
+  ${rows.map(({e,f})=>`<tr><td>${new Date(e.created_at).toLocaleString('es-MX')}</td><td>${esc(nombre(e))}</td><td>${esc(persona(e))}</td><td>${(e.detalle&&e.detalle.nivel)||'básico'}</td><td>${(e.detalle&&e.detalle.consentimiento===false)?'NO':'Sí'}</td><td>${f.map(x=>x[1]).join(', ')||'—'}</td></tr>`).join('')}
+  </tbody></table><script>window.onload=function(){setTimeout(function(){window.print();},250);}<\/script></body></html>`);
+  w.document.close(); toast('Abriendo auditoría para PDF…');
+}
+
+/* ── SECCIÓN: Reportes ── */
+function secReportes(V){
+  V.innerHTML=`<div class="card"><h2>Reportes</h2><p class="muted" style="font-size:.84rem">Genera reportes con membrete de la DEU, exportables a PDF o Excel.</p>
+   <div class="row" style="margin-top:12px;gap:8px;align-items:center">
+     <select id="repTipo" class="mini"><option value="ejecutivo">Ejecutivo general</option><option value="padron">Padrón completo</option><option value="carrera">Por carrera</option></select>
+     <select id="repCarrera" class="mini">${[...new Set(ADMIN_DATA.map(a=>a.carrera))].map(c=>`<option value="${c}">${CARRERA_LBL[c]||c}</option>`).join('')}</select>
+     <button class="btn gold sm" id="repPDF">⬇ PDF</button><button class="btn ghost sm" id="repXls">⬇ Excel</button>
+   </div>
+   <div class="grid grid-4" style="margin-top:16px">
+     <div class="stat"><div class="lbl">Total</div><div class="val">${ADMIN_DATA.length}</div></div>
+     <div class="stat"><div class="lbl">Avalados</div><div class="val">${ADMIN_DATA.filter(a=>a.estado==='avalado').length}</div></div>
+     <div class="stat"><div class="lbl">En proceso</div><div class="val">${ADMIN_DATA.filter(a=>a.estado.startsWith('en_revision')).length}</div></div>
+     <div class="stat"><div class="lbl">Rechazados</div><div class="val">${ADMIN_DATA.filter(a=>a.estado==='rechazado').length}</div></div>
+   </div></div>`;
+  const rowsFor=()=>{const t=$('#repTipo').value,c=$('#repCarrera').value;return t==='carrera'?ADMIN_DATA.filter(a=>a.carrera===c):ADMIN_DATA;};
+  $('#repXls').onclick=()=>exportExcel(rowsFor());
+  $('#repPDF').onclick=()=>reportePDF($('#repTipo').value,$('#repCarrera').value);
+}
+function reportePDF(tipo,carrera){ const rows=tipo==='carrera'?ADMIN_DATA.filter(a=>a.carrera===carrera):ADMIN_DATA;
+  const byE={}; rows.forEach(a=>byE[a.estado]=(byE[a.estado]||0)+1);
+  const w=window.open('','_blank'); if(!w){toast('Permite ventanas emergentes.');return;}
+  const titulo=tipo==='ejecutivo'?'Reporte ejecutivo':tipo==='carrera'?('Reporte · '+(CARRERA_LBL[carrera]||carrera)):'Padrón completo';
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>${titulo} — DEU</title><style>body{font-family:Inter,Arial,sans-serif;color:#0A1A30;padding:26px}h1{color:#062B5C;font-size:18px;margin:0}.gold{height:4px;background:#D5A021;width:60px;border-radius:2px;margin:4px 0 12px}.sub{color:#6b7686;font-size:12px;margin-bottom:14px}.kpis{display:flex;gap:14px;margin:10px 0 18px}.kpi{border:1px solid #e5e5e5;border-radius:10px;padding:10px 14px}.kpi b{font-size:20px;color:#062B5C;display:block}table{width:100%;border-collapse:collapse;font-size:11px}th{background:#062B5C;color:#fff;text-align:left;padding:7px 8px}td{padding:6px 8px;border-bottom:1px solid #e5e5e5}</style></head><body>
+  <h1>${titulo} · Diplomados DEU</h1><div class="gold"></div>
+  <div class="sub">División de Estudios Universitarios · FES Iztacala, UNAM · ${new Date().toLocaleDateString('es-MX')} · ${rows.length} actividades</div>
+  <div class="kpis"><div class="kpi"><b>${rows.length}</b>Total</div><div class="kpi"><b>${byE.avalado||0}</b>Avalados</div><div class="kpi"><b>${(byE.en_revision_carrera||0)+(byE.en_revision_deu||0)}</b>En proceso</div><div class="kpi"><b>${byE.condicionado||0}</b>Condicionados</div><div class="kpi"><b>${byE.rechazado||0}</b>Rechazados</div></div>
+  <table><thead><tr><th>Folio</th><th>Actividad</th><th>Tipo</th><th>Carrera</th><th>Horas</th><th>Estado</th></tr></thead><tbody>
+  ${rows.map(a=>`<tr><td>${esc(a.folio)}</td><td>${esc(a.titulo)}</td><td>${TIPO_LBL[a.tipo]}</td><td>${CARRERA_LBL[a.carrera]}</td><td>${a.duracion_horas||'—'}</td><td>${ESTADO_LBL[a.estado]}</td></tr>`).join('')}
+  </tbody></table><script>window.onload=function(){setTimeout(function(){window.print();},250);}<\/script></body></html>`);
+  w.document.close(); toast('Abriendo reporte para PDF…');
 }
 function rowsForExport(rows){return rows.map(a=>({Folio:a.folio,Actividad:a.titulo,Tipo:TIPO_LBL[a.tipo],Carrera:CARRERA_LBL[a.carrera]||a.carrera,Horas:a.duracion_horas,Creditos:a.creditos,Estado:ESTADO_LBL[a.estado],Registro:(a.created_at||'').slice(0,10)}));}
-function exportExcel(rows){
-  const data=rowsForExport(rows);
-  const done=(XLSX)=>{const ws=XLSX.utils.json_to_sheet(data);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Diplomados');XLSX.writeFile(wb,'padron-diplomados-DEU.xlsx');toast('Excel generado ✓');};
+function exportExcel(rows){ const data=rowsForExport(rows);
+  const done=(X)=>{const ws=X.utils.json_to_sheet(data);const wb=X.utils.book_new();X.utils.book_append_sheet(wb,ws,'Diplomados');X.writeFile(wb,'padron-diplomados-DEU.xlsx');toast('Excel generado ✓');};
   if(window.XLSX)return done(window.XLSX);
-  const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
-  s.onload=()=>done(window.XLSX);
-  s.onerror=()=>{ // fallback CSV
-    const head=Object.keys(data[0]||{Folio:''});const csv=[head.join(',')].concat(data.map(r=>head.map(h=>'"'+(''+r[h]).replace(/"/g,'""')+'"').join(','))).join('\n');
-    const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='padron-diplomados-DEU.csv';a.click();URL.revokeObjectURL(url);toast('Exportado como CSV (compatible con Excel)');
-  };
+  const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';s.onload=()=>done(window.XLSX);
+  s.onerror=()=>{const head=Object.keys(data[0]||{Folio:''});const csv=[head.join(',')].concat(data.map(r=>head.map(h=>'"'+(''+r[h]).replace(/"/g,'""')+'"').join(','))).join('\n');const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});const u=URL.createObjectURL(blob);const a=document.createElement('a');a.href=u;a.download='padron-diplomados-DEU.csv';a.click();URL.revokeObjectURL(u);toast('Exportado como CSV');};
   document.head.appendChild(s);
 }
-function exportPDF(rows){
-  const data=rowsForExport(rows);const fecha=new Date().toISOString().slice(0,10);
-  const w=window.open('','_blank');if(!w){toast('Permite ventanas emergentes para el PDF.');return;}
-  const head=['Folio','Actividad','Tipo','Carrera','Horas','Estado'];
-  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Padrón de Diplomados — DEU</title>
-    <style>body{font-family:Inter,Arial,sans-serif;color:#0A1A30;padding:26px}h1{color:#062B5C;font-size:18px;margin:0}
-    .sub{color:#6b7686;font-size:12px;margin:2px 0 16px}table{width:100%;border-collapse:collapse;font-size:11px}
-    th{background:#062B5C;color:#fff;text-align:left;padding:7px 8px}td{padding:6px 8px;border-bottom:1px solid #e5e5e5}
-    .head{display:flex;align-items:center;gap:12px;margin-bottom:6px}.gold{height:4px;background:#D5A021;width:60px;border-radius:2px}
-    @media print{.noprint{display:none}}</style></head><body>
-    <div class="head"><div><h1>Padrón de Diplomados y Cursos</h1><div class="gold"></div></div></div>
-    <div class="sub">División de Estudios Universitarios · FES Iztacala, UNAM · Generado ${fecha} · ${data.length} registros</div>
-    <table><thead><tr>${head.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>
-    ${data.map(r=>`<tr><td>${r.Folio}</td><td>${r.Actividad}</td><td>${r.Tipo}</td><td>${r.Carrera}</td><td>${r.Horas}</td><td>${r.Estado}</td></tr>`).join('')}
-    </tbody></table>
-    <p class="noprint" style="margin-top:18px;color:#6b7686;font-size:12px">Usa el diálogo de impresión para guardar como PDF.</p>
-    <script>window.onload=function(){setTimeout(function(){window.print();},250);}<\/script></body></html>`);
-  w.document.close();toast('Abriendo PDF para impresión…');
+
+/* ── SECCIÓN: Configuración ── */
+function secConfig(V){
+  const fuentes=CFG.fuentes||[];
+  V.innerHTML=`
+  <div class="grid grid-2">
+    <div class="card"><h2>Nivel de análisis del responsable académico</h2>
+      <p class="muted" style="font-size:.83rem">Controla qué tan profundo es el análisis de personas. El profundo activa OSINT (redes, fuentes legales) y exige mayores controles.</p>
+      <div class="row" style="margin-top:10px;gap:8px">
+        <button class="btn ${CFG.nivel_analisis==='basico'?'gold':'ghost'} sm" data-niv="basico">Básico (oficial + académico)</button>
+        <button class="btn ${CFG.nivel_analisis==='profundo'?'gold':'ghost'} sm" data-niv="profundo">Profundo (OSINT)</button>
+      </div>
+      <div class="notice legal" style="margin-top:12px"><span class="ni">🔒</span><div>El nivel profundo se rige por la LFPDPPP: requiere consentimiento, deja bitácora y se somete a la auditoría de uso responsable.</div></div>
+      <div class="divider"></div>
+      <h3>Umbral de confianza para alerta</h3>
+      <div class="slider-row"><label>Mínimo aceptable</label><input type="range" id="cfgUmbral" min="30" max="90" value="${CFG.umbral_confianza||60}"><span class="v" id="cfgUmbralV">${CFG.umbral_confianza||60}</span></div>
+      <button class="btn navy sm" id="cfgSave" style="background:var(--navy);color:#fff;margin-top:8px">Guardar configuración</button>
+    </div>
+    <div class="card"><h2>Fuentes de verificación</h2><p class="muted" style="font-size:.83rem">Activa o define las fuentes que consulta la verificación del RAA.</p>
+      <div id="fuentesList" style="margin-top:8px">${fuentes.map((f,i)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)"><div><b style="font-size:.86rem">${esc(f.nombre)}</b><div style="font-size:.72rem;color:#8a97a8">${f.cat}${f.base?' · base':''}</div></div><label style="font-size:.8rem"><input type="checkbox" data-fsrc="${i}" ${f.on?'checked':''} ${f.base?'disabled':''} style="width:auto"> activa</label></div>`).join('')}</div>
+      <div class="row" style="margin-top:10px;gap:6px"><input id="fNom" class="mini" style="flex:1" placeholder="Nueva fuente (nombre)"><input id="fUrl" class="mini" style="flex:1" placeholder="URL/API (opcional)"><button class="btn ghost sm" id="fAdd">+ Agregar</button></div>
+    </div>
+  </div>
+  <div class="card"><div class="row" style="justify-content:space-between;align-items:center"><h2>Gestión de usuarios</h2><span class="muted" style="font-size:.8rem">${PERFILES.length} usuarios</span></div>
+    <div style="overflow:auto;margin-top:10px"><table><thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Carrera</th><th>Activo</th><th></th></tr></thead><tbody>
+    ${PERFILES.map(p=>`<tr data-uid="${p.id}"><td>${esc(p.nombre)}</td><td style="font-size:.8rem">${esc(p.correo)}</td>
+      <td><select class="mini u-rol"><option value="registrante">Registrante</option><option value="comite_carrera">Comité carrera</option><option value="comite_deu">Comité DEU</option><option value="admin">Admin</option></select></td>
+      <td><select class="mini u-car"><option value="">—</option>${Object.entries(CARRERA_LBL).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></td>
+      <td><input type="checkbox" class="u-act" ${p.activo!==false?'checked':''} style="width:auto"></td>
+      <td><button class="btn ghost sm u-save">Guardar</button></td></tr>`).join('')}
+    </tbody></table></div>
+    <div class="notice info" style="margin-top:10px"><span>ℹ</span><div>Las cuentas se crean cuando la persona se registra en el portal; aquí asignas su rol y carrera.</div></div>
+  </div>`;
+  V.querySelectorAll('[data-niv]').forEach(b=>b.onclick=()=>{CFG.nivel_analisis=b.dataset.niv;V.querySelectorAll('[data-niv]').forEach(x=>{x.classList.toggle('gold',x.dataset.niv===CFG.nivel_analisis);x.classList.toggle('ghost',x.dataset.niv!==CFG.nivel_analisis);});});
+  $('#cfgUmbral').oninput=()=>$('#cfgUmbralV').textContent=$('#cfgUmbral').value;
+  V.querySelectorAll('[data-fsrc]').forEach(c=>c.onchange=()=>{CFG.fuentes[+c.dataset.fsrc].on=c.checked;});
+  $('#fAdd').onclick=()=>{const n=$('#fNom').value.trim();if(!n)return;CFG.fuentes=CFG.fuentes||[];CFG.fuentes.push({id:'custom_'+Date.now(),nombre:n,cat:'personalizada',on:true,url:$('#fUrl').value.trim()});secConfig(V);};
+  $('#cfgSave').onclick=async()=>{try{const {error}=await DEU().from('config').update({nivel_analisis:CFG.nivel_analisis,fuentes:CFG.fuentes,umbral_confianza:+$('#cfgUmbral').value,updated_at:new Date().toISOString()}).eq('id',1);if(error)throw error;toast('Configuración guardada ✓');}catch(e){toast('Error: '+(e.message||e));}};
+  // set current rol/carrera per row + save
+  V.querySelectorAll('tr[data-uid]').forEach(tr=>{const p=PERFILES.find(x=>x.id===tr.dataset.uid);if(!p)return;tr.querySelector('.u-rol').value=p.rol;tr.querySelector('.u-car').value=p.carrera||'';
+    tr.querySelector('.u-save').onclick=async()=>{try{const {error}=await DEU().from('perfiles').update({rol:tr.querySelector('.u-rol').value,carrera:tr.querySelector('.u-car').value||null,activo:tr.querySelector('.u-act').checked}).eq('id',p.id);if(error)throw error;toast('Usuario actualizado ✓');}catch(e){toast('Error: '+(e.message||e));}};});
 }
 
 /* init */
