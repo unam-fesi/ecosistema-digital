@@ -303,7 +303,7 @@ td{padding:11px 12px;border-bottom:1px solid var(--line)}
         <p class="muted" style="font-size:.85rem;margin-top:4px">Sube el programa completo y los documentos de soporte (solo PDF, máx. 20 MB).</p>
         <label class="upload" style="margin-top:14px;display:block">
           <div style="font-size:1.6rem">📎</div><div style="margin-top:6px;font-weight:600">Haz clic para seleccionar tus PDF</div>
-          <input id="f_files" type="file" accept="application/pdf" multiple hidden>
+          <input id="f_files" type="file" accept="application/pdf,.pdf" multiple hidden>
         </label>
         <div id="filesList"></div>
       </div>
@@ -618,17 +618,25 @@ async function abrirActividad(id){
 
 /* ══════════ Documentos ══════════ */
 $('#f_files').addEventListener('change',async e=>{
-  if(!ACT){await guardar(false);} if(!ACT){toast('Guarda el borrador antes de subir.');return;}
-  for(const file of e.target.files){
-    if(file.type!=='application/pdf'){toast('Solo PDF: '+file.name);continue;}
-    if(file.size>20*1024*1024){toast('Máx 20 MB: '+file.name);continue;}
+  const files=[...e.target.files]; e.target.value='';   // permite re-seleccionar el mismo archivo
+  if(!files.length)return;
+  if(!USER){showAuth();return;}
+  if(!ACT){ try{ await guardar(false); }catch(_){}}
+  if(!ACT){ toast('No se pudo crear el borrador; captura al menos el título en el paso 1.'); return; }
+  let ok=0;
+  for(const file of files){
+    const esPdf = file.type==='application/pdf' || /\.pdf$/i.test(file.name);
+    if(!esPdf){ toast('Solo se aceptan archivos PDF: '+file.name); continue; }
+    if(file.size>20*1024*1024){ toast('El archivo supera 20 MB: '+file.name); continue; }
+    toast('Subiendo '+file.name+'…',4000);
     const path=`${ACT.id}/${Date.now()}_${file.name.replace(/[^\w.\-]/g,'_')}`;
-    const {error}=await SB.storage.from(BUCKET).upload(path,file,{contentType:'application/pdf'});
-    if(error){toast('Error subiendo '+file.name);continue;}
-    const {data:doc}=await DEU().from('documentos').insert({actividad_id:ACT.id,nombre:file.name,storage_path:path,tipo:'programa',size_bytes:file.size}).select().single();
-    DOCS.push(doc);
+    const {error}=await SB.storage.from(BUCKET).upload(path,file,{contentType:file.type||'application/pdf',upsert:true});
+    if(error){ toast('Error al subir: '+(error.message||file.name)); continue; }
+    const {data:doc,error:dErr}=await DEU().from('documentos').insert({actividad_id:ACT.id,nombre:file.name,storage_path:path,tipo:'programa',size_bytes:file.size}).select().single();
+    if(dErr){ toast('Subido, pero no se registró: '+dErr.message); continue; }
+    DOCS.push(doc); ok++;
   }
-  renderFiles();toast('Documento(s) subido(s) ✓');
+  renderFiles(); if(ok) toast(ok+' documento(s) subido(s) ✓');
 });
 function renderFiles(){
   $('#filesList').innerHTML=DOCS.map(d=>`<div class="file-item"><div class="fic">PDF</div><div class="fmeta"><div class="fn">${esc(d.nombre)}</div><div class="fs">${(d.size_bytes/1024/1024).toFixed(2)} MB</div></div><button class="btn sm ghost" data-del="${d.id}">Quitar</button></div>`).join('');
