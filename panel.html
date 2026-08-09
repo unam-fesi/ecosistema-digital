@@ -445,7 +445,7 @@ function radarSVG(a){ const axes=['Contenido','Duración','Costo/acc.','Alcance'
   const labs=axes.map((ax,i)=>{const p=pt(i,118);return `<text x="${p[0].toFixed(1)}" y="${p[1].toFixed(1)}" text-anchor="middle" font-size="8.5" fill="#54606f">${ax}</text>`;}).join('');
   return `<svg viewBox="0 0 220 220" class="chart-svg" style="max-width:280px">${grid}<polygon points="${poly(mkt)}" fill="rgba(124,92,255,.18)" stroke="#7C5CFF" stroke-width="1.5"/><polygon points="${poly(unam)}" fill="rgba(213,160,33,.28)" stroke="#D5A021" stroke-width="2"/>${labs}</svg><div class="dlegend"><span><i style="background:#D5A021"></i>Este diplomado</span><span><i style="background:#7C5CFF"></i>Mercado privado</span></div>`; }
 function mdLite(t){ return esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h3>$1</h3>').replace(/\n/g,'<br>'); }
-async function pumaiAsk(promptText){ try{ const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-chat',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPABASE_ANON},body:JSON.stringify({messages:[{role:'user',parts:[{text:promptText}]}]})}); if(!res.ok)return null; const d=await res.json(); return d.reply||d.text||null; }catch(e){ return null; } }
+async function pumaiAsk(promptText){ try{ const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-chat',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':'Bearer '+SUPABASE_ANON},body:JSON.stringify({messages:[{role:'user',parts:[{text:promptText}]}]})}); if(!res.ok)return null; const d=await res.json(); return d.reply||d.text||null; }catch(e){ return null; } }
 
 /* ── SECCIÓN: Inteligencia ── */
 function secInteligencia(V){
@@ -745,12 +745,19 @@ function secConfig(V){
       <td><button class="btn ghost sm u-save">Guardar</button></td></tr>`).join('')}
     </tbody></table></div>
     <div class="notice info" style="margin-top:10px"><span>ℹ</span><div>Las cuentas se crean cuando la persona se registra en el portal; aquí asignas su rol y carrera.</div></div>
+  </div>
+  <div class="card" style="border:1px solid rgba(192,57,43,.35)"><h2 style="color:#c0392b">Zona de datos de prueba</h2>
+    <p class="muted" style="font-size:.83rem">Elimina los diplomados, verificaciones, bitácora y usuarios <b>demo</b> marcados como prueba. No afecta registros reales. Acción irreversible; solo administrador.</p>
+    <div class="row" style="margin-top:10px"><button class="btn sm" id="btnPurgar" style="background:#c0392b;color:#fff">🗑 Purgar datos de prueba</button></div>
   </div>`;
   V.querySelectorAll('[data-niv]').forEach(b=>b.onclick=()=>{CFG.nivel_analisis=b.dataset.niv;V.querySelectorAll('[data-niv]').forEach(x=>{x.classList.toggle('gold',x.dataset.niv===CFG.nivel_analisis);x.classList.toggle('ghost',x.dataset.niv!==CFG.nivel_analisis);});});
   $('#cfgUmbral').oninput=()=>$('#cfgUmbralV').textContent=$('#cfgUmbral').value;
   V.querySelectorAll('[data-fsrc]').forEach(c=>c.onchange=()=>{CFG.fuentes[+c.dataset.fsrc].on=c.checked;});
   $('#fAdd').onclick=()=>{const n=$('#fNom').value.trim();if(!n)return;CFG.fuentes=CFG.fuentes||[];CFG.fuentes.push({id:'custom_'+Date.now(),nombre:n,cat:'personalizada',on:true,url:$('#fUrl').value.trim()});secConfig(V);};
   $('#cfgSave').onclick=async()=>{try{const {error}=await DEU().from('config').update({nivel_analisis:CFG.nivel_analisis,fuentes:CFG.fuentes,umbral_confianza:+$('#cfgUmbral').value,updated_at:new Date().toISOString()}).eq('id',1);if(error)throw error;toast('Configuración guardada ✓');}catch(e){toast('Error: '+(e.message||e));}};
+  const bp=$('#btnPurgar'); if(bp) bp.onclick=async()=>{ if(!confirm('¿Purgar TODOS los datos de prueba (diplomados, verificaciones, bitácora y usuarios demo)? Esta acción es irreversible.'))return; bp.disabled=true;bp.innerHTML='<span class="spin"></span> Purgando…';
+    try{const {data,error}=await DEU().rpc('purgar_datos_prueba'); if(error)throw error; toast('Purga completada: '+(data?data.actividades:0)+' actividades, '+(data?data.usuarios:0)+' usuarios demo.'); adminDashboard();}
+    catch(e){toast('Error: '+(e.message||e));bp.disabled=false;bp.innerHTML='🗑 Purgar datos de prueba';} };
   // set current rol/carrera per row + save
   V.querySelectorAll('tr[data-uid]').forEach(tr=>{const p=PERFILES.find(x=>x.id===tr.dataset.uid);if(!p)return;tr.querySelector('.u-rol').value=p.rol;tr.querySelector('.u-car').value=p.carrera||'';
     tr.querySelector('.u-save').onclick=async()=>{try{const {error}=await DEU().from('perfiles').update({rol:tr.querySelector('.u-rol').value,carrera:tr.querySelector('.u-car').value||null,activo:tr.querySelector('.u-act').checked}).eq('id',p.id);if(error)throw error;toast('Usuario actualizado ✓');}catch(e){toast('Error: '+(e.message||e));}};});
