@@ -183,6 +183,7 @@ td{padding:11px 12px;border-bottom:1px solid var(--line)}
   <div class="brand"><div class="logo-chip"><img src="public/assets/Gestion-diplomados-logo.png" alt="Gestión de Diplomados"></div></div>
   <div class="appbar-spacer"></div>
   <a href="index.html" class="btn-home">Ir al Ecosistema</a>
+  <a id="panelBtn" href="panel.html" class="btn gold sm hidden" style="text-decoration:none">⚙ Panel interno</a>
   <button id="loginBtn" class="btn gold sm hidden" onclick="showAuth()">Ingresar</button>
   <div id="userChip" class="user-chip hidden"><div class="av" id="avInit">U</div><div><small id="uName" style="color:#fff;font-weight:600;display:block">Usuario</small><small id="uMail">correo</small></div></div>
   <button id="perfilBtn" class="btn-home hidden">Mi perfil</button>
@@ -486,6 +487,7 @@ async function onLogin(){
   $('#uName').textContent=nom; $('#uMail').textContent=USER.email;
   $('#avInit').textContent=(nom[0]||'U').toUpperCase();
   $('#userChip').classList.remove('hidden'); $('#logoutBtn').classList.remove('hidden'); $('#perfilBtn').classList.remove('hidden'); $('#loginBtn').classList.add('hidden');
+  if(perfil && ['admin','comite_carrera','comite_deu'].includes(perfil.rol)) $('#panelBtn').classList.remove('hidden');
   await cargarLista();
 }
 
