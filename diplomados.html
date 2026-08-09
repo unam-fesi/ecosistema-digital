@@ -39,7 +39,7 @@ h1,h2,h3{line-height:1.2}
 .user-chip small{color:#c3d2e6;line-height:1.1}
 
 .wrap{max-width:1060px;margin:0 auto;padding:26px 22px 80px}
-.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow-1)}
+.card{background:rgba(255,255,255,.86);backdrop-filter:blur(18px) saturate(1.25);-webkit-backdrop-filter:blur(18px) saturate(1.25);border:1px solid rgba(255,255,255,.6);border-radius:18px;padding:22px;box-shadow:0 14px 44px rgba(3,20,40,.24),inset 0 1px 0 rgba(255,255,255,.5)}
 .card+.card{margin-top:16px}
 .card h2{font-size:1.12rem;margin-bottom:4px}
 .muted{color:#6b7686}
@@ -78,7 +78,8 @@ td{padding:11px 12px;border-bottom:1px solid var(--line)}
 .t-folio{font-family:ui-monospace,monospace;font-size:.8rem;color:var(--navy);font-weight:600}
 
 .stepper{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
-.step{flex:1;min-width:120px;display:flex;align-items:center;gap:9px;padding:10px 11px;border-radius:12px;background:#fff;border:1.5px solid var(--line);font-size:.8rem;color:#6b7686}
+.step{flex:1;min-width:120px;display:flex;align-items:center;gap:9px;padding:10px 11px;border-radius:12px;background:rgba(255,255,255,.86);backdrop-filter:blur(12px);border:1.5px solid rgba(255,255,255,.5);font-size:.8rem;color:#6b7686;cursor:pointer;transition:.18s var(--ease)}
+.step:hover{border-color:var(--gold);transform:translateY(-1px)}
 .step .num{width:23px;height:23px;border-radius:50%;background:#eef1f5;color:#6b7686;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.76rem;flex-shrink:0}
 .step.active{border-color:var(--gold);background:#fffdf7;color:var(--navy);font-weight:600}
 .step.active .num{background:var(--gold);color:var(--navy)}
@@ -124,7 +125,8 @@ td{padding:11px 12px;border-bottom:1px solid var(--line)}
 .tl-item .tt{font-weight:600;font-size:.88rem}.tl-item .td{font-size:.77rem;color:#8a97a8}
 
 /* modal */
-.modal{position:fixed;inset:0;background:rgba(10,26,48,.55);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.modal{position:fixed;inset:0;background:rgba(3,16,36,.5);backdrop-filter:blur(3px);z-index:100;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-card{backdrop-filter:blur(20px)}
 .modal.active{display:flex}
 .modal-card{background:#fff;border-radius:20px;padding:28px;width:100%;max-width:420px;box-shadow:var(--shadow-2)}
 .modal-card h2{font-size:1.3rem;margin-bottom:4px}
@@ -134,11 +136,12 @@ td{padding:11px 12px;border-bottom:1px solid var(--line)}
 
 /* PUMAI */
 .pumai-fab{position:fixed;right:20px;bottom:20px;z-index:80;display:flex;align-items:center;gap:9px;background:linear-gradient(120deg,var(--violet),var(--cyan));color:#fff;padding:11px 17px 11px 12px;border-radius:40px;box-shadow:0 12px 40px rgba(124,92,255,.4);font-weight:600;font-size:.86rem}
-.pumai-fab .orb{width:25px;height:25px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center}
+.pumai-fab .orb{width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.orb img{width:100%;height:100%;object-fit:cover;display:block}
 .pumai-panel{position:fixed;right:20px;bottom:76px;width:350px;max-width:calc(100vw-40px);height:480px;max-height:70vh;background:#fff;border-radius:18px;box-shadow:var(--shadow-2);z-index:81;display:none;flex-direction:column;overflow:hidden;border:1px solid var(--line)}
 .pumai-panel.open{display:flex}
 .pumai-head{background:linear-gradient(120deg,var(--violet),var(--cyan));color:#fff;padding:13px 15px;display:flex;align-items:center;gap:10px}
-.pumai-head .orb{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:1rem}
+.pumai-head .orb{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;font-size:1rem;overflow:hidden}
 .pumai-head small{color:rgba(255,255,255,.85)}
 .pumai-body{flex:1;overflow-y:auto;padding:14px;background:#f7f8fa;display:flex;flex-direction:column;gap:9px}
 .msg{max-width:84%;padding:9px 12px;border-radius:13px;font-size:.83rem;line-height:1.45}
@@ -162,6 +165,7 @@ td{padding:11px 12px;border-bottom:1px solid var(--line)}
   <div class="brand"><div class="logo-chip"><img src="public/assets/Gestion-diplomados-logo.png" alt="Gestión de Diplomados"></div></div>
   <div class="appbar-spacer"></div>
   <a href="index.html" class="btn-home">Ir al Ecosistema</a>
+  <button id="loginBtn" class="btn gold sm hidden" onclick="showAuth()">Ingresar</button>
   <div id="userChip" class="user-chip hidden"><div class="av" id="avInit">U</div><div><small id="uName" style="color:#fff;font-weight:600;display:block">Usuario</small><small id="uMail">correo</small></div></div>
   <button id="perfilBtn" class="btn-home hidden">Mi perfil</button>
   <button id="logoutBtn" class="btn-home hidden">Salir</button>
@@ -337,9 +341,9 @@ td{padding:11px 12px;border-bottom:1px solid var(--line)}
 </div>
 
 <!-- PUMAI -->
-<div class="pumai-fab" onclick="Pumai.toggle()"><div class="orb">🤖</div> PUM-AI</div>
+<div class="pumai-fab" onclick="Pumai.toggle()"><div class="orb"><img src="MIRC-Demo/assets/mirc-animation.gif" alt="PUM-AI"></div> PUM-AI</div>
 <div class="pumai-panel" id="pumaiPanel">
-  <div class="pumai-head"><div class="orb">🤖</div><div>PUM-AI<br><small>Valida tu registro · DEU</small></div></div>
+  <div class="pumai-head"><div class="orb"><img src="MIRC-Demo/assets/mirc-animation.gif" alt="PUM-AI"></div><div>PUM-AI<br><small>Valida tu registro · DEU</small></div></div>
   <div class="pumai-body" id="pumaiBody"></div>
   <div class="pumai-foot"><input id="pumaiInput" placeholder="Pregúntame sobre los lineamientos…"><button onclick="Pumai.send()">➤</button></div>
 </div>
@@ -469,7 +473,7 @@ async function onLogin(){
   const nom=perfil?.nombre||USER.email;
   $('#uName').textContent=nom; $('#uMail').textContent=USER.email;
   $('#avInit').textContent=(nom[0]||'U').toUpperCase();
-  $('#userChip').classList.remove('hidden'); $('#logoutBtn').classList.remove('hidden'); $('#perfilBtn').classList.remove('hidden');
+  $('#userChip').classList.remove('hidden'); $('#logoutBtn').classList.remove('hidden'); $('#perfilBtn').classList.remove('hidden'); $('#loginBtn').classList.add('hidden');
   await cargarLista();
 }
 
@@ -494,7 +498,7 @@ function showWizard(){$('#viewLista').classList.add('hidden');$('#viewWizard').c
 function goStep(n){$$('.wizstep').forEach(s=>s.classList.toggle('active',s.dataset.wizstep==n));
   $$('.step').forEach(s=>{const sn=+s.dataset.step;s.classList.toggle('active',sn==n);s.classList.toggle('done',sn<n);});
   if(n==5)renderReview(); window.scrollTo({top:0,behavior:'smooth'});}
-$('#btnNueva').onclick=()=>{ACT=null;RESP=null;DOCS=[];clearForm();$('#wizFolio').textContent='Nueva solicitud (borrador)';showWizard();};
+$('#btnNueva').onclick=()=>{if(!USER){showAuth();return;}ACT=null;RESP=null;DOCS=[];clearForm();$('#wizFolio').textContent='Nueva solicitud (borrador)';showWizard();};
 $('#btnVolverLista').onclick=showLista;
 $$('[data-next]').forEach(b=>b.onclick=async()=>{await guardar(false);goStep(+b.dataset.next);});
 $$('[data-prev]').forEach(b=>b.onclick=()=>goStep(+b.dataset.prev));
@@ -518,7 +522,7 @@ function bindValidation(){
 function collect(){
   return{
     tipo:$('#f_tipo').value,carrera:$('#f_carrera').value,titulo:$('#f_titulo').value.trim(),
-    duracion_horas:+$('#f_duracion').value||0,modalidad:$('#f_modalidad').value,
+    duracion_horas:$('#f_duracion').value?(+$('#f_duracion').value):null,modalidad:$('#f_modalidad').value,
     cupo:$('#f_cupo').value?+$('#f_cupo').value:null,fecha_inicio:$('#f_ini').value||null,fecha_fin:$('#f_fin').value||null,
     objetivo_general:$('#f_objg').value.trim(),objetivos_especificos:$('#f_obje').value.trim(),
     perfil_ingreso:$('#f_pin').value.trim(),perfil_egreso:$('#f_peg').value.trim(),
@@ -665,7 +669,17 @@ function renderDossier(d){
 
 /* ══════════ Init ══════════ */
 bindValidation();
-SB.auth.getSession().then(({data:{session}})=>{ if(session){onLogin();} else {showAuth();} });
+// Pasos del wizard clicables: regresar/avanzar a cualquier paso para corregir
+$$('.step').forEach(s=>{ s.onclick=async()=>{ try{ if(USER) await guardar(false);}catch(e){} goStep(+s.dataset.step); }; });
+async function boot(){
+  const {data:{session}}=await SB.auth.getSession();
+  if(session){ await onLogin(); }
+  else {
+    $('#loginBtn').classList.remove('hidden');
+    $('#listaBody').innerHTML='<div class="empty" style="color:#3a4557;font-weight:500">Inicia sesión o crea tu cuenta para registrar tus diplomados y darles seguimiento.<div style="margin-top:14px"><button class="btn gold" onclick="showAuth()">Ingresar / Crear cuenta</button></div></div>';
+  }
+}
+boot();
 </script>
 </body>
 </html>
