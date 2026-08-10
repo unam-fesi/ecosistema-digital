@@ -445,7 +445,7 @@ function radarSVG(a){ const axes=['Contenido','Duración','Costo/acc.','Alcance'
   const labs=axes.map((ax,i)=>{const p=pt(i,118);return `<text x="${p[0].toFixed(1)}" y="${p[1].toFixed(1)}" text-anchor="middle" font-size="8.5" fill="#54606f">${ax}</text>`;}).join('');
   return `<svg viewBox="0 0 220 220" class="chart-svg" style="max-width:280px">${grid}<polygon points="${poly(mkt)}" fill="rgba(124,92,255,.18)" stroke="#7C5CFF" stroke-width="1.5"/><polygon points="${poly(unam)}" fill="rgba(213,160,33,.28)" stroke="#D5A021" stroke-width="2"/>${labs}</svg><div class="dlegend"><span><i style="background:#D5A021"></i>Este diplomado</span><span><i style="background:#7C5CFF"></i>Mercado privado</span></div>`; }
 function mdLite(t){ return esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h3>$1</h3>').replace(/\n/g,'<br>'); }
-async function pumaiAsk(promptText){ try{ const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-chat',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':'Bearer '+SUPABASE_ANON},body:JSON.stringify({messages:[{role:'user',parts:[{text:promptText}]}]})}); if(!res.ok)return null; const d=await res.json(); return d.reply||d.text||null; }catch(e){ return null; } }
+async function pumaiAsk(promptText){ try{ const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-chat',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':'Bearer '+SUPABASE_ANON},body:JSON.stringify({mode:'analysis',messages:[{role:'user',parts:[{text:promptText}]}]})}); if(!res.ok)return null; const d=await res.json(); return d.reply||d.text||null; }catch(e){ return null; } }
 
 /* ── SECCIÓN: Inteligencia ── */
 function secInteligencia(V){
@@ -594,30 +594,70 @@ function cmpFallback(a){ const horas=a.duracion_horas||120; const precio=Math.ro
   </tbody></table><div class="insight" style="margin-top:8px">Rango de precio sugerido: <b>$${Math.round(precio*0.6).toLocaleString()}–$${precio.toLocaleString()}</b> (accesible vs mercado privado, capitalizando el aval UNAM).</div>`; }
 
 /* ── SECCIÓN: Demanda (MiroFish) ── */
+function demandaSeed(a){ // deriva valores iniciales de los deslizadores a partir del diplomado
+  const byC={}; ADMIN_DATA.forEach(x=>byC[x.carrera]=(byC[x.carrera]||0)+1);
+  const maxC=Math.max(1,...Object.values(byC));
+  const afinidad=Math.round(45+ (byC[a.carrera]||1)/maxC*40 + ((META[a.id]||{}).score||50)*0.1); // popularidad de la carrera + viabilidad
+  const horas=a.duracion_horas||120; const precio=Math.min(90,Math.round(30+horas/4)); // + horas → percibido más caro
+  const m=(a.modalidad||'').toLowerCase();
+  const modFlex=m.includes('línea')||m.includes('linea')||m.includes('distancia')?85:m.includes('mixta')||m.includes('híbr')||m.includes('hibr')?70:45;
+  const dif=(META[a.id]||{}).hasDocs?55:40;
+  return {tema:Math.min(100,afinidad),precio,dif,mod:modFlex};
+}
 function secDemanda(V){
-  V.innerHTML=`<div class="card"><h2>🐟 Simulación de demanda (MiroFish)</h2><p class="muted" style="font-size:.84rem">Simula estudiantes potenciales para estimar el interés en un diplomado según sus características. Modelo <b>what-if</b> (indicativo), afinable con encuestas o analítica real.</p>
-   <div class="grid grid-2" style="margin-top:12px"><div>
+  const enRev=ADMIN_DATA.filter(a=>a.estado==='en_revision_carrera'||a.estado==='en_revision_deu');
+  const lista=enRev.length?enRev:ADMIN_DATA;
+  if(!lista.length){ V.innerHTML='<div class="card"><h2>🐟 Simulación de demanda</h2><div class="empty">No hay diplomados para analizar todavía.</div></div>'; return; }
+  V.innerHTML=`<div class="card"><h2>🐟 Simulación de demanda por diplomado (MiroFish)</h2><p class="muted" style="font-size:.84rem">Selecciona un diplomado <b>en revisión</b> y el modelo estima si habrá demanda suficiente para abrir grupo. Los deslizadores parten de las características del diplomado; ajústalos para explorar escenarios <b>what-if</b>. Estimación <b>indicativa</b> hasta cargar datos reales (ver insumos abajo).</p>
+   <div class="row" style="margin-top:10px;gap:8px;flex-wrap:wrap"><select id="demSel" class="mini" style="flex:1;min-width:240px">${lista.map(a=>`<option value="${a.id}">${esc(a.folio)} · ${esc(a.titulo)} — ${ESTADO_LBL[a.estado]}</option>`).join('')}</select>
+     <button class="btn gold sm" id="demRun">🔮 Analizar demanda con PUM-AI</button></div>
+   ${enRev.length?'':'<div class="notice info" style="margin-top:8px"><span>ℹ</span><div>No hay diplomados en revisión ahora; se muestran todos para que puedas probar.</div></div>'}
+   <div class="grid grid-2" style="margin-top:14px"><div>
      <div class="slider-row"><label>Afinidad del tema</label><input type="range" id="s_tema" min="0" max="100" value="68"><span class="v" id="v_tema">68</span></div>
      <div class="slider-row"><label>Precio (accesible→caro)</label><input type="range" id="s_precio" min="0" max="100" value="45"><span class="v" id="v_precio">45</span></div>
      <div class="slider-row"><label>Difusión</label><input type="range" id="s_dif" min="0" max="100" value="55"><span class="v" id="v_dif">55</span></div>
      <div class="slider-row"><label>Modalidad flexible</label><input type="range" id="s_mod" min="0" max="100" value="60"><span class="v" id="v_mod">60</span></div>
      <div id="demStats" style="margin-top:12px"></div></div>
-   <div><canvas id="swarm" style="width:100%;height:360px;display:block;border-radius:12px;background:radial-gradient(circle at 50% 30%,#0d2444,#071022)"></canvas></div></div></div>`;
-  const cv=$('#swarm'),dpr=Math.min(2,devicePixelRatio||1),N=420,ag=[];
-  function size(){cv.width=(cv.clientWidth||600)*dpr;cv.height=360*dpr;}
+   <div><canvas id="swarm" style="width:100%;height:300px;display:block;border-radius:12px;background:radial-gradient(circle at 50% 30%,#0d2444,#071022)"></canvas>
+     <div id="demAI" style="margin-top:12px"></div></div></div></div>
+   <div class="card"><h2>📥 Insumos para un análisis confiable</h2><p class="muted" style="font-size:.84rem">Hoy la estimación usa solo las características del diplomado (heurística). Para pasar de <i>indicativo</i> a <i>predictivo</i> harían falta estos insumos:</p>
+     <div id="demInsumos" style="margin-top:10px"></div></div>`;
+  const cv=$('#swarm'),dpr=Math.min(2,devicePixelRatio||1),N=360,ag=[];
+  function size(){cv.width=(cv.clientWidth||600)*dpr;cv.height=300*dpr;}
   size(); const ctx=cv.getContext('2d');
   for(let i=0;i<N;i++)ag.push({x:Math.random()*cv.width,y:Math.random()*cv.height,vx:(Math.random()-.5)*0.7*dpr,vy:(Math.random()-.5)*0.7*dpr,seed:Math.random()});
   const val=id=>+document.getElementById(id).value;
   function interest(){return Math.max(0,Math.min(100,0.4*val('s_tema')+0.25*(100-val('s_precio'))+0.2*val('s_dif')+0.15*val('s_mod')));}
-  function stats(){const sc=Math.round(interest());
-    document.getElementById('demStats').innerHTML=`<div class="stat" style="box-shadow:none;border:1px solid var(--line)"><div class="lbl">Interés estimado</div><div class="val" style="color:${sc>=65?'#0d8b5c':sc>=45?'#a67c14':'#c0392b'}">${sc}%</div><div class="sub">${Math.round(N*sc/100)} de ${N} potenciales</div></div>
-    <div class="insight" style="margin-top:10px">${sc>=65?'Alta probabilidad de demanda; conviene abrir grupo.':sc>=45?'Demanda moderada; refuerza difusión o ajusta precio/modalidad.':'Baja demanda proyectada; revisar pertinencia, precio y difusión.'}</div>`;}
+  function curAct(){return ADMIN_DATA.find(x=>x.id===$('#demSel').value)||lista[0];}
+  function stats(){const sc=Math.round(interest()); const a=curAct();
+    const cupo= sc>=65?'25–30':sc>=45?'15–22':'<12'; // inscripciones proyectadas por grupo
+    document.getElementById('demStats').innerHTML=`<div class="stat" style="box-shadow:none;border:1px solid var(--line)"><div class="lbl">Interés estimado</div><div class="val" style="color:${sc>=65?'#0d8b5c':sc>=45?'#a67c14':'#c0392b'}">${sc}%</div><div class="sub">${Math.round(N*sc/100)} de ${N} prospectos simulados</div></div>
+    <div class="stat" style="box-shadow:none;border:1px solid var(--line);margin-top:8px"><div class="lbl">Inscripciones proyectadas</div><div class="val">${cupo}</div><div class="sub">por grupo (indicativo)</div></div>
+    <div class="insight" style="margin-top:10px"><b>${sc>=65?'Demanda ALTA':sc>=45?'Demanda MEDIA':'Demanda BAJA'}.</b> ${sc>=65?'Conviene abrir grupo; asegura difusión y cupo.':sc>=45?'Viable con ajustes: refuerza difusión o revisa precio/modalidad.':'Riesgo de no reunir cupo mínimo; revisar pertinencia, precio y difusión antes de abrir.'}</div>`;}
   function draw(){const sc=interest()/100;ctx.clearRect(0,0,cv.width,cv.height);
     for(const a of ag){a.x+=a.vx;a.y+=a.vy;if(a.x<0||a.x>cv.width)a.vx*=-1;if(a.y<0||a.y>cv.height)a.vy*=-1;
       const c=a.seed<sc?'52,211,153':'239,100,97';ctx.beginPath();ctx.arc(a.x,a.y,2.5*dpr,0,6.2832);ctx.fillStyle='rgba('+c+',0.88)';ctx.fill();}
     DEMANDA_RAF=requestAnimationFrame(draw);}
+  function setSeed(){ const a=curAct(); const s=demandaSeed(a);
+    ['tema','precio','dif','mod'].forEach(k=>{const el=document.getElementById('s_'+k);el.value=s[k];document.getElementById('v_'+k).textContent=s[k];});
+    stats(); insumos(a); document.getElementById('demAI').innerHTML=''; }
+  function insumos(a){ const m=META[a.id]||{};
+    const have=[['Características del diplomado (tipo, duración, modalidad)',true],['Carrera y demanda relativa dentro del sistema',true],['Documentos de soporte cargados',!!m.hasDocs]];
+    const need=['Inscripciones de ediciones previas de este diplomado o similares','Matrícula histórica y nº de egresados de la carrera (público cautivo)','Encuesta de interés / lista de espera de aspirantes','Precio y cupo de programas equivalentes (competencia)','Tendencias de búsqueda del tema (Google Trends / redes)','Demanda del mercado laboral por esas competencias (vacantes)','Presupuesto y alcance de difusión previsto','Estacionalidad (mes de apertura) y calendario académico'];
+    document.getElementById('demInsumos').innerHTML=
+      have.map(([t,ok])=>`<div class="check"><div class="ci ${ok?'ok':'warn'}">${ok?'✓':'!'}</div><div><div class="ct">${esc(t)}</div><div class="cd">${ok?'Disponible en el sistema.':'Aún no cargado.'}</div></div></div>`).join('')+
+      `<div class="divider"></div><div style="font-size:.72rem;color:#8a97a8;font-weight:700;text-transform:uppercase;margin-bottom:6px">Faltan para un modelo predictivo</div>`+
+      need.map(t=>`<div class="check"><div class="ci warn">+</div><div><div class="ct">${esc(t)}</div></div></div>`).join('');
+  }
   ['tema','precio','dif','mod'].forEach(k=>document.getElementById('s_'+k).oninput=()=>{document.getElementById('v_'+k).textContent=val('s_'+k);stats();});
-  stats(); if(DEMANDA_RAF)cancelAnimationFrame(DEMANDA_RAF); draw();
+  $('#demSel').onchange=setSeed;
+  $('#demRun').onclick=async()=>{ const a=curAct(); const box=$('#demAI');
+    box.innerHTML='<div class="empty"><span class="spin" style="border-color:rgba(6,43,92,.3);border-top-color:#062B5C"></span> PUM-AI estimando la demanda…</div>';
+    const byC={}; ADMIN_DATA.forEach(x=>byC[x.carrera]=(byC[x.carrera]||0)+1);
+    const reply=await pumaiAsk(`Eres PUM-AI, analista de la DEU FES Iztacala (UNAM). Estima la DEMANDA potencial de este diplomado y si conviene abrir grupo. Diplomado: "${a.titulo}", tipo ${TIPO_LBL[a.tipo]||a.tipo}, ${a.duracion_horas||'?'} horas, carrera ${CARRERA_LBL[a.carrera]||a.carrera}, modalidad ${a.modalidad}. Objetivo: ${(a.objetivo_general||'no especificado').slice(0,300)}. Contexto interno: ${byC[a.carrera]||1} solicitudes de esa carrera en el sistema; índice de viabilidad ${(META[a.id]||{}).score||'?'} /100; el modelo heurístico estima ${Math.round(interest())}% de interés. En español y breve, con subtítulos en negrita: 1) Veredicto de demanda (Alta/Media/Baja) con % estimado y por qué; 2) Público objetivo; 3) 3 acciones para aumentar inscripciones; 4) Qué INSUMOS de datos faltan para una estimación confiable. Aclara que es una estimación indicativa.`);
+    box.innerHTML=`<div class="card" style="box-shadow:none;border:1px solid var(--line);background:#f8fafc"><h3 style="margin-top:0">🔮 Lectura de PUM-AI — ${esc(a.folio)}</h3>${reply?mdLite(reply):'<div class="notice info"><span>ℹ</span><div>PUM-AI no está disponible ahora. Usa la estimación heurística de la izquierda; el veredicto actual es <b>'+(interest()>=65?'demanda alta':interest()>=45?'demanda media':'demanda baja')+'</b>.</div></div>'}</div>`;
+  };
+  if(DEMANDA_RAF)cancelAnimationFrame(DEMANDA_RAF); setSeed(); draw();
 }
 
 /* ── SECCIÓN: Auditoría / Uso responsable ── */
