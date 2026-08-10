@@ -73,6 +73,20 @@ table{width:100%;border-collapse:collapse;font-size:.85rem}
 th{text-align:left;color:#8a97a8;font-weight:600;font-size:.71rem;text-transform:uppercase;letter-spacing:.06em;padding:9px 11px;border-bottom:1px solid var(--line)}
 td{padding:10px 11px;border-bottom:1px solid var(--line);vertical-align:middle}
 tr:hover td{background:#faf8f4}
+.mdbody{font-size:.88rem;line-height:1.55;color:#2b3646}
+.mdbody h3{font-size:.95rem;color:var(--navy);margin:14px 0 4px;font-weight:700}
+.mdbody h3:first-child{margin-top:0}
+.mdbody p{margin:7px 0}
+.mdbody ul,.mdbody ol{margin:6px 0 6px 20px}
+.mdbody li{margin:3px 0}
+.mdbody hr{border:0;border-top:1px solid var(--line);margin:12px 0}
+.mdbody code{background:#eef1f5;padding:1px 5px;border-radius:4px;font-size:.82em}
+.mdbody b{color:var(--navy)}
+table.mdt{margin:12px 0;border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:.82rem}
+table.mdt th{background:var(--navy);color:#fff;text-transform:none;letter-spacing:0;font-size:.74rem;font-weight:700;border-bottom:0;padding:8px 10px}
+table.mdt td{font-size:.82rem;padding:8px 10px}
+table.mdt tbody tr:nth-child(even) td{background:#f8fafc}
+table.mdt tbody tr:hover td{background:#f1f5ff}
 .t-folio{font-family:ui-monospace,monospace;font-size:.79rem;color:var(--navy);font-weight:600}
 
 .field{margin-bottom:13px}
@@ -145,6 +159,17 @@ tr:hover td{background:#faf8f4}
 .pa-msg{max-width:88%;padding:10px 13px;border-radius:13px;font-size:.86rem;line-height:1.5}
 .pa-msg.bot{background:#f2f5f9;align-self:flex-start;border-bottom-left-radius:4px}
 .pa-msg.user{background:var(--navy);color:#fff;align-self:flex-end;border-bottom-right-radius:4px}
+.pa-msg.bot .mdbody{font-size:.86rem}.pa-msg.bot .mdbody p{margin:4px 0}
+.arq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.arq-card{border:1px solid var(--line);border-radius:12px;padding:13px;background:#fff}
+.arq-top{display:flex;gap:10px;align-items:flex-start}
+.arq-emoji{font-size:1.5rem;line-height:1}
+.arq-name{font-weight:700;font-size:.9rem;color:var(--navy)}
+.arq-desc{font-size:.76rem;color:#6b7686;margin-top:2px;line-height:1.35}
+.arq-meter{height:7px;border-radius:5px;background:#eef1f5;overflow:hidden;margin-top:10px}
+.arq-meter>div{height:100%;border-radius:5px;transition:width .3s}
+.chip-q{border:1px solid var(--line);background:#f6f8fb;color:#3a4557;border-radius:999px;padding:5px 11px;font-size:.76rem;cursor:pointer;font-family:inherit}
+.chip-q:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
 </style>
 </head>
 <body>
@@ -444,8 +469,45 @@ function radarSVG(a){ const axes=['Contenido','Duración','Costo/acc.','Alcance'
   const grid=[25,50,75,100].map(g=>`<polygon points="${axes.map((_,i)=>pt(i,g).map(x=>x.toFixed(1)).join(',')).join(' ')}" fill="none" stroke="#e3e8ef"/>`).join('');
   const labs=axes.map((ax,i)=>{const p=pt(i,118);return `<text x="${p[0].toFixed(1)}" y="${p[1].toFixed(1)}" text-anchor="middle" font-size="8.5" fill="#54606f">${ax}</text>`;}).join('');
   return `<svg viewBox="0 0 220 220" class="chart-svg" style="max-width:280px">${grid}<polygon points="${poly(mkt)}" fill="rgba(124,92,255,.18)" stroke="#7C5CFF" stroke-width="1.5"/><polygon points="${poly(unam)}" fill="rgba(213,160,33,.28)" stroke="#D5A021" stroke-width="2"/>${labs}</svg><div class="dlegend"><span><i style="background:#D5A021"></i>Este diplomado</span><span><i style="background:#7C5CFF"></i>Mercado privado</span></div>`; }
-function mdLite(t){ return esc(t).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/^### (.+)$/gm,'<h3>$1</h3>').replace(/^## (.+)$/gm,'<h3>$1</h3>').replace(/\n/g,'<br>'); }
+function mdInline(s){ return esc(s)
+  .replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')
+  .replace(/__(.+?)__/g,'<b>$1</b>')
+  .replace(/(^|[^*])\*(?!\s)([^*\n]+?)\*(?!\*)/g,'$1<i>$2</i>')
+  .replace(/`([^`]+?)`/g,'<code>$1</code>'); }
+function mdLite(t){
+  if(t==null||t==='') return '';
+  const lines=String(t).replace(/\r/g,'').replace(/```+[a-z]*/gi,'').split('\n');
+  const isSep=s=>/^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)+\|?\s*$/.test(s);
+  const cells=s=>s.replace(/^\s*\|/,'').replace(/\|\s*$/,'').split('|').map(c=>c.trim());
+  let html='',i=0;
+  while(i<lines.length){
+    const ln=lines[i];
+    // Tabla estilo Markdown (GFM)
+    if(ln.includes('|') && i+1<lines.length && isSep(lines[i+1])){
+      const head=cells(ln); i+=2; const body=[];
+      while(i<lines.length && lines[i].includes('|') && lines[i].trim()!==''){ body.push(cells(lines[i])); i++; }
+      html+='<table class="mdt"><thead><tr>'+head.map(h=>`<th>${mdInline(h)}</th>`).join('')+'</tr></thead><tbody>'+
+        body.map(r=>'<tr>'+head.map((_,c)=>`<td>${mdInline(r[c]||'')}</td>`).join('')+'</tr>').join('')+'</tbody></table>';
+      continue;
+    }
+    let m;
+    if((m=ln.match(/^\s*#{1,6}\s+(.+?)\s*#*$/))){ html+=`<h3>${mdInline(m[1])}</h3>`; i++; continue; }
+    if(/^\s*---+\s*$/.test(ln)){ html+='<hr>'; i++; continue; }
+    if(/^\s*[-*•]\s+/.test(ln)){ const it=[];
+      while(i<lines.length && /^\s*[-*•]\s+/.test(lines[i])){ it.push(mdInline(lines[i].replace(/^\s*[-*•]\s+/,''))); i++; }
+      html+='<ul>'+it.map(x=>`<li>${x}</li>`).join('')+'</ul>'; continue; }
+    if(/^\s*\d+[.)]\s+/.test(ln)){ const it=[];
+      while(i<lines.length && /^\s*\d+[.)]\s+/.test(lines[i])){ it.push(mdInline(lines[i].replace(/^\s*\d+[.)]\s+/,''))); i++; }
+      html+='<ol>'+it.map(x=>`<li>${x}</li>`).join('')+'</ol>'; continue; }
+    if(ln.trim()===''){ i++; continue; }
+    const para=[ln]; i++;
+    while(i<lines.length && lines[i].trim()!=='' && !/^\s*([-*•]\s|\d+[.)]\s|#{1,6}\s|\|)/.test(lines[i]) && !isSep(lines[i])){ para.push(lines[i]); i++; }
+    html+=`<p>${para.map(mdInline).join('<br>')}</p>`;
+  }
+  return `<div class="mdbody">${html}</div>`;
+}
 async function pumaiAsk(promptText){ try{ const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-chat',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':'Bearer '+SUPABASE_ANON},body:JSON.stringify({mode:'analysis',messages:[{role:'user',parts:[{text:promptText}]}]})}); if(!res.ok)return null; const d=await res.json(); return d.reply||d.text||null; }catch(e){ return null; } }
+async function pumaiConversar(history){ try{ const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-chat',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':'Bearer '+SUPABASE_ANON},body:JSON.stringify({mode:'analysis',messages:history})}); if(!res.ok)return null; const d=await res.json(); return d.reply||d.text||null; }catch(e){ return null; } }
 
 /* ── SECCIÓN: Inteligencia ── */
 function secInteligencia(V){
@@ -620,6 +682,9 @@ function secDemanda(V){
      <div id="demStats" style="margin-top:12px"></div></div>
    <div><canvas id="swarm" style="width:100%;height:300px;display:block;border-radius:12px;background:radial-gradient(circle at 50% 30%,#0d2444,#071022)"></canvas>
      <div id="demAI" style="margin-top:12px"></div></div></div></div>
+   <div class="card"><h2>🧑‍🤝‍🧑 Entrevista a prospectos (arquetipos)</h2><p class="muted" style="font-size:.84rem">PUM-AI genera <b>arquetipos</b> de aspirantes a partir de los insumos del diplomado. Conversa con cada uno para entender <b>por qué se inscribiría o no</b>. Respuestas simuladas <b>indicativas</b>; se afinan con encuestas y datos reales.</p>
+     <div id="arqGrid" class="arq-grid" style="margin-top:12px"></div>
+     <div id="arqChat" style="margin-top:14px"></div></div>
    <div class="card"><h2>📥 Insumos para un análisis confiable</h2><p class="muted" style="font-size:.84rem">Hoy la estimación usa solo las características del diplomado (heurística). Para pasar de <i>indicativo</i> a <i>predictivo</i> harían falta estos insumos:</p>
      <div id="demInsumos" style="margin-top:10px"></div></div>`;
   const cv=$('#swarm'),dpr=Math.min(2,devicePixelRatio||1),N=360,ag=[];
@@ -640,7 +705,53 @@ function secDemanda(V){
     DEMANDA_RAF=requestAnimationFrame(draw);}
   function setSeed(){ const a=curAct(); const s=demandaSeed(a);
     ['tema','precio','dif','mod'].forEach(k=>{const el=document.getElementById('s_'+k);el.value=s[k];document.getElementById('v_'+k).textContent=s[k];});
-    stats(); insumos(a); document.getElementById('demAI').innerHTML=''; }
+    stats(); insumos(a); renderArquetipos(a); document.getElementById('demAI').innerHTML=''; document.getElementById('arqChat').innerHTML=''; }
+  // ── Arquetipos de prospectos ──
+  const ARQ=[
+    {id:'egresado',emoji:'🎓',nombre:'Recién egresado/a',desc:'0–2 años de titulación; busca empleabilidad',w:{tema:.35,precio:.40,dif:.15,mod:.10},motiv:'diferenciarse en el mercado laboral y ganar empleabilidad',frena:'presupuesto limitado y dudas sobre el retorno'},
+    {id:'activo',emoji:'💼',nombre:'Profesional en activo',desc:'trabaja; quiere actualizarse sin dejar el empleo',w:{tema:.35,precio:.15,dif:.10,mod:.40},motiv:'crecer profesionalmente con horarios compatibles',frena:'falta de tiempo y horarios rígidos'},
+    {id:'docente',emoji:'📚',nombre:'Docente / académico',desc:'busca actualización disciplinar y valor curricular',w:{tema:.45,precio:.10,dif:.10,mod:.35},motiv:'rigor académico, aval institucional y puntaje',frena:'contenido poco especializado o repetido'},
+    {id:'externo',emoji:'🌐',nombre:'Profesional de otra institución',desc:'atraído por el prestigio UNAM; compara con privadas',w:{tema:.30,precio:.30,dif:.25,mod:.15},motiv:'prestigio UNAM a un costo accesible',frena:'no se entera de la oferta (difusión débil)'},
+  ];
+  function arqScore(arch){ const favor={tema:val('s_tema'),precio:100-val('s_precio'),dif:val('s_dif'),mod:val('s_mod')};
+    return Math.round(arch.w.tema*favor.tema+arch.w.precio*favor.precio+arch.w.dif*favor.dif+arch.w.mod*favor.mod); }
+  function arqLabel(s){ return s>=65?['Probablemente SÍ','#0d8b5c']:s>=45?['Indeciso','#a67c14']:['Probablemente NO','#c0392b']; }
+  function renderArquetipos(a){ const g=document.getElementById('arqGrid'); if(!g)return;
+    g.innerHTML=ARQ.map(arch=>{const s=arqScore(arch),[lb,col]=arqLabel(s);
+      return `<div class="arq-card"><div class="arq-top"><span class="arq-emoji">${arch.emoji}</span><div><div class="arq-name">${arch.nombre}</div><div class="arq-desc">${esc(arch.desc)}</div></div></div>
+      <div class="arq-meter"><div style="width:${s}%;background:${col}"></div></div>
+      <div class="row" style="justify-content:space-between;align-items:center;margin-top:6px"><span class="flag" style="background:${col}22;color:${col};font-weight:700">${lb} · ${s}%</span><button class="btn navy sm arq-go" data-arq="${arch.id}" style="background:var(--navy);color:#fff">💬 Conversar</button></div></div>`;
+    }).join('');
+    g.querySelectorAll('.arq-go').forEach(b=>b.onclick=()=>openChat(a,ARQ.find(x=>x.id===b.dataset.arq)));
+  }
+  function precioTxt(){ const p=val('s_precio'); return p>=66?'alto':p>=40?'moderado':'accesible'; }
+  let HIST=[]; // historial de la conversación con el arquetipo actual
+  function openChat(a,arch){ const s=arqScore(arch),[lb]=arqLabel(s);
+    const box=document.getElementById('arqChat');
+    box.innerHTML=`<div class="card" style="box-shadow:none;border:1px solid var(--line);background:#fbfcfe">
+      <div class="row" style="justify-content:space-between;align-items:center"><h3 style="margin:0">${arch.emoji} ${arch.nombre} <span style="font-weight:500;color:#8a97a8">— ${esc(a.folio)}</span></h3><span class="flag info">${lb} · ${s}%</span></div>
+      <div id="arqBody" class="pumai-analyst" style="margin:10px 0;max-height:260px;overflow:auto"></div>
+      <div class="row" style="gap:8px"><input id="arqIn" class="mini" style="flex:1" placeholder="Pregúntale… ej. ¿qué te haría inscribirte?"><button class="btn gold sm" id="arqSend">Enviar</button></div>
+      <div class="row" style="gap:6px;margin-top:8px;flex-wrap:wrap">${['¿Por qué sí o por qué no te inscribirías?','¿Qué precio te parecería justo?','¿Qué modalidad y horario prefieres?','¿Qué te haría cambiar de opinión?'].map(q=>`<button class="chip-q" data-q="${esc(q)}">${esc(q)}</button>`).join('')}</div></div>`;
+    HIST=[]; const persona=`Vas a ROLEPLAY como un PROSPECTO real (no como asistente ni analista) para un diplomado de la DEU FES Iztacala (UNAM). Personaje: ${arch.nombre} — ${arch.desc}. Tu motivación principal: ${arch.motiv}. Tu principal freno: ${arch.frena}. Diplomado: "${a.titulo}", ${a.duracion_horas||'?'} horas, carrera ${CARRERA_LBL[a.carrera]||a.carrera}, modalidad ${a.modalidad}, precio percibido ${precioTxt()}. Tu inclinación actual a inscribirte es "${lb}" (${s}/100). Responde SIEMPRE en primera persona como este personaje, en español, de forma breve (2–4 frases), realista y honesta sobre por qué te inscribirías o no. Nunca rompas el personaje ni digas que eres una IA.`;
+    const bootstrap='¿Te inscribirías a este diplomado? ¿Por qué sí o por qué no?';
+    HIST.push({role:'user',parts:[{text:persona+'\n\nEntrevistador: '+bootstrap}]});
+    const body=document.getElementById('arqBody');
+    body.insertAdjacentHTML('beforeend',`<div class="pa-msg user">${esc(bootstrap)}</div>`);
+    body.insertAdjacentHTML('beforeend','<div class="pa-msg bot" id="arqTyping">…</div>');
+    (async()=>{ const r=await pumaiConversar(HIST); const el=document.getElementById('arqTyping'); if(el){el.id='';el.innerHTML=r?mdLite(r):'(No pude responder ahora, intenta de nuevo.)';} if(r)HIST.push({role:'model',parts:[{text:r}]}); body.scrollTop=1e6; })();
+    document.getElementById('arqSend').onclick=arqSend;
+    document.getElementById('arqIn').addEventListener('keydown',e=>{if(e.key==='Enter')arqSend();});
+    box.querySelectorAll('.chip-q').forEach(c=>c.onclick=()=>{document.getElementById('arqIn').value=c.dataset.q;arqSend();});
+  }
+  async function arqSend(){ const inp=document.getElementById('arqIn'),t=(inp.value||'').trim(); if(!t)return; inp.value='';
+    const body=document.getElementById('arqBody');
+    body.insertAdjacentHTML('beforeend',`<div class="pa-msg user">${esc(t)}</div>`); body.scrollTop=1e6;
+    body.insertAdjacentHTML('beforeend','<div class="pa-msg bot" id="arqTyping">…</div>');
+    HIST.push({role:'user',parts:[{text:t}]});
+    const r=await pumaiConversar(HIST); const el=document.getElementById('arqTyping'); if(el){el.id='';el.innerHTML=r?mdLite(r):'(No pude responder ahora, intenta de nuevo.)';}
+    if(r)HIST.push({role:'model',parts:[{text:r}]}); body.scrollTop=1e6;
+  }
   function insumos(a){ const m=META[a.id]||{};
     const have=[['Características del diplomado (tipo, duración, modalidad)',true],['Carrera y demanda relativa dentro del sistema',true],['Documentos de soporte cargados',!!m.hasDocs]];
     const need=['Inscripciones de ediciones previas de este diplomado o similares','Matrícula histórica y nº de egresados de la carrera (público cautivo)','Encuesta de interés / lista de espera de aspirantes','Precio y cupo de programas equivalentes (competencia)','Tendencias de búsqueda del tema (Google Trends / redes)','Demanda del mercado laboral por esas competencias (vacantes)','Presupuesto y alcance de difusión previsto','Estacionalidad (mes de apertura) y calendario académico'];
