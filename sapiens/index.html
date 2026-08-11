@@ -44,6 +44,8 @@
     <div class="sb-group" id="sbGestGroup" style="display:none">Docente</div>
     <a class="sb-item" id="sbTablero" data-scr="screen-tablero" style="display:none" onclick="showTablero()"><span>📊</span> Tablero docente</a>
     <a class="sb-item" id="sbGestion" data-scr="screen-gestion" style="display:none" onclick="showGestion()"><span>⚙️</span> Gestión</a>
+    <div class="sb-group" id="sbSegGroup" style="display:none">Seguridad</div>
+    <a class="sb-item" id="sbSeguridad" data-scr="screen-seguridad" style="display:none" onclick="showSeguridad()"><span>🛡️</span> Seguridad</a>
   </nav>
   <div class="sb-foot">
     <span class="rolechip" id="roleChip"></span>
@@ -800,6 +802,7 @@
 </div></div>
 
 <!-- ══ SCREEN: TABLERO DOCENTE ══ -->
+<div class="screen pagebg" id="screen-seguridad"><div class="wrap pad" id="segRoot"></div></div>
 <div class="screen pagebg" id="screen-tablero"><div class="wrap pad">
   <button class="btn btn-ghost" style="margin-bottom:10px" onclick="showScreen('screen-onb')">◀ Volver</button>
   <div class="sec-tag"><span class="dot"></span> Panel del profesor</div>

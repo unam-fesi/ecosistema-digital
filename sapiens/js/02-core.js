@@ -40,6 +40,9 @@ function enterApp(){
   document.getElementById('sbGestGroup').style.display=showGest?'block':'none';
   document.getElementById('sbGestion').style.display=showGest?'flex':'none';
   document.getElementById('sbTablero').style.display=showGest?'flex':'none';
+  var _adm=(rol==='admin');
+  var _sbSeg=document.getElementById('sbSeguridad'); if(_sbSeg)_sbSeg.style.display=_adm?'flex':'none';
+  var _sbSegG=document.getElementById('sbSegGroup'); if(_sbSegG)_sbSegG.style.display=_adm?'block':'none';
   try{if(localStorage.getItem('sap_sbcol')==='1'&&window.innerWidth>900)document.body.classList.add('sbcol');}catch(e){}
   showScreen('screen-onb');
   loadProgress();

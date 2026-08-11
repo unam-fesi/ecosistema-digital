@@ -2403,3 +2403,235 @@ function swxOnEnter(){if(!(typeof RAW_DATA!=='undefined'&&RAW_DATA&&RAW_DATA.col
 function swxOpenTwin(idx){var a=sag[idx];if(!a||!a.raw)return;twinIdx=idx;var p=swxPred(a.raw);var cols=RAW_DATA.cols,r=a.raw;document.getElementById('twinTitle').textContent='Registro real · Individuo #'+(10000+idx);var cell=function(l,v,c){return '<div style="background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:7px 10px"><div style="font-size:9.5px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.3px">'+esc(l)+'</div><div style="font-size:13.5px;font-weight:700;color:'+(c||'var(--navy)')+'">'+esc(v)+'</div></div>';};var sec=function(t){return '<div style="font-size:10.5px;font-weight:800;letter-spacing:.4px;color:var(--gold2);margin:12px 0 6px;text-transform:uppercase">'+t+'</div>';};var cells='';for(var i=0;i<cols.length;i++){var hl=(cols[i]===SWX.desen)?'#0C2340':(SWX.factores.indexOf(cols[i])>=0?'#2f7fb8':'');cells+=cell(cols[i],(r[i]===''||r[i]==null)?'—':r[i],hl);}var rc=p>=0.65?['Muy alto','#7b1113']:p>=0.45?['Alto','#c0392b']:p>=0.25?['Moderado','#c8791a']:['Bajo','#1f9d6b'];var drivers=[];var M=SWX.model;if(M&&M.beta){M.specs.forEach(function(s,k){var contrib;if(s.type==='num'){var n=gNum(r[s.i]);if(n==null)return;contrib=M.beta[k+1]*((n-M.stats[s.name].m)/M.stats[s.name].sd);}else contrib=M.beta[k+1]*((gcell(r[s.i])===s.pos)?1:0);if(contrib>0.15)drivers.push(esc(s.name)+' = '+esc(r[s.i]));});}
  document.getElementById('twinBody').innerHTML=sec('Datos de la persona (tu base)')+'<div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">'+cells+'</div>'+'<div style="margin-top:11px;background:'+rc[1]+'14;border:1px solid '+rc[1]+'55;border-radius:10px;padding:11px 13px"><div style="font-size:10px;color:var(--muted);font-weight:800;letter-spacing:.3px">PROBABILIDAD DE '+esc((SWX.desen||'DESENLACE').toUpperCase())+' (LOGÍSTICA)</div><div style="font-size:22px;font-weight:800;color:'+rc[1]+'">'+(p*100).toFixed(1)+'% · '+rc[0]+'</div>'+'<div style="font-size:12px;color:#26364e;margin-top:4px;line-height:1.45"><b>Variables que elevan su riesgo:</b> '+(drivers.length?drivers.join(' · '):'ninguna destacada')+'.</div>'+'<div class="note" style="margin-top:4px">Observado en la base: '+(a.event?'sí presentó el desenlace':'no lo presentó')+'.</div></div>';var tc=document.getElementById('twinChat');if(tc)tc.innerHTML='<div style="font-size:12px;color:var(--muted)">Puedes entrevistar a esta persona; responde según su perfil real.</div>';twinMsgs=[];document.getElementById('twinModal').style.display='flex';}
 
+
+/* ==================== 🛡 SEGURIDAD — OSINT / IntelOwl (mock, solo admin) ==================== */
+var SEC=null, SEC_FILTER='all';
+var SEC_SEV={critico:{t:'CRÍTICO',c:'#b02a37'},alto:{t:'ALTO',c:'#e0564f'},medio:{t:'MEDIO',c:'#d99413'},bajo:{t:'BAJO',c:'#2f7fb8'}};
+var SEC_TYPE={target:{t:'Objetivo',hex:0xC4A24E,css:'#C4A24E'},username:{t:'Usuario',hex:0x2f7fb8,css:'#2f7fb8'},domain:{t:'Dominio',hex:0x6b4fd6,css:'#6b4fd6'},ip:{t:'IP',hex:0xe0564f,css:'#e0564f'},breach:{t:'Filtración',hex:0xd99413,css:'#d99413'},malware:{t:'Malware/C2',hex:0xb02a37,css:'#b02a37'},platform:{t:'Plataforma',hex:0x1f9d6b,css:'#1f9d6b'}};
+function secRnd(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;var t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return ((t^t>>>14)>>>0)/4294967296;};}
+function secInt(r,a,b){return a+Math.floor(r()*(b-a+1));}
+function secPick(r,arr){return arr[Math.floor(r()*arr.length)];}
+function secPad(n){return (n<10?'0':'')+n;}
+
+function secBuild(){
+  if(SEC) return SEC;
+  var r=secRnd(20260811);
+  var countries=[['Rusia','🇷🇺','AS12389 Rostelecom'],['China','🇨🇳','AS4134 Chinanet'],['EE.UU.','🇺🇸','AS14061 DigitalOcean'],['Brasil','🇧🇷','AS28573 Claro'],['Países Bajos','🇳🇱','AS60781 LeaseWeb'],['India','🇮🇳','AS9829 BSNL'],['Vietnam','🇻🇳','AS7552 Viettel'],['Alemania','🇩🇪','AS24940 Hetzner'],['Nigeria','🇳🇬','AS328983 CloudNG'],['Irán','🇮🇷','AS12880 TIC']];
+  var evt=[['Credential stuffing','critico'],['Fuerza bruta SSH','alto'],['Login brute-force','alto'],['Escaneo de puertos','medio'],['Bot / scraper','medio'],['Phishing dirigido','alto'],['Spam masivo','bajo'],['Inyección SQL','critico'],['Intento XSS','alto'],['Enumeración de usuarios','medio'],['Malware C2 beacon','critico'],['Abuso de rate-limit','bajo'],['Acceso vía nodo Tor','medio'],['Descarga de payload','critico']];
+  var mods=['AbuseIPDB','GreyNoise','SpiderFoot','Maigret','PhishTank','URLhaus','VirusTotal','Suricata IDS','Fail2ban','WAF','Shodan','ThreatFox'];
+  var targets=['/auth/v1/token','ssh://:22','/functions/v1/iep-usuarios','/rest/v1/iep_perfiles','smtp://:25','/wp-login.php','admin@ecosistemadigital.unam.mx','/rest/v1/rpc/iep_uso_metricas','/functions/v1/admin-users','/rest/v1/iep_documentos'];
+  var acts=[['Bloqueado','#b02a37'],['En cuarentena','#d99413'],['Rechazado','#e0564f'],['Monitoreo','#2f7fb8'],['Tarpit','#6b4fd6']];
+
+  // Log de eventos recientes (muestra de 52)
+  var events=[]; var now=Date.now();
+  for(var i=0;i<52;i++){
+    var e=secPick(r,evt); var c=secPick(r,countries);
+    var ip=secInt(r,45,205)+'.'+secInt(r,0,255)+'.'+secInt(r,0,255)+'.'+secInt(r,1,254);
+    var sev=e[1]; var act=(sev==='critico'||sev==='alto')?secPick(r,[acts[0],acts[1],acts[2]]):secPick(r,acts);
+    var d=new Date(now - i*secInt(r,3,34)*60000);
+    events.push({ts:secPad(d.getHours())+':'+secPad(d.getMinutes()),tipo:e[0],sev:sev,ip:ip,pais:c[0],flag:c[1],asn:c[2],objetivo:secPick(r,targets),modulo:secPick(r,mods),accion:act[0],accColor:act[1]});
+  }
+
+  // Agregados 24h (magnitudes realistas)
+  var hourly=[]; var tot=0; for(var h=0;h<24;h++){var v=secInt(r,40,150)+ (h>=1&&h<=5?secInt(r,60,180):0); hourly.push(v); tot+=v;}
+  var kpi={eventos:tot,criticas:secInt(r,9,17),ipsBloq:secInt(r,180,260),correos:secInt(r,410,520),spam:secInt(r,5200,6400),bots:secInt(r,1200,1600),observables:secInt(r,8200,9600),exposicion:secInt(r,66,79)};
+
+  // Distribución por tipo
+  var types=evt.map(function(e){return {l:e[0],v:secInt(r,30,340),s:e[1]};}).sort(function(a,b){return b.v-a.v;});
+
+  // Top IPs atacantes
+  var topips=[]; for(var k=0;k<8;k++){var c=secPick(r,countries);topips.push({l:secInt(r,45,205)+'.'+secInt(r,0,255)+'.'+secInt(r,0,255)+'.'+secInt(r,1,254),v:secInt(r,120,980),pais:c[0],flag:c[1],asn:c[2],abuse:secInt(r,72,100),cat:secPick(r,['SSH bruteforce','Web scan','Spam bot','C2','Credential stuffing','Tor exit'])});}
+  topips.sort(function(a,b){return b.v-a.v;});
+
+  // Países origen
+  var cc={}; countries.forEach(function(c){cc[c[0]]={l:c[0],flag:c[1],v:secInt(r,60,760)};});
+  var countriesAgg=Object.keys(cc).map(function(k){return cc[k];}).sort(function(a,b){return b.v-a.v;}).slice(0,7);
+
+  // Correos maliciosos / dominios spam
+  var emails=[{l:'no-reply@unam-verify.xyz',v:secInt(r,80,180),d:'Phishing (credenciales)'},{l:'soporte@fesi-secure-login.top',v:secInt(r,70,150),d:'Phishing (portal falso)'},{l:'billing@paypa1-mx.cc',v:secInt(r,40,120),d:'Fraude / BEC'},{l:'promo@farmacia-oferta.ru',v:secInt(r,300,900),d:'Spam masivo'},{l:'winner@lottery-global.info',v:secInt(r,200,700),d:'Scam / estafa'},{l:'ceo@ecosistemadlgital.unam.mx',v:secInt(r,20,60),d:'Suplantación (typosquat)'}].sort(function(a,b){return b.v-a.v;});
+
+  // Analyzers IntelOwl
+  var analyzers=[
+    {n:'Maigret',ic:'🕵️',st:'success',obs:38,hits:19,ms:secInt(r,1400,2600)},
+    {n:'SpiderFoot',ic:'🕸️',st:'success',obs:112,hits:41,ms:secInt(r,8000,14000)},
+    {n:'AbuseIPDB',ic:'🚫',st:'success',obs:214,hits:186,ms:secInt(r,300,700)},
+    {n:'GreyNoise',ic:'🌫️',st:'success',obs:214,hits:97,ms:secInt(r,250,600)},
+    {n:'VirusTotal',ic:'🧬',st:'success',obs:64,hits:22,ms:secInt(r,500,1200)},
+    {n:'Shodan',ic:'🔎',st:'success',obs:31,hits:14,ms:secInt(r,400,900)},
+    {n:'HaveIBeenPwned',ic:'💧',st:'success',obs:12,hits:7,ms:secInt(r,200,500)},
+    {n:'PhishTank',ic:'🎣',st:'success',obs:48,hits:11,ms:secInt(r,300,650)},
+    {n:'URLhaus',ic:'☣️',st:'success',obs:48,hits:9,ms:secInt(r,250,550)},
+    {n:'ThreatFox',ic:'🦊',st:'running',obs:26,hits:5,ms:0},
+    {n:'Censys',ic:'📡',st:'success',obs:31,hits:12,ms:secInt(r,600,1400)},
+    {n:'Tor Exit Nodes',ic:'🧅',st:'success',obs:214,hits:18,ms:secInt(r,120,300)},
+    {n:'MISP',ic:'🧾',st:'failed',obs:0,hits:0,ms:0},
+    {n:'Pulsedive',ic:'💠',st:'success',obs:40,hits:16,ms:secInt(r,400,900)}
+  ];
+
+  // Maigret — reutilización de usuario
+  var mg=[
+    ['GitHub','Código',true],['Twitter / X','Social',true],['Instagram','Social',false],['Reddit','Social',true],['Telegram','Chat',true],['TikTok','Social',false],['Gravatar','Perfil',true],['Pinterest','Social',false],['VK','Social',true],['Steam','Gaming',true],['HackerNews','Tech',true],['Keybase','Cripto',false],['GitLab','Código',true],['Docker Hub','Código',true],['Pastebin','Paste',true],['Discord','Chat',true],['Medium','Blog',false],['SoundCloud','Media',false],['Twitch','Media',true],['About.me','Perfil',false]
+  ].map(function(x){return {site:x[0],cat:x[1],found:x[2],url:'https://'+x[0].toLowerCase().replace(/[^a-z]/g,'')+'.com/n1ght0wl_mx'};});
+  var maigret={target:'n1ght0wl_mx',found:mg.filter(function(s){return s.found;}).length,total:mg.length,sites:mg};
+
+  // SpiderFoot — correlaciones
+  var spiderfoot=[
+    {type:'EMAILADDR',data:'admin@ecosistemadigital.unam.mx',mod:'sfp_hunter',risk:'medio'},
+    {type:'BREACH',data:'Collection#1 (2019) — hash NTLM expuesto',mod:'sfp_haveibeenpwned',risk:'alto'},
+    {type:'BREACH',data:'LinkedIn (2021) — correo + puesto',mod:'sfp_haveibeenpwned',risk:'medio'},
+    {type:'USERNAME',data:'n1ght0wl_mx (reutilizado en 13 sitios)',mod:'sfp_maigret',risk:'alto'},
+    {type:'DOMAIN',data:'unam-verify.xyz (registrado hace 6 días)',mod:'sfp_whois',risk:'critico'},
+    {type:'CO_HOSTED_SITE',data:'fesi-secure-login.top ↔ 185.220.101.44',mod:'sfp_spider',risk:'alto'},
+    {type:'IP_ADDRESS',data:'185.220.101.44 — nodo de salida Tor + C2',mod:'sfp_abuseipdb',risk:'critico'},
+    {type:'MALICIOUS_URL',data:'hxxp://cdn-mirror.ru/x/payload.ps1',mod:'sfp_urlhaus',risk:'critico'},
+    {type:'LEAKED_PASSWORD',data:'hash coincide con lista rockyou (SHA-1)',mod:'sfp_leakcheck',risk:'critico'},
+    {type:'AFFILIATE',data:'@pum_leak (Telegram, 2.1k miembros)',mod:'sfp_telegram',risk:'medio'},
+    {type:'DNS_TXT',data:'SPF ausente en dominio suplantado',mod:'sfp_dnsresolve',risk:'bajo'},
+    {type:'GEOINFO',data:'Infraestructura distribuida: RU, NL, IR',mod:'sfp_ipinfo',risk:'medio'}
+  ];
+
+  // Grafo OSINT 3D
+  var N=[
+    {id:'t0',label:'actor: b0tn3t-mx',type:'target'},
+    {id:'u1',label:'n1ght0wl_mx',type:'username'},{id:'u2',label:'pum_leak',type:'username'},{id:'u3',label:'adm1n_x',type:'username'},{id:'u4',label:'fesi_ghost',type:'username'},
+    {id:'p1',label:'GitHub',type:'platform'},{id:'p2',label:'Telegram',type:'platform'},{id:'p3',label:'Pastebin',type:'platform'},{id:'p4',label:'VK',type:'platform'},{id:'p5',label:'Discord',type:'platform'},{id:'p6',label:'Steam',type:'platform'},
+    {id:'d1',label:'unam-verify.xyz',type:'domain'},{id:'d2',label:'fesi-secure-login.top',type:'domain'},{id:'d3',label:'cdn-mirror.ru',type:'domain'},{id:'d4',label:'paypa1-mx.cc',type:'domain'},
+    {id:'i1',label:'185.220.101.44',type:'ip'},{id:'i2',label:'45.134.26.9',type:'ip'},{id:'i3',label:'193.169.255.12',type:'ip'},{id:'i4',label:'103.208.86.7',type:'ip'},
+    {id:'b1',label:'Collection#1',type:'breach'},{id:'b2',label:'LinkedIn 2021',type:'breach'},{id:'b3',label:'rockyou.txt',type:'breach'},
+    {id:'m1',label:'Cobalt Strike C2',type:'malware'},{id:'m2',label:'RedLine Stealer',type:'malware'},{id:'m3',label:'Mirai bot',type:'malware'}
+  ];
+  var E=[
+    ['t0','u1'],['t0','u2'],['t0','u3'],['t0','u4'],
+    ['u1','p1'],['u1','p3'],['u1','p4'],['u2','p2'],['u2','p3'],['u3','p5'],['u4','p1'],['u4','p6'],
+    ['t0','d1'],['t0','d2'],['t0','d3'],['t0','d4'],
+    ['d1','i1'],['d2','i1'],['d3','i2'],['d4','i3'],['d1','i4'],
+    ['i1','m1'],['i2','m2'],['i3','m3'],['i1','m3'],
+    ['u1','b1'],['u1','b2'],['u3','b1'],['t0','b3'],['b3','m2']
+  ].map(function(x){return {s:x[0],t:x[1]};});
+  var graph={nodes:N,edges:E};
+
+  SEC={kpi:kpi,events:events,hourly:hourly,types:types,topips:topips,countries:countriesAgg,emails:emails,analyzers:analyzers,maigret:maigret,spiderfoot:spiderfoot,graph:graph,_gen:0};
+  return SEC;
+}
+
+/* ---------- helpers de UI ---------- */
+function secBadge(sev){var s=SEC_SEV[sev]||SEC_SEV.bajo;return '<span style="font-size:9.5px;font-weight:800;letter-spacing:.3px;padding:2px 7px;border-radius:100px;color:#fff;background:'+s.c+'">'+s.t+'</span>';}
+function secBarsH(items,color,unit){var max=Math.max.apply(null,items.map(function(x){return x.v;}))||1;return '<div style="display:flex;flex-direction:column;gap:7px">'+items.map(function(x){var p=Math.round(x.v/max*100);var lab=(x.flag?x.flag+' ':'')+esc(x.l);return '<div><div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted)"><span>'+lab+'</span><b style="color:var(--navy)">'+x.v.toLocaleString('es-MX')+(unit||'')+'</b></div><div style="height:8px;background:#eef1f6;border-radius:5px;overflow:hidden;margin-top:2px"><div style="height:100%;width:'+p+'%;background:'+(x.c||color)+'"></div></div></div>';}).join('')+'</div>';}
+function secSpark(vals,color){var W=560,H=96,n=vals.length,bw=W/n,max=Math.max.apply(null,vals)||1;var b='';for(var i=0;i<n;i++){var bh=Math.round(vals[i]/max*(H-18));b+='<rect x="'+(i*bw+1).toFixed(1)+'" y="'+(H-bh-2)+'" width="'+(bw-2).toFixed(1)+'" height="'+bh+'" rx="2" fill="'+color+'" opacity="'+(0.5+0.5*vals[i]/max).toFixed(2)+'"></rect>';}var ax='';for(var h=0;h<24;h+=6){ax+='<text x="'+(h*bw+2)+'" y="'+(H-4)+'" font-size="8" fill="#8593a8">'+secPad(h)+':00</text>';}return '<svg viewBox="0 0 '+W+' '+H+'" width="100%" preserveAspectRatio="none" style="display:block">'+b+ax+'</svg>';}
+
+function secLogRows(filter){
+  var rows=SEC.events.filter(function(e){return filter==='all'||e.sev===filter;});
+  if(!rows.length) return '<tr><td colspan="7" class="note" style="padding:14px">Sin eventos con ese filtro.</td></tr>';
+  return rows.map(function(e){return '<tr>'+
+    '<td style="font-variant-numeric:tabular-nums;color:var(--muted)">'+e.ts+'</td>'+
+    '<td>'+secBadge(e.sev)+'</td>'+
+    '<td><b style="color:var(--navy)">'+esc(e.tipo)+'</b></td>'+
+    '<td style="font-family:monospace;font-size:11.5px">'+e.flag+' '+esc(e.ip)+'<div class="note" style="font-size:10px">'+esc(e.asn)+'</div></td>'+
+    '<td style="font-family:monospace;font-size:11px;color:var(--muted)">'+esc(e.objetivo)+'</td>'+
+    '<td><span style="font-size:11px;color:var(--violet);font-weight:700">'+esc(e.modulo)+'</span></td>'+
+    '<td><span style="font-size:10px;font-weight:800;color:'+e.accColor+'">'+esc(e.accion)+'</span></td>'+
+  '</tr>';}).join('');
+}
+function secFilter(f){SEC_FILTER=f;var b=document.getElementById('segLogBody');if(b)b.innerHTML=secLogRows(f);document.querySelectorAll('.seg-fchip').forEach(function(c){c.classList.toggle('on',c.getAttribute('data-f')===f);});}
+
+/* ---------- vista principal ---------- */
+function showSeguridad(){
+  if(!(MY_PROFILE&&MY_PROFILE.rol==='admin')){if(typeof toast==='function')toast('🛡 Sección exclusiva para administradores');return;}
+  secBuild();
+  var root=document.getElementById('segRoot'); if(!root){showScreen('screen-seguridad');return;}
+  var k=SEC.kpi;
+  var html='';
+  html+='<button class="btn btn-ghost" style="margin-bottom:10px" onclick="showScreen(\'screen-onb\')">◀ Volver</button>';
+  html+='<div class="sec-tag"><span class="dot"></span> Centro de operaciones de seguridad</div>';
+  html+='<h2 class="serif">Inteligencia de amenazas <span class="gold">OSINT · IntelOwl</span></h2>';
+  html+='<p class="sub">Correlación de observables (IPs, correos, dominios, usuarios) con analyzers automatizados. <b>Datos simulados</b> para demostración del SOC.</p>';
+  // barra de estado del motor
+  html+='<div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:var(--navy);color:#fff;border-radius:12px;padding:12px 16px;margin:16px 0 4px">'+
+    '<span style="width:9px;height:9px;border-radius:50%;background:#1f9d6b;box-shadow:0 0 8px #1f9d6b"></span>'+
+    '<b style="font-size:13px">IntelOwl v6.2</b><span style="opacity:.7;font-size:12px">motor conectado</span>'+
+    '<span style="opacity:.5">·</span><span style="font-size:12px;opacity:.85">14 analyzers · última corrida hace 3 min</span>'+
+    '<span style="margin-left:auto;font-size:11px;background:rgba(255,255,255,.12);padding:4px 10px;border-radius:100px">Exposición del tenant: <b style="color:#EBD9A8">'+k.exposicion+'/100</b></span>'+
+  '</div>';
+  // KPIs
+  html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin:16px 0">'+
+    kpiTile('Eventos (24 h)',k.eventos.toLocaleString('es-MX'),'#0C2340')+
+    kpiTile('Amenazas críticas',k.criticas,'#b02a37')+
+    kpiTile('IPs bloqueadas',k.ipsBloq,'#e0564f')+
+    kpiTile('Correos maliciosos',k.correos,'#d99413')+
+    kpiTile('Spam filtrado',k.spam.toLocaleString('es-MX'),'#6b4fd6')+
+    kpiTile('Bots detectados',k.bots.toLocaleString('es-MX'),'#2f7fb8')+
+    kpiTile('Observables analizados',k.observables.toLocaleString('es-MX'),'#1f9d6b')+
+  '</div>';
+  // Log de eventos
+  html+='<div class="card" style="margin-top:8px"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px"><div class="chart-title">📋 Log de eventos en vivo</div>'+
+    '<div style="display:flex;gap:6px;flex-wrap:wrap">'+['all','critico','alto','medio','bajo'].map(function(f){var lab=f==='all'?'Todos':(SEC_SEV[f]?SEC_SEV[f].t:f);return '<button class="seg-fchip'+(f==='all'?' on':'')+'" data-f="'+f+'" onclick="secFilter(\''+f+'\')">'+lab+'</button>';}).join('')+'</div></div>'+
+    '<div style="overflow:auto;max-height:420px;margin-top:10px"><table class="gtable" style="width:100%"><thead><tr><th>Hora</th><th>Sev.</th><th>Tipo</th><th>Origen</th><th>Objetivo</th><th>Módulo</th><th>Acción</th></tr></thead><tbody id="segLogBody">'+secLogRows('all')+'</tbody></table></div></div>';
+  // Estadísticas
+  html+='<div class="chart-title" style="margin:22px 0 2px">📊 Estadísticas de amenazas</div>';
+  html+='<div class="card" style="margin-top:8px"><div class="chart-title" style="font-size:13px">Eventos por hora (últimas 24 h)</div>'+secSpark(SEC.hourly,'#2f7fb8')+'</div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:14px">'+
+    '<div class="card"><div class="chart-title" style="font-size:13px;margin-bottom:8px">🤖 IPs atacantes (bots) — top 8</div>'+secBarsH(SEC.topips,'#e0564f')+'</div>'+
+    '<div class="card"><div class="chart-title" style="font-size:13px;margin-bottom:8px">🧩 Amenazas por tipo</div>'+secBarsH(SEC.types.map(function(t){return {l:t.l,v:t.v,c:SEC_SEV[t.s].c};}),'#6b4fd6')+'</div>'+
+    '<div class="card"><div class="chart-title" style="font-size:13px;margin-bottom:8px">🌐 Países de origen</div>'+secBarsH(SEC.countries,'#0C2340')+'</div>'+
+    '<div class="card"><div class="chart-title" style="font-size:13px;margin-bottom:8px">✉️ Correos maliciosos / spam</div>'+secBarsH(SEC.emails,'#d99413')+'<div class="note" style="margin-top:8px">Disposición: '+SEC.emails.map(function(e){return esc(e.l.split('@')[1])+' → '+e.d;}).slice(0,3).join(' · ')+'</div></div>'+
+  '</div>';
+  // Analyzers IntelOwl
+  html+='<div class="chart-title" style="margin:22px 0 2px">🧠 Analyzers ejecutados</div>';
+  html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:10px">'+SEC.analyzers.map(function(a){var st=a.st==='success'?['✓ OK','#1f9d6b']:a.st==='running'?['● corriendo','#d99413']:['✕ error','#e0564f'];return '<div class="card" style="padding:12px"><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:13px;color:var(--navy)">'+a.ic+' '+esc(a.n)+'</b><span style="font-size:9.5px;font-weight:800;color:'+st[1]+'">'+st[0]+'</span></div><div class="note" style="margin-top:6px;font-size:11px">Observables: <b>'+a.obs+'</b> · hallazgos: <b style="color:#b02a37">'+a.hits+'</b>'+(a.ms?' · '+a.ms+' ms':'')+'</div></div>';}).join('')+'</div>';
+  // Maigret + SpiderFoot
+  html+='<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin-top:22px">';
+  html+='<div class="card"><div class="chart-title" style="font-size:14px">🕵️ Maigret — huella de usuario</div><p class="note" style="margin:4px 0 10px">Objetivo <b style="color:var(--navy);font-family:monospace">'+esc(SEC.maigret.target)+'</b> — encontrado en <b style="color:#b02a37">'+SEC.maigret.found+'</b> de '+SEC.maigret.total+' plataformas.</p>'+
+    '<div style="overflow:auto;max-height:300px"><table class="gtable" style="width:100%"><thead><tr><th>Plataforma</th><th>Categoría</th><th>Estado</th></tr></thead><tbody>'+SEC.maigret.sites.map(function(s){return '<tr><td><b style="color:var(--navy)">'+esc(s.site)+'</b></td><td class="note">'+esc(s.cat)+'</td><td>'+(s.found?'<span style="color:#b02a37;font-weight:800;font-size:11px">● encontrado</span>':'<span class="note" style="font-size:11px">no</span>')+'</td></tr>';}).join('')+'</tbody></table></div></div>';
+  html+='<div class="card"><div class="chart-title" style="font-size:14px">🕸️ SpiderFoot — correlaciones</div><p class="note" style="margin:4px 0 10px">'+SEC.spiderfoot.length+' entidades correlacionadas a partir del correo semilla.</p>'+
+    '<div style="overflow:auto;max-height:300px;display:flex;flex-direction:column;gap:7px">'+SEC.spiderfoot.map(function(f){var s=SEC_SEV[f.risk];return '<div style="border-left:3px solid '+s.c+';background:#faf9f6;border-radius:0 8px 8px 0;padding:7px 10px"><div style="display:flex;justify-content:space-between;gap:8px"><b style="font-size:11px;color:'+s.c+';letter-spacing:.3px">'+esc(f.type)+'</b><span class="note" style="font-size:10px">'+esc(f.mod)+'</span></div><div style="font-size:12.5px;color:#26364e;margin-top:2px">'+esc(f.data)+'</div></div>';}).join('')+'</div></div>';
+  html+='</div>';
+  // Grafo 3D
+  html+='<div class="chart-title" style="margin:22px 0 2px">🧊 Grafo de correlación OSINT (3D)</div>';
+  html+='<div class="card" style="margin-top:8px"><p class="note" style="margin:0 0 8px">Actor de amenaza y su infraestructura: usuarios reutilizados, dominios de phishing, IPs C2, filtraciones y malware asociado. Arrastra para rotar; pasa el cursor sobre un nodo.</p>'+
+    '<div style="display:flex;flex-wrap:wrap;gap:12px;margin-bottom:8px">'+Object.keys(SEC_TYPE).map(function(t){return '<span style="font-size:11px;color:var(--muted);display:inline-flex;align-items:center;gap:5px"><span style="width:10px;height:10px;border-radius:50%;background:'+SEC_TYPE[t].css+';display:inline-block"></span>'+SEC_TYPE[t].t+'</span>';}).join('')+'</div>'+
+    '<div id="segGraphHost"></div></div>';
+
+  root.innerHTML=html;
+  showScreen('screen-seguridad');
+  setTimeout(secInit3D,60);
+}
+
+/* ---------- grafo 3D ---------- */
+function secLayout(nodes,edges){
+  var r=secRnd(7); nodes.forEach(function(n){n.x=(r()*2-1)*55;n.y=(r()*2-1)*55;n.z=(r()*2-1)*55;});
+  var idx={}; nodes.forEach(function(n,i){idx[n.id]=i;});
+  for(var it=0;it<160;it++){
+    for(var i=0;i<nodes.length;i++){var fx=0,fy=0,fz=0;
+      for(var j=0;j<nodes.length;j++){if(i===j)continue;var dx=nodes[i].x-nodes[j].x,dy=nodes[i].y-nodes[j].y,dz=nodes[i].z-nodes[j].z;var d2=dx*dx+dy*dy+dz*dz+0.01;var f=420/d2;fx+=dx*f;fy+=dy*f;fz+=dz*f;}
+      fx+=-nodes[i].x*0.021;fy+=-nodes[i].y*0.021;fz+=-nodes[i].z*0.021;
+      nodes[i]._fx=fx;nodes[i]._fy=fy;nodes[i]._fz=fz;}
+    edges.forEach(function(e){var a=nodes[idx[e.s]],b=nodes[idx[e.t]];var dx=b.x-a.x,dy=b.y-a.y,dz=b.z-a.z;var d=Math.sqrt(dx*dx+dy*dy+dz*dz)||1;var f=(d-24)*0.05;var ux=dx/d,uy=dy/d,uz=dz/d;a._fx+=ux*f;a._fy+=uy*f;a._fz+=uz*f;b._fx-=ux*f;b._fy-=uy*f;b._fz-=uz*f;});
+    for(var i2=0;i2<nodes.length;i2++){nodes[i2].x+=Math.max(-6,Math.min(6,nodes[i2]._fx));nodes[i2].y+=Math.max(-6,Math.min(6,nodes[i2]._fy));nodes[i2].z+=Math.max(-6,Math.min(6,nodes[i2]._fz));}
+  }
+}
+function secInit3D(){
+  var host=document.getElementById('segGraphHost'); if(!host||!SEC)return;
+  var gen=(SEC._gen=(SEC._gen||0)+1);
+  if(typeof THREE==='undefined'||!THREE.WebGLRenderer||!THREE.OrbitControls){host.innerHTML='<div class="note">Vista 3D no disponible en este navegador (WebGL). Correlación: '+SEC.graph.nodes.length+' nodos · '+SEC.graph.edges.length+' relaciones.</div>';return;}
+  host.style.position='relative';
+  host.innerHTML='<canvas id="segGraphCv" style="width:100%;height:470px;display:block;border-radius:12px;background:radial-gradient(circle at 50% 40%,#12233f,#0a1526)"></canvas><div id="segTip" style="position:absolute;pointer-events:none;background:rgba(12,35,64,.96);color:#fff;font-size:11px;padding:5px 9px;border-radius:7px;display:none;z-index:5;white-space:nowrap;border:1px solid rgba(235,217,168,.4)"></div>';
+  var cv=document.getElementById('segGraphCv');var w=cv.clientWidth||600,h=470;
+  var renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true});renderer.setPixelRatio(Math.min(2,devicePixelRatio||1));renderer.setSize(w,h,false);
+  var scene=new THREE.Scene();premiumScene(scene);
+  var camera=new THREE.PerspectiveCamera(55,w/h,0.1,3000);camera.position.set(0,0,168);
+  var controls=new THREE.OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=0.08;controls.autoRotate=true;controls.autoRotateSpeed=0.55;controls.minDistance=70;controls.maxDistance=320;
+  var group=new THREE.Group();scene.add(group);
+  secLayout(SEC.graph.nodes,SEC.graph.edges);
+  var idx={};SEC.graph.nodes.forEach(function(n,i){idx[n.id]=i;});
+  var pos=[];SEC.graph.edges.forEach(function(e){var a=SEC.graph.nodes[idx[e.s]],b=SEC.graph.nodes[idx[e.t]];pos.push(a.x,a.y,a.z,b.x,b.y,b.z);});
+  var eg=new THREE.BufferGeometry();eg.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));
+  group.add(new THREE.LineSegments(eg,new THREE.LineBasicMaterial({color:0x4a6a99,transparent:true,opacity:0.32})));
+  var meshes=[];
+  SEC.graph.nodes.forEach(function(n){var col=SEC_TYPE[n.type].hex;var rad=n.type==='target'?7.5:(n.type==='ip'||n.type==='malware'?4.6:3.7);var g=new THREE.SphereGeometry(rad,20,20);var m=new THREE.MeshStandardMaterial({color:col,emissive:col,emissiveIntensity:0.4,roughness:0.45,metalness:0.25});var mesh=new THREE.Mesh(g,m);mesh.position.set(n.x,n.y,n.z);mesh.userData=n;group.add(mesh);meshes.push(mesh);});
+  var ray=new THREE.Raycaster();var ptr=new THREE.Vector2();var tip=document.getElementById('segTip');
+  function onMove(ev){var rect=cv.getBoundingClientRect();ptr.x=((ev.clientX-rect.left)/rect.width)*2-1;ptr.y=-((ev.clientY-rect.top)/rect.height)*2+1;ray.setFromCamera(ptr,camera);var hit=ray.intersectObjects(meshes);if(hit.length){var n=hit[0].object.userData;tip.style.display='block';tip.style.left=(ev.clientX-rect.left+12)+'px';tip.style.top=(ev.clientY-rect.top+8)+'px';tip.innerHTML='<span style="color:'+SEC_TYPE[n.type].css+'">'+SEC_TYPE[n.type].t+'</span> · <b>'+esc(n.label)+'</b>';controls.autoRotate=false;}else{tip.style.display='none';controls.autoRotate=true;}}
+  cv.addEventListener('pointermove',onMove);
+  cv.addEventListener('pointerleave',function(){tip.style.display='none';controls.autoRotate=true;});
+  function loop(){var scr=document.getElementById('screen-seguridad');if(!scr||!scr.classList.contains('active')||SEC._gen!==gen){try{renderer.dispose();}catch(e){}return;}controls.update();group.rotation.y+=0.0008;renderer.render(scene,camera);requestAnimationFrame(loop);}
+  loop();
+}
