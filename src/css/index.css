@@ -1678,3 +1678,28 @@ body.spa-locked { overflow: hidden; }
 .mirc-logo{ height:48px; width:auto; max-width:240px; object-fit:contain; display:block; margin:0 0 12px;
   filter:drop-shadow(0 4px 14px rgba(0,0,0,.35)); }
 @media(max-width:600px){ .spa-card-logo{ height:46px; } .mirc-logo{ height:40px; } }
+
+/* ============================================================
+   Card CUSMSR - Salud Menstrual, Sexual y Reproductiva
+   Lockup FES Iztacala + CUSMSR centrado sobre el card.
+   ============================================================ */
+.card-cusmsr .cusmsr-lockup{
+  display:flex; align-items:center; justify-content:center; gap:16px;
+  margin:2px 0 16px; padding-bottom:14px; position:relative;
+}
+.card-cusmsr .cusmsr-lockup::after{
+  content:""; position:absolute; bottom:0; left:50%; transform:translateX(-50%);
+  width:72%; height:1px;
+  background:linear-gradient(90deg,transparent,rgba(169,139,240,.55),rgba(242,170,204,.55),transparent);
+}
+.card-cusmsr .cusmsr-fesi{ height:54px; width:auto; object-fit:contain; display:block;
+  filter:drop-shadow(0 3px 10px rgba(0,0,0,.22)); }
+.card-cusmsr .cusmsr-logo{ height:82px; width:auto; object-fit:contain; display:block;
+  filter:drop-shadow(0 4px 14px rgba(0,0,0,.22)); }
+.card-cusmsr .cusmsr-sep{ width:1px; height:40px;
+  background:linear-gradient(180deg,transparent,rgba(169,139,240,.6),transparent); }
+.card-cusmsr:hover{ box-shadow:0 26px 70px rgba(8,20,40,.42), 0 0 50px rgba(169,139,240,.22); }
+@media(max-width:600px){
+  .card-cusmsr .cusmsr-fesi{ height:44px }
+  .card-cusmsr .cusmsr-logo{ height:66px }
+}
