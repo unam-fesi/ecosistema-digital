@@ -8,6 +8,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<!-- Three.js servido desde el propio repo: sin CDN de terceros, sin fugar a quien
+     visita el panel, y funciona aunque la red de la Facultad filtre dominios. -->
+<script src="../public/vendor/three.min.js" defer></script>
 <link rel="icon" href="../public/assets/CUSMSR-emblem.png" type="image/png">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -125,6 +128,34 @@ main{padding:0 0 60px;min-width:0}
   box-shadow:0 0 0 3px color-mix(in srgb,var(--series-1) 18%,transparent)}
 .f2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
 
+/* ── Mapa de temas en 3D ─────────────────────────────────── */
+#g3d{position:relative;width:100%;height:min(66vh,560px);border-radius:var(--r);
+  background:#fff;border:1px solid var(--line);overflow:hidden;touch-action:none;cursor:grab}
+#g3d.arrastrando{cursor:grabbing}
+#g3d canvas{display:block;width:100%;height:100%}
+#g3d .eti{position:absolute;transform:translate(-50%,-50%);pointer-events:none;
+  font-size:12.5px;font-weight:650;color:var(--text-primary);white-space:nowrap;
+  text-shadow:0 1px 3px #fff,0 -1px 3px #fff,1px 0 3px #fff,-1px 0 3px #fff;
+  transition:opacity .2s}
+#g3d .pista{position:absolute;left:14px;bottom:12px;font-size:11.5px;color:var(--text-muted);
+  background:rgba(255,255,255,.86);padding:5px 11px;border-radius:999px;pointer-events:none}
+#g3d .sinwebgl{display:flex;align-items:center;justify-content:center;height:100%;
+  padding:30px;text-align:center;font-size:13.5px;color:var(--text-muted);line-height:1.65}
+.g-ficha{border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;
+  background:var(--surface-1);min-height:150px}
+.g-ficha .vacia{color:var(--text-muted);font-size:13.5px;line-height:1.65}
+.g-ficha h4{font-family:Inter,sans-serif;font-size:17px;font-weight:700;margin-bottom:3px;
+  display:flex;align-items:center;gap:9px}
+.g-ficha h4 i{width:13px;height:13px;border-radius:50%;flex:none;display:block}
+.g-ficha .kv{display:flex;justify-content:space-between;gap:14px;padding:6px 0;
+  border-bottom:1px solid var(--line);font-size:13px}
+.g-ficha .kv:last-of-type{border-bottom:none}
+.g-ficha .kv b{font-variant-numeric:tabular-nums;color:var(--text-primary)}
+.g-ficha .conq{margin-top:12px;font-size:12.5px;color:var(--text-secondary);line-height:1.7}
+.g-ficha .conq b{color:var(--text-primary)}
+.g-leyenda{display:flex;flex-wrap:wrap;gap:12px;margin-top:13px}
+.g-leyenda span{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--text-secondary)}
+.g-leyenda i{width:12px;height:12px;border-radius:50%;display:block}
 /* ── Filtros ────────────────────────────────────────────── */
 .filters{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:20px;
   padding:12px 15px;background:var(--surface-1);border:1px solid var(--line);border-radius:var(--r)}
@@ -420,6 +451,7 @@ const MENU = [
   { g:'Escucha' },
   { v:'preguntas',  t:'Banco de preguntas', i:'❝', p:'ver_preguntas' },
   { v:'cuarentena', t:'Cuarentena',         i:'⚑', p:'ver_preguntas' },
+  { v:'grafo',      t:'Mapa de temas',      i:'❖', p:'ver_agregados' },
   { v:'insights',   t:'Lecturas de IA',     i:'✦', p:'ver_insights' },
   { g:'Atención' },
   { v:'solicitudes',t:'Solicitudes',        i:'✉', p:'gestionar_agenda' },
@@ -850,6 +882,31 @@ const VISTAS = {
           <button class="btn btn-2 btn-sm">CSV</button></div>`).join('')}
     </div>`,
 
+  grafo: () => `
+    <div class="note info"><span class="ic">❖</span><div><b>Qué dudas viajan juntas</b>
+      Cada esfera es un tema y cada hilo une a las personas que preguntaron por los dos.
+      Arrástralo con el dedo o el ratón para girarlo; toca una esfera para ver su ficha.
+      El grosor del hilo es cuánta gente comparte esa pareja de dudas.</div></div>
+
+    <div class="grid" style="grid-template-columns:1fr 300px;gap:16px;align-items:start">
+      <div>
+        <div id="g3d"></div>
+        <div class="g-leyenda" id="gLeyenda"></div>
+        <button class="tgl" id="gTabla" style="margin-top:12px">Ver los mismos datos en tabla</button>
+        <div id="gTablaBox" hidden style="margin-top:12px"></div>
+      </div>
+      <div class="g-ficha" id="gFicha">
+        <p class="vacia">Toca una esfera para ver de qué trata, cuánta gente pregunta por eso
+          y con qué otras dudas aparece junto.</p>
+      </div>
+    </div>
+
+    <div class="note lock" style="margin-top:18px"><span class="ic">⛨</span><div>
+      <b>El umbral va por hilo, no por esfera</b>
+      Un grafo dibuja una distribución conjunta y el k-anonimato la recorta mucho más que a una
+      barra: aquí funciona sólo porque una persona genera muchas preguntas. Cada hilo necesita al
+      menos ${MIN_N} personas para dibujarse. <span id="gOcultas"></span></div></div>`,
+
   contenido: () => `
     <div class="note info"><span class="ic">✎</span><div><b>El semáforo es lo que más se usa</b>
       Cambiar la disponibilidad de un método se guarda al instante y la alumna lo ve en el portal.
@@ -1089,13 +1146,14 @@ const VISTAS = {
     </div>
     <div class="card pad">
       <h3 style="font-family:Inter,sans-serif;font-size:14.5px;font-weight:700;margin-bottom:14px">PUM-AI</h3>
-      <div class="field"><label>Modelo</label>
-        <select><option>Automático — el primero de la lista que responda</option>
-          <option>gemini-3.6-flash</option><option>gemini-flash-latest</option></select>
+      <div class="field"><label>Motor de respuesta</label>
+        <select><option>Automático (recomendado)</option><option>Fijar uno en concreto</option></select>
         <p style="font-size:11.5px;color:var(--text-muted);margin-top:6px;line-height:1.5">
-          Google retira modelos sin aviso: <code>gemini-2.5-flash</code> empezó a devolver 404 de
-          un día para otro. En automático, la función recorre su lista hasta que uno contesta y
-          recuerda cuál funcionó, así que un retiro no tumba el servicio.</p></div>
+          En automático, PUM-AI recorre los motores configurados hasta que uno responde y recuerda
+          cuál funcionó. Los proveedores retiran versiones sin aviso; así un retiro no tumba el
+          servicio. Cuál se está usando se configura del lado del servidor, en
+          <code>CUSMSR_AI_MODEL</code>, y no se muestra aquí ni a la alumna: para ella el
+          asistente es PUM-AI y nada más.</p></div>
       <div class="field"><label>Disparadores de escalamiento</label>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           ${['crisis','violencia sexual','ventana 72 h','urgencia médica'].map(t=>
@@ -1170,9 +1228,295 @@ function ir(v){
   if (v === 'agenda')      pintarActividades();
   if (v === 'solicitudes') pintarCola();
   if (v === 'config')      pintarDemo();
+  if (v === 'grafo')       pintarGrafo();
   conectar();
   scrollTo({ top:0 });
 }
+
+// ═══════════════════════════════════════════════════════════════════
+// MAPA DE TEMAS EN 3D
+//
+// Three.js sólo para dibujar. El acomodo y el control de cámara son propios:
+// una dependencia menos y funciona igual con dedo que con ratón.
+//
+// Los seis colores pasan las cinco pruebas del validador de paleta, incluida
+// la separación bajo daltonismo (peor par ΔE 9.6 deutan). Aun así cada esfera
+// lleva su nombre escrito al lado: el color acompaña, no informa solo.
+// ═══════════════════════════════════════════════════════════════════
+const G_COLOR = {
+  anticoncepcion:'#9B7BF0', menstrual:'#E87BA8', its:'#4FAFDC',
+  embarazo:'#EE9450', sexualidad:'#3FBE9B', servicios:'#D4AE3C',
+};
+const G_NOMBRE = {
+  anticoncepcion:'Anticoncepción', menstrual:'Salud menstrual', its:'ITS',
+  embarazo:'Embarazo', sexualidad:'Sexualidad', servicios:'Servicios del Centro',
+};
+const G_COLOR_OTRO = '#A9A2BC';
+const gColor  = t => G_COLOR[t]  || G_COLOR_OTRO;
+const gNombre = t => G_NOMBRE[t] || t;
+
+let gDatos = null, gAnim = null;
+
+async function pintarGrafo(){
+  const cont = $('#g3d');
+  if (!cont) return;
+  if (gAnim){ cancelAnimationFrame(gAnim); gAnim = null; }
+
+  let d;
+  try { d = DEMO ? null : await api({ action:'grafo_temas' }); }
+  catch (e) { cont.innerHTML = `<div class="sinwebgl">${e.message}</div>`; return; }
+  if (!d || !d.nodos || d.nodos.length < 2){
+    cont.innerHTML = '<div class="sinwebgl">Todavía no hay suficientes preguntas para dibujar el mapa.<br>Hacen falta al menos dos temas con ' + MIN_N + ' personas cada uno.</div>';
+    return;
+  }
+  gDatos = d;
+
+  $('#gOcultas').textContent = d.ocultas
+    ? `Ahora mismo hay ${d.ocultas} pareja${d.ocultas === 1 ? '' : 's'} de temas sin dibujar por no llegar a ese mínimo.`
+    : 'Ahora mismo no hay ninguna pareja oculta.';
+
+  $('#gLeyenda').innerHTML = d.nodos.map(n =>
+    `<span><i style="background:${gColor(n.topic)}"></i>${gNombre(n.topic)}</span>`).join('');
+
+  // Tabla equivalente, siempre disponible
+  $('#gTablaBox').innerHTML = tabla(
+    ['Tema', 'Tema', 'Personas con ambas dudas'],
+    d.aristas.map(a => [gNombre(a.origen), gNombre(a.destino), fmt(a.personas)]));
+  $('#gTabla').onclick = () => {
+    const abierto = !$('#gTablaBox').hidden;
+    $('#gTablaBox').hidden = abierto;
+    $('#gTabla').textContent = abierto ? 'Ver los mismos datos en tabla' : 'Ocultar la tabla';
+  };
+
+  if (typeof THREE === 'undefined'){
+    cont.innerHTML = `<div class="sinwebgl">No se pudo cargar la librería de 3D
+      (¿sin internet o bloqueada por la red de la Facultad?).<br>
+      Los mismos datos están completos en la tabla de abajo.</div>`;
+    $('#gTablaBox').hidden = false;
+    $('#gTabla').textContent = 'Ocultar la tabla';
+    return;
+  }
+  montarGrafo3D(cont, d);
+}
+
+function montarGrafo3D(cont, d){
+  cont.innerHTML = '<div class="pista">Arrastra para girar · rueda o pellizca para acercar · toca una esfera</div>';
+
+  const nodos = d.nodos.map(n => ({ ...n, p:new THREE.Vector3(
+    (Math.random()-.5)*60, (Math.random()-.5)*60, (Math.random()-.5)*60), v:new THREE.Vector3() }));
+  const idx = Object.fromEntries(nodos.map((n,i) => [n.topic, i]));
+  const aristas = d.aristas.filter(a => a.origen in idx && a.destino in idx);
+
+  // ── Acomodo por fuerzas, en 3D. Se corre hasta el final ANTES de dibujar:
+  // un grafo que sigue temblando mientras lo lees es ruido, no información.
+  const maxA = Math.max(...aristas.map(a => a.personas), 1);
+  for (let paso = 0; paso < 420; paso++){
+    const frena = 0.92 - paso/420*0.35;
+    for (let i = 0; i < nodos.length; i++){
+      for (let j = i+1; j < nodos.length; j++){
+        const dv = new THREE.Vector3().subVectors(nodos[i].p, nodos[j].p);
+        const dist = Math.max(dv.length(), 4);
+        const f = 5200 / (dist*dist);
+        dv.normalize().multiplyScalar(f);
+        nodos[i].v.add(dv); nodos[j].v.sub(dv);
+      }
+    }
+    aristas.forEach(a => {
+      const A = nodos[idx[a.origen]], B = nodos[idx[a.destino]];
+      // Más gente compartiendo la duda = más corto el hilo = más cerca las esferas
+      const reposo = 46 - 26 * (a.personas / maxA);
+      const dv = new THREE.Vector3().subVectors(B.p, A.p);
+      const f = (dv.length() - reposo) * 0.06;
+      dv.normalize().multiplyScalar(f);
+      A.v.add(dv); B.v.sub(dv);
+    });
+    nodos.forEach(n => {
+      n.v.addScaledVector(n.p, -0.012);          // hacia el centro
+      n.p.add(n.v.multiplyScalar(frena));
+    });
+  }
+  const centro = nodos.reduce((a,n) => a.add(n.p), new THREE.Vector3()).divideScalar(nodos.length);
+  nodos.forEach(n => n.p.sub(centro));
+
+  // ── Escena ─────────────────────────────────────────────────────────
+  const esc = new THREE.Scene();
+  esc.background = new THREE.Color(0xffffff);
+  const cam = new THREE.PerspectiveCamera(46, 1, 0.1, 2000);
+  const rend = new THREE.WebGLRenderer({ antialias:true, alpha:false });
+  rend.setPixelRatio(Math.min(devicePixelRatio, 2));
+  cont.appendChild(rend.domElement);
+
+  // Luz suave, para que los colores se lean pastel y no plástico
+  esc.add(new THREE.AmbientLight(0xffffff, 0.86));
+  const l1 = new THREE.DirectionalLight(0xffffff, 0.55); l1.position.set(60,90,70); esc.add(l1);
+  const l2 = new THREE.DirectionalLight(0xEDE5FF, 0.34); l2.position.set(-70,-40,-50); esc.add(l2);
+
+  const maxN = Math.max(...nodos.map(n => n.personas));
+  const esferas = [];
+  const geoEsf = new THREE.SphereGeometry(1, 42, 30);
+  nodos.forEach(n => {
+    const r = 4.2 + 8.5 * Math.sqrt(n.personas / maxN);
+    const mat = new THREE.MeshStandardMaterial({
+      color:new THREE.Color(gColor(n.topic)), roughness:0.52, metalness:0.03,
+      emissive:new THREE.Color(gColor(n.topic)), emissiveIntensity:0.14 });
+    const m = new THREE.Mesh(geoEsf, mat);
+    m.position.copy(n.p); m.scale.setScalar(r);
+    m.userData = { nodo:n, r };
+    esc.add(m); esferas.push(m);
+  });
+
+  // Hilos: cilindros, porque el grosor de una línea no es fiable entre navegadores
+  const geoCil = new THREE.CylinderGeometry(1, 1, 1, 10, 1, true);
+  const hilos = [];
+  aristas.forEach(a => {
+    const A = nodos[idx[a.origen]].p, B = nodos[idx[a.destino]].p;
+    const g = 0.22 + 1.05 * (a.personas / maxA);
+    const mat = new THREE.MeshBasicMaterial({
+      color:new THREE.Color(0xB9AFD6), transparent:true,
+      opacity:0.3 + 0.42 * (a.personas / maxA) });
+    const m = new THREE.Mesh(geoCil, mat);
+    const medio = new THREE.Vector3().addVectors(A,B).multiplyScalar(0.5);
+    const dir = new THREE.Vector3().subVectors(B,A);
+    m.position.copy(medio);
+    m.scale.set(g, dir.length(), g);
+    m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir.clone().normalize());
+    m.userData = { arista:a };
+    esc.add(m); hilos.push(m);
+  });
+
+  // ── Etiquetas en HTML, proyectadas cada cuadro. Se leen mejor que un sprite
+  // y el color deja de ser el único dato que distingue una esfera de otra.
+  const etiquetas = nodos.map(n => {
+    const e = document.createElement('div');
+    e.className = 'eti'; e.textContent = gNombre(n.topic);
+    cont.appendChild(e); return e;
+  });
+
+  // ── Cámara orbital propia: los mismos eventos para dedo y ratón ────
+  let radio = 128, theta = 0.72, phi = 1.18, auto = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const punteros = new Map();
+  let ultimo = null, distPellizco = 0, movido = 0;
+
+  const colocaCam = () => {
+    cam.position.set(radio*Math.sin(phi)*Math.cos(theta), radio*Math.cos(phi),
+                     radio*Math.sin(phi)*Math.sin(theta));
+    cam.lookAt(0,0,0);
+  };
+
+  cont.addEventListener('pointerdown', ev => {
+    cont.setPointerCapture(ev.pointerId);
+    punteros.set(ev.pointerId, { x:ev.clientX, y:ev.clientY });
+    ultimo = { x:ev.clientX, y:ev.clientY }; movido = 0; auto = false;
+    cont.classList.add('arrastrando');
+  });
+  cont.addEventListener('pointermove', ev => {
+    if (!punteros.has(ev.pointerId)) return;
+    punteros.set(ev.pointerId, { x:ev.clientX, y:ev.clientY });
+    if (punteros.size === 2){
+      const [a,b] = [...punteros.values()];
+      const dd = Math.hypot(a.x-b.x, a.y-b.y);
+      if (distPellizco) radio = Math.min(320, Math.max(52, radio * distPellizco/dd));
+      distPellizco = dd; colocaCam(); return;
+    }
+    const dx = ev.clientX - ultimo.x, dy = ev.clientY - ultimo.y;
+    movido += Math.abs(dx) + Math.abs(dy);
+    theta -= dx * 0.006;
+    phi = Math.min(Math.PI - 0.12, Math.max(0.12, phi - dy * 0.006));
+    ultimo = { x:ev.clientX, y:ev.clientY };
+    colocaCam();
+  });
+  const soltar = ev => {
+    punteros.delete(ev.pointerId);
+    if (punteros.size < 2) distPellizco = 0;
+    cont.classList.remove('arrastrando');
+    if (movido < 6) elegir(ev);      // fue un toque, no un arrastre
+  };
+  cont.addEventListener('pointerup', soltar);
+  cont.addEventListener('pointercancel', soltar);
+  cont.addEventListener('wheel', ev => {
+    ev.preventDefault(); auto = false;
+    radio = Math.min(320, Math.max(52, radio * (1 + Math.sign(ev.deltaY)*0.1)));
+    colocaCam();
+  }, { passive:false });
+
+  // ── Selección ──────────────────────────────────────────────────────
+  const rayo = new THREE.Raycaster();
+  let elegido = null;
+  function elegir(ev){
+    const c = cont.getBoundingClientRect();
+    rayo.setFromCamera(new THREE.Vector2(
+      ((ev.clientX-c.left)/c.width)*2-1, -((ev.clientY-c.top)/c.height)*2+1), cam);
+    const hit = rayo.intersectObjects(esferas)[0];
+    marcar(hit ? hit.object : null);
+  }
+  function marcar(obj){
+    elegido = obj;
+    esferas.forEach(m => {
+      const activo = !elegido || m === elegido;
+      m.material.opacity = activo ? 1 : 0.24;
+      m.material.transparent = !activo;
+      m.material.emissiveIntensity = m === elegido ? 0.3 : 0.14;
+    });
+    if (!elegido){
+      hilos.forEach(h => h.material.opacity = 0.3 + 0.42*(h.userData.arista.personas/maxA));
+      $('#gFicha').innerHTML = `<p class="vacia">Toca una esfera para ver de qué trata,
+        cuánta gente pregunta por eso y con qué otras dudas aparece junto.</p>`;
+      return;
+    }
+    const t = elegido.userData.nodo.topic;
+    hilos.forEach(h => {
+      const a = h.userData.arista;
+      const tocada = a.origen === t || a.destino === t;
+      h.material.opacity = tocada ? 0.85 : 0.07;
+    });
+    ficha(elegido.userData.nodo);
+  }
+
+  function ficha(n){
+    const conectadas = gDatos.aristas
+      .filter(a => a.origen === n.topic || a.destino === n.topic)
+      .map(a => ({ otro: a.origen === n.topic ? a.destino : a.origen, n: a.personas }))
+      .sort((x,y) => y.n - x.n);
+    const pct = x => Math.round(100 * x / n.personas);
+    $('#gFicha').innerHTML = `
+      <h4><i style="background:${gColor(n.topic)}"></i>${gNombre(n.topic)}</h4>
+      <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:12px">
+        Preguntas hechas a PUM-AI sobre este tema.</p>
+      <div class="kv"><span>Personas que preguntaron</span><b>${fmt(n.personas)}</b></div>
+      <div class="kv"><span>Preguntas en total</span><b>${fmt(n.preguntas)}</b></div>
+      <div class="kv"><span>Sin buena respuesta</span><b>${
+        n.pct_sin_buena_respuesta == null ? '—' : pct2(n.pct_sin_buena_respuesta)}</b></div>
+      ${conectadas.length ? `<div class="conq"><b>Con qué más lo preguntan</b><br>${
+        conectadas.slice(0,4).map(c =>
+          `${gNombre(c.otro)} — ${fmt(c.n)} personas <span style="color:var(--text-muted)">(${pct(c.n)}% de las de este tema)</span>`
+        ).join('<br>')}</div>` : ''}`;
+  }
+
+  // ── Bucle ──────────────────────────────────────────────────────────
+  function medir(){
+    const w = cont.clientWidth, h = cont.clientHeight;
+    rend.setSize(w, h, false);
+    cam.aspect = w / h; cam.updateProjectionMatrix();
+  }
+  const ro = new ResizeObserver(medir); ro.observe(cont); medir(); colocaCam();
+
+  const v = new THREE.Vector3();
+  (function cuadro(){
+    gAnim = requestAnimationFrame(cuadro);
+    if (!cont.isConnected){ cancelAnimationFrame(gAnim); gAnim = null; ro.disconnect(); return; }
+    if (auto){ theta += 0.0016; colocaCam(); }
+    rend.render(esc, cam);
+    const c = cont.getBoundingClientRect();
+    nodos.forEach((n,i) => {
+      v.copy(n.p).project(cam);
+      const vis = v.z < 1;
+      etiquetas[i].style.opacity = vis ? (elegido && elegido.userData.nodo !== n ? 0.3 : 1) : 0;
+      etiquetas[i].style.left = ((v.x*0.5+0.5)*c.width) + 'px';
+      etiquetas[i].style.top  = ((-v.y*0.5+0.5)*c.height - esferas[i].userData.r*1.9) + 'px';
+    });
+  })();
+}
+const pct2 = n => (n === null || n === undefined) ? '—' : (+n).toFixed(1).replace('.0','') + '%';
 
 // ── Datos de demostración ────────────────────────────────────────
 async function pintarDemo(){
