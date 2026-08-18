@@ -163,16 +163,19 @@ header.nav.solid{background:rgba(255,255,255,.82);box-shadow:0 6px 30px rgba(92,
    clic; es decoración y se comporta como tal. Por debajo del modal (z 250) y
    del riel de navegación, y fuera de pantallas angostas, donde el ancho hace
    falta para el contenido. */
-/* Va anclado al MARGEN, no al borde de la ventana. El contenido vive en una
-   columna de --max (1180px) centrada; si el pumita se pega al borde izquierdo,
-   en cuanto la ventana baja de ~1500px se le encima al texto y come la primera
-   letra de cada línea. Con right:calc(50% + 580px) su borde derecho queda
-   siempre 10px a la izquierda de la columna, pase lo que pase con el ancho.
-   El alto también sale del margen disponible, con tope de 224px; la relación
-   0.66 es la del PNG (748x1133 de contenido). Abajo de 1400px el margen ya no
-   da y desaparece. */
-#pumita{position:fixed;right:calc(50% + 580px);bottom:0;z-index:90;
-  width:auto;height:min(224px, calc((100vw - 1180px) / 2 / .66));
+/* Va anclado al MARGEN derecho, no al borde de la ventana. El contenido vive
+   en una columna de --max (1180px) centrada; pegado al borde de la ventana, en
+   cuanto ésta baja de ~1500px se le encima al texto. Con left:calc(50% + 580px)
+   su borde izquierdo queda siempre 16px a la derecha de donde termina el texto,
+   pase lo que pase con el ancho. El alto sale del mismo margen —menos 6px, para
+   que del otro lado le queden también 16px al borde de la ventana y no se vea
+   pegado— con tope de 224px; la relación 0.705 es la del ARCHIVO (846x1200), no la del
+   dibujo: lo que ocupa espacio es la caja de la imagen, transparencias
+   incluidas. Abajo de 1400px el margen ya no da y desaparece.
+   Queda por debajo del riel de navegación (z 120) y con pointer-events:none,
+   así que aunque se rocen, el riel sigue recibiendo los clics. */
+#pumita{position:fixed;left:calc(50% + 580px);bottom:0;z-index:90;
+  width:auto;height:min(224px, calc(((100vw - 1180px) / 2 - 6px) / .705));
   pointer-events:none;user-select:none;
   filter:drop-shadow(0 14px 30px rgba(92,55,166,.22));
   opacity:0;transform:translateY(26px);
