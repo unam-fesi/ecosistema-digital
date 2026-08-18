@@ -273,7 +273,9 @@ main{padding:0 0 60px;min-width:0}
 'use strict';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const fmt=n=>new Intl.NumberFormat('es-MX').format(n);
-const pct=n=>n.toFixed(1).replace('.0','')+'%';
+// null no es cero: significa que esa cohorte todavia no junta el minimo de
+// personas. Pintarlo como 0% seria inventar una caida que no ocurrio.
+const pct=n=>(n===null||n===undefined||Number.isNaN(n))?'—':(+n).toFixed(1).replace('.0','')+'%';
 const MIN_N = 10;  // espejo de cusmsr.min_n()
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -364,6 +366,8 @@ const ETI = {
 const eti = k => ETI[k] || k;
 
 // Traduce las vistas cusmsr.v_* a la forma que usan las gráficas
+const num = v => (v === null || v === undefined) ? null : +v;
+
 function adaptar(r){
   const pivot = {};
   (r.temasMes||[]).forEach(x=>{
@@ -384,7 +388,8 @@ function adaptar(r){
     ],
     metodos:(r.metodos||[]).map(x=>({ k:eti(x.method), v:+x.personas })),
     continuidad:(r.continuidad||[]).map(x=>({ k:eti(x.method), c:+x.cohorte,
-      m3:+x.pct_3m, m6:+x.pct_6m, m12:+x.pct_12m })),
+      c3:+x.cohorte_3m, c6:+x.cohorte_6m, c12:+x.cohorte_12m,
+      m3:num(x.pct_3m), m6:num(x.pct_6m), m12:num(x.pct_12m) })),
     abandono:(r.abandono||[]).map(x=>({ k:eti(x.end_reason), v:+x.casos })),
     menstrual:{ personas:r.menstrual?.personas ?? 0, dolorSevero:+(r.menstrual?.pct_dolor_severo ?? 0),
       faltoClase:+(r.menstrual?.pct_falto_clase ?? 0), diasProm:+(r.menstrual?.dias_perdidos_prom ?? 0),
@@ -584,7 +589,8 @@ function barrasH(datos, {color='var(--series-1)', unidad=''}={}){
 // Barras agrupadas — varias series, con leyenda
 function barrasG(datos, series){
   if (!datos || !datos.length) return SIN_DATOS();
-  const W=760,H=260,L=44,B=54,T=14,R=12;
+  const W=760,L=44,T=14,R=12;
+  const B=datos.length>6?96:54, H=datos.length>6?306:260;
   const gw=(W-L-R)/datos.length, bw=Math.min(21,(gw-16)/series.length);
   const max=100;
   const y=v=>T+(H-T-B)*(1-v/max);
@@ -595,14 +601,30 @@ function barrasG(datos, series){
     ${datos.map((d,i)=>{
       const x0=L+i*gw+(gw-bw*series.length-4*(series.length-1))/2;
       return series.map((s,j)=>{
-        const v=d[s.k], x=x0+j*(bw+4), yy=y(v);
-        return `<g class="hit" data-tip="<b>${d.k}</b>${s.t}: ${pct(v)} · cohorte ${d.c}">
+        const v=d[s.k], x=x0+j*(bw+4);
+        // Sin barra cuando no hay dato: una barra de altura cero se lee como
+        // "cayo a cero", que es justo lo contrario de "todavia no sabemos".
+        if (v === null || v === undefined) return `<g class="hit"
+          data-tip="<b>${d.k}</b>${s.t}: sin cohorte suficiente todavía">
+          <rect x="${x}" y="${y(0)-3}" width="${bw}" height="3" rx="1.5"
+                fill="var(--line-2)"/></g>`;
+        const yy=y(v);
+        return `<g class="hit" data-tip="<b>${d.k}</b>${s.t}: ${pct(v)} · cohorte ${
+          s.k==='m3'?d.c3:s.k==='m6'?d.c6:s.k==='m12'?d.c12:d.c}">
           <rect x="${x}" y="${yy}" width="${bw}" height="${y(0)-yy}" rx="4" fill="${s.c}"/></g>`;
       }).join('') +
-      `<text x="${L+i*gw+gw/2}" y="${H-B+20}" text-anchor="middle" font-size="11.5"
-         fill="var(--text-secondary)">${d.k.length>17?d.k.slice(0,16)+'…':d.k}</text>
-       <text x="${L+i*gw+gw/2}" y="${H-B+35}" text-anchor="middle" font-size="10.5"
-         fill="var(--text-muted)">n=${d.c}</text>`;
+      // Con más de seis categorías las etiquetas horizontales se encabalgan.
+      // Se giran en lugar de recortarlas: un nombre de método a medias no dice
+      // cuál método es.
+      (datos.length > 6
+        ? `<g transform="translate(${L+i*gw+gw/2},${H-B+16}) rotate(-32)">
+             <text text-anchor="end" font-size="11" fill="var(--text-secondary)">${d.k}</text>
+             <text text-anchor="end" font-size="10" dy="12"
+                   fill="var(--text-muted)">n=${d.c}</text></g>`
+        : `<text x="${L+i*gw+gw/2}" y="${H-B+20}" text-anchor="middle" font-size="11.5"
+             fill="var(--text-secondary)">${d.k}</text>
+           <text x="${L+i*gw+gw/2}" y="${H-B+35}" text-anchor="middle" font-size="10.5"
+             fill="var(--text-muted)">n=${d.c}</text>`);
     }).join('')}
     <line x1="${L}" x2="${W-R}" y1="${y(0)}" y2="${y(0)}" stroke="var(--axis)" stroke-width="1"/></svg>`;
 }
@@ -1045,9 +1067,35 @@ const VISTAS = {
       </div>
       <button class="btn btn-1 btn-sm">Guardar</button>
     </div>
+    <div class="card pad" style="margin-bottom:16px;border-color:var(--warn)">
+      <h3 style="font-family:Inter,sans-serif;font-size:14.5px;font-weight:700;margin-bottom:6px">
+        Datos de demostración</h3>
+      <p style="font-size:13px;color:var(--text-secondary);line-height:1.65;margin-bottom:14px">
+        Sirven para enseñar el panel antes de que exista un solo registro real.
+        <b style="color:var(--text-primary)">Hay que quitarlos antes de abrir a la comunidad</b>:
+        una cifra inventada en el tablero de un centro de salud no es un detalle cosmético.
+        La purga borra exactamente lo que se sembró, anotado una por una — no adivina por fecha
+        ni por patrón del código, así que no puede llevarse por delante a una alumna real.</p>
+      <div id="demoEstado" style="font-size:13.5px;color:var(--text-secondary);margin-bottom:14px">
+        Consultando…</div>
+      <div id="demoAcciones" style="display:none">
+        <div class="field" style="max-width:320px">
+          <label for="demoConf">Escribe <b>PURGAR</b> para confirmar</label>
+          <input id="demoConf" autocomplete="off" placeholder="PURGAR">
+        </div>
+        <button class="btn btn-d btn-sm" id="demoPurgar">Purgar los datos de demostración</button>
+        <span id="demoMsg" style="margin-left:12px;font-size:13px"></span>
+      </div>
+    </div>
     <div class="card pad">
       <h3 style="font-family:Inter,sans-serif;font-size:14.5px;font-weight:700;margin-bottom:14px">PUM-AI</h3>
-      <div class="field"><label>Modelo</label><select><option>gemini-2.5-flash</option><option>gemini-2.5-pro</option></select></div>
+      <div class="field"><label>Modelo</label>
+        <select><option>Automático — el primero de la lista que responda</option>
+          <option>gemini-3.6-flash</option><option>gemini-flash-latest</option></select>
+        <p style="font-size:11.5px;color:var(--text-muted);margin-top:6px;line-height:1.5">
+          Google retira modelos sin aviso: <code>gemini-2.5-flash</code> empezó a devolver 404 de
+          un día para otro. En automático, la función recorre su lista hasta que uno contesta y
+          recuerda cuál funcionó, así que un retiro no tumba el servicio.</p></div>
       <div class="field"><label>Disparadores de escalamiento</label>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           ${['crisis','violencia sexual','ventana 72 h','urgencia médica'].map(t=>
@@ -1121,8 +1169,53 @@ function ir(v){
   if (v === 'contenido')   pintarMetodos();
   if (v === 'agenda')      pintarActividades();
   if (v === 'solicitudes') pintarCola();
+  if (v === 'config')      pintarDemo();
   conectar();
   scrollTo({ top:0 });
+}
+
+// ── Datos de demostración ────────────────────────────────────────
+async function pintarDemo(){
+  const box = $('#demoEstado');
+  if (!box) return;
+  if (DEMO){ box.textContent = 'Sin conexión configurada.'; return; }
+  try {
+    const d = await api({ action:'demo_estado' });
+    const hay = (d.demo_perfiles || 0) + (d.demo_preguntas || 0) + (d.demo_actividades || 0);
+    if (!hay){
+      box.innerHTML = `<b style="color:var(--good)">No hay datos de demostración.</b>
+        La base tiene ${d.perfiles_reales} cuenta${d.perfiles_reales === 1 ? '' : 's'} real${
+        d.perfiles_reales === 1 ? '' : 'es'} y nada inventado.`;
+      $('#demoAcciones').style.display = 'none';
+      return;
+    }
+    box.innerHTML = `
+      <b style="color:var(--warn)">Hay datos de demostración cargados.</b>
+      <div style="margin-top:8px;line-height:1.9">
+        ${d.demo_perfiles} cuentas simuladas, con sus ciclos, métodos, citas y solicitudes<br>
+        ${d.demo_preguntas} preguntas en el banco<br>
+        ${d.demo_actividades} actividades en la cartelera<br>
+        <span style="color:var(--text-muted)">Sembrados el ${
+          new Date(d.sembrado_en).toLocaleDateString('es-MX',
+            { day:'numeric', month:'long', year:'numeric' })}</span><br>
+        <b style="color:var(--text-primary)">Cuentas reales que NO se tocan: ${d.perfiles_reales}</b>
+      </div>`;
+    $('#demoAcciones').style.display = '';
+    $('#demoPurgar').onclick = async () => {
+      const m = $('#demoMsg');
+      m.style.color = 'var(--text-muted)'; m.textContent = 'Purgando…';
+      try {
+        const r = await api({ action:'demo_purgar', confirmacion:$('#demoConf').value });
+        m.style.color = 'var(--good)';
+        m.textContent = `Listo: ${r.perfiles} cuentas, ${r.preguntas} preguntas y ${
+          r.actividades} actividades.`;
+        $('#demoConf').value = '';
+        await pintarDemo();
+      } catch (e) { m.style.color = 'var(--critical)'; m.textContent = e.message; }
+    };
+  } catch (e) {
+    box.innerHTML = `<span style="color:var(--critical)">${e.message}</span>`;
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
