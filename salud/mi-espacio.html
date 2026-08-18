@@ -192,6 +192,52 @@ main,header,footer{position:relative;z-index:2}
 .bub.esc{background:var(--rosa-50);border:1.5px solid var(--rosa-300);color:var(--rosa-700)}
 .bub .act{display:inline-block;margin-top:11px;padding:8px 15px;border-radius:var(--r-full);
   background:var(--rosa-600);color:#fff;font-size:12.5px;font-weight:600;text-decoration:none}
+/* Escalas dibujadas. Nadie sabe si su dolor es "un 7": lo que sí sabe es que
+   se parece a una cara. El numero sigue existiendo debajo, para la grafica. */
+.escala{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 6px;padding:0}
+.escala button{flex:1 1 0;min-width:66px;padding:10px 4px 8px;border-radius:15px;
+  border:1.5px solid var(--linea-2);background:rgba(255,255,255,.72);cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  font:inherit;font-size:11px;line-height:1.25;color:var(--tinta-3);text-align:center;
+  transition:transform .18s var(--ease),border-color .18s,box-shadow .18s,background .18s}
+.escala button svg{width:40px;height:40px;display:block;overflow:visible}
+.escala.gotas button svg{width:58px;height:24px}
+.escala button:hover{transform:translateY(-2px);border-color:var(--lila-300)}
+.escala button[aria-checked="true"]{border-color:var(--lila-400);color:var(--tinta);
+  background:#fff;box-shadow:0 8px 20px rgba(117,73,206,.17);font-weight:600;
+  transform:translateY(-2px)}
+.escala button:focus-visible{outline:none;box-shadow:0 0 0 4px var(--lila-100)}
+.escala-txt{font-size:12.5px;color:var(--tinta-3);margin:0 0 2px;line-height:1.5}
+.lbl{display:block;font-size:13.5px;font-weight:600;color:var(--tinta-2);margin-bottom:7px}
+@media (prefers-reduced-motion:reduce){.escala button{transition:none}
+  .escala button:hover,.escala button[aria-checked="true"]{transform:none}}
+.escala.servicios button svg{width:34px;height:34px}
+.btn:disabled,.btn[disabled]{background:var(--linea)!important;color:var(--tinta-3)!important;
+  box-shadow:none!important;cursor:not-allowed;opacity:1;transform:none!important}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chips button{padding:8px 14px;border-radius:var(--r-full);border:1.5px solid var(--linea-2);
+  background:rgba(255,255,255,.7);font:inherit;font-size:12.5px;color:var(--tinta-2);cursor:pointer;
+  transition:border-color .16s,background .16s,color .16s}
+.chips button[aria-pressed="true"]{border-color:var(--lila-400);background:var(--lila-50);
+  color:var(--lila-700);font-weight:600}
+.chips button:focus-visible{outline:none;box-shadow:0 0 0 4px var(--lila-100)}
+.aviso-urg{border-color:var(--rosa-300)!important;background:linear-gradient(135deg,var(--rosa-50),var(--lila-50))!important}
+.aviso-urg p{font-size:13.5px;color:var(--tinta-2);line-height:1.65;margin:0}
+.estado{display:inline-block;padding:3px 10px;border-radius:var(--r-full);font-size:11.5px;font-weight:600}
+.e-solicitada{background:var(--azul-50);color:var(--azul-700)}
+.e-confirmada{background:var(--lila-50);color:var(--lila-700)}
+.e-atendida{background:#E7F5EE;color:#186B4A}
+.e-cancelada,.e-no_asistio{background:#F1EFF5;color:var(--tinta-3)}
+.act{border:1.5px solid var(--linea-2);border-radius:var(--r-lg);padding:18px 20px;margin-bottom:13px;
+  background:rgba(255,255,255,.72);backdrop-filter:blur(9px)}
+.act h4{margin:0 0 5px;font-size:16px;color:var(--tinta)}
+.act .meta{font-size:12.5px;color:var(--tinta-3);margin-bottom:9px;line-height:1.6}
+.act p{font-size:13.5px;color:var(--tinta-2);line-height:1.65;margin:0 0 13px}
+.act .pie{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.act .cupo{font-size:12px;color:var(--tinta-3)}
+.tag{display:inline-block;padding:2px 9px;border-radius:var(--r-full);font-size:11px;font-weight:600;
+  background:var(--lila-50);color:var(--lila-700);margin-right:6px}
+.tag.linea{background:var(--azul-50);color:var(--azul-700)}
 .chat-in{display:flex;gap:9px}
 .chat-in input{flex:1;padding:13px 17px;border-radius:var(--r-full);border:1.5px solid var(--linea-2);
   font-size:14.5px;font-family:inherit;background:rgba(255,255,255,.85)}
@@ -341,6 +387,8 @@ main,header,footer{position:relative;z-index:2}
     <button data-v="metodo">Mi método</button>
     <button data-v="pruebas">Mis pruebas</button>
     <button data-v="bitacora">Bitácora</button>
+    <button data-v="atencion">Pedir atención</button>
+    <button data-v="agenda">Actividades</button>
     <button data-v="consulta">Preparar consulta</button>
     <button data-v="pumai">PUM-AI</button>
     <button data-v="ajustes">Ajustes</button>
@@ -377,13 +425,15 @@ main,header,footer{position:relative;z-index:2}
           <div class="field"><label for="cIni">Primer día</label><input type="date" id="cIni"></div>
           <div class="field"><label for="cFin">Último día <span style="font-weight:400;color:var(--tinta-3)">(opcional)</span></label><input type="date" id="cFin"></div>
         </div>
-        <div class="f2">
-          <div class="field"><label for="cFlujo">Sangrado más abundante</label>
-            <select id="cFlujo"><option value="">—</option><option value="1">Leve</option>
-              <option value="2">Moderado</option><option value="3">Abundante</option>
-              <option value="4">Muy abundante</option></select></div>
-          <div class="field"><label for="cDolor">Dolor máximo (0–10)</label>
-            <input type="number" id="cDolor" min="0" max="10" placeholder="0"></div>
+        <div class="field">
+          <span class="lbl" id="lblDolor">¿Cuánto te dolió, en tu peor momento?</span>
+          <div class="escala" id="cDolor" role="radiogroup" aria-labelledby="lblDolor"></div>
+          <p class="escala-txt" id="cDolorTxt">Elige la carita que se parezca a como te sentiste.</p>
+        </div>
+        <div class="field">
+          <span class="lbl" id="lblFlujo">¿Cómo fue tu día de sangrado más abundante?</span>
+          <div class="escala gotas" id="cFlujo" role="radiogroup" aria-labelledby="lblFlujo"></div>
+          <p class="escala-txt" id="cFlujoTxt">Piensa en cada cuánto tuviste que cambiarte.</p>
         </div>
         <label class="check"><input type="checkbox" id="cFalte">
           <span>Falté a clase por esto</span></label>
@@ -408,6 +458,12 @@ main,header,footer{position:relative;z-index:2}
       <h2>Mi método</h2>
       <p class="lead">La causa número uno de que un método falle es el olvido. Aquí lo tienes con
         su recordatorio.</p>
+      <div class="panel glass" id="dispMetodos" style="display:none">
+        <h3><span class="ic">📗</span> Qué hay hoy en el Centro</h3>
+        <div id="dispLista"></div>
+        <a class="btn btn-2 btn-sm" href="metodos.html" style="margin-top:12px;display:inline-block">
+          Ver la guía completa de métodos →</a>
+      </div>
       <div class="panel glass">
         <h3><span class="ic">💊</span> Registrar método</h3>
         <div class="f2">
@@ -491,6 +547,68 @@ main,header,footer{position:relative;z-index:2}
     </section>
 
     <!-- PREPARAR CONSULTA -->
+    <!-- PEDIR ATENCIÓN -->
+    <section class="view" id="v-atencion">
+      <h2>Pedir atención</h2>
+      <p class="lead">Psicología, odontología, enfermería y salud sexual y reproductiva. Puede ser
+        en línea o en el Centro, tú decides. No tienes que explicar por qué: dinos cuándo puedes y
+        el personal te confirma aquí mismo.</p>
+
+      <div class="panel glass">
+        <h3><span class="ic">🗓️</span> Nueva solicitud</h3>
+        <span class="lbl">¿Qué necesitas?</span>
+        <div class="escala servicios" id="sServicio" role="radiogroup" aria-label="Servicio"></div>
+        <p class="escala-txt" id="sServicioTxt">Elige un servicio para continuar.</p>
+
+        <div class="f2">
+          <div class="field"><label for="sModo">¿Cómo prefieres?</label>
+            <select id="sModo">
+              <option value="cualquiera">Como sea más rápido</option>
+              <option value="linea">En línea, por videollamada</option>
+              <option value="presencial">En el Centro, en persona</option>
+            </select></div>
+          <div class="field"><label for="sUrg">¿Qué tan pronto?</label>
+            <select id="sUrg">
+              <option value="normal">Cuando haya lugar</option>
+              <option value="pronto">Lo antes posible</option>
+            </select></div>
+        </div>
+
+        <span class="lbl">¿Cuándo te queda bien? Marca todas las que puedas.</span>
+        <div class="chips" id="sFranjas"></div>
+
+        <div class="field" style="margin-top:14px">
+          <label for="sNota">Si quieres, cuéntanos algo <span style="font-weight:400;color:var(--tinta-3)">(opcional)</span></label>
+          <textarea id="sNota" rows="3" maxlength="500"
+            placeholder="Ej.: prefiero que no sea en horario de clase"></textarea>
+          <small><b>Ojo:</b> esto sí lo lee la persona que te va a atender. Es el único texto tuyo
+            que alguien del Centro ve. Tu bitácora y tus registros no.</small>
+        </div>
+
+        <button class="btn btn-1" id="sEnviar">Enviar solicitud</button>
+      </div>
+
+      <div class="panel glass">
+        <h3><span class="ic">📋</span> Mis solicitudes</h3>
+        <ul class="list" id="listaServicios"></ul>
+      </div>
+
+      <div class="panel glass aviso-urg">
+        <h3><span class="ic">⚠️</span> Si es una urgencia, no esperes aquí</h3>
+        <p>Esto no es un canal de urgencias y nadie lo está mirando en este momento. Si hay sangrado
+          que no cede, dolor que no aguantas o pasó algo en las últimas 72 horas, ve directo al
+          Centro en horario de atención o marca <b>911</b>.</p>
+      </div>
+    </section>
+
+    <!-- ACTIVIDADES -->
+    <section class="view" id="v-agenda">
+      <h2>Actividades</h2>
+      <p class="lead">Talleres, pláticas y jornadas del Centro. Apuntarte sólo sirve para que sepan
+        cuánta gente esperar: el personal ve el número, nunca quién.</p>
+      <div id="listaAgenda"></div>
+    </section>
+
     <section class="view" id="v-consulta">
       <h2>Preparar mi consulta</h2>
       <p class="lead">El "se me olvidó preguntar" es universal. Esto arma una hoja con lo tuyo y tus
@@ -616,7 +734,7 @@ const TAGS = ['ansiedad','dolor','alivio','duda','pareja','decisión','cuerpo','
 // =============================================================================
 let S = { code:null, token:null, consent:true, shared:false,
           ciclos:[], metodos:[], pruebas:[], bitacora:[], citas:[], riesgos:[], hilo:[],
-          preguntas:[] };
+          servicios:[], actividades:[], inscritas:[], metodosCat:[], preguntas:[] };
 
 const store = {
   get k(){ return 'cusmsr_sesion'; },
@@ -773,7 +891,9 @@ async function recargar(){
   try {
     const h = await api(CFG.FN_AUTH, { action:'history', token:S.token });
     Object.assign(S, { ciclos:h.ciclos||[], metodos:h.metodos||[], pruebas:h.pruebas||[],
-      bitacora:h.bitacora||[], citas:h.citas||[], riesgos:h.riesgos||[], hilo:h.hilo||[] });
+      bitacora:h.bitacora||[], citas:h.citas||[], riesgos:h.riesgos||[], hilo:h.hilo||[],
+      servicios:h.servicios||[], actividades:h.actividades||[],
+      inscritas:h.inscritas||[], metodosCat:h.metodosCat||[] });
     pintarTodo();
   } catch (err) { aviso($('#appMsg'), 'No pude cargar tus datos: ' + err.message); }
 }
@@ -805,7 +925,8 @@ addEventListener('keydown', e => {
 // =============================================================================
 // PINTADO
 // =============================================================================
-function pintarTodo(){ resumen(); ciclos(); metodos(); pruebas(); bitacora(); consulta(); chat(); }
+function pintarTodo(){ resumen(); ciclos(); metodos(); pruebas(); bitacora(); consulta(); chat();
+                       servicios(); agenda(); disponibilidad(); }
 
 function proxRegla(){
   if (!S.ciclos.length) return null;
@@ -881,18 +1002,219 @@ $('#btnRiesgo').onclick = async () => {
   aviso($('#appMsg'), 'Registrado. Mira el reloj de 72 horas arriba.', true);
 };
 
+// ---- disponibilidad de metodos en el Centro --------------------------------
+const N_DISP = {
+  disponible:        ['Disponible',        'var(--azul-700)',  'var(--azul-50)'],
+  pocas_existencias: ['Quedan pocas',      '#8A5A05',          '#FDF3E0'],
+  agotado:           ['Agotado por ahora', '#9B3218',          '#FDECE8'],
+  con_receta:        ['Con valoración',    'var(--lila-700)',  'var(--lila-50)'],
+  no_se_ofrece:      ['No se ofrece aquí', 'var(--tinta-3)',   'var(--linea)'],
+};
+function disponibilidad(){
+  const l = (S.metodosCat || []).filter(m => m.disponibilidad !== 'no_se_ofrece');
+  const box = $('#dispMetodos');
+  if (!box) return;
+  if (!l.length){ box.style.display = 'none'; return; }
+  box.style.display = '';
+  $('#dispLista').innerHTML = `<div style="display:flex;flex-wrap:wrap;gap:8px">${
+    l.map(m => { const [t,c,bg] = N_DISP[m.disponibilidad] || N_DISP.disponible;
+      return `<span style="padding:7px 13px;border-radius:var(--r-full);background:${bg};color:${c};
+        font-size:12.5px;font-weight:600" title="${esc(m.nota_disponibilidad || '')}">
+        ${esc(m.nombre)} · ${t}</span>`; }).join('')}</div>
+    <p style="font-size:12.5px;color:var(--tinta-3);margin-top:11px;line-height:1.55">
+      Es lo último que registró el personal. Si vienes por uno en concreto, confírmalo antes.</p>`;
+}
+
+// ---- pedir atencion ---------------------------------------------------------
+const SERVICIOS = [
+  { v:'psicologia',  t:'Psicología',  d:'Ansiedad, duelo, violencia, lo que traigas',
+    i:'<circle cx="20" cy="20" r="16.5" fill="#7549CE14" stroke="#7549CE" stroke-width="2"/><path d="M20 28c-5-3.4-8-6.4-8-9.8A4.2 4.2 0 0 1 20 15.6a4.2 4.2 0 0 1 8 2.6c0 3.4-3 6.4-8 9.8z" fill="#7549CE"/>' },
+  { v:'odontologia', t:'Odontología', d:'Revisión, limpieza, dolor de muela',
+    i:'<circle cx="20" cy="20" r="16.5" fill="#2A7BA814" stroke="#2A7BA8" stroke-width="2"/><path d="M14 13c-2.4 0-3.6 2-3.6 4.6 0 4 1.6 6 2.4 9.2.5 2 2.6 2.2 3-.2l.9-4.5c.2-1 1.4-1 1.6 0l.9 4.5c.4 2.4 2.5 2.2 3 .2.8-3.2 2.4-5.2 2.4-9.2C24.6 15 23.4 13 21 13c-1.6 0-2.2.9-3.5.9S15.6 13 14 13z" fill="#2A7BA8" transform="translate(2.5,0)"/>' },
+  { v:'enfermeria',  t:'Enfermería',  d:'Signos vitales, curaciones, inyecciones',
+    i:'<circle cx="20" cy="20" r="16.5" fill="#B54A8014" stroke="#B54A80" stroke-width="2"/><path d="M17.4 12h5.2v5.4H28v5.2h-5.4V28h-5.2v-5.4H12v-5.2h5.4z" fill="#B54A80"/>' },
+  { v:'ssr',         t:'Salud sexual', d:'Anticoncepción, pruebas, consejería',
+    i:'<circle cx="20" cy="20" r="16.5" fill="#9D4FA614" stroke="#9D4FA6" stroke-width="2"/><circle cx="20" cy="17" r="5.2" fill="none" stroke="#9D4FA6" stroke-width="2.4"/><path d="M20 22.2V30M16.6 26.6h6.8" stroke="#9D4FA6" stroke-width="2.4" stroke-linecap="round"/>' },
+];
+const FRANJAS = [
+  ['lun_am','Lunes por la mañana'],   ['lun_pm','Lunes por la tarde'],
+  ['mar_am','Martes por la mañana'],  ['mar_pm','Martes por la tarde'],
+  ['mie_am','Miércoles por la mañana'],['mie_pm','Miércoles por la tarde'],
+  ['jue_am','Jueves por la mañana'],  ['jue_pm','Jueves por la tarde'],
+  ['vie_am','Viernes por la mañana'], ['vie_pm','Viernes por la tarde'],
+];
+const N_SERV = { psicologia:'Psicología', odontologia:'Odontología',
+                 enfermeria:'Enfermería', ssr:'Salud sexual y reproductiva' };
+const N_EST  = { solicitada:'Esperando respuesta', confirmada:'Confirmada',
+                 atendida:'Atendida', cancelada:'Cancelada', no_asistio:'No asististe' };
+const N_MODO = { linea:'en línea', presencial:'en el Centro', cualquiera:'como sea más rápido' };
+
+$('#sFranjas').innerHTML = FRANJAS.map(([v,t]) =>
+  `<button type="button" aria-pressed="false" data-v="${v}">${t}</button>`).join('');
+$$('#sFranjas button').forEach(b => b.onclick = () =>
+  b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true'));
+
+escala('#sServicio', SERVICIOS,
+  d => `<svg viewBox="0 0 40 40" aria-hidden="true">${d.i}</svg>`, '#sServicioTxt');
+
+$('#sEnviar').onclick = async () => {
+  const serv = $('#sServicio').dataset.valor;
+  if (!serv) return aviso($('#appMsg'), 'Primero elige qué necesitas.');
+  const franjas = $$('#sFranjas button[aria-pressed="true"]').map(b => b.dataset.v);
+  try {
+    await api(CFG.FN_AUTH, { action:'pedir_servicio', token:S.token, servicio:serv,
+      modalidad:$('#sModo').value, urgencia:$('#sUrg').value, franjas,
+      nota:$('#sNota').value.trim() || null });
+    $('#sServicio').limpiar(); $('#sNota').value = '';
+    $$('#sFranjas button').forEach(b => b.setAttribute('aria-pressed','false'));
+    await recargar();
+    aviso($('#appMsg'), 'Solicitud enviada. La respuesta te aparece aquí, en esta pantalla.', true);
+  } catch (e) { aviso($('#appMsg'), e.message); }
+};
+
+function servicios(){
+  const l = S.servicios || [];
+  $('#listaServicios').innerHTML = l.length ? l.map(r => {
+    const fecha = r.cita_en ? new Date(r.cita_en).toLocaleString('es-MX',
+      { weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' }) : null;
+    const abierta = r.status === 'solicitada' || r.status === 'confirmada';
+    return `<li class="item"><span class="dot" style="background:var(--lila-400)"></span>
+      <div class="body">
+        <b>${N_SERV[r.servicio] || r.servicio} <span class="estado e-${r.status}">${N_EST[r.status] || r.status}</span></b>
+        <span>${N_MODO[r.modalidad]}</span>
+        ${fecha ? `<span><b>${fecha}</b></span>` : ''}
+        ${r.respuesta ? `<span>${esc(r.respuesta)}</span>` : ''}
+        ${r.enlace && r.status === 'confirmada'
+          ? `<a class="btn btn-2 btn-sm" style="margin-top:8px;display:inline-block"
+                href="${esc(r.enlace)}" target="_blank" rel="noopener">Entrar a la videollamada</a>` : ''}
+      </div>
+      ${abierta ? `<button class="del" data-cancel="${r.id}" title="Cancelar">×</button>` : ''}</li>`;
+  }).join('') : '<div class="empty">Todavía no has pedido nada. Cuando lo hagas, el estado aparece aquí.</div>';
+
+  $$('#listaServicios [data-cancel]').forEach(b => b.onclick = async () => {
+    if (!confirm('¿Cancelar esta solicitud?')) return;
+    try { await api(CFG.FN_AUTH, { action:'cancelar_servicio', token:S.token, id:b.dataset.cancel });
+          await recargar(); } catch (e) { aviso($('#appMsg'), e.message); }
+  });
+}
+
+// ---- actividades ------------------------------------------------------------
+function agenda(){
+  const l = S.actividades || [];
+  const mias = new Set(S.inscritas || []);
+  $('#listaAgenda').innerHTML = l.length ? l.map(a => {
+    const ini = new Date(a.inicia_en);
+    const cuando = ini.toLocaleString('es-MX',
+      { weekday:'long', day:'numeric', month:'long', hour:'2-digit', minute:'2-digit' });
+    const dentro = mias.has(a.id);
+    const lleno = a.cupo && a.inscritas >= a.cupo && !dentro;
+    return `<article class="act">
+      <h4>${esc(a.titulo)}</h4>
+      <div class="meta">
+        <span class="tag${a.modalidad === 'linea' ? ' linea' : ''}">${
+          a.modalidad === 'linea' ? 'En línea' : a.modalidad === 'hibrida' ? 'Presencial y en línea' : 'Presencial'}</span>
+        ${cuando}${a.lugar ? ` · ${esc(a.lugar)}` : ''}
+      </div>
+      ${a.descripcion ? `<p>${esc(a.descripcion)}</p>` : ''}
+      <div class="pie">
+        <button class="btn ${dentro ? 'btn-2' : 'btn-1'} btn-sm" data-act="${a.id}"
+                ${lleno ? 'disabled' : ''}>${
+          dentro ? 'Ya me apunté — quitarme' : lleno ? 'Sin cupo' : 'Apuntarme'}</button>
+        ${dentro && a.enlace ? `<a class="btn btn-2 btn-sm" href="${esc(a.enlace)}"
+             target="_blank" rel="noopener">Enlace de la sesión</a>` : ''}
+        <span class="cupo">${a.cupo ? `${a.inscritas} de ${a.cupo} lugares` : `${a.inscritas} apuntadas`}</span>
+      </div>
+    </article>`;
+  }).join('') : '<div class="empty">No hay actividades programadas por ahora. Vuelve a asomarte la próxima semana.</div>';
+
+  $$('#listaAgenda [data-act]').forEach(b => b.onclick = async () => {
+    try {
+      const r = await api(CFG.FN_AUTH, { action:'inscribir', token:S.token,
+        actividad:b.dataset.act, alta:!mias.has(b.dataset.act) });
+      await recargar();
+      aviso($('#appMsg'), r.inscrita ? 'Listo, te apuntamos.' : 'Te quitamos de la lista.', true);
+    } catch (e) { aviso($('#appMsg'), e.message); }
+  });
+}
+
+// ---- escalas dibujadas de dolor y sangrado ----------------------------------
+// El valor que se guarda no cambia: pain_max 0-10 y flow_max 1-4, como estaba.
+// Lo unico que cambia es como se elige.
+const DOLOR = [
+  { v:0,  t:'Nada',        c:'#2A7BA8', k: 5 },
+  { v:2,  t:'Un poco',     c:'#4E67C8', k: 3 },
+  { v:4,  t:'Molesta',     c:'#7549CE', k: 1 },
+  { v:6,  t:'Molesta mucho',c:'#9D4FA6', k:-2 },
+  { v:8,  t:'Duele feo',   c:'#B54A80', k:-4 },
+  { v:10, t:'No lo aguanto',c:'#8E2F58', k:-6 },
+];
+const FLUJO = [
+  { v:1, t:'Leve',          d:'Casi manchas' },
+  { v:2, t:'Moderado',      d:'Cambio normal' },
+  { v:3, t:'Abundante',     d:'Cambio seguido' },
+  { v:4, t:'Muy abundante', d:'Cada 1–2 horas' },
+];
+const F_COL = ['#E3A6C4','#D2749F','#BE5583','#8E2F58'];
+const GOTA = 'M7 1 C7 1 12.4 7.4 12.4 10.6 A5.4 5.4 0 0 1 1.6 10.6 C1.6 7.4 7 1 7 1 Z';
+
+const cara = d => {
+  const boca = d.k < 0 ? 27 : 25;
+  return `<svg viewBox="0 0 40 40" aria-hidden="true">
+    <circle cx="20" cy="20" r="16.5" fill="${d.c}14" stroke="${d.c}" stroke-width="2"/>
+    <circle cx="14.2" cy="17" r="2" fill="${d.c}"/><circle cx="25.8" cy="17" r="2" fill="${d.c}"/>
+    ${d.k < 0 ? `<path d="M9.6 11.8 L16 13.8" stroke="${d.c}" stroke-width="1.7" stroke-linecap="round"/>
+                 <path d="M30.4 11.8 L24 13.8" stroke="${d.c}" stroke-width="1.7" stroke-linecap="round"/>` : ''}
+    <path d="M12.5 ${boca} Q20 ${boca + d.k} 27.5 ${boca}" fill="none"
+          stroke="${d.c}" stroke-width="2.2" stroke-linecap="round"/>
+    ${d.v === 10 ? `<path d="M27.6 21.4 q1.9 3.3 0 4.4 q-1.9 -1.1 0 -4.4z" fill="${d.c}" opacity=".65"/>` : ''}
+  </svg>`;
+};
+const gotitas = d => `<svg viewBox="0 0 58 24" aria-hidden="true">${
+  [0,1,2,3].map(i => `<g transform="translate(${i*14 + 1},5)">
+    <path d="${GOTA}" fill="${i < d.v ? F_COL[d.v-1] : 'none'}"
+          stroke="${i < d.v ? F_COL[d.v-1] : 'var(--linea-2)'}" stroke-width="1.4"/></g>`).join('')}</svg>`;
+
+function escala(cont, datos, dibujo, texto){
+  const el = $(cont);
+  el.innerHTML = datos.map((d, i) => `
+    <button type="button" role="radio" aria-checked="false" tabindex="${i === 0 ? 0 : -1}"
+            data-v="${d.v}" aria-label="${d.t}${d.d ? '. ' + d.d : ''}">
+      ${dibujo(d)}<span>${d.t}</span></button>`).join('');
+  const btns = [...el.querySelectorAll('button')];
+  const pinta = b => {
+    btns.forEach(x => { x.setAttribute('aria-checked', x === b ? 'true' : 'false');
+                        x.tabIndex = x === b ? 0 : -1; });
+    el.dataset.valor = b ? b.dataset.v : '';
+    const d = b ? datos.find(x => String(x.v) === b.dataset.v) : null;
+    $(texto).textContent = d ? (d.d ? `${d.t} — ${d.d}` : d.t) : el.dataset.vacio;
+  };
+  el.dataset.vacio = $(texto).textContent;
+  el.limpiar = () => { pinta(null); btns[0].tabIndex = 0; };
+  btns.forEach(b => b.onclick = () => pinta(el.dataset.valor === b.dataset.v ? null : b));
+  el.onkeydown = e => {
+    const i = btns.indexOf(document.activeElement);
+    if (i < 0) return;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown'){ e.preventDefault(); const n = btns[(i+1)%btns.length]; n.focus(); pinta(n); }
+    if (e.key === 'ArrowLeft'  || e.key === 'ArrowUp'  ){ e.preventDefault(); const n = btns[(i-1+btns.length)%btns.length]; n.focus(); pinta(n); }
+  };
+  return el;
+}
+escala('#cDolor', DOLOR, cara,     '#cDolorTxt');
+escala('#cFlujo', FLUJO, gotitas,  '#cFlujoTxt');
+
 // ---- ciclo ----
 $('#cFalte').onchange = e => $('#cDiasWrap').style.display = e.target.checked ? '' : 'none';
 $('#cSave').onclick = async () => {
   const ini = $('#cIni').value;
   if (!ini) return aviso($('#appMsg'), 'Falta el primer día.');
   const row = { started_on:ini, ended_on:$('#cFin').value || null,
-    flow_max: +$('#cFlujo').value || null, pain_max: $('#cDolor').value === '' ? null : +$('#cDolor').value,
+    flow_max: +$('#cFlujo').dataset.valor || null,
+    pain_max: $('#cDolor').dataset.valor === '' ? null : +$('#cDolor').dataset.valor,
     missed_class: $('#cFalte').checked, missed_days: $('#cFalte').checked ? +$('#cDias').value : null };
   try {
     await api(CFG.FN_AUTH, { action:'save', token:S.token, table:'cycle_events', row });
-    ['#cIni','#cFin','#cDolor'].forEach(s => $(s).value = '');
-    $('#cFlujo').value = ''; $('#cFalte').checked = false; $('#cDiasWrap').style.display = 'none';
+    ['#cIni','#cFin'].forEach(s => $(s).value = '');
+    $('#cDolor').limpiar(); $('#cFlujo').limpiar(); $('#cFalte').checked = false; $('#cDiasWrap').style.display = 'none';
     await recargar(); aviso($('#appMsg'), 'Ciclo guardado.', true);
   } catch (e) { aviso($('#appMsg'), e.message); }
 };
@@ -902,7 +1224,7 @@ function ciclos(){
   $('#listaCiclos').innerHTML = l.length ? l.map(c => {
     const det = [];
     if (c.ended_on) det.push(`${dias(c.started_on, c.ended_on) + 1} días`);
-    if (c.pain_max != null) det.push(`dolor ${c.pain_max}/10`);
+    if (c.pain_max != null) det.push(`dolor: ${(DOLOR.find(d => d.v === c.pain_max) || {t:c.pain_max + '/10'}).t.toLowerCase()}`);
     if (c.flow_max) det.push(['','leve','moderado','abundante','muy abundante'][c.flow_max]);
     if (c.missed_class) det.push(`faltó ${c.missed_days || 1} día(s)`);
     return `<li class="item"><span class="dot" style="background:var(--rosa-400)"></span>

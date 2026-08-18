@@ -416,9 +416,12 @@ const MENU = [
   { v:'preguntas',  t:'Banco de preguntas', i:'❝', p:'ver_preguntas' },
   { v:'cuarentena', t:'Cuarentena',         i:'⚑', p:'ver_preguntas' },
   { v:'insights',   t:'Lecturas de IA',     i:'✦', p:'ver_insights' },
+  { g:'Atención' },
+  { v:'solicitudes',t:'Solicitudes',        i:'✉', p:'gestionar_agenda' },
+  { v:'agenda',     t:'Actividades',        i:'◍', p:'gestionar_contenido' },
   { g:'Operación' },
   { v:'exportar',   t:'Exportar',           i:'↧', p:'exportar' },
-  { v:'contenido',  t:'Contenido',          i:'✎', p:'gestionar_contenido' },
+  { v:'contenido',  t:'Métodos y contenido',i:'✎', p:'gestionar_contenido' },
   { v:'usuarios',   t:'Personal',           i:'☰', p:'gestionar_usuarios' },
   { v:'seguridad',  t:'Seguridad',          i:'⛨', p:'gestionar_seguridad' },
   { v:'config',     t:'Configuración',      i:'⚙', p:'gestionar_config' },
@@ -546,13 +549,24 @@ function bloque({titulo,porque,svg,tabla,legend,extra}){
     ${extra||''}
   </div>`;
 }
+// Sin datos no hay grafica. Pasa mucho al principio y pasa siempre que el
+// k-anonimato suprime una categoria: la vista devuelve cero filas a proposito.
+// Antes esto reventaba con "cannot read properties of undefined".
+const SIN_DATOS = (msg = 'Todavía no hay suficientes datos para mostrar esto.') =>
+  `<div style="padding:44px 20px;text-align:center;color:var(--text-muted);font-size:13.5px;
+      border:1px dashed var(--line-2);border-radius:var(--r);line-height:1.6">${msg}<br>
+    <span style="font-size:12.5px">El umbral de k-anonimato es ${'10'}: una categoría con menos
+    personas no se grafica.</span></div>`;
+
 function tabla(cols, filas){
+  if (!filas || !filas.length) return SIN_DATOS('Sin filas que mostrar.');
   return `<table><thead><tr>${cols.map((c,i)=>`<th class="${i?'num':''}">${c}</th>`).join('')}</tr></thead>
     <tbody>${filas.map(f=>`<tr>${f.map((c,i)=>`<td class="${i?'num':''}">${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
 }
 
 // Barras horizontales — una sola serie, etiqueta directa en cada barra
 function barrasH(datos, {color='var(--series-1)', unidad=''}={}){
+  if (!datos || !datos.length) return SIN_DATOS();
   const max=Math.max(...datos.map(d=>d.v)), h=34, W=760, L=178, R=64;
   const alto=datos.length*h+8;
   return `<svg viewBox="0 0 ${W} ${alto}" style="width:100%;height:auto" role="img">
@@ -569,6 +583,7 @@ function barrasH(datos, {color='var(--series-1)', unidad=''}={}){
 
 // Barras agrupadas — varias series, con leyenda
 function barrasG(datos, series){
+  if (!datos || !datos.length) return SIN_DATOS();
   const W=760,H=260,L=44,B=54,T=14,R=12;
   const gw=(W-L-R)/datos.length, bw=Math.min(21,(gw-16)/series.length);
   const max=100;
@@ -594,6 +609,7 @@ function barrasG(datos, series){
 
 // Líneas — varias series, con marcadores y leyenda
 function lineas(datos, series, campoX='m'){
+  if (!datos || !datos.length) return SIN_DATOS();
   const W=760,H=250,L=42,B=38,T=14,R=14;
   const max=Math.ceil(Math.max(...datos.flatMap(d=>series.map(s=>d[s.k])))/20)*20;
   const x=i=>L+(W-L-R)*(datos.length===1?0.5:i/(datos.length-1));
@@ -620,6 +636,7 @@ function lineas(datos, series, campoX='m'){
 
 // Embudo — una serie, con la caída entre pasos
 function embudo(datos){
+  if (!datos || !datos.length) return SIN_DATOS();
   const W=760,h=52,max=datos[0].v;
   return `<svg viewBox="0 0 ${W} ${datos.length*h+6}" style="width:100%;height:auto" role="img">
     ${datos.map((d,i)=>{
@@ -812,17 +829,79 @@ const VISTAS = {
     </div>`,
 
   contenido: () => `
-    <div class="note info"><span class="ic">✎</span><div><b>Lo que ve la comunidad</b>
-      Preguntas frecuentes del sitio, mitos, catálogos de motivos de cita y materiales educativos.</div></div>
-    <div class="grid g2">
-      ${[['Preguntas frecuentes','14 publicadas'],['Mitos y realidades','8 publicados'],
-         ['Motivos de cita','6 códigos activos'],['Respuestas guardadas','Textos que PUM-AI usa como base'],
-         ['Materiales educativos','Guías descargables'],['Avisos del sitio','Horarios, ubicación, teléfonos']]
-        .map(([t,d])=>`<div class="card pad" style="display:flex;gap:14px;align-items:center">
-          <div style="flex:1"><h3 style="font-family:Inter,sans-serif;font-size:14.5px;font-weight:700">${t}</h3>
-          <p style="font-size:12.5px;color:var(--text-muted)">${d}</p></div>
-          <button class="btn btn-2 btn-sm">Editar</button></div>`).join('')}
+    <div class="note info"><span class="ic">✎</span><div><b>El semáforo es lo que más se usa</b>
+      Cambiar la disponibilidad de un método se guarda al instante y la alumna lo ve en el portal.
+      Que diga "agotado" a tiempo evita que alguien haga el viaje para nada.</div></div>
+    <div class="card pad">
+      <div style="overflow-x:auto"><table id="tMetodos">
+        <thead><tr><th>Método</th><th>Tipo</th><th>Disponibilidad</th><th>Nota para la alumna</th>
+          <th style="text-align:right">Último cambio</th></tr></thead>
+        <tbody></tbody></table></div>
+    </div>
+    <div class="note lock" style="margin-top:18px"><span class="ic">⛨</span><div>
+      <b>Las cifras de eficacia no se editan a la ligera</b>
+      Son estimaciones poblacionales de uso típico y uso perfecto. Si hay que corregirlas,
+      que sea con la fuente en la mano: la alumna toma decisiones con ese número.</div></div>`,
+
+  agenda: () => `
+    <div class="note info"><span class="ic">◍</span><div><b>Cartelera de la semana</b>
+      Lo que publiques aquí aparece en el sitio y en Mi espacio. Verás cuánta gente se apuntó,
+      nunca quién: el panel no tiene permiso sobre esa tabla.</div></div>
+
+    <div class="card pad" style="margin-bottom:20px">
+      <h3 style="font-family:Inter,sans-serif;font-size:15px;font-weight:700;margin-bottom:14px">
+        Nueva actividad</h3>
+      <input type="hidden" id="aId">
+      <div class="field"><label for="aTitulo">Título</label>
+        <input id="aTitulo" placeholder="Taller: elegir método sin que te lo impongan"></div>
+      <div class="field"><label for="aDesc">Descripción</label>
+        <textarea id="aDesc" rows="3" placeholder="Qué se va a hacer, cuánto dura, si hay que llevar algo"></textarea></div>
+      <div class="f2">
+        <div class="field"><label for="aTipo">Tipo</label><select id="aTipo">
+          <option value="taller">Taller</option><option value="platica">Plática</option>
+          <option value="jornada">Jornada</option><option value="consejeria_grupal">Consejería grupal</option>
+          <option value="otra">Otra</option></select></div>
+        <div class="field"><label for="aModo">Modalidad</label><select id="aModo">
+          <option value="presencial">Presencial</option><option value="linea">En línea</option>
+          <option value="hibrida">Presencial y en línea</option></select></div>
+      </div>
+      <div class="f2">
+        <div class="field"><label for="aIni">Inicia</label><input type="datetime-local" id="aIni"></div>
+        <div class="field"><label for="aFin">Termina <span style="font-weight:400">(opcional)</span></label>
+          <input type="datetime-local" id="aFin"></div>
+      </div>
+      <div class="f2">
+        <div class="field"><label for="aLugar">Lugar</label>
+          <input id="aLugar" placeholder="Aula 3, Unidad de Seminarios"></div>
+        <div class="field"><label for="aEnlace">Enlace de la sesión</label>
+          <input id="aEnlace" placeholder="https://…"></div>
+      </div>
+      <div class="f2">
+        <div class="field"><label for="aCupo">Cupo <span style="font-weight:400">(opcional)</span></label>
+          <input type="number" id="aCupo" min="1" placeholder="Sin límite"></div>
+        <div class="field"><label for="aPub">Estado</label><select id="aPub">
+          <option value="0">Borrador — no se ve todavía</option>
+          <option value="1">Publicada — visible para la comunidad</option></select></div>
+      </div>
+      <button class="btn btn-1" id="aGuardar">Guardar actividad</button>
+      <button class="btn btn-2" id="aLimpiar" style="margin-left:8px">Limpiar</button>
+      <div id="aMsg" style="margin-top:10px;font-size:13px"></div>
+    </div>
+
+    <div class="card pad">
+      <h3 style="font-family:Inter,sans-serif;font-size:15px;font-weight:700;margin-bottom:12px">
+        Programadas</h3>
+      <div id="listaActs"></div>
     </div>`,
+
+  solicitudes: () => `
+    <div class="note lock"><span class="ic">⛨</span><div>
+      <b>Aquí atiendes una solicitud, no identificas a una persona</b>
+      Esta bandeja no muestra el código de la alumna, y no es que la pantalla lo esconda: el rol de
+      base de datos de este panel <b style="display:inline;font-weight:700">no tiene permiso de
+      Postgres</b> sobre esa columna. Cuando confirmas, ella ve el horario y el enlace en su propio
+      espacio.</div></div>
+    <div id="listaCola"></div>`,
 
   usuarios: () => `
     <div class="note lock"><span class="ic">☰</span><div><b>Ningún rol puede ver a una persona</b>
@@ -1038,9 +1117,215 @@ function ir(v){
        <b style="color:var(--text-primary)">No tienes acceso a esta sección.</b>
        <p style="margin-top:8px">Requiere el permiso <code>${m.p}</code>.
        Tu rol es ${ROLES[sesion.rol].nombre}.</p></div>`;
-  if (v === 'preguntas') pintarPreguntas('todas');
+  if (v === 'preguntas')   pintarPreguntas('todas');
+  if (v === 'contenido')   pintarMetodos();
+  if (v === 'agenda')      pintarActividades();
+  if (v === 'solicitudes') pintarCola();
   conectar();
   scrollTo({ top:0 });
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MÉTODOS, ACTIVIDADES Y BANDEJA DE SOLICITUDES
+// ═══════════════════════════════════════════════════════════════════
+const DISP = {
+  disponible:        'Disponible',
+  pocas_existencias: 'Quedan pocas',
+  agotado:           'Agotado',
+  con_receta:        'Sólo con receta',
+  no_se_ofrece:      'No se ofrece aquí',
+};
+const N_FAMILIA = { larga_duracion:'Larga duración', hormonal:'Hormonal', barrera:'Barrera',
+  emergencia:'Emergencia', definitivo:'Definitivo', conocimiento_fertilidad:'Conocer la fertilidad' };
+const N_SERVICIO = { psicologia:'Psicología', odontologia:'Odontología',
+  enfermeria:'Enfermería', ssr:'Salud sexual y reproductiva' };
+const N_FRANJA = { lun:'Lun', mar:'Mar', mie:'Mié', jue:'Jue', vie:'Vie' };
+const franjaTxt = f => (f||[]).map(x => {
+  const [d,t] = String(x).split('_');
+  return `${N_FRANJA[d] || d} ${t === 'am' ? 'a.m.' : 'p.m.'}`;
+}).join(' · ') || 'Sin preferencia';
+const fechaCorta = d => d ? new Date(d).toLocaleString('es-MX',
+  { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' }) : '—';
+
+let CONTENIDO = { metodos:[], actividades:[] };
+
+async function cargarContenido(){
+  if (DEMO) return CONTENIDO;
+  try { CONTENIDO = await api({ action:'contenido' }); } catch (e) { console.error(e); }
+  return CONTENIDO;
+}
+
+// ── Catálogo de métodos ──────────────────────────────────────────
+async function pintarMetodos(){
+  const tb = document.querySelector('#tMetodos tbody');
+  if (!tb) return;
+  tb.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted)">Cargando…</td></tr>';
+  await cargarContenido();
+  const l = CONTENIDO.metodos || [];
+  if (!l.length){ tb.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted)">Sin métodos en el catálogo.</td></tr>'; return; }
+
+  tb.innerHTML = l.map(m => `<tr data-slug="${m.slug}">
+    <td><b>${m.nombre}</b><br><span style="font-size:12px;color:var(--text-muted)">
+      ${m.eficacia_real != null ? `${(100 - m.eficacia_real).toFixed(1)} de cada 100 en uso real` : 'Sin cifra de eficacia'}</span></td>
+    <td style="font-size:12.5px;color:var(--text-secondary)">${N_FAMILIA[m.familia] || m.familia}</td>
+    <td><select class="mDisp" style="padding:7px 10px;border-radius:9px;border:1px solid var(--line-2);
+        font-size:13px;font-family:inherit;background:var(--surface-1);color:var(--text-primary)">
+      ${Object.entries(DISP).map(([k,t]) =>
+        `<option value="${k}"${k === m.disponibilidad ? ' selected' : ''}>${t}</option>`).join('')}
+    </select></td>
+    <td><input class="mNota" value="${(m.nota_disponibilidad || '').replace(/"/g,'&quot;')}"
+        placeholder="Opcional: qué hacer mientras tanto"
+        style="width:100%;padding:7px 10px;border-radius:9px;border:1px solid var(--line-2);
+               font-size:13px;font-family:inherit;background:var(--surface-1);color:var(--text-primary)"></td>
+    <td style="text-align:right;font-size:12px;color:var(--text-muted)">
+      ${m.actualizado_por ? `${m.actualizado_por}<br>${fechaCorta(m.actualizado_en)}` : '—'}</td>
+  </tr>`).join('');
+
+  tb.querySelectorAll('tr').forEach(tr => {
+    const guardar = async () => {
+      const slug = tr.dataset.slug;
+      try {
+        await api({ action:'metodo_disponibilidad', slug,
+          disponibilidad: tr.querySelector('.mDisp').value,
+          nota: tr.querySelector('.mNota').value.trim() || null });
+        tr.style.background = 'color-mix(in srgb, var(--good) 12%, transparent)';
+        setTimeout(() => tr.style.background = '', 900);
+        CONTENIDO.metodos = [];
+      } catch (e) { alert(e.message); }
+    };
+    tr.querySelector('.mDisp').onchange = guardar;
+    tr.querySelector('.mNota').onblur   = guardar;
+  });
+}
+
+// ── Actividades ──────────────────────────────────────────────────
+const localISO = d => { const x = new Date(d);
+  return new Date(x.getTime() - x.getTimezoneOffset()*60000).toISOString().slice(0,16); };
+
+async function pintarActividades(){
+  const cont = $('#listaActs');
+  if (!cont) return;
+  cont.innerHTML = '<p style="color:var(--text-muted);font-size:13px">Cargando…</p>';
+  CONTENIDO.actividades = [];
+  await cargarContenido();
+  const l = CONTENIDO.actividades || [];
+  cont.innerHTML = l.length ? l.map(a => `
+    <div style="border:1px solid var(--line);border-radius:var(--r);padding:15px 17px;margin-bottom:11px;
+                display:flex;gap:14px;align-items:flex-start;flex-wrap:wrap">
+      <div style="flex:1;min-width:240px">
+        <b style="font-size:14.5px">${a.titulo}</b>
+        <div style="font-size:12.5px;color:var(--text-muted);margin-top:3px">
+          ${fechaCorta(a.inicia_en)} · ${a.modalidad === 'linea' ? 'En línea'
+            : a.modalidad === 'hibrida' ? 'Presencial y en línea' : 'Presencial'}
+          ${a.lugar ? ` · ${a.lugar}` : ''}
+          · <b style="color:var(--text-secondary)">${a.inscritas} apuntadas${a.cupo ? ` de ${a.cupo}` : ''}</b>
+        </div>
+      </div>
+      <span style="padding:4px 11px;border-radius:999px;font-size:11.5px;font-weight:650;
+        background:${a.publicada ? 'color-mix(in srgb,var(--good) 15%,transparent)' : 'var(--surface-2)'};
+        color:${a.publicada ? 'var(--good)' : 'var(--text-muted)'}">
+        ${a.publicada ? 'Publicada' : 'Borrador'}</span>
+      <button class="btn btn-2 btn-sm" data-edit="${a.id}">Editar</button>
+      <button class="btn btn-d btn-sm" data-del="${a.id}">Borrar</button>
+    </div>`).join('')
+    : '<p style="color:var(--text-muted);font-size:13px">Todavía no hay actividades programadas.</p>';
+
+  cont.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => {
+    const a = l.find(x => x.id === b.dataset.edit);
+    $('#aId').value = a.id; $('#aTitulo').value = a.titulo;
+    $('#aDesc').value = a.descripcion || ''; $('#aTipo').value = a.tipo;
+    $('#aModo').value = a.modalidad; $('#aLugar').value = a.lugar || '';
+    $('#aEnlace').value = a.enlace || ''; $('#aCupo').value = a.cupo || '';
+    $('#aIni').value = localISO(a.inicia_en);
+    $('#aFin').value = a.termina_en ? localISO(a.termina_en) : '';
+    $('#aPub').value = a.publicada ? '1' : '0';
+    scrollTo({ top:0, behavior:'smooth' });
+  });
+  cont.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
+    if (!confirm('¿Borrar esta actividad? También se borran las inscripciones.')) return;
+    try { await api({ action:'actividad_borrar', id:b.dataset.del }); await pintarActividades(); }
+    catch (e) { alert(e.message); }
+  });
+
+  const limpiar = () => { ['#aId','#aTitulo','#aDesc','#aLugar','#aEnlace','#aCupo','#aIni','#aFin']
+    .forEach(x => $(x).value = ''); $('#aPub').value = '0'; $('#aMsg').textContent = ''; };
+  $('#aLimpiar').onclick = limpiar;
+  $('#aGuardar').onclick = async () => {
+    if (!$('#aTitulo').value.trim() || !$('#aIni').value){
+      $('#aMsg').style.color = 'var(--critical)';
+      $('#aMsg').textContent = 'Faltan el título y la fecha de inicio.'; return;
+    }
+    try {
+      await api({ action:'actividad_upsert', actividad:{
+        id: $('#aId').value || null, titulo:$('#aTitulo').value.trim(),
+        descripcion:$('#aDesc').value.trim() || null, tipo:$('#aTipo').value,
+        modalidad:$('#aModo').value, lugar:$('#aLugar').value.trim() || null,
+        enlace:$('#aEnlace').value.trim() || null,
+        inicia_en:new Date($('#aIni').value).toISOString(),
+        termina_en:$('#aFin').value ? new Date($('#aFin').value).toISOString() : null,
+        cupo:$('#aCupo').value ? +$('#aCupo').value : null,
+        publicada:$('#aPub').value === '1' } });
+      limpiar();
+      $('#aMsg').style.color = 'var(--good)'; $('#aMsg').textContent = 'Guardada.';
+      await pintarActividades();
+    } catch (e) { $('#aMsg').style.color = 'var(--critical)'; $('#aMsg').textContent = e.message; }
+  };
+}
+
+// ── Bandeja de solicitudes ───────────────────────────────────────
+async function pintarCola(){
+  const cont = $('#listaCola');
+  if (!cont) return;
+  cont.innerHTML = '<p style="color:var(--text-muted);font-size:13px">Cargando…</p>';
+  let rows = [];
+  try { rows = (await api({ action:'cola' })).rows || []; }
+  catch (e) { cont.innerHTML = `<p style="color:var(--critical);font-size:13px">${e.message}</p>`; return; }
+
+  cont.innerHTML = rows.length ? rows.map(r => `
+    <div class="card pad" style="margin-bottom:14px" data-id="${r.id}">
+      <div style="display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;margin-bottom:9px">
+        <b style="font-size:15px">${N_SERVICIO[r.servicio] || r.servicio}</b>
+        <span style="padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:650;
+          background:${r.urgencia === 'pronto' ? 'color-mix(in srgb,var(--warn) 18%,transparent)' : 'var(--surface-2)'};
+          color:${r.urgencia === 'pronto' ? 'var(--warn)' : 'var(--text-muted)'}">
+          ${r.urgencia === 'pronto' ? 'Lo antes posible' : 'Cuando haya lugar'}</span>
+        <span style="font-size:12.5px;color:var(--text-muted)">
+          ${r.modalidad === 'linea' ? 'En línea' : r.modalidad === 'presencial' ? 'En el Centro' : 'Como sea más rápido'}
+          · esperando ${r.dias_esperando} día${r.dias_esperando === 1 ? '' : 's'}
+          · estado: ${r.status}</span>
+      </div>
+      <div style="font-size:13px;color:var(--text-secondary);margin-bottom:8px">
+        <b style="color:var(--text-primary)">Puede:</b> ${franjaTxt(r.franjas)}</div>
+      ${r.nota ? `<div style="font-size:13px;background:var(--surface-2);border-radius:10px;
+        padding:10px 13px;margin-bottom:12px;line-height:1.6">${r.nota}</div>` : ''}
+      <div class="f2">
+        <div class="field"><label>Cita</label>
+          <input type="datetime-local" class="cCita" value="${r.cita_en ? localISO(r.cita_en) : ''}"></div>
+        <div class="field"><label>Enlace de videollamada</label>
+          <input class="cEnlace" placeholder="https://…" value="${(r.enlace||'').replace(/"/g,'&quot;')}"></div>
+      </div>
+      <div class="field"><label>Mensaje para ella</label>
+        <input class="cResp" placeholder="Te esperamos. Si no puedes, avísanos por aquí."
+               value="${(r.respuesta||'').replace(/"/g,'&quot;')}"></div>
+      <button class="btn btn-1 btn-sm" data-st="confirmada">Confirmar</button>
+      <button class="btn btn-2 btn-sm" data-st="atendida" style="margin-left:7px">Marcar atendida</button>
+      <button class="btn btn-2 btn-sm" data-st="no_asistio" style="margin-left:7px">No asistió</button>
+      <button class="btn btn-d btn-sm" data-st="cancelada" style="margin-left:7px">Cancelar</button>
+    </div>`).join('')
+    : '<div class="card pad" style="color:var(--text-muted);font-size:13.5px">Bandeja vacía. No hay solicitudes esperando.</div>';
+
+  cont.querySelectorAll('[data-st]').forEach(b => b.onclick = async () => {
+    const card = b.closest('[data-id]');
+    const cita = card.querySelector('.cCita').value;
+    if (b.dataset.st === 'confirmada' && !cita) return alert('Para confirmar hace falta la fecha y hora.');
+    try {
+      await api({ action:'solicitud_resolver', id:card.dataset.id, status:b.dataset.st,
+        cita_en: cita ? new Date(cita).toISOString() : null,
+        enlace: card.querySelector('.cEnlace').value.trim() || null,
+        respuesta: card.querySelector('.cResp').value.trim() || null });
+      await pintarCola();
+    } catch (e) { alert(e.message); }
+  });
 }
 
 async function pintarPreguntas(f){
