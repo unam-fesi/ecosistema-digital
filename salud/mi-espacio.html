@@ -1137,6 +1137,11 @@ function chat(){
   c.scrollTop = c.scrollHeight;
 }
 const esc = s => s.replace(/[<>&]/g, ch => ({'<':'&lt;','>':'&gt;','&':'&amp;'}[ch]));
+// El modelo a veces responde con markdown ligero. Se escapa PRIMERO y luego se
+// convierten solo negritas y vinetas: nunca se inyecta HTML del modelo.
+const md = s => esc(s)
+  .replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>')
+  .replace(/(^|\n)\s*[-*\u2022]\s+/g, '$1\u2022 ');
 function burbuja(role, txt, escalado){
   if (role === 'user') return `<div class="bub u">${esc(txt)}</div>`;
   const acciones = { ruta_crisis:['Ver ruta de apoyo','index.html#urgente'],
@@ -1145,7 +1150,7 @@ function burbuja(role, txt, escalado){
     urgencias:['Ver qué hacer ahora','index.html#urgente'],
     agendar_cita:['Agendar una cita','index.html#cita'] };
   const a = acciones[escalado];
-  return `<div class="bub a ${escalado ? 'esc' : ''}">${esc(txt)}${
+  return `<div class="bub a ${escalado ? 'esc' : ''}">${md(txt)}${
     a ? `<a class="act" href="${a[1]}">${a[0]} →</a>` : ''}</div>`;
 }
 $('#chatForm').onsubmit = async e => {
