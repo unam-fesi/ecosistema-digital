@@ -68,6 +68,28 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .b3{width:60vw;height:60vw;left:18vw;top:58vh;background:radial-gradient(circle,rgba(150,207,238,.48),rgba(150,207,238,0) 68%);animation:drift3 29s var(--ease) infinite alternate}
 .b4{width:38vw;height:38vw;right:8vw;top:120vh;background:radial-gradient(circle,rgba(196,174,248,.42),rgba(196,174,248,0) 68%);animation:drift1 34s var(--ease) infinite alternate-reverse}
 @keyframes drift1{0%{transform:translate3d(0,0,0) scale(1)}100%{transform:translate3d(9vw,7vh,0) scale(1.18)}}
+
+/* Lavado de fondo: el color del ambiente viaja lila -> rosa -> azul y
+   regresa. Se anima background-color (sí es animable) y una máscara
+   radial le quita la planitud para que no apague el blanco. */
+#tint{
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  -webkit-mask-image:radial-gradient(135% 105% at 50% -5%,#000 8%,rgba(0,0,0,.55) 52%,transparent 88%);
+  mask-image:radial-gradient(135% 105% at 50% -5%,#000 8%,rgba(0,0,0,.55) 52%,transparent 88%);
+  animation:wash 34s ease-in-out infinite;
+}
+@keyframes wash{
+  0%,100%{background-color:rgba(169,139,240,.13)}
+  28%{background-color:rgba(214,150,224,.13)}
+  50%{background-color:rgba(242,170,204,.14)}
+  76%{background-color:rgba(168,196,232,.11)}
+}
+/* Cada blob respira en fase distinta: en cada momento manda un color */
+.b1{animation:drift1 26s var(--ease) infinite alternate,breathe 34s ease-in-out infinite}
+.b2{animation:drift2 32s var(--ease) infinite alternate,breathe 34s ease-in-out -11.3s infinite}
+.b3{animation:drift3 29s var(--ease) infinite alternate,breathe 34s ease-in-out -22.6s infinite}
+.b4{animation:drift1 34s var(--ease) infinite alternate-reverse,breathe 34s ease-in-out -17s infinite}
+@keyframes breathe{0%,100%{opacity:1}34%{opacity:.34}67%{opacity:.62}}
 @keyframes drift2{0%{transform:translate3d(0,0,0) scale(1.1)}100%{transform:translate3d(-8vw,10vh,0) scale(.92)}}
 @keyframes drift3{0%{transform:translate3d(0,0,0) scale(.95)}100%{transform:translate3d(7vw,-9vh,0) scale(1.2)}}
 
@@ -507,6 +529,7 @@ footer{padding:64px 0 30px;margin-top:40px;background:rgba(247,243,255,.5);backd
   .sc{position:relative!important;top:auto!important}
   #grain,#spot{display:none}
   .blob{animation:none}
+  #tint{animation:none;background-color:rgba(169,139,240,.11)}
 }
 </style>
 </head>
@@ -514,6 +537,7 @@ footer{padding:64px 0 30px;margin-top:40px;background:rgba(247,243,255,.5);backd
 <a href="#main" class="skip">Saltar al contenido</a>
 
 <!-- ══ ATMÓSFERA ══ -->
+<div id="tint" aria-hidden="true"></div>
 <div id="fx" aria-hidden="true">
   <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div>
 </div>
@@ -550,6 +574,7 @@ footer{padding:64px 0 30px;margin-top:40px;background:rgba(247,243,255,.5);backd
       <a href="#servicios" data-s="servicios">Servicios</a>
       <a href="#preguntas" data-s="preguntas">Preguntas</a>
       <a href="#aprende" data-s="aprende">Aprende</a>
+      <a href="mi-espacio.html">Mi espacio</a>
       <a href="#cita" class="nav-cta mag">Agendar cita</a>
     </nav>
     <button class="burger" id="burger" aria-label="Abrir menú" aria-expanded="false">
@@ -563,6 +588,7 @@ footer{padding:64px 0 30px;margin-top:40px;background:rgba(247,243,255,.5);backd
     <a href="#servicios">Servicios</a>
     <a href="#aprende">Aprende</a>
     <a href="#preguntas">Preguntas frecuentes</a>
+    <a href="mi-espacio.html">Mi espacio</a>
     <a href="#cita" style="color:var(--lila-700);font-weight:700">Agendar cita →</a>
   </div>
 </header>
@@ -816,6 +842,21 @@ footer{padding:64px 0 30px;margin-top:40px;background:rgba(247,243,255,.5);backd
       <h2 class="sec-h wr" data-wr="Agenda tu cita"></h2>
       <p class="sec-p">Te pedimos lo mínimo indispensable. Puedes cancelar o cambiarla cuando quieras.</p>
     </div>
+    <div class="glass glass-edge rv" style="padding:26px 30px;margin-bottom:26px;display:flex;
+         gap:22px;align-items:center;flex-wrap:wrap">
+      <div style="flex:1;min-width:260px">
+        <h3 style="font-family:'Playfair Display',serif;font-size:22px;margin-bottom:7px">
+          ¿Prefieres llevar tu propio seguimiento?</h3>
+        <p style="font-size:14.5px;color:var(--tinta-2);line-height:1.6;max-width:620px">
+          Puedes crear tu espacio personal con un código anónimo — sin nombre, sin correo y sin
+          número de cuenta. Ahí registras tu ciclo, tu método y tus pruebas, preguntas lo que
+          quieras y llegas a la consulta con tus dudas anotadas.</p>
+      </div>
+      <a href="mi-espacio.html" class="btn btn-1 mag" style="flex-shrink:0">
+        <span>Crear o entrar a mi espacio</span>
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:start" class="rv" id="citaGrid">
       <div>
         <form class="glass glass-edge" id="citaForm" novalidate style="padding:32px">
@@ -892,14 +933,15 @@ footer{padding:64px 0 30px;margin-top:40px;background:rgba(247,243,255,.5);backd
         <h5>El Centro</h5>
         <p>Centro Universitario de Salud Menstrual, Sexual y Reproductiva de la Facultad de Estudios Superiores Iztacala, Universidad Nacional Autónoma de México.</p>
       </div>
-      <div class="fc"><h5>El servicio</h5><a href="#ayuda">¿Qué necesitas?</a><a href="#visita">Cómo es tu visita</a><a href="#servicios">Servicios</a><a href="#cita">Agendar cita</a></div>
+      <div class="fc"><h5>El servicio</h5><a href="#ayuda">¿Qué necesitas?</a><a href="#visita">Cómo es tu visita</a><a href="#servicios">Servicios</a><a href="#cita">Agendar cita</a><a href="mi-espacio.html">Mi espacio</a></div>
       <div class="fc"><h5>Información</h5><a href="#preguntas">Preguntas frecuentes</a><a href="#mitos">Mitos y realidades</a><a href="#aprende">Conoce tu ciclo</a><a href="#urgente">Si es urgente</a></div>
       <div class="fc"><h5>Ayuda inmediata</h5><p><strong style="color:var(--tinta)">Emergencia médica:</strong> 911</p><p><span class="tbd">Por confirmar</span> Línea de atención de la Facultad y ruta del Protocolo de Género de la UNAM.</p></div>
     </div>
     <div class="fl">
       <p><strong>Aviso.</strong> La información de este sitio es orientativa y educativa; no sustituye una consulta médica ni la valoración de un profesional de la salud. Ante una urgencia acude al servicio de urgencias más cercano o marca 911.</p>
       <p style="margin-top:9px"><strong>Privacidad.</strong> Los datos de salud son información personal sensible. Su tratamiento se rige por la normatividad universitaria y por la legislación aplicable en materia de protección de datos personales.</p>
-      <p style="margin-top:9px">Propuesta de sitio · Versión de trabajo · Contenidos sujetos a validación por las autoridades de la Facultad. © UNAM · FES Iztacala.</p>
+      <p style="margin-top:9px">Propuesta de sitio · Versión de trabajo · Contenidos sujetos a validación por las autoridades de la Facultad. © UNAM · FES Iztacala.
+        <a href="admin.html" style="color:var(--tinta-3);margin-left:10px">Acceso del personal</a></p>
     </div>
   </div>
 </footer>

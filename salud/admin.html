@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel · CUSMSR FES Iztacala</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="../public/assets/CUSMSR-emblem.png" type="image/png">
+<style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   PALETA
+   Marca: lila / rosa / azul (misma del sitio público).
+   Series de datos: tema categórico propio, validado con el validador de la
+   guía de visualización — las 6 comprobaciones pasan en claro y en oscuro.
+   El violeta encabeza porque es el que más se acerca al lila de la marca.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  color-scheme:light;
+  --lila-50:#F7F3FF;--lila-100:#EDE5FF;--lila-200:#DBCCFF;--lila-300:#C4AEF8;
+  --lila-400:#A98BF0;--lila-500:#8E68E4;--lila-600:#7549CE;--lila-700:#5C37A6;
+  --rosa-100:#FCE5F1;--rosa-200:#F8CCE2;--rosa-500:#D4629B;--rosa-600:#B54A80;--rosa-700:#933765;
+  --azul-50:#F0F9FE;--azul-100:#DDF0FB;--azul-200:#BFE3F6;--azul-600:#2A7BA8;--azul-700:#1E6187;
+
+  --bg:#FAF8FE; --surface-1:#FFFFFF; --surface-2:#F7F3FF;
+  --text-primary:#2A2340; --text-secondary:#544E70; --text-muted:#726A8E;
+  --line:#EEEAF7; --line-2:#E3DCF2;
+
+  /* categóricas — orden fijo, nunca cíclico */
+  --series-1:#4A3AA7; --series-2:#EDA100; --series-3:#2A78D6;
+  --series-4:#1BAF7A; --series-5:#EB6834;
+  /* secuencial: un solo tono, claro → oscuro */
+  --seq-1:#EDE5FF;--seq-2:#C4AEF8;--seq-3:#8E68E4;--seq-4:#5C37A6;--seq-5:#3A2170;
+  /* estado — reservados, nunca se reutilizan como serie */
+  --ok:#1B7F4F; --warn:#B07100; --serious:#C0562A; --critical:#B3243F;
+
+  --grid:#EDEAF6; --axis:#B9B2CE;
+  --sh-1:0 1px 3px rgba(42,35,64,.05);--sh-2:0 6px 22px rgba(42,35,64,.09);
+  --sh-3:0 18px 48px rgba(42,35,64,.14);
+  --r:14px;--r-lg:20px;--r-full:999px;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#15121F; --surface-1:#1D1930; --surface-2:#241F3B;
+  --text-primary:#F2EFFA; --text-secondary:#C3BDD8; --text-muted:#948CB0;
+  --line:#2C2645; --line-2:#372F52;
+  --series-1:#9085E9; --series-2:#C98500; --series-3:#3987E5;
+  --series-4:#199E70; --series-5:#D95926;
+  --seq-1:#2A2247;--seq-2:#41337A;--seq-3:#6B51B8;--seq-4:#9C82E8;--seq-5:#C9B6FA;
+  --ok:#37B375; --warn:#D9A521; --serious:#E5794A; --critical:#E5566F;
+  --grid:#2A2444; --axis:#5A527A;
+  --lila-50:#241F3B;--lila-100:#2C2549;--lila-700:#C4AEF8;
+  --azul-50:#1B2434;--azul-100:#22314A;--azul-700:#8FC4E8;
+  --rosa-100:#332030;--rosa-700:#F0A8C8;
+  --sh-1:0 1px 3px rgba(0,0,0,.4);--sh-2:0 6px 22px rgba(0,0,0,.45);--sh-3:0 18px 48px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);color:var(--text-secondary);
+  font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:'Playfair Display',Georgia,serif;color:var(--text-primary);line-height:1.2;font-weight:600}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+a{color:var(--lila-700)}
+img,svg{display:block;max-width:100%}
+:focus-visible{outline:3px solid var(--series-1);outline-offset:2px;border-radius:6px}
+table{border-collapse:collapse;width:100%}
+
+/* ── Acceso ─────────────────────────────────────────────── */
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;
+  background:radial-gradient(900px 500px at 20% 0%,var(--lila-100),transparent 62%),var(--bg)}
+.login-card{background:var(--surface-1);border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:34px;max-width:400px;width:100%;box-shadow:var(--sh-3)}
+.login-card img{height:78px;margin:0 auto 18px}
+.login-card h1{font-size:22px;text-align:center;margin-bottom:6px}
+.login-card p.sub{text-align:center;font-size:13.5px;color:var(--text-muted);margin-bottom:24px}
+
+/* ── Estructura ─────────────────────────────────────────── */
+#app{display:none;min-height:100vh}
+#app.on{display:grid;grid-template-columns:250px 1fr}
+aside{background:var(--surface-1);border-right:1px solid var(--line);padding:18px 14px;
+  position:sticky;top:0;height:100vh;overflow-y:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 8px 18px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.brand img{height:34px}
+.brand b{font-size:13.5px;color:var(--text-primary);line-height:1.25}
+.brand span{display:block;font-size:11px;color:var(--text-muted);font-weight:400}
+.grp{font-size:10.5px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--text-muted);padding:14px 10px 7px}
+aside nav button{display:flex;align-items:center;gap:10px;width:100%;padding:9px 11px;border-radius:10px;
+  font-size:13.5px;font-weight:500;color:var(--text-secondary);text-align:left;transition:.2s}
+aside nav button:hover{background:var(--surface-2);color:var(--text-primary)}
+aside nav button.on{background:var(--lila-100);color:var(--lila-700);font-weight:650}
+aside nav button .i{width:18px;text-align:center;flex-shrink:0;font-size:14px}
+aside nav button.lock{opacity:.35;cursor:not-allowed}
+
+main{padding:0 0 60px;min-width:0}
+.bar{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:13px 28px;
+  display:flex;align-items:center;gap:14px}
+.bar h1{font-size:19px}
+.bar .right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.chip{padding:6px 13px;border-radius:var(--r-full);font-size:12px;font-weight:650;
+  background:var(--lila-100);color:var(--lila-700)}
+.icon-btn{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;
+  justify-content:center;background:var(--surface-1);border:1px solid var(--line);font-size:15px;transition:.2s}
+.icon-btn:hover{background:var(--surface-2)}
+.wrap{padding:24px 28px;max-width:1240px}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 18px;
+  border-radius:10px;font-size:13.5px;font-weight:600;transition:.22s;border:1px solid transparent}
+.btn-1{background:var(--lila-600);color:#fff}
+.btn-1:hover{background:var(--lila-700)}
+.btn-2{background:var(--surface-1);color:var(--text-primary);border-color:var(--line-2)}
+.btn-2:hover{background:var(--surface-2)}
+.btn-d{background:transparent;color:var(--critical);border-color:var(--critical)}
+.btn-sm{padding:7px 13px;font-size:12.5px}
+
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12.5px;font-weight:650;color:var(--text-primary);margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;padding:10px 13px;border-radius:10px;
+  border:1px solid var(--line-2);font-size:14px;font-family:inherit;color:var(--text-primary);
+  background:var(--surface-1)}
+.field input:focus,.field select:focus{outline:none;border-color:var(--series-1);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--series-1) 18%,transparent)}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+
+/* ── Filtros ────────────────────────────────────────────── */
+.filters{display:flex;gap:9px;flex-wrap:wrap;align-items:center;margin-bottom:20px;
+  padding:12px 15px;background:var(--surface-1);border:1px solid var(--line);border-radius:var(--r)}
+.filters .lbl{font-size:12px;font-weight:650;color:var(--text-muted);margin-right:3px}
+.seg{display:flex;gap:3px;background:var(--surface-2);padding:3px;border-radius:9px}
+.seg button{padding:6px 12px;border-radius:7px;font-size:12.5px;font-weight:550;color:var(--text-secondary)}
+.seg button.on{background:var(--surface-1);color:var(--lila-700);font-weight:700;box-shadow:var(--sh-1)}
+
+/* ── Tarjetas ───────────────────────────────────────────── */
+.grid{display:grid;gap:16px;margin-bottom:20px}
+.g4{grid-template-columns:repeat(auto-fit,minmax(212px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(400px,1fr))}
+.card{background:var(--surface-1);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+.card.pad{padding:20px 22px}
+.tile .k{font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--text-muted);margin-bottom:9px}
+.tile .v{font-family:'Playfair Display',serif;font-size:36px;font-weight:700;color:var(--text-primary);
+  line-height:1;margin-bottom:6px;letter-spacing:-.02em}
+.tile .s{font-size:12.5px;color:var(--text-muted);line-height:1.45}
+.tile .d{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:700;margin-top:7px}
+.d.up{color:var(--ok)}.d.dn{color:var(--serious)}
+
+.chart-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:4px}
+.chart-head h3{font-family:'Inter',sans-serif;font-size:14.5px;font-weight:700;color:var(--text-primary)}
+.chart-head .why{font-size:12px;color:var(--text-muted);margin-top:3px;line-height:1.5}
+.chart-head .tools{margin-left:auto;display:flex;gap:5px;flex-shrink:0}
+.tgl{padding:5px 10px;border-radius:8px;font-size:11.5px;font-weight:650;color:var(--text-muted);
+  border:1px solid var(--line-2);background:var(--surface-1)}
+.tgl.on{background:var(--lila-100);color:var(--lila-700);border-color:transparent}
+
+.legend{display:flex;gap:15px;flex-wrap:wrap;margin:12px 0 4px}
+.legend span{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--text-secondary)}
+.legend i{width:11px;height:11px;border-radius:3px;display:block;flex-shrink:0}
+
+.tbl{margin-top:12px;font-size:13px;display:none}
+.tbl.on{display:block}
+.tbl th{text-align:left;font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--text-muted);padding:8px 10px;border-bottom:1px solid var(--line-2)}
+.tbl td{padding:8px 10px;border-bottom:1px solid var(--line);color:var(--text-secondary)}
+.tbl td:first-child{color:var(--text-primary);font-weight:600}
+.tbl tr:last-child td{border-bottom:none}
+.num{text-align:right;font-variant-numeric:tabular-nums}
+
+/* supresión por k-anonimato: se MUESTRA, no se esconde */
+.supr{display:flex;align-items:flex-start;gap:11px;background:var(--surface-2);
+  border:1px dashed var(--line-2);border-radius:11px;padding:12px 15px;font-size:12.5px;
+  color:var(--text-muted);line-height:1.55;margin-top:12px}
+.supr b{color:var(--text-secondary)}
+
+/* tooltip */
+#tip{position:fixed;z-index:200;pointer-events:none;opacity:0;transition:opacity .12s;
+  background:var(--text-primary);color:var(--surface-1);padding:9px 12px;border-radius:9px;
+  font-size:12.5px;line-height:1.5;box-shadow:var(--sh-2);max-width:250px}
+#tip.on{opacity:1}
+#tip b{display:block;font-size:13px;margin-bottom:3px}
+
+/* preguntas */
+.q{padding:15px 17px;background:var(--surface-1);border:1px solid var(--line);border-radius:var(--r);margin-bottom:11px}
+.q .txt{font-size:14.5px;color:var(--text-primary);line-height:1.55;margin-bottom:10px}
+.q .meta{display:flex;gap:9px;flex-wrap:wrap;align-items:center;font-size:11.5px;color:var(--text-muted)}
+.tag{padding:3px 10px;border-radius:var(--r-full);font-size:11px;font-weight:700;
+  background:var(--lila-100);color:var(--lila-700)}
+.tag.w{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.tag.c{background:color-mix(in srgb,var(--critical) 14%,transparent);color:var(--critical)}
+
+.note{display:flex;gap:12px;padding:15px 17px;border-radius:var(--r);font-size:13px;line-height:1.6;margin-bottom:18px}
+.note .ic{font-size:17px;flex-shrink:0}
+.note.info{background:var(--azul-50);border:1px solid var(--azul-200);color:var(--azul-700)}
+.note.lock{background:var(--lila-50);border:1px solid var(--lila-200);color:var(--lila-700)}
+.note b{display:block;margin-bottom:3px}
+
+.view{display:none}.view.on{display:block}
+.deny{text-align:center;padding:70px 20px;color:var(--text-muted)}
+.deny .big{font-size:40px;margin-bottom:14px}
+
+@media(max-width:940px){
+  #app.on{grid-template-columns:1fr}
+  aside{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}
+  aside nav{display:flex;gap:5px;overflow-x:auto}
+  aside nav button{white-space:nowrap;width:auto}
+  .grp{display:none}
+  .wrap,.bar{padding-left:18px;padding-right:18px}
+  .f2{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="tip"></div>
+
+<!-- ══════════ ACCESO ══════════ -->
+<div id="login">
+  <form class="login-card" id="loginForm">
+    <img src="../public/assets/CUSMSR-logo.png" alt="CUSMSR">
+    <h1>Panel del Centro</h1>
+    <p class="sub">Acceso para personal designado</p>
+    <div class="field">
+      <label for="lUser">Identificador o correo</label>
+      <input type="text" id="lUser" placeholder="admin@ecosistemadigital.unam.mx" autocomplete="off">
+    </div>
+    <div class="field">
+      <label for="lPass">Contraseña</label>
+      <input type="password" id="lPass" autocomplete="off">
+    </div>
+    <div class="field" id="rolDemo" style="display:none">
+      <label for="lRole">Entrar como <span style="font-weight:400;color:var(--text-muted)">(sólo en demostración)</span></label>
+      <select id="lRole">
+        <option value="admin">Administración</option>
+        <option value="coordinacion">Coordinación</option>
+        <option value="analitica">Analítica</option>
+        <option value="clinico">Equipo clínico</option>
+        <option value="docencia">Docencia</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-1" style="width:100%">Entrar</button>
+    <p style="margin-top:16px;font-size:11.5px;color:var(--text-muted);line-height:1.55;text-align:center">
+      Cada consulta al banco de preguntas queda registrada con tu identificador.
+    </p>
+  </form>
+</div>
+
+<!-- ══════════ PANEL ══════════ -->
+<div id="app">
+  <aside>
+    <div class="brand">
+      <img src="../public/assets/CUSMSR-emblem.png" alt="">
+      <b>CUSMSR<span>Panel del Centro</span></b>
+    </div>
+    <nav id="menu"></nav>
+  </aside>
+
+  <main>
+    <div class="bar">
+      <h1 id="titulo">Tablero</h1>
+      <div class="right">
+        <span class="chip" id="chipRol"></span>
+        <button class="icon-btn" id="btnTema" title="Cambiar tema">☾</button>
+        <button class="icon-btn" id="btnSalir" title="Salir">↪</button>
+      </div>
+    </div>
+    <div class="wrap" id="contenido"></div>
+  </main>
+</div>
+
+<script>
+'use strict';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const fmt=n=>new Intl.NumberFormat('es-MX').format(n);
+const pct=n=>n.toFixed(1).replace('.0','')+'%';
+const MIN_N = 10;  // espejo de cusmsr.min_n()
+
+/* ═══════════════════════════════════════════════════════════════════
+   ROLES Y PERMISOS
+   Adaptado del modelo de Aura, con una diferencia deliberada:
+   NO existe un permiso "ver_individual". No hay pantalla, ni consulta,
+   ni exportación que devuelva la fila de una persona. La continuidad
+   clínica va por el expediente; el puente lo hace la propia alumna con
+   su hoja de "preparar consulta".
+   ═══════════════════════════════════════════════════════════════════ */
+const PERMISOS = {
+  ver_agregados:       'KPIs y gráficas agregadas, siempre con k ≥ ' + MIN_N,
+  ver_preguntas:       'Banco de preguntas disociadas (único texto libre del sistema)',
+  ver_insights:        'Lecturas generadas por IA sobre los agregados',
+  exportar:            'Descargar agregados en CSV',
+  gestionar_contenido: 'Catálogos, respuestas guardadas y materiales',
+  gestionar_usuarios:  'Alta y baja de personal y sus roles',
+  gestionar_config:    'Umbral de k-anonimato, retención, parámetros',
+  gestionar_seguridad: 'Auditoría de accesos, abuso, bloqueos de red',
+};
+// Espejo de la tabla cusmsr.roles. En producción se carga con action:'roles'
+// para que el panel y la base nunca discrepen.
+const ROLES = {
+  admin: { nombre:'Administración',
+    para:'Responsable técnico y operativo del Centro',
+    desc:'Control total. Es el único que da de alta personal, cambia el umbral de k-anonimato, ajusta la retención de datos y revisa la auditoría. Ve todo lo que ven los demás.',
+    ojo:'Asígnalo a una o dos personas, no más. Quien lo tiene puede cambiar quién ve qué.',
+    permisos:Object.keys(PERMISOS) },
+  coordinacion: { nombre:'Coordinación',
+    para:'Quien coordina el programa y sus contenidos',
+    desc:'Lee los agregados y el banco de preguntas, edita las preguntas frecuentes del sitio, los mitos, los motivos de cita y los materiales. Puede exportar agregados.',
+    ojo:'Incluye lectura del banco de preguntas: texto que escribieron alumnas, aunque esté disociado.',
+    permisos:['ver_agregados','ver_preguntas','gestionar_contenido','exportar'] },
+  analitica: { nombre:'Analítica',
+    para:'Dirección, investigación o evaluación del programa',
+    desc:'Ve todas las cifras agregadas, las lecturas generadas por IA y puede exportar en CSV. No lee el texto de ninguna pregunta.',
+    ojo:'Es el rol correcto para quien pide "los números" sin necesitar leer lo que la gente escribió.',
+    permisos:['ver_agregados','ver_insights','exportar'] },
+  clinico: { nombre:'Equipo clínico',
+    para:'Personal médico, de enfermería y de psicología del Centro',
+    desc:'Ve los agregados clínicos y el banco de preguntas, que es lo que le sirve para ajustar la consejería y detectar qué se está explicando mal en consulta.',
+    ojo:'No da acceso a expedientes ni a ninguna persona en particular: eso vive en el expediente clínico, no aquí.',
+    permisos:['ver_agregados','ver_preguntas'] },
+  docencia: { nombre:'Docencia',
+    para:'Profesorado que acompaña o difunde el programa',
+    desc:'Sólo materiales educativos y contenidos del sitio. No ve cifras ni preguntas.',
+    ojo:'Es el rol más acotado a propósito. Si alguien de docencia pide ver números, el rol correcto es Analítica.',
+    permisos:['gestionar_contenido'] },
+};
+
+// ── Conexión ────────────────────────────────────────────────────────────────
+// Sin URL, el panel corre con datos de demostración.
+const CFG = { SUPABASE_URL:'https://risatbuqolklefvjgngb.supabase.co',
+              ANON_KEY:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpc2F0YnVxb2xrbGVmdmpnbmdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxNjc0MzUsImV4cCI6MjA4OTc0MzQzNX0.PTDGmpihCPd5iz8ZhbcUOMbGNuS4mi1sCD5linrVGvY',
+              FN:'cusmsr-panel' };
+const DEMO = !CFG.SUPABASE_URL;
+
+async function api(payload){
+  if (DEMO) throw new Error('demo');
+  const r = await fetch(`${CFG.SUPABASE_URL}/functions/v1/${CFG.FN}`, {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json', apikey:CFG.ANON_KEY,
+              Authorization:`Bearer ${CFG.ANON_KEY}` },
+    body: JSON.stringify({ ...payload, token: sesion.token }),
+  });
+  const d = await r.json().catch(()=>({error:'Respuesta inválida'}));
+  if (!r.ok) throw new Error(d.error || 'Algo salió mal');
+  return d;
+}
+
+// Etiquetas de los códigos que guarda la base
+const ETI = {
+  oral_combinado:'Pastillas combinadas', oral_progestina:'Pastillas de progestina',
+  inyectable_mensual:'Inyección mensual', inyectable_trimestral:'Inyección trimestral',
+  implante:'Implante subdérmico', diu_cobre:'DIU de cobre', diu_hormonal:'DIU hormonal',
+  parche:'Parche', anillo:'Anillo vaginal', condon_externo:'Condón externo',
+  condon_interno:'Condón interno', emergencia:'Anticoncepción de emergencia',
+  definitivo:'Método definitivo', ninguno:'Ninguno', otro:'Otro',
+  vih:'VIH', sifilis:'Sífilis', hepatitis_b:'Hepatitis B', hepatitis_c:'Hepatitis C',
+  clamidia_gonorrea:'Clamidia / gonorrea', papanicolaou:'Papanicolaou', vph:'VPH',
+  embarazo:'Embarazo', otra:'Otra',
+  efectos_adversos:'Efectos adversos', cambio_de_metodo:'Cambio de método',
+  busca_embarazo:'Busca embarazo', ya_no_lo_necesita:'Ya no lo necesita',
+  dificultad_de_acceso:'Dificultad de acceso', olvidos:'Olvidos',
+  anticoncepcion:'Anticoncepción', menstrual:'Salud menstrual', its:'ITS',
+  sexualidad:'Sexualidad', servicios:'Servicios',
+};
+const eti = k => ETI[k] || k;
+
+// Traduce las vistas cusmsr.v_* a la forma que usan las gráficas
+function adaptar(r){
+  const pivot = {};
+  (r.temasMes||[]).forEach(x=>{
+    const m = String(x.mes).slice(0,7);
+    (pivot[m] = pivot[m] || { m })[x.topic] = x.preguntas;
+  });
+  const e = r.embudo || {};
+  return {
+    kpis:{ registradas:r.actividad?.cuentas ?? 0, activas30:r.actividad?.activas_30d ?? 0,
+           citas:e.solicitaron_cita ?? 0, atendidas:e.fueron_atendidas ?? 0,
+           seguimiento:e.con_seguimiento ?? 0 },
+    embudo:[
+      { k:'Se registraron',            v:e.registradas ?? 0 },
+      { k:'Usan el seguimiento',       v:e.usan_seguimiento ?? 0 },
+      { k:'Solicitaron cita',          v:e.solicitaron_cita ?? 0 },
+      { k:'Fueron atendidas',          v:e.fueron_atendidas ?? 0 },
+      { k:'Con seguimiento a 3 meses', v:e.con_seguimiento ?? 0 },
+    ],
+    metodos:(r.metodos||[]).map(x=>({ k:eti(x.method), v:+x.personas })),
+    continuidad:(r.continuidad||[]).map(x=>({ k:eti(x.method), c:+x.cohorte,
+      m3:+x.pct_3m, m6:+x.pct_6m, m12:+x.pct_12m })),
+    abandono:(r.abandono||[]).map(x=>({ k:eti(x.end_reason), v:+x.casos })),
+    menstrual:{ personas:r.menstrual?.personas ?? 0, dolorSevero:+(r.menstrual?.pct_dolor_severo ?? 0),
+      faltoClase:+(r.menstrual?.pct_falto_clase ?? 0), diasProm:+(r.menstrual?.dias_perdidos_prom ?? 0),
+      ciclosProm:+(r.menstrual?.ciclos_prom ?? 0),
+      dolor:(r.dolor||[]).map(x=>({ k:x.rango, v:+x.personas })) },
+    tamizaje:(r.tamizaje||[]).map(x=>({ k:eti(x.test_type), v:+x.pruebas,
+      centro:+x.en_el_centro, venc:+x.vencidas })),
+    ventana:(r.ventana||[]).map(x=>({ m:String(x.mes).slice(0,7), e:+x.eventos, a:+x.actuaron })),
+    temasMes:Object.values(pivot).sort((a,b)=>a.m<b.m?-1:1)
+      .map(o=>({ anticoncepcion:0, menstrual:0, its:0, embarazo:0, ...o })),
+    suprimidos:(r.suprimidos||[]).map(x=>({ d:x.dimension, c:eti(x.categoria) })),
+    preguntas:[], cuarentena:[], accesos:[], abuso:[], personal:[],
+  };
+}
+let sesion = { id:null, rol:null, token:null, permisos:null };
+const puede = p => sesion.permisos ? sesion.permisos.includes(p)
+  : (sesion.rol && ROLES[sesion.rol].permisos.includes(p));
+
+const MENU = [
+  { g:'Panorama' },
+  { v:'tablero',    t:'Tablero',            i:'▦', p:'ver_agregados' },
+  { v:'embudo',     t:'Embudo de atención', i:'⇥', p:'ver_agregados' },
+  { g:'Salud' },
+  { v:'menstrual',  t:'Salud menstrual',    i:'◑', p:'ver_agregados' },
+  { v:'anticon',    t:'Anticoncepción',     i:'◈', p:'ver_agregados' },
+  { v:'its',        t:'ITS y tamizaje',     i:'◎', p:'ver_agregados' },
+  { v:'ventana',    t:'Ventana de 72 horas',i:'◔', p:'ver_agregados' },
+  { g:'Escucha' },
+  { v:'preguntas',  t:'Banco de preguntas', i:'❝', p:'ver_preguntas' },
+  { v:'cuarentena', t:'Cuarentena',         i:'⚑', p:'ver_preguntas' },
+  { v:'insights',   t:'Lecturas de IA',     i:'✦', p:'ver_insights' },
+  { g:'Operación' },
+  { v:'exportar',   t:'Exportar',           i:'↧', p:'exportar' },
+  { v:'contenido',  t:'Contenido',          i:'✎', p:'gestionar_contenido' },
+  { v:'usuarios',   t:'Personal',           i:'☰', p:'gestionar_usuarios' },
+  { v:'seguridad',  t:'Seguridad',          i:'⛨', p:'gestionar_seguridad' },
+  { v:'config',     t:'Configuración',      i:'⚙', p:'gestionar_config' },
+];
+
+/* ═══════════════════════════════════════════════════════════════════
+   DATOS DE DEMOSTRACIÓN
+   En producción esto sale de las vistas cusmsr.v_* — que ya aplican el
+   umbral en SQL, no aquí.
+   ═══════════════════════════════════════════════════════════════════ */
+const D = {
+  kpis:{ registradas:412, activas30:238, citas:186, atendidas:151, seguimiento:97 },
+  embudo:[
+    { k:'Se registraron',            v:412 },
+    { k:'Usan el seguimiento',       v:301 },
+    { k:'Solicitaron cita',          v:186 },
+    { k:'Fueron atendidas',          v:151 },
+    { k:'Con seguimiento a 3 meses', v:97  },
+  ],
+  metodos:[
+    { k:'Pastillas combinadas', v:78 }, { k:'Implante', v:64 }, { k:'Condón externo', v:52 },
+    { k:'Inyección trimestral', v:41 }, { k:'DIU hormonal', v:28 }, { k:'DIU de cobre', v:19 },
+    { k:'Parche', v:13 },
+  ],
+  continuidad:[
+    { k:'Implante',             c:64, m3:95.3, m6:89.1, m12:81.2 },
+    { k:'DIU hormonal',         c:28, m3:96.4, m6:92.9, m12:85.7 },
+    { k:'Pastillas combinadas', c:78, m3:79.5, m6:61.5, m12:44.9 },
+    { k:'Inyección trimestral', c:41, m3:82.9, m6:65.9, m12:48.8 },
+  ],
+  abandono:[
+    { k:'Efectos adversos', v:34 }, { k:'Olvidos', v:27 }, { k:'Cambio de método', v:22 },
+    { k:'Dificultad de acceso', v:14 }, { k:'Busca embarazo', v:11 },
+  ],
+  menstrual:{ personas:287, dolorSevero:41.8, faltoClase:33.4, diasProm:2.7, ciclosProm:5.2,
+    dolor:[{k:'0–2',v:38},{k:'3–4',v:52},{k:'5–6',v:76},{k:'7–8',v:79},{k:'9–10',v:42}] },
+  tamizaje:[
+    { k:'VIH', v:164, centro:141, venc:38 }, { k:'Sífilis', v:152, centro:139, venc:35 },
+    { k:'Papanicolaou', v:88, centro:71, venc:12 }, { k:'Clamidia / gonorrea', v:47, centro:44, venc:9 },
+    { k:'Hepatitis B', v:31, centro:29, venc:6 },
+  ],
+  ventana:[
+    { m:'2026-03', e:14, a:9 },{ m:'2026-04', e:19, a:13 },{ m:'2026-05', e:17, a:13 },
+    { m:'2026-06', e:23, a:18 },{ m:'2026-07', e:21, a:17 },{ m:'2026-08', e:26, a:22 },
+  ],
+  temasMes:[
+    { m:'2026-03', anticoncepcion:61, menstrual:48, its:29, embarazo:17 },
+    { m:'2026-04', anticoncepcion:74, menstrual:52, its:35, embarazo:21 },
+    { m:'2026-05', anticoncepcion:69, menstrual:71, its:33, embarazo:19 },
+    { m:'2026-06', anticoncepcion:88, menstrual:58, its:47, embarazo:26 },
+    { m:'2026-07', anticoncepcion:81, menstrual:54, its:52, embarazo:23 },
+    { m:'2026-08', anticoncepcion:96, menstrual:63, its:58, embarazo:31 },
+  ],
+  suprimidos:[
+    { d:'Método anticonceptivo', c:'Anillo vaginal' },
+    { d:'Método anticonceptivo', c:'Condón interno' },
+    { d:'Tamizaje', c:'Hepatitis C' },
+  ],
+  preguntas:[
+    { id:1, q:'Si tomo la pastilla y vomito a los 20 minutos, ¿cuenta como tomada?', t:'anticoncepcion', d:'2026-08-16', ok:true },
+    { id:2, q:'¿El implante engorda? Una amiga dice que subió mucho de peso.', t:'anticoncepcion', d:'2026-08-16', ok:true },
+    { id:3, q:'¿Cada cuánto me tengo que hacer la prueba de VIH si tengo la misma pareja?', t:'its', d:'2026-08-15', ok:true },
+    { id:4, q:'Me duele muchísimo al tener relaciones, ¿eso es normal?', t:'sexualidad', d:'2026-08-15', ok:false },
+    { id:5, q:'¿El DIU se puede mover si hago ejercicio pesado?', t:'anticoncepcion', d:'2026-08-14', ok:true },
+    { id:6, q:'¿Puedo ir aunque no tenga vida sexual todavía?', t:'servicios', d:'2026-08-14', ok:true },
+    { id:7, q:'Llevo 3 meses sin que me baje y no he tenido relaciones, ¿qué puede ser?', t:'menstrual', d:'2026-08-13', ok:false },
+    { id:8, q:'¿La prueba de VPH duele? Me da miedo el Papanicolaou.', t:'its', d:'2026-08-13', ok:true },
+    { id:9, q:'¿Puedo usar dos métodos a la vez sin problema?', t:'anticoncepcion', d:'2026-08-12', ok:true },
+    { id:10,q:'¿Qué pasa si se me olvidan dos pastillas seguidas?', t:'anticoncepcion', d:'2026-08-12', ok:true },
+  ],
+  cuarentena:[
+    { id:101, q:'Soy de optometría, semestre 7 y llevo 4 meses con el implante…', r:'carrera + semestre', d:'2026-08-16' },
+    { id:102, q:'Mi número de cuenta es 42105478, ¿pueden ver mi expediente?', r:'posible numero de cuenta', d:'2026-08-15' },
+    { id:103, q:'Mi novio Carlos dice que no hace falta condón si ya tomo pastillas', r:'nombre de tercero', d:'2026-08-14' },
+  ],
+  accesos:[
+    { a:'clinico.ssr01',  ac:'consulta banco de preguntas', n:24, t:'2026-08-17 11:42' },
+    { a:'coordinacion.ssr', ac:'exportó agregados de anticoncepción', n:8, t:'2026-08-17 09:15' },
+    { a:'clinico.ssr01',  ac:'revisó cuarentena', n:3, t:'2026-08-16 17:03' },
+    { a:'analitica.dir',  ac:'consultó tablero', n:1, t:'2026-08-16 12:20' },
+  ],
+  abuso:[
+    { s:'a3f9…c21b', k:'inyeccion de prompt', n:3, t:'2026-08-17 14:22' },
+    { s:'7d12…89ef', k:'fuera de alcance repetido', n:5, t:'2026-08-16 20:11' },
+    { s:'b8e4…10aa', k:'ofuscacion base64', n:1, t:'2026-08-15 08:47' },
+  ],
+  personal:[
+    { id:'admin.ssr',       rol:'admin',        alta:'2026-05-02', visto:'2026-08-18 09:12', activo:true },
+    { id:'coordinacion.ssr',rol:'coordinacion', alta:'2026-06-11', visto:'2026-08-17 09:15', activo:true },
+    { id:'clinico.ssr01',   rol:'clinico',      alta:'2026-06-11', visto:'2026-08-17 11:42', activo:true },
+    { id:'analitica.dir',   rol:'analitica',    alta:'2026-07-01', visto:'2026-08-16 12:20', activo:true },
+    { id:'clinico.ssr02',   rol:'clinico',      alta:'2026-07-20', visto:null,               activo:false },
+  ],
+};
+
+// M es lo que pintan las vistas: demostración, o lo que devuelve la API.
+let M = D;
+
+/* ═══════════════════════════════════════════════════════════════════
+   PIEZAS DE GRÁFICA  (SVG a mano, sin librerías)
+   Marcas delgadas, extremos redondeados de 4px anclados a la línea base,
+   rejilla discreta, etiquetas directas, y siempre una vista de tabla.
+   ═══════════════════════════════════════════════════════════════════ */
+const tip=$('#tip');
+function tipOn(e,html){ tip.innerHTML=html; tip.classList.add('on');
+  const r=tip.getBoundingClientRect();
+  tip.style.left=Math.min(innerWidth-r.width-10, e.clientX+14)+'px';
+  tip.style.top=Math.max(10, e.clientY-r.height-12)+'px'; }
+function tipOff(){ tip.classList.remove('on'); }
+
+let uid=0;
+function bloque({titulo,porque,svg,tabla,legend,extra}){
+  const id='c'+(++uid);
+  return `<div class="card pad">
+    <div class="chart-head">
+      <div><h3>${titulo}</h3>${porque?`<p class="why">${porque}</p>`:''}</div>
+      <div class="tools">
+        <button class="tgl on" data-mode="g" data-t="${id}">Gráfica</button>
+        <button class="tgl" data-mode="t" data-t="${id}">Tabla</button>
+      </div>
+    </div>
+    ${legend||''}
+    <div id="${id}-g">${svg}</div>
+    <div id="${id}-t" class="tbl">${tabla}</div>
+    ${extra||''}
+  </div>`;
+}
+function tabla(cols, filas){
+  return `<table><thead><tr>${cols.map((c,i)=>`<th class="${i?'num':''}">${c}</th>`).join('')}</tr></thead>
+    <tbody>${filas.map(f=>`<tr>${f.map((c,i)=>`<td class="${i?'num':''}">${c}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+}
+
+// Barras horizontales — una sola serie, etiqueta directa en cada barra
+function barrasH(datos, {color='var(--series-1)', unidad=''}={}){
+  const max=Math.max(...datos.map(d=>d.v)), h=34, W=760, L=178, R=64;
+  const alto=datos.length*h+8;
+  return `<svg viewBox="0 0 ${W} ${alto}" style="width:100%;height:auto" role="img">
+    ${datos.map((d,i)=>{
+      const y=i*h+7, w=Math.max(3,(d.v/max)*(W-L-R));
+      return `<g class="hit" data-tip="<b>${d.k}</b>${fmt(d.v)}${unidad}">
+        <text x="${L-12}" y="${y+13}" text-anchor="end" font-size="12.5" fill="var(--text-secondary)">${d.k}</text>
+        <rect x="${L}" y="${y}" width="${w}" height="19" rx="4" fill="${color}"/>
+        <text x="${L+w+9}" y="${y+13.5}" font-size="12" font-weight="700" fill="var(--text-primary)"
+          font-variant-numeric="tabular-nums">${fmt(d.v)}${unidad}</text>
+        <rect x="0" y="${y-3}" width="${W}" height="25" fill="transparent"/></g>`;
+    }).join('')}</svg>`;
+}
+
+// Barras agrupadas — varias series, con leyenda
+function barrasG(datos, series){
+  const W=760,H=260,L=44,B=54,T=14,R=12;
+  const gw=(W-L-R)/datos.length, bw=Math.min(21,(gw-16)/series.length);
+  const max=100;
+  const y=v=>T+(H-T-B)*(1-v/max);
+  const ticks=[0,25,50,75,100];
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" role="img">
+    ${ticks.map(t=>`<g><line x1="${L}" x2="${W-R}" y1="${y(t)}" y2="${y(t)}" stroke="var(--grid)" stroke-width="1"/>
+      <text x="${L-9}" y="${y(t)+4}" text-anchor="end" font-size="11" fill="var(--text-muted)">${t}%</text></g>`).join('')}
+    ${datos.map((d,i)=>{
+      const x0=L+i*gw+(gw-bw*series.length-4*(series.length-1))/2;
+      return series.map((s,j)=>{
+        const v=d[s.k], x=x0+j*(bw+4), yy=y(v);
+        return `<g class="hit" data-tip="<b>${d.k}</b>${s.t}: ${pct(v)} · cohorte ${d.c}">
+          <rect x="${x}" y="${yy}" width="${bw}" height="${y(0)-yy}" rx="4" fill="${s.c}"/></g>`;
+      }).join('') +
+      `<text x="${L+i*gw+gw/2}" y="${H-B+20}" text-anchor="middle" font-size="11.5"
+         fill="var(--text-secondary)">${d.k.length>17?d.k.slice(0,16)+'…':d.k}</text>
+       <text x="${L+i*gw+gw/2}" y="${H-B+35}" text-anchor="middle" font-size="10.5"
+         fill="var(--text-muted)">n=${d.c}</text>`;
+    }).join('')}
+    <line x1="${L}" x2="${W-R}" y1="${y(0)}" y2="${y(0)}" stroke="var(--axis)" stroke-width="1"/></svg>`;
+}
+
+// Líneas — varias series, con marcadores y leyenda
+function lineas(datos, series, campoX='m'){
+  const W=760,H=250,L=42,B=38,T=14,R=14;
+  const max=Math.ceil(Math.max(...datos.flatMap(d=>series.map(s=>d[s.k])))/20)*20;
+  const x=i=>L+(W-L-R)*(datos.length===1?0.5:i/(datos.length-1));
+  const y=v=>T+(H-T-B)*(1-v/max);
+  const ticks=[0,max/4,max/2,max*3/4,max];
+  const mes=m=>['','ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][+m.slice(5,7)];
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" role="img">
+    ${ticks.map(t=>`<g><line x1="${L}" x2="${W-R}" y1="${y(t)}" y2="${y(t)}" stroke="var(--grid)" stroke-width="1"/>
+      <text x="${L-9}" y="${y(t)+4}" text-anchor="end" font-size="11" fill="var(--text-muted)">${t}</text></g>`).join('')}
+    ${datos.map((d,i)=>`<text x="${x(i)}" y="${H-B+21}" text-anchor="middle" font-size="11.5"
+       fill="var(--text-secondary)">${mes(d[campoX])}</text>`).join('')}
+    ${series.map(s=>`<polyline fill="none" stroke="${s.c}" stroke-width="2" stroke-linecap="round"
+       stroke-linejoin="round" points="${datos.map((d,i)=>`${x(i)},${y(d[s.k])}`).join(' ')}"/>`).join('')}
+    ${series.map(s=>datos.map((d,i)=>`<circle cx="${x(i)}" cy="${y(d[s.k])}" r="4.5" fill="${s.c}"
+       stroke="var(--surface-1)" stroke-width="2"/>`).join('')).join('')}
+    ${series.map(s=>{const d=datos[datos.length-1];
+       return `<text x="${x(datos.length-1)+8}" y="${y(d[s.k])+4}" font-size="11.5" font-weight="700"
+         fill="var(--text-primary)">${d[s.k]}</text>`;}).join('')}
+    ${datos.map((d,i)=>`<rect class="hit" x="${x(i)-((W-L-R)/datos.length)/2}" y="${T}"
+       width="${(W-L-R)/datos.length}" height="${H-T-B}" fill="transparent"
+       data-tip="<b>${mes(d[campoX])}</b>${series.map(s=>`${s.t}: ${d[s.k]}`).join('<br>')}"/>`).join('')}
+    <line x1="${L}" x2="${W-R}" y1="${y(0)}" y2="${y(0)}" stroke="var(--axis)" stroke-width="1"/></svg>`;
+}
+
+// Embudo — una serie, con la caída entre pasos
+function embudo(datos){
+  const W=760,h=52,max=datos[0].v;
+  return `<svg viewBox="0 0 ${W} ${datos.length*h+6}" style="width:100%;height:auto" role="img">
+    ${datos.map((d,i)=>{
+      const y=i*h+6, w=(d.v/max)*(W-250), prev=i?datos[i-1].v:null;
+      const caida=prev?Math.round((1-d.v/prev)*100):null;
+      return `<g class="hit" data-tip="<b>${d.k}</b>${fmt(d.v)} personas${caida!==null?` · ${caida}% menos que el paso anterior`:''}">
+        <text x="0" y="${y+21}" font-size="13" fill="var(--text-secondary)">${d.k}</text>
+        <rect x="190" y="${y+6}" width="${Math.max(4,w)}" height="26" rx="4" fill="var(--seq-${5-i>0?5-i:1})"/>
+        <text x="${190+Math.max(4,w)+10}" y="${y+24}" font-size="13.5" font-weight="700"
+          fill="var(--text-primary)" font-variant-numeric="tabular-nums">${fmt(d.v)}</text>
+        ${caida!==null?`<text x="${W-4}" y="${y+24}" text-anchor="end" font-size="12" font-weight="650"
+          fill="${caida>=40?'var(--serious)':'var(--text-muted)'}">−${caida}%</text>`:''}
+        <rect x="0" y="${y}" width="${W}" height="${h-4}" fill="transparent"/></g>`;
+    }).join('')}</svg>`;
+}
+
+function leyenda(series){
+  return `<div class="legend">${series.map(s=>`<span><i style="background:${s.c}"></i>${s.t}</span>`).join('')}</div>`;
+}
+function nSuprimidos(lista){
+  if(!lista.length) return '';
+  return `<div class="supr"><span>⊘</span><div><b>${lista.length} categoría(s) oculta(s) por el umbral de k-anonimato.</b>
+    ${lista.map(s=>s.c).join(' · ')}.
+    Se nombran para que sepas que existen y no leas la gráfica como si fuera todo — pero el
+    conteo no se muestra: por debajo de ${MIN_N} personas una celda puede identificar a alguien.</div></div>`;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   VISTAS
+   ═══════════════════════════════════════════════════════════════════ */
+const SER_CONT=[{k:'m3',t:'3 meses',c:'var(--series-1)'},{k:'m6',t:'6 meses',c:'var(--series-2)'},
+                {k:'m12',t:'12 meses',c:'var(--series-3)'}];
+const SER_TEMAS=[{k:'anticoncepcion',t:'Anticoncepción',c:'var(--series-1)'},
+                 {k:'menstrual',t:'Salud menstrual',c:'var(--series-2)'},
+                 {k:'its',t:'ITS',c:'var(--series-3)'},
+                 {k:'embarazo',t:'Embarazo',c:'var(--series-4)'}];
+const SER_VENT=[{k:'e',t:'Eventos registrados',c:'var(--series-1)'},
+                {k:'a',t:'Acudieron a tiempo',c:'var(--series-4)'}];
+
+const filtros = p => `<div class="filters">
+  <span class="lbl">Periodo</span>
+  <div class="seg"><button class="on">6 meses</button><button>12 meses</button><button>Todo</button></div>
+  <span class="lbl" style="margin-left:8px">Área</span>
+  <div class="seg"><button class="on">Todas</button><button>Salud</button><button>Biológicas</button><button>Sociales</button></div>
+  ${p?`<span style="margin-left:auto;font-size:11.5px;color:var(--text-muted)">${p}</span>`:''}
+</div>`;
+
+const VISTAS = {
+  tablero: () => `
+    ${filtros('Datos al 18 de agosto de 2026')}
+    <div class="grid g4">
+      ${[['Cuentas creadas',fmt(M.kpis.registradas),'desde la apertura','up','+14% vs. mes previo'],
+         ['Activas (30 días)',fmt(M.kpis.activas30),'entraron al menos una vez','up','+9%'],
+         ['Citas solicitadas',fmt(M.kpis.citas),'a través del portal','up','+22%'],
+         ['Con seguimiento',fmt(M.kpis.seguimiento),'respondieron a 3 o 6 meses','dn','−6%']]
+        .map(([k,v,s,d,dt])=>`<div class="card tile"><div class="k">${k}</div><div class="v">${v}</div>
+          <div class="s">${s}</div><div class="d ${d}">${d==='up'?'▲':'▼'} ${dt}</div></div>`).join('')}
+    </div>
+    <div class="grid g2">
+      ${bloque({ titulo:'De qué preguntan, mes a mes',
+        porque:'Los temas que suben te dicen qué reforzar en la próxima campaña — y qué no está cubriendo el plan de estudios.',
+        legend:leyenda(SER_TEMAS), svg:lineas(M.temasMes,SER_TEMAS),
+        tabla:tabla(['Mes',...SER_TEMAS.map(s=>s.t)], M.temasMes.map(d=>[d.m,...SER_TEMAS.map(s=>d[s.k])])) })}
+      ${bloque({ titulo:'Métodos anticonceptivos en uso',
+        porque:'La mezcla dice si la consejería está ofreciendo todo el abanico o empujando a lo de siempre.',
+        svg:barrasH(M.metodos), tabla:tabla(['Método','Personas'], M.metodos.map(d=>[d.k,fmt(d.v)])),
+        extra:nSuprimidos(M.suprimidos.filter(s=>s.d==='Método anticonceptivo')) })}
+    </div>`,
+
+  embudo: () => `
+    ${filtros()}
+    <div class="note info"><span class="ic">◔</span><div><b>Dónde se cae la gente</b>
+      Este es el tablero que más debería mover decisiones. Un salto grande entre dos pasos
+      señala un problema concreto: si caen entre "solicitó cita" y "fue atendida", el problema
+      es la agenda; si caen entre "atendida" y "seguimiento", el problema es el cierre de la consulta.</div></div>
+    ${bloque({ titulo:'Del registro al seguimiento', porque:'Cada barra es una persona distinta, no una visita.',
+      svg:embudo(M.embudo),
+      tabla:tabla(['Paso','Personas','Caída'], M.embudo.map((d,i)=>[d.k,fmt(d.v),
+        i?`−${Math.round((1-d.v/M.embudo[i-1].v)*100)}%`:'—'])) })}`,
+
+  menstrual: () => `
+    ${filtros()}
+    <div class="grid g4">
+      ${[['Con registro de ciclo',fmt(M.menstrual.personas),'últimos 12 meses'],
+         ['Dolor severo (≥7/10)',pct(M.menstrual.dolorSevero),'de quienes registran'],
+         ['Faltó a clase',pct(M.menstrual.faltoClase),'al menos un ciclo'],
+         ['Días perdidos',M.menstrual.diasProm,'promedio por persona al año']]
+        .map(([k,v,s])=>`<div class="card tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join('')}
+    </div>
+    <div class="note info"><span class="ic">◑</span><div><b>Contra la línea base del proyecto</b>
+      El estudio en 2,154 universitarias mexicanas reportó 78.9% con dolor menstrual y sólo 28.4%
+      consultando. Estas cifras son de tu propia población y autoreportadas, así que no son
+      comparables punto a punto — pero sí sirven para ver si la brecha se cierra con el tiempo.</div></div>
+    ${bloque({ titulo:'Distribución del dolor máximo por ciclo',
+      porque:'Si la masa está a la derecha, la consejería analgésica no está funcionando.',
+      svg:barrasH(M.menstrual.dolor,{color:'var(--series-2)',unidad:' pers.'}),
+      tabla:tabla(['Dolor (0–10)','Personas'], M.menstrual.dolor.map(d=>[d.k,fmt(d.v)])) })}`,
+
+  anticon: () => `
+    ${filtros()}
+    ${bloque({ titulo:'Continuidad del método', legend:leyenda(SER_CONT),
+      porque:'El indicador comprometido en el proyecto es ≥ 70% a los 6 meses. Los métodos de larga duración lo cumplen; los de toma diaria no.',
+      svg:barrasG(M.continuidad,SER_CONT),
+      tabla:tabla(['Método','Cohorte','3 meses','6 meses','12 meses'],
+        M.continuidad.map(d=>[d.k,d.c,pct(d.m3),pct(d.m6),pct(d.m12)])) })}
+    <div class="grid g2" style="margin-top:16px">
+      ${bloque({ titulo:'Por qué dejan el método',
+        porque:'Distingue si el problema es clínico (efectos), de consejería (olvidos) o de abasto (acceso).',
+        svg:barrasH(M.abandono,{color:'var(--series-5)'}),
+        tabla:tabla(['Motivo','Casos'], M.abandono.map(d=>[d.k,fmt(d.v)])) })}
+      ${bloque({ titulo:'Métodos en uso', svg:barrasH(M.metodos),
+        tabla:tabla(['Método','Personas'], M.metodos.map(d=>[d.k,fmt(d.v)])),
+        extra:nSuprimidos(M.suprimidos.filter(s=>s.d==='Método anticonceptivo')) })}
+    </div>`,
+
+  its: () => `
+    ${filtros()}
+    ${bloque({ titulo:'Pruebas registradas y rezago',
+      porque:'"Vencidas" son las que ya pasaron su fecha de repetición. Es la cifra que justifica una jornada de tamizaje.',
+      svg:barrasH(M.tamizaje,{color:'var(--series-3)'}),
+      tabla:tabla(['Prueba','Total','En el Centro','Vencidas'],
+        M.tamizaje.map(d=>[d.k,fmt(d.v),fmt(d.centro),fmt(d.venc)])),
+      extra:nSuprimidos(M.suprimidos.filter(s=>s.d==='Tamizaje')) })}`,
+
+  ventana: () => `
+    ${filtros()}
+    <div class="note info"><span class="ic">◔</span><div><b>El indicador más duro del sistema</b>
+      Cuántas personas registraron una exposición de riesgo y cuántas efectivamente acudieron
+      dentro de las 72 horas. La diferencia entre las dos líneas es gente que no llegó a tiempo.</div></div>
+    ${bloque({ titulo:'Eventos de riesgo y respuesta', legend:leyenda(SER_VENT),
+      svg:lineas(M.ventana,SER_VENT),
+      tabla:tabla(['Mes','Eventos','Acudieron','% a tiempo'],
+        M.ventana.map(d=>[d.m,d.e,d.a,pct(d.a/d.e*100)])) })}`,
+
+  preguntas: () => `
+    <div class="note lock"><span class="ic">⛨</span><div><b>Único texto libre que este panel muestra</b>
+      Estas preguntas no tienen código, ni hora, ni vínculo con el hilo de conversación: la tabla
+      donde viven no tiene ninguna columna que se pueda unir con una persona. Sólo entran si quien
+      preguntó dio su consentimiento y si pasaron el depurador de identificadores.
+      <b style="display:inline;font-weight:700">Tu consulta a esta sección quedó registrada.</b></div></div>
+    ${filtros()}
+    <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px">
+      ${['todas','anticoncepcion','menstrual','its','sexualidad','servicios'].map((t,i)=>
+        `<button class="tgl ${i?'':'on'}" data-qf="${t}">${t}</button>`).join('')}
+      <button class="tgl" data-qf="sin-respuesta" style="margin-left:auto">sin buena respuesta</button>
+    </div>
+    <div id="listaQ"></div>`,
+
+  cuarentena: () => `
+    <div class="note lock"><span class="ic">⚑</span><div><b>Preguntas que el depurador detuvo</b>
+      Contienen algo que parece identificar a una persona. No entran al banco hasta que alguien
+      las revise. Lo correcto casi siempre es <b style="display:inline;font-weight:700">descartar</b>:
+      el valor de una pregunta suelta nunca compensa el riesgo de reidentificar a quien la escribió.</div></div>
+    ${M.cuarentena.map(c=>`<div class="q">
+      <div class="txt">${c.q}</div>
+      <div class="meta"><span class="tag c">${c.r}</span><span>${c.d}</span>
+        <span style="margin-left:auto;display:flex;gap:7px">
+          <button class="btn btn-2 btn-sm">Limpiar y publicar</button>
+          <button class="btn btn-d btn-sm">Descartar</button></span></div></div>`).join('')}`,
+
+  insights: () => `
+    <div class="note info"><span class="ic">✦</span><div><b>Lecturas generadas sobre los agregados</b>
+      La IA sólo ve las mismas cifras que tú, nunca datos individuales. Son hipótesis para discutir
+      en reunión, no conclusiones.</div></div>
+    ${[['Los métodos de toma diaria pierden a la mitad de sus usuarias antes del año',
+        'Pastillas combinadas cae a 44.9% a 12 meses contra 81.2% del implante. Con 78 personas en pastillas, el cambio de método más ofrecido en consejería podría mover el indicador global de continuidad más que cualquier campaña.'],
+       ['Las preguntas sobre ITS crecen el doble de rápido que las de anticoncepción',
+        'ITS pasó de 29 a 58 preguntas mensuales (+100%) mientras anticoncepción creció 57%. Coincide con 38 pruebas de VIH vencidas. Sugiere programar una jornada de tamizaje antes que una campaña de métodos.'],
+       ['La mayor caída del embudo está entre la cita solicitada y la atendida',
+        '186 solicitaron, 151 llegaron: 19% no concreta. Es la única transición con caída mayor a la esperada. Vale revisar el tiempo entre solicitud y fecha asignada antes de asumir que es desinterés.']]
+      .map(([t,d])=>`<div class="card pad" style="margin-bottom:14px">
+        <h3 style="font-family:Inter,sans-serif;font-size:15px;font-weight:700;margin-bottom:8px">${t}</h3>
+        <p style="font-size:13.5px;line-height:1.65">${d}</p></div>`).join('')}`,
+
+  exportar: () => `
+    <div class="note info"><span class="ic">↧</span><div><b>Sólo agregados</b>
+      Los archivos contienen exactamente lo que ves en las gráficas, con el mismo umbral de
+      k-anonimato aplicado. No existe una exportación con filas individuales.</div></div>
+    <div class="grid g2">
+      ${[['Métodos y continuidad','Mezcla vigente, continuidad a 3/6/12 meses y motivos de abandono'],
+         ['Salud menstrual','Distribución de dolor, ausentismo y días perdidos'],
+         ['Tamizaje','Pruebas por tipo, cobertura y rezago'],
+         ['Embudo y demanda','Pasos del embudo y solicitudes por motivo y mes'],
+         ['Temas preguntados','Conteo mensual por tema, sin el texto de las preguntas'],
+         ['Banco de preguntas','Texto disociado. Requiere permiso de banco de preguntas.']]
+        .map(([t,d])=>`<div class="card pad" style="display:flex;gap:14px;align-items:flex-start">
+          <div style="flex:1"><h3 style="font-family:Inter,sans-serif;font-size:14.5px;font-weight:700;margin-bottom:5px">${t}</h3>
+          <p style="font-size:12.5px;color:var(--text-muted);line-height:1.5">${d}</p></div>
+          <button class="btn btn-2 btn-sm">CSV</button></div>`).join('')}
+    </div>`,
+
+  contenido: () => `
+    <div class="note info"><span class="ic">✎</span><div><b>Lo que ve la comunidad</b>
+      Preguntas frecuentes del sitio, mitos, catálogos de motivos de cita y materiales educativos.</div></div>
+    <div class="grid g2">
+      ${[['Preguntas frecuentes','14 publicadas'],['Mitos y realidades','8 publicados'],
+         ['Motivos de cita','6 códigos activos'],['Respuestas guardadas','Textos que PUM-AI usa como base'],
+         ['Materiales educativos','Guías descargables'],['Avisos del sitio','Horarios, ubicación, teléfonos']]
+        .map(([t,d])=>`<div class="card pad" style="display:flex;gap:14px;align-items:center">
+          <div style="flex:1"><h3 style="font-family:Inter,sans-serif;font-size:14.5px;font-weight:700">${t}</h3>
+          <p style="font-size:12.5px;color:var(--text-muted)">${d}</p></div>
+          <button class="btn btn-2 btn-sm">Editar</button></div>`).join('')}
+    </div>`,
+
+  usuarios: () => `
+    <div class="note lock"><span class="ic">☰</span><div><b>Ningún rol puede ver a una persona</b>
+      La tabla de permisos de abajo no incluye "ver individual" y no es un olvido: no existe
+      pantalla, consulta ni exportación que devuelva la fila de una alumna. Además, el rol de
+      base de datos con el que se conecta este panel <b style="display:inline;font-weight:700">no
+      tiene permiso de Postgres</b> sobre las tablas individuales — aunque alguien programara la
+      consulta, la base la rechaza.</div></div>
+
+    <h3 style="font-family:Inter,sans-serif;font-size:15px;font-weight:700;color:var(--text-primary);margin-bottom:4px">
+      Qué rol le toca a cada quien</h3>
+    <p style="font-size:13px;color:var(--text-muted);margin-bottom:14px">
+      Asigna el rol más acotado que le sirva a la persona. Un rol de más aquí no es un detalle de
+      permisos: es alguien leyendo preguntas de salud sexual que no necesitaba leer.</p>
+    <div class="grid g2" style="margin-bottom:22px">
+      ${Object.entries(ROLES).map(([k,r])=>`
+        <div class="card pad" style="border-left:3px solid var(--series-${
+          {admin:1,coordinacion:2,analitica:3,clinico:4,docencia:5}[k]})">
+          <div style="display:flex;align-items:baseline;gap:9px;margin-bottom:3px">
+            <h3 style="font-family:Inter,sans-serif;font-size:15px;font-weight:700">${r.nombre}</h3>
+            <code style="font-size:11px;color:var(--text-muted);font-family:ui-monospace,monospace">${k}</code>
+          </div>
+          <p style="font-size:12.5px;font-weight:650;color:var(--text-secondary);margin-bottom:8px">${r.para}</p>
+          <p style="font-size:13px;line-height:1.6;margin-bottom:10px">${r.desc}</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+            ${r.permisos.map(pp=>`<span class="tag" style="font-size:10.5px">${pp.replace(/_/g,' ')}</span>`).join('')}
+          </div>
+          <p style="font-size:12px;color:var(--warn);line-height:1.55;display:flex;gap:7px">
+            <span>⚠</span><span>${r.ojo}</span></p>
+        </div>`).join('')}
+    </div>
+
+    <div class="card pad" style="margin-bottom:18px">
+      <h3 style="font-family:Inter,sans-serif;font-size:14.5px;font-weight:700;margin-bottom:12px">
+        Dar de alta o editar</h3>
+      <div class="f2">
+        <div class="field"><label for="uLabel">Identificador funcional</label>
+          <input type="text" id="uLabel" placeholder="clinico.ssr02" autocomplete="off">
+          <p style="font-size:11.5px;color:var(--text-muted);margin-top:6px;line-height:1.5">
+            Minúsculas, números, punto y guion. <b>No uses el nombre completo</b>: la bitácora de
+            accesos se lee en reuniones y no necesita exponer a la persona.</p></div>
+        <div class="field"><label for="uRol">Rol</label>
+          <select id="uRol">${Object.entries(ROLES).map(([k,r])=>
+            `<option value="${k}">${r.nombre} — ${r.para}</option>`).join('')}</select>
+          <div id="uRolInfo" style="margin-top:9px;padding:11px 13px;background:var(--surface-2);
+               border-radius:10px;font-size:12.5px;line-height:1.55"></div></div>
+      </div>
+      <div class="f2">
+        <div class="field"><label for="uPass">Contraseña</label>
+          <input type="password" id="uPass" autocomplete="new-password">
+          <p style="font-size:11.5px;color:var(--text-muted);margin-top:6px">Mínimo 10 caracteres. Déjala vacía al editar para conservarla.</p></div>
+        <div class="field"><label for="uActivo">Estado</label>
+          <select id="uActivo"><option value="true">Activo</option><option value="false">Suspendido</option></select></div>
+      </div>
+      <button class="btn btn-1 btn-sm" id="uGuardar">Guardar</button>
+      <span id="uMsg" style="margin-left:12px;font-size:13px"></span>
+    </div>
+
+    <div class="card pad" style="margin-bottom:18px">
+      <h3 style="font-family:Inter,sans-serif;font-size:14.5px;font-weight:700;margin-bottom:12px">Personal con acceso</h3>
+      <table style="font-size:13.5px">
+        <thead><tr><th>Identificador</th><th>Rol</th><th>Alta</th><th>Última entrada</th><th>Estado</th><th></th></tr></thead>
+        <tbody>${M.personal.map(u=>`<tr>
+          <td style="font-family:ui-monospace,monospace;font-size:12.5px;color:var(--text-primary)">${u.id}</td>
+          <td>${ROLES[u.rol]?ROLES[u.rol].nombre:u.rol}</td>
+          <td style="color:var(--text-muted)">${u.alta}</td>
+          <td style="color:var(--text-muted)">${u.visto||'—'}</td>
+          <td>${u.activo?'<span class="tag">activo</span>':'<span class="tag w">suspendido</span>'}</td>
+          <td style="text-align:right"><button class="btn btn-2 btn-sm" data-edit="${u.id}" data-rol="${u.rol}">Editar</button></td></tr>`).join('')}
+        </tbody></table>
+    </div>
+
+    <div class="card pad">
+      <h3 style="font-family:Inter,sans-serif;font-size:14.5px;font-weight:700;margin-bottom:4px">Matriz de permisos</h3>
+      <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:14px">Los permisos se suman; ninguno otorga acceso individual.</p>
+      <div style="overflow-x:auto"><table style="font-size:12.5px;min-width:640px">
+        <thead><tr><th>Permiso</th>${Object.keys(ROLES).map(r=>`<th class="num">${ROLES[r].nombre}</th>`).join('')}</tr></thead>
+        <tbody>${Object.entries(PERMISOS).map(([pp,d])=>`<tr>
+          <td><b style="color:var(--text-primary)">${pp.replace(/_/g,' ')}</b><br>
+            <span style="font-weight:400;color:var(--text-muted);font-size:11.5px">${d}</span></td>
+          ${Object.keys(ROLES).map(r=>`<td class="num" style="font-size:15px">${
+            ROLES[r].permisos.includes(pp)?'<span style="color:var(--ok)">●</span>':'<span style="color:var(--line-2)">○</span>'}</td>`).join('')}
+        </tr>`).join('')}
+        <tr style="background:color-mix(in srgb,var(--critical) 6%,transparent)">
+          <td><b style="color:var(--critical)">ver individual</b><br>
+            <span style="font-weight:400;color:var(--text-muted);font-size:11.5px">Buscar por código y leer el registro de una persona · <b style="display:inline">este permiso no existe en el sistema</b></span></td>
+          ${Object.keys(ROLES).map(()=>'<td class="num" style="font-size:15px;color:var(--line-2)">○</td>').join('')}
+        </tr></tbody></table></div>
+    </div>`,
+
+  seguridad: () => `
+    <div class="grid g4">
+      ${[['Accesos al banco','36','en los últimos 7 días'],['Intentos de abuso','9','por sesión, nunca por persona'],
+         ['Conexiones bloqueadas','2','por registros automatizados'],['Umbral k vigente',MIN_N,'aplicado en SQL']]
+        .map(([k,v,s])=>`<div class="card tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join('')}
+    </div>
+    <div class="card pad" style="margin-bottom:16px">
+      <h3 style="font-family:Inter,sans-serif;font-size:14.5px;font-weight:700;margin-bottom:4px">Bitácora de accesos del personal</h3>
+      <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:12px">
+        Cada lectura del banco de preguntas queda registrada. No es desconfianza: es lo que protege
+        al personal si alguien alguna vez reclama una filtración.</p>
+      <table style="font-size:13px"><thead><tr><th>Quién</th><th>Qué hizo</th><th class="num">Filas</th><th class="num">Cuándo</th></tr></thead>
+        <tbody>${M.accesos.map(a=>`<tr>
+          <td style="font-family:ui-monospace,monospace;font-size:12px">${a.a}</td><td>${a.ac}</td>
+          <td class="num">${a.n}</td><td class="num" style="color:var(--text-muted)">${a.t}</td></tr>`).join('')}
+        </tbody></table>
+    </div>
+    <div class="card pad">
+      <h3 style="font-family:Inter,sans-serif;font-size:14.5px;font-weight:700;margin-bottom:4px">Intentos de abuso de PUM-AI</h3>
+      <p style="font-size:12.5px;color:var(--text-muted);margin-bottom:12px">
+        Identificados por <b>sesión</b>, no por persona. En SAPIENS los incidentes se ligan al alumno
+        para que el profesor los vea; aquí eso sería peligroso — un registro de "esta persona intentó X"
+        en contexto de salud sexual no debe existir.</p>
+      <table style="font-size:13px"><thead><tr><th>Sesión</th><th>Tipo</th><th class="num">Intentos</th><th class="num">Último</th></tr></thead>
+        <tbody>${M.abuso.map(a=>`<tr>
+          <td style="font-family:ui-monospace,monospace;font-size:12px;color:var(--text-muted)">${a.s}</td>
+          <td>${a.k}</td><td class="num">${a.n}</td><td class="num" style="color:var(--text-muted)">${a.t}</td></tr>`).join('')}
+        </tbody></table>
+    </div>`,
+
+  config: () => `
+    <div class="card pad" style="margin-bottom:16px">
+      <h3 style="font-family:Inter,sans-serif;font-size:14.5px;font-weight:700;margin-bottom:14px">Privacidad</h3>
+      <div class="f2">
+        <div class="field"><label for="cK">Umbral de k-anonimato</label>
+          <input type="number" id="cK" value="${MIN_N}" min="5">
+          <p style="font-size:11.5px;color:var(--text-muted);margin-top:6px;line-height:1.5">
+            Subirlo es seguro. <b>Bajarlo debería requerir aval del Comité de Bioética</b> y
+            el cambio queda en la bitácora.</p></div>
+        <div class="field"><label for="cRet">Retención del texto de preguntas</label>
+          <select id="cRet"><option>6 meses</option><option selected>12 meses</option><option>24 meses</option></select>
+          <p style="font-size:11.5px;color:var(--text-muted);margin-top:6px;line-height:1.5">
+            El texto crudo caduca; el aprendizaje que sacaste de él no. Nadie necesita leer
+            una pregunta de hace dos años.</p></div>
+      </div>
+      <div class="f2">
+        <div class="field"><label for="cIp">Retención de la bitácora de red</label>
+          <select id="cIp"><option selected>30 días</option><option>60 días</option><option>90 días</option></select></div>
+        <div class="field"><label for="cLim">Límite de preguntas por sesión y día</label>
+          <input type="number" id="cLim" value="60"></div>
+      </div>
+      <button class="btn btn-1 btn-sm">Guardar</button>
+    </div>
+    <div class="card pad">
+      <h3 style="font-family:Inter,sans-serif;font-size:14.5px;font-weight:700;margin-bottom:14px">PUM-AI</h3>
+      <div class="field"><label>Modelo</label><select><option>gemini-2.5-flash</option><option>gemini-2.5-pro</option></select></div>
+      <div class="field"><label>Disparadores de escalamiento</label>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          ${['crisis','violencia sexual','ventana 72 h','urgencia médica'].map(t=>
+            `<span class="tag">${t} · activo</span>`).join('')}
+        </div>
+        <p style="font-size:11.5px;color:var(--text-muted);margin-top:9px;line-height:1.55">
+          No se pueden desactivar desde aquí. Cuando uno se dispara, el modelo ni siquiera se
+          invoca: la respuesta es fija y la interfaz rompe a una ruta humana.</p></div>
+    </div>`,
+};
+
+/* ═══════════════════════════════════════════════════════════════════
+   ARRANQUE Y NAVEGACIÓN
+   ═══════════════════════════════════════════════════════════════════ */
+if (DEMO) $('#rolDemo').style.display = '';
+$('#loginForm').onsubmit = async e => {
+  e.preventDefault();
+  const btn = e.target.querySelector('button');
+  btn.disabled = true;
+  try {
+    if (DEMO){
+      sesion = { id: $('#lUser').value.trim() || $('#lRole').value + '.ssr',
+                 rol: $('#lRole').value, token:null, permisos:null };
+      M = D;
+    } else {
+      const r = await api({ action:'login', label:$('#lUser').value.trim(), password:$('#lPass').value });
+      sesion = { id:r.label, rol:r.role, token:r.token, permisos:r.permissions };
+      if (r.permissions.includes('ver_agregados')) M = adaptar(await api({ action:'metrics' }));
+    }
+  } catch (err) {
+    btn.disabled = false;
+    $('#lPass').style.borderColor = 'var(--critical)';
+    alert(err.message === 'demo' ? 'Sin conexión configurada.' : err.message);
+    return;
+  }
+  $('#login').style.display='none';
+  $('#app').classList.add('on');
+  $('#chipRol').textContent = ROLES[sesion.rol] ? ROLES[sesion.rol].nombre : sesion.rol;
+  pintarMenu();
+  const primera = MENU.find(m => m.v && puede(m.p));
+  ir(primera ? primera.v : null);
+};
+$('#btnSalir').onclick = () => location.reload();
+$('#btnTema').onclick = () => {
+  const d = document.documentElement.dataset.theme === 'dark';
+  document.documentElement.dataset.theme = d ? 'light' : 'dark';
+};
+
+function pintarMenu(){
+  $('#menu').innerHTML = MENU.map(m => m.g
+    ? `<div class="grp">${m.g}</div>`
+    : `<button data-v="${m.v}" class="${puede(m.p)?'':'lock'}" ${puede(m.p)?'':'disabled'}
+         title="${puede(m.p)?'':'Tu rol no incluye este permiso'}">
+         <span class="i">${m.i}</span>${m.t}</button>`).join('');
+  $$('#menu button').forEach(b => b.onclick = () => ir(b.dataset.v));
+}
+
+function ir(v){
+  if(!v){ $('#contenido').innerHTML = `<div class="deny"><div class="big">⛨</div>
+    <b style="color:var(--text-primary)">Tu rol no tiene acceso a ninguna sección de datos.</b>
+    <p style="margin-top:8px">Habla con quien administra el panel.</p></div>`; return; }
+  const m = MENU.find(x => x.v === v);
+  $$('#menu button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  $('#titulo').textContent = m.t;
+  $('#contenido').innerHTML = puede(m.p) ? VISTAS[v]()
+    : `<div class="deny"><div class="big">⛨</div>
+       <b style="color:var(--text-primary)">No tienes acceso a esta sección.</b>
+       <p style="margin-top:8px">Requiere el permiso <code>${m.p}</code>.
+       Tu rol es ${ROLES[sesion.rol].nombre}.</p></div>`;
+  if (v === 'preguntas') pintarPreguntas('todas');
+  conectar();
+  scrollTo({ top:0 });
+}
+
+async function pintarPreguntas(f){
+  if (!DEMO){
+    try {
+      const r = await api({ action:'questions',
+        topic: f === 'sin-respuesta' ? 'todas' : f,
+        only_unanswered: f === 'sin-respuesta' });
+      M.preguntas = r.rows.map(x=>({ id:x.id, q:x.question, t:x.topic,
+        d:String(x.asked_on).slice(0,10), ok:x.answer_ok !== false }));
+      f = 'todas';
+    } catch (err){ $('#listaQ').innerHTML = `<div class="deny">${err.message}</div>`; return; }
+  }
+  const l = M.preguntas.filter(q =>
+    f === 'todas' ? true : f === 'sin-respuesta' ? !q.ok : q.t === f);
+  $('#listaQ').innerHTML = l.length ? l.map(q => `<div class="q">
+    <div class="txt">${q.q}</div>
+    <div class="meta"><span class="tag">${q.t}</span>
+      ${q.ok ? '' : '<span class="tag w">PUM-AI no la resolvió</span>'}
+      <span>${q.d}</span>
+      <span style="margin-left:auto"><button class="btn btn-2 btn-sm">Marcar para contenido</button></span>
+    </div></div>`).join('')
+    : '<div class="deny">Sin preguntas con ese filtro.</div>';
+}
+
+function conectar(){
+  // toggles gráfica / tabla
+  $$('.tgl[data-t]').forEach(b => b.onclick = () => {
+    const id = b.dataset.t, tabla = b.dataset.mode === 't';
+    $(`#${id}-g`).style.display = tabla ? 'none' : '';
+    $(`#${id}-t`).classList.toggle('on', tabla);
+    $$(`.tgl[data-t="${id}"]`).forEach(x => x.classList.toggle('on', x === b));
+  });
+  // filtros del banco de preguntas
+  $$('.tgl[data-qf]').forEach(b => b.onclick = () => {
+    $$('.tgl[data-qf]').forEach(x => x.classList.remove('on'));
+    b.classList.add('on'); pintarPreguntas(b.dataset.qf);
+  });
+  // ficha del rol seleccionado al dar de alta
+  const uRol = $('#uRol');
+  if (uRol){
+    const pinta = () => {
+      const r = ROLES[uRol.value];
+      $('#uRolInfo').innerHTML = `<b style="color:var(--text-primary)">${r.para}</b><br>${r.desc}
+        <div style="margin-top:8px;color:var(--warn);display:flex;gap:7px"><span>⚠</span><span>${r.ojo}</span></div>`;
+    };
+    uRol.onchange = pinta; pinta();
+    $$('[data-edit]').forEach(b => b.onclick = () => {
+      $('#uLabel').value = b.dataset.edit; uRol.value = b.dataset.rol; pinta();
+      $('#uLabel').scrollIntoView({ block:'center', behavior:'smooth' });
+    });
+    $('#uGuardar').onclick = async () => {
+      const msg = $('#uMsg');
+      if (DEMO){ msg.style.color='var(--warn)';
+        msg.textContent='Modo demostración: no se guardó.'; return; }
+      try {
+        await api({ action:'staff_upsert', label:$('#uLabel').value,
+          role:uRol.value, password:$('#uPass').value || null,
+          active:$('#uActivo').value === 'true' });
+        const r = await api({ action:'staff_list' });
+        M.personal = r.rows.map(u=>({ id:u.label, rol:u.role, alta:String(u.created_at).slice(0,10),
+          visto:u.last_seen ? String(u.last_seen).slice(0,16).replace('T',' ') : null, activo:u.active }));
+        msg.style.color='var(--ok)'; msg.textContent='Guardado.';
+        $('#uPass').value=''; setTimeout(()=>ir('usuarios'), 700);
+      } catch (err){ msg.style.color='var(--critical)'; msg.textContent=err.message; }
+    };
+  }
+  // tooltips
+  $$('.hit').forEach(g => {
+    g.style.cursor = 'default';
+    g.addEventListener('mousemove', e => tipOn(e, g.dataset.tip));
+    g.addEventListener('mouseleave', tipOff);
+  });
+}
+</script>
+</body>
+</html>
