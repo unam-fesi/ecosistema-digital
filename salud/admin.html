@@ -226,6 +226,21 @@ main{padding:0 0 60px;min-width:0}
 .note.info{background:var(--azul-50);border:1px solid var(--azul-200);color:var(--azul-700)}
 .note.lock{background:var(--lila-50);border:1px solid var(--lila-200);color:var(--lila-700)}
 .note b{display:block;margin-bottom:3px}
+.note.warn{background:color-mix(in srgb,var(--warn) 11%,var(--surface-1));
+  border:1px solid color-mix(in srgb,var(--warn) 34%,transparent);color:var(--warn)}
+.note.ok{background:color-mix(in srgb,var(--ok) 10%,var(--surface-1));
+  border:1px solid color-mix(in srgb,var(--ok) 32%,transparent);color:var(--ok)}
+.note.critical{background:color-mix(in srgb,var(--critical) 10%,var(--surface-1));
+  border:1px solid color-mix(in srgb,var(--critical) 34%,transparent);color:var(--critical)}
+.note.warn b,.note.ok b,.note.critical b{color:inherit}
+.tag.ok{background:color-mix(in srgb,var(--ok) 15%,transparent);color:var(--ok)}
+/* Entradas sueltas del Laboratorio: el chat del ensayo y los supuestos */
+#lcTexto,input[data-coef]{padding:10px 13px;border-radius:10px;background:var(--surface-1);
+  border:1px solid var(--line-2);color:var(--text-primary);font:inherit;font-size:13.5px}
+#lcTexto:focus,input[data-coef]:focus{outline:none;border-color:var(--series-1);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--series-1) 18%,transparent)}
+input[data-coef]{padding:6px 9px;font-size:12.5px}
+.tag.warn{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
 
 .view{display:none}.view.on{display:block}
 .deny{text-align:center;padding:70px 20px;color:var(--text-muted)}
@@ -326,6 +341,8 @@ const PERMISOS = {
   gestionar_usuarios:  'Alta y baja de personal y sus roles',
   gestionar_config:    'Umbral de k-anonimato, retención, parámetros',
   gestionar_seguridad: 'Auditoría de accesos, abuso, bloqueos de red',
+  gestionar_agenda:    'Bandeja de solicitudes de atención y su resolución',
+  usar_laboratorio:    'Ensayo de mensajes, simulación de 72 h y ensayo de consejería',
 };
 // Espejo de la tabla cusmsr.roles. En producción se carga con action:'roles'
 // para que el panel y la base nunca discrepen.
@@ -339,7 +356,8 @@ const ROLES = {
     para:'Quien coordina el programa y sus contenidos',
     desc:'Lee los agregados y el banco de preguntas, edita las preguntas frecuentes del sitio, los mitos, los motivos de cita y los materiales. Puede exportar agregados.',
     ojo:'Incluye lectura del banco de preguntas: texto que escribieron alumnas, aunque esté disociado.',
-    permisos:['ver_agregados','ver_preguntas','gestionar_contenido','exportar'] },
+    permisos:['ver_agregados','ver_preguntas','gestionar_contenido','exportar',
+              'gestionar_agenda','usar_laboratorio'] },
   analitica: { nombre:'Analítica',
     para:'Dirección, investigación o evaluación del programa',
     desc:'Ve todas las cifras agregadas, las lecturas generadas por IA y puede exportar en CSV. No lee el texto de ninguna pregunta.',
@@ -349,12 +367,12 @@ const ROLES = {
     para:'Personal médico, de enfermería y de psicología del Centro',
     desc:'Ve los agregados clínicos y el banco de preguntas, que es lo que le sirve para ajustar la consejería y detectar qué se está explicando mal en consulta.',
     ojo:'No da acceso a expedientes ni a ninguna persona en particular: eso vive en el expediente clínico, no aquí.',
-    permisos:['ver_agregados','ver_preguntas'] },
+    permisos:['ver_agregados','ver_preguntas','gestionar_agenda','usar_laboratorio'] },
   docencia: { nombre:'Docencia',
     para:'Profesorado que acompaña o difunde el programa',
     desc:'Sólo materiales educativos y contenidos del sitio. No ve cifras ni preguntas.',
     ojo:'Es el rol más acotado a propósito. Si alguien de docencia pide ver números, el rol correcto es Analítica.',
-    permisos:['gestionar_contenido'] },
+    permisos:['gestionar_contenido','usar_laboratorio'] },
 };
 
 // ── Conexión ────────────────────────────────────────────────────────────────
@@ -400,6 +418,12 @@ const eti = k => ETI[k] || k;
 const num = v => (v === null || v === undefined) ? null : +v;
 
 function adaptar(r){
+  // fn_metrics devuelve ok=false cuando la cohorte filtrada no llega al umbral.
+  // No es un error: es la respuesta correcta. Se conserva el tamaño para poder
+  // decir en pantalla POR QUÉ no hay gráficas, en vez de dejar cajas vacías.
+  if (r && r.ok === false){
+    return { ...vacio(), cohorte:r.filtros?.cohorte ?? 0, cohorteCorta:true };
+  }
   const pivot = {};
   (r.temasMes||[]).forEach(x=>{
     const m = String(x.mes).slice(0,7);
@@ -407,6 +431,8 @@ function adaptar(r){
   });
   const e = r.embudo || {};
   return {
+    cohorte: r.filtros?.cohorte ?? (r.actividad?.cuentas ?? 0),
+    cohorteCorta: false,
     kpis:{ registradas:r.actividad?.cuentas ?? 0, activas30:r.actividad?.activas_30d ?? 0,
            citas:e.solicitaron_cita ?? 0, atendidas:e.fueron_atendidas ?? 0,
            seguimiento:e.con_seguimiento ?? 0 },
@@ -435,6 +461,19 @@ function adaptar(r){
     preguntas:[], cuarentena:[], accesos:[], abuso:[], personal:[],
   };
 }
+
+// Forma vacía con la misma estructura. La usan el corte demasiado chico y
+// cualquier vista que se pinte antes de que llegue la respuesta.
+function vacio(){
+  return {
+    cohorte:0, cohorteCorta:false,
+    kpis:{ registradas:0, activas30:0, citas:0, atendidas:0, seguimiento:0 },
+    embudo:[], metodos:[], continuidad:[], abandono:[],
+    menstrual:{ personas:0, dolorSevero:0, faltoClase:0, diasProm:0, ciclosProm:0, dolor:[] },
+    tamizaje:[], ventana:[], temasMes:[], suprimidos:[],
+    preguntas:[], cuarentena:[], accesos:[], abuso:[], personal:[],
+  };
+}
 let sesion = { id:null, rol:null, token:null, permisos:null };
 const puede = p => sesion.permisos ? sesion.permisos.includes(p)
   : (sesion.rol && ROLES[sesion.rol].permisos.includes(p));
@@ -443,6 +482,7 @@ const MENU = [
   { g:'Panorama' },
   { v:'tablero',    t:'Tablero',            i:'▦', p:'ver_agregados' },
   { v:'embudo',     t:'Embudo de atención', i:'⇥', p:'ver_agregados' },
+  { v:'comunidad',  t:'Comunidad anónima',  i:'◉', p:'ver_agregados' },
   { g:'Salud' },
   { v:'menstrual',  t:'Salud menstrual',    i:'◑', p:'ver_agregados' },
   { v:'anticon',    t:'Anticoncepción',     i:'◈', p:'ver_agregados' },
@@ -456,6 +496,10 @@ const MENU = [
   { g:'Atención' },
   { v:'solicitudes',t:'Solicitudes',        i:'✉', p:'gestionar_agenda' },
   { v:'agenda',     t:'Actividades',        i:'◍', p:'gestionar_contenido' },
+  { g:'Laboratorio' },
+  { v:'lmensaje',    t:'Ensayo de mensaje',   i:'✍', p:'usar_laboratorio' },
+  { v:'l72h',        t:'Simulación de 72 h',  i:'◷', p:'usar_laboratorio' },
+  { v:'lconsejeria', t:'Ensayo de consejería',i:'☏', p:'usar_laboratorio' },
   { g:'Operación' },
   { v:'exportar',   t:'Exportar',           i:'↧', p:'exportar' },
   { v:'contenido',  t:'Métodos y contenido',i:'✎', p:'gestionar_contenido' },
@@ -730,13 +774,49 @@ const SER_TEMAS=[{k:'anticoncepcion',t:'Anticoncepción',c:'var(--series-1)'},
 const SER_VENT=[{k:'e',t:'Eventos registrados',c:'var(--series-1)'},
                 {k:'a',t:'Acudieron a tiempo',c:'var(--series-4)'}];
 
-const filtros = p => `<div class="filters">
+/* ═══════════════════════════════════════════════════════════════════
+   FILTROS
+   Estos botones eran decoración: <button> sin manejador, sobre vistas de SQL
+   sin parámetros. Ahora el filtro viaja a la base — cusmsr.fn_metrics
+   recalcula cada agregado y aplica el umbral DESPUÉS de filtrar, que es el
+   único orden correcto: filtrar sobre cifras ya publicadas dejaría celdas de
+   tres personas.
+
+   Dos consecuencias visibles, y las dos se explican en pantalla:
+   · si la cohorte filtrada queda por debajo del umbral no se dibuja nada;
+   · el banco de preguntas NO se puede filtrar por área. `question_pool` no
+     tiene columna que lo ligue a un perfil. Es la disociación del sistema,
+     no un pendiente.
+   ═══════════════════════════════════════════════════════════════════ */
+let FILTRO = { meses:null, area:null };
+let cargandoFiltro = false;
+
+const AREAS = [
+  { v:null,                   t:'Todas' },
+  { v:'ciencias de la salud', t:'Salud' },
+  { v:'ciencias biologicas',  t:'Biológicas' },
+  { v:'ciencias sociales',    t:'Sociales' },
+];
+const PERIODOS = [{ v:6, t:'6 meses' }, { v:12, t:'12 meses' }, { v:null, t:'Todo' }];
+
+const filtros = (p, opts = {}) => `<div class="filters"${cargandoFiltro?' style="opacity:.45;pointer-events:none"':''}>
   <span class="lbl">Periodo</span>
-  <div class="seg"><button class="on">6 meses</button><button>12 meses</button><button>Todo</button></div>
+  <div class="seg">${PERIODOS.map(o=>
+    `<button data-f="meses" data-v="${o.v ?? ''}" class="${FILTRO.meses===o.v?'on':''}">${o.t}</button>`).join('')}</div>
   <span class="lbl" style="margin-left:8px">Área</span>
-  <div class="seg"><button class="on">Todas</button><button>Salud</button><button>Biológicas</button><button>Sociales</button></div>
-  ${p?`<span style="margin-left:auto;font-size:11.5px;color:var(--text-muted)">${p}</span>`:''}
-</div>`;
+  <div class="seg"${opts.sinArea?' style="opacity:.45"':''}>${AREAS.map(o=>
+    `<button ${opts.sinArea?'disabled':`data-f="area" data-v="${o.v ?? ''}"`}
+       class="${!opts.sinArea && FILTRO.area===o.v?'on':''}">${o.t}</button>`).join('')}</div>
+  ${opts.sinArea ? `<span class="tag" style="margin-left:6px;cursor:help"
+      title="question_pool no guarda ningún vínculo con el perfil de quien preguntó: ésa es la garantía de disociación del sistema, no una limitación del panel.">el área no aplica aquí ⓘ</span>` : ''}
+  <span style="margin-left:auto;font-size:11.5px;color:var(--text-muted)">
+    ${cargandoFiltro ? 'Recalculando…'
+      : `${fmt(M.cohorte ?? 0)} personas en el corte${p?` · ${p}`:''}`}</span>
+</div>${M.cohorteCorta ? `
+<div class="note warn"><span class="ic">⚠</span><div><b>Ese corte deja muy poca gente</b>
+  La combinación que elegiste deja ${fmt(M.cohorte ?? 0)} personas, por debajo del umbral de
+  k-anonimato (${MIN_N}). No se dibuja nada: con una cohorte así de chica cada barra
+  señala a personas concretas. Amplía el periodo o quita el filtro de área.</div></div>` : ''}`;
 
 const VISTAS = {
   tablero: () => `
@@ -770,6 +850,127 @@ const VISTAS = {
       svg:embudo(M.embudo),
       tabla:tabla(['Paso','Personas','Caída'], M.embudo.map((d,i)=>[d.k,fmt(d.v),
         i?`−${Math.round((1-d.v/M.embudo[i-1].v)*100)}%`:'—'])) })}`,
+
+  // ── Comunidad anónima ────────────────────────────────────────────────────
+  comunidad: () => `
+    ${filtros()}
+    <div class="note lock"><span class="ic">⛨</span><div><b>Renglones reales, y aun así anónimos</b>
+      Cada fila es una persona distinta. Lo que no verás nunca aquí es su código de acceso
+      —ése es su contraseña de entrada, no un identificador de trabajo— ni su carrera exacta:
+      el perfil sólo guarda área y tramo de avance, a propósito.
+      <b style="display:inline;font-weight:700">Tu consulta a esta sección quedó registrada.</b></div></div>
+    <div id="comuBody">${SIN_DATOS('Cargando la comunidad…')}</div>`,
+
+  // ── Laboratorio: ensayo de mensaje ───────────────────────────────────────
+  lmensaje: () => !puede('ver_agregados') ? SIN_AGREGADOS('el ensayo de mensaje') : `
+    ${cintaSim(true, 'Ensayo de mensaje',
+      'Escribes una convocatoria y se prueba contra una población sintética antes de publicarla. ' +
+      'Los agentes no son alumnas: se arman muestreando por separado las distribuciones que ya ' +
+      'pasaron el umbral, de modo que ningún agente reproduce a nadie.')}
+    <div class="grid g2" style="align-items:start">
+      <div class="card pad">
+        <h3>La convocatoria</h3>
+        <p class="why">Escríbela como la vas a publicar. PUM-AI lee este texto — no lee datos de nadie.</p>
+        <div class="field"><label for="lmTitulo">Título</label>
+          <input id="lmTitulo" placeholder="Taller de anticoncepción: elige con información"></div>
+        <div class="field"><label for="lmTexto">Texto</label>
+          <textarea id="lmTexto" rows="9" placeholder="Pega aquí la convocatoria completa."></textarea></div>
+        <div class="field"><label>Por dónde se publica</label>
+          <div id="lmCanales" style="display:flex;gap:8px;flex-wrap:wrap">
+            ${Object.entries(LAB_CANALES).map(([k,c])=>
+              `<button class="tgl${c.on?' on':''}" data-canal="${k}">${c.t}</button>`).join('')}
+          </div></div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:6px">
+          <button class="btn btn-1" id="lmCorrer">Ensayar</button>
+          <button class="btn btn-2 btn-sm" id="lmLeer">Que PUM-AI lo lea</button>
+          <button class="btn btn-2 btn-sm" id="lmGuardar">Guardar el ensayo</button>
+        </div>
+        <p style="font-size:11.5px;color:var(--text-muted);margin-top:10px;line-height:1.55">
+          "Ensayar" corre la simulación con las reglas que ves abajo. "Que PUM-AI lo lea" además
+          revisa el texto y propone una reescritura.</p>
+      </div>
+      <div id="lmSalida" class="card pad">${SIN_DATOS('Escribe la convocatoria y dale a Ensayar.')}</div>
+    </div>
+    <div id="lmSupuestos"></div>`,
+
+  // ── Laboratorio: simulación de 72 horas ──────────────────────────────────
+  l72h: () => !puede('ver_agregados') ? SIN_AGREGADOS('la simulación de 72 horas') : `
+    ${cintaSim(true, 'Simulación de 72 horas',
+      'La misma población sintética, ahora con reloj: hora por hora durante tres días desde que ' +
+      'publicas. Contesta si te alcanza el cupo y si te alcanza la agenda, no cuánta gente irá.')}
+    <div class="note info"><span class="ic">◔</span><div><b>No confundir con "Ventana de 72 horas"</b>
+      Aquella sección mide lo que YA pasó: cuántas llegaron a tiempo para anticoncepción de
+      emergencia o profilaxis. Ésta proyecta lo que pasaría con una convocatoria que todavía no
+      publicas. Una es medición, la otra es simulación. Se tocan en un punto y por eso vale la
+      pena tenerlas cerca: si el mensaje es de urgencia, lo que importa no es a cuánta gente
+      llega, sino a cuánta llega <b style="display:inline">dentro</b> de la ventana en la que
+      todavía sirve.</div></div>
+    <div class="grid g2" style="align-items:start">
+      <div class="card pad">
+        <h3>Qué se publica y con qué capacidad</h3>
+        <div class="field"><label for="l7Texto">Convocatoria</label>
+          <textarea id="l7Texto" rows="6" placeholder="Puedes traer la misma del ensayo de mensaje."></textarea></div>
+        <div class="grid g2" style="gap:12px;margin-bottom:0">
+          <div class="field"><label for="l7Cupo">Cupo del evento</label>
+            <input id="l7Cupo" type="number" min="1" value="40"></div>
+          <div class="field"><label for="l7Hora">Hora de publicación</label>
+            <input id="l7Hora" type="number" min="0" max="23" value="10"></div>
+        </div>
+        <div class="field"><label>Por dónde se publica</label>
+          <div id="l7Canales" style="display:flex;gap:8px;flex-wrap:wrap">
+            ${Object.entries(LAB_CANALES).map(([k,c])=>
+              `<button class="tgl${c.on?' on':''}" data-canal="${k}">${c.t}</button>`).join('')}
+          </div></div>
+        <div class="field"><label for="l7Urg">¿Es un mensaje de urgencia?</label>
+          <select id="l7Urg">
+            <option value="no">No — actividad o difusión normal</option>
+            <option value="si">Sí — anticoncepción de emergencia o profilaxis</option>
+          </select>
+          <p style="font-size:11.5px;color:var(--text-muted);margin-top:7px;line-height:1.55">
+            Si dices que sí, el resultado deja de leerse como "cuánta gente" y pasa a leerse como
+            "cuánta gente alcanzada mientras la medida todavía funciona".</p></div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap">
+          <button class="btn btn-1" id="l7Correr">Correr las 72 horas</button>
+          <button class="btn btn-2 btn-sm" id="l7Guardar">Guardar la corrida</button>
+        </div>
+      </div>
+      <div id="l7Salida" class="card pad">${SIN_DATOS('Define el cupo y dale a Correr.')}</div>
+    </div>
+    <div id="l7Detalle"></div>`,
+
+  // ── Laboratorio: ensayo de consejería ────────────────────────────────────
+  lconsejeria: () => `
+    ${cintaSim(false, 'Ensayo de consejería',
+      'Esto NO es una simulación y no predice nada. Es un maniquí de práctica: PUM-AI interpreta ' +
+      'un personaje ficticio escrito a mano, que no salió de ningún registro. Lo que aquí ocurra ' +
+      'no es evidencia sobre nadie — es un ensayo, como practicar una sutura en una esponja.')}
+    <div class="grid g2" style="align-items:start">
+      <div class="card pad">
+        <h3>Elige el caso</h3>
+        <p class="why">Los ocho casos están escritos a mano a partir del catálogo didáctico.
+          Ninguno se generó con datos del Centro.</p>
+        <div id="lcCasos" style="display:flex;flex-direction:column;gap:8px">
+          ${CASOS.map((c,i)=>`<button class="tgl${i?'':' on'}" data-caso="${i}"
+            style="text-align:left;padding:11px 13px;line-height:1.5">
+            <b style="display:block;color:var(--text-primary)">${c.t}</b>
+            <span style="font-size:12px;color:var(--text-muted)">${c.pista}</span></button>`).join('')}
+        </div>
+        <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:14px">
+          <button class="btn btn-1" id="lcIniciar">Empezar el ensayo</button>
+          <button class="btn btn-2 btn-sm" id="lcRubrica">Terminar y pedir la rúbrica</button>
+        </div>
+      </div>
+      <div class="card pad">
+        <h3>La conversación</h3>
+        <div id="lcChat" style="max-height:420px;overflow:auto;display:flex;flex-direction:column;
+          gap:10px;padding:6px 2px 12px">${SIN_DATOS('Elige un caso y empieza.')}</div>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <input id="lcTexto" placeholder="Escribe lo que le dirías…" style="flex:1">
+          <button class="btn btn-1" id="lcEnviar">Enviar</button>
+        </div>
+      </div>
+    </div>
+    <div id="lcRub"></div>`,
 
   menstrual: () => `
     ${filtros()}
@@ -831,7 +1032,7 @@ const VISTAS = {
       donde viven no tiene ninguna columna que se pueda unir con una persona. Sólo entran si quien
       preguntó dio su consentimiento y si pasaron el depurador de identificadores.
       <b style="display:inline;font-weight:700">Tu consulta a esta sección quedó registrada.</b></div></div>
-    ${filtros()}
+    ${filtros('', { sinArea:true })}
     <div style="display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px">
       ${['todas','anticoncepcion','menstrual','its','sexualidad','servicios'].map((t,i)=>
         `<button class="tgl ${i?'':'on'}" data-qf="${t}">${t}</button>`).join('')}
@@ -1177,11 +1378,12 @@ $('#loginForm').onsubmit = async e => {
     if (DEMO){
       sesion = { id: $('#lUser').value.trim() || $('#lRole').value + '.ssr',
                  rol: $('#lRole').value, token:null, permisos:null };
-      M = D;
+      M = { ...D, cohorte:D.kpis.registradas, cohorteCorta:false };
     } else {
       const r = await api({ action:'login', label:$('#lUser').value.trim(), password:$('#lPass').value });
       sesion = { id:r.label, rol:r.role, token:r.token, permisos:r.permissions };
-      if (r.permissions.includes('ver_agregados')) M = adaptar(await api({ action:'metrics' }));
+      if (r.permissions.includes('ver_agregados'))
+        M = adaptar(await api({ action:'metrics', meses:FILTRO.meses, area:FILTRO.area }));
     }
   } catch (err) {
     btn.disabled = false;
@@ -1211,11 +1413,14 @@ function pintarMenu(){
   $$('#menu button').forEach(b => b.onclick = () => ir(b.dataset.v));
 }
 
-function ir(v){
+let vistaActual = null;
+
+function ir(v, conservarScroll){
   if(!v){ $('#contenido').innerHTML = `<div class="deny"><div class="big">⛨</div>
     <b style="color:var(--text-primary)">Tu rol no tiene acceso a ninguna sección de datos.</b>
     <p style="margin-top:8px">Habla con quien administra el panel.</p></div>`; return; }
   const m = MENU.find(x => x.v === v);
+  vistaActual = v;
   $$('#menu button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
   $('#titulo').textContent = m.t;
   $('#contenido').innerHTML = puede(m.p) ? VISTAS[v]()
@@ -1229,8 +1434,28 @@ function ir(v){
   if (v === 'solicitudes') pintarCola();
   if (v === 'config')      pintarDemo();
   if (v === 'grafo')       pintarGrafo();
+  if (v === 'comunidad')   pintarComunidad();
+  if (v === 'lmensaje' || v === 'l72h') prepararLab();
   conectar();
-  scrollTo({ top:0 });
+  if (!conservarScroll) scrollTo({ top:0 });
+}
+
+// Cambiar el filtro no cambia de vista: recalcula en la base y vuelve a pintar
+// lo que ya estaba en pantalla, sin brincar al inicio.
+async function aplicarFiltro(campo, valor){
+  if (FILTRO[campo] === valor) return;
+  FILTRO[campo] = valor;
+  cargandoFiltro = true;
+  ir(vistaActual, true);
+  try {
+    M = DEMO ? { ...D, cohorte:D.kpis.registradas, cohorteCorta:false }
+             : adaptar(await api({ action:'metrics', meses:FILTRO.meses, area:FILTRO.area }));
+  } catch (err) {
+    alert(err.message === 'demo' ? 'Sin conexión configurada.' : err.message);
+  } finally {
+    cargandoFiltro = false;
+    ir(vistaActual, true);
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════
@@ -1788,6 +2013,946 @@ async function pintarPreguntas(f){
     : '<div class="deny">Sin preguntas con ese filtro.</div>';
 }
 
+/* ═══════════════════════════════════════════════════════════════════════════
+   COMUNIDAD ANÓNIMA
+
+   Lo que AURA muestra en su pantalla de usuarios anónimos —código, facultad,
+   carrera, métricas— aquí no se puede copiar tal cual, por dos razones que no
+   son de estilo:
+
+   · El anonymous_code es la CREDENCIAL de la alumna. Verlo en el panel
+     convierte "soy CUS-ABC-1234" en una llave. Cada renglón trae en su lugar
+     un seudónimo que se rehace en cada carga: sirve para leer la tabla y no
+     sirve para armar un expediente a lo largo del tiempo.
+   · Carrera + semestre identifica en una población de cientos. El perfil sólo
+     guarda área y tramo de avance, y ésa fue una decisión de diseño, no una
+     omisión.
+
+   Y una tercera cosa que hace fn_comunidad y conviene entender: quitar el
+   nombre no basta. Lo que identifica es la combinación. Antes de devolver, las
+   filas se agrupan por (área, avance) y cualquier grupo con menos de 10 se
+   generaliza; si aun así no llega, se suprime.
+   ═══════════════════════════════════════════════════════════════════════════ */
+let COMU = null;
+let comuOrden = { col:'seudonimo', dir:1 };
+
+const COL_COMU = [
+  { k:'seudonimo',         t:'Seudónimo',   w:'86px' },
+  { k:'area',              t:'Área' },
+  { k:'avance',            t:'Avance' },
+  { k:'antiguedad',        t:'Antigüedad' },
+  { k:'actividad',         t:'Última entrada' },
+  { k:'metodo',            t:'Método',      eti:true },
+  { k:'estado_metodo',     t:'Adherencia' },
+  { k:'permanencia',       t:'Permanencia' },
+  { k:'motivo_fin',        t:'Motivo de baja', eti:true },
+  { k:'consulta',          t:'Consulta' },
+  { k:'seguimiento_3m',    t:'Seguimiento' },
+  { k:'dolor',             t:'Dolor máx.' },
+  { k:'falto_clase',       t:'Faltó a clase' },
+  { k:'seguimiento_ciclo', t:'Ciclos' },
+  { k:'tamizaje',          t:'Tamizaje' },
+  { k:'temas_pum',         t:'PUM-AI' },
+];
+
+const celdaComu = (f, c) => {
+  const v = f[c.k];
+  if (v === null || v === undefined) return '<span style="color:var(--text-muted)">—</span>';
+  if (v === true)  return 'sí';
+  if (v === false) return 'no';
+  if (String(v).startsWith('no publicad'))
+    return `<span style="color:var(--text-muted)" title="Se ocultó para que el grupo alcance el umbral">${v}</span>`;
+  return c.eti ? eti(v) : v;
+};
+
+async function pintarComunidad(){
+  const box = $('#comuBody');
+  if (!box) return;
+  if (DEMO){ box.innerHTML = SIN_DATOS('Sin conexión configurada.'); return; }
+  box.innerHTML = SIN_DATOS('Cargando la comunidad…');
+  try {
+    COMU = await api({ action:'comunidad', meses:FILTRO.meses, area:FILTRO.area,
+                       estado:comuEstado, limite:2000 });
+  } catch (err) { box.innerHTML = SIN_DATOS(err.message); return; }
+  dibujarComunidad();
+}
+
+let comuEstado = null;
+const ESTADOS = [
+  { v:null,                             t:'Todas' },
+  { v:'vigente',                        t:'Con método vigente' },
+  { v:'lo dejo',                        t:'Lo dejaron' },
+  { v:'nunca registro',                 t:'Sin método registrado' },
+  { v:'suspendio por embarazo buscado', t:'Buscando embarazo' },
+];
+
+function dibujarComunidad(){
+  const box = $('#comuBody');
+  if (!COMU) { box.innerHTML = SIN_DATOS(); return; }
+  if (COMU.ok === false){
+    box.innerHTML = SIN_DATOS(`Con ese corte quedan ${fmt(COMU.publicadas||0)} personas publicables,
+      menos que el umbral de ${MIN_N}. No se muestra ninguna fila.`);
+    return;
+  }
+  const filas = [...(COMU.filas||[])].sort((a,b)=>{
+    const A=a[comuOrden.col], B=b[comuOrden.col];
+    if (A===B) return 0;
+    if (A===null||A===undefined) return 1;
+    if (B===null||B===undefined) return -1;
+    return (A>B?1:-1)*comuOrden.dir;
+  });
+
+  const cuenta = k => filas.filter(f=>f.estado_metodo===k).length;
+  const kpis = [
+    ['En el corte',      fmt(COMU.total_cohorte), 'personas registradas'],
+    ['Publicadas',       fmt(COMU.publicadas),
+       COMU.suprimidas ? `${fmt(COMU.suprimidas)} suprimidas por umbral` : 'ninguna suprimida'],
+    ['Generalizadas',    fmt(COMU.generalizadas), 'se les ocultó un dato para llegar al umbral'],
+    ['Con método vigente', fmt(cuenta('vigente')), 'adherencia activa'],
+    ['Lo dejaron',       fmt(cuenta('lo dejo')), 'con motivo registrado o no'],
+  ];
+
+  box.innerHTML = `
+    <div class="grid g4">${kpis.map(([k,v,s])=>
+      `<div class="card tile"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></div>`).join('')}</div>
+
+    <div class="filters">
+      <span class="lbl">Adherencia</span>
+      <div class="seg">${ESTADOS.map(o=>
+        `<button data-ce="${o.v ?? ''}" class="${comuEstado===o.v?'on':''}">${o.t}</button>`).join('')}</div>
+      <button class="btn btn-2 btn-sm" id="comuCsv" style="margin-left:auto">↧ Exportar CSV</button>
+    </div>
+
+    <div class="card pad">
+      <div class="chart-head"><div>
+        <h3>Quiénes son, sin que sean nadie</h3>
+        <p class="why">Ordena por cualquier columna. Un guion largo significa que ese dato no
+          existe; "no publicado" significa que existía y se ocultó para proteger al grupo.</p>
+      </div></div>
+      <div class="tbl on" style="overflow:auto;max-height:620px">
+        <table><thead><tr>${COL_COMU.map(c=>
+          `<th data-sc="${c.k}" style="cursor:pointer;white-space:nowrap${c.w?`;width:${c.w}`:''}">
+            ${c.t}${comuOrden.col===c.k?(comuOrden.dir>0?' ▲':' ▼'):''}</th>`).join('')}</tr></thead>
+          <tbody>${filas.map(f=>`<tr>${COL_COMU.map(c=>
+            `<td style="white-space:nowrap">${celdaComu(f,c)}</td>`).join('')}</tr>`).join('')}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card pad">
+      <h3>Cómo se protege esta tabla, y hasta dónde</h3>
+      <p class="why">Vale la pena leerlo una vez: es lo que hay que poder explicar si alguien
+        pregunta por qué el Centro publica renglones de personas.</p>
+      <div style="font-size:13px;line-height:1.65;color:var(--text-secondary)">
+        <p style="margin-bottom:10px"><b style="color:var(--text-primary)">La clase de equivalencia
+          es (área, avance).</b> Son los dos únicos datos que alguien podría saber por fuera del
+          sistema. Cuándo se registró o cuándo entró por última vez no lo sabe nadie más: eso es
+          conducta, no identidad. Cada combinación de área y avance que ves aquí agrupa a
+          ${MIN_N} personas o más.</p>
+        <p style="margin-bottom:10px"><b style="color:var(--text-primary)">Además hay
+          l-diversidad.</b> Si dentro de un grupo todas comparten el mismo método, saber a qué
+          grupo pertenece alguien basta para conocer su método aunque el grupo sea grande. En ese
+          caso el valor se oculta.</p>
+        <p style="margin-bottom:10px"><b style="color:var(--warn)">Y esto es lo que NO protege.</b>
+          Si alguien ya conoce varias respuestas de salud de una persona y viene a buscar el
+          renglón que las reúne, esta tabla no lo detiene. Contra eso ninguna tabla de microdatos
+          sirve; para eso están los agregados. Si el uso que vas a darle es de ese tipo, usa el
+          Tablero, no esta pantalla.</p>
+      </div>
+      <div style="margin-top:14px">
+        ${tabla(['Área','Avance','Personas'],
+          (COMU.clases||[]).map(c=>[c.area, c.avance, fmt(c.n)]))}
+      </div>
+    </div>`;
+
+  $$('#comuBody th[data-sc]').forEach(th => th.onclick = () => {
+    const k = th.dataset.sc;
+    comuOrden = comuOrden.col === k ? { col:k, dir:-comuOrden.dir } : { col:k, dir:1 };
+    dibujarComunidad();
+  });
+  $$('#comuBody button[data-ce]').forEach(b => b.onclick = () => {
+    comuEstado = b.dataset.ce === '' ? null : b.dataset.ce;
+    pintarComunidad();
+  });
+  const csv = $('#comuCsv');
+  if (csv) csv.onclick = () => {
+    const cols = COL_COMU.map(c=>c.k);
+    const esc = v => { const s = v===null||v===undefined?'':String(v);
+      return /[",\n;]/.test(s) ? `"${s.replace(/"/g,'""')}"` : s; };
+    const txt = [cols.join(','), ...filas.map(f=>cols.map(c=>esc(f[c])).join(','))].join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([txt], { type:'text/csv;charset=utf-8' }));
+    a.download = `comunidad-anonima-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+  };
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LABORATORIO
+
+   Tres herramientas, y la primera cosa que hay que tener clara es cuál de las
+   tres es simulación:
+
+     Ensayo de mensaje     SÍ. Población sintética + reglas explícitas.
+     Simulación de 72 h    SÍ. La misma población, con reloj.
+     Ensayo de consejería  NO. Un personaje ficticio escrito a mano. No predice
+                           nada y no es evidencia sobre nadie.
+
+   La regla que ordena las dos simulaciones: NUNCA leen un renglón. Leen
+   cusmsr.fn_calibracion_sim(), que sólo publica celdas que ya pasaron el
+   umbral, y con esas celdas se arma una población muestreando cada atributo
+   POR SEPARADO. Eso destruye las correlaciones a propósito: si se muestreara
+   de la distribución conjunta, cada agente sería la copia de una combinación
+   que existe de verdad, y una combinación rara identifica aunque no traiga
+   nombre. Se pierde realismo para que ningún agente corresponda a nadie.
+
+   Segunda regla, y es la que hace útil la herramienta: cada número que entra
+   a la simulación trae etiqueta de DATO o de SUPUESTO. Los supuestos son
+   editables y se guardan con la corrida. Una simulación que no dice cuáles de
+   sus números se inventó no sirve para discutir nada.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+const cintaSim = (esSim, titulo, texto) => `
+  <div class="note ${esSim?'info':'lock'}" style="align-items:flex-start">
+    <span class="ic">${esSim?'◈':'☏'}</span>
+    <div><b>${titulo} · <span style="color:${esSim?'var(--lila-700)':'var(--text-primary)'}">
+      ${esSim?'ESTO ES UNA SIMULACIÓN':'ESTO NO ES UNA SIMULACIÓN'}</span></b>
+      ${texto}</div></div>`;
+
+const SIN_AGREGADOS = que => `<div class="deny"><div class="big">⛨</div>
+  <b style="color:var(--text-primary)">Tu rol no puede usar ${que}.</b>
+  <p style="margin-top:8px">Esta herramienta consume cifras agregadas, así que requiere además
+  el permiso <code>ver_agregados</code>. El ensayo de consejería sí está disponible para ti:
+  no toca ningún dato.</p></div>`;
+
+// Canales de difusión. El alcance es SUPUESTO — la base no mide por dónde se
+// enteró nadie, y no debería: eso sería rastreo.
+const LAB_CANALES = {
+  whatsapp: { t:'WhatsApp y grupos',    on:true,  alcance:38 },
+  correo:   { t:'Correo institucional', on:true,  alcance:22 },
+  redes:    { t:'Redes del Centro',     on:false, alcance:26 },
+  cartel:   { t:'Carteles en campus',   on:false, alcance:18 },
+  clase:    { t:'Aviso en clase',       on:false, alcance:55 },
+};
+
+// Coeficientes del modelo. TODOS son supuestos declarados; ninguno sale de la
+// base. Están aquí, con nombre y valor a la vista, para que se puedan discutir.
+const LAB_COEF = {
+  comunidad:        11000, // personas a las que puede llegar una convocatoria
+  atencion:          0.42, // de quien la ve, la lee
+  interes_ajeno:     0.22, // responde aunque el tema no sea suyo
+  barrera_base:      0.40, // lo que frena, antes de que el texto ayude
+  alivio_gratis:     0.10, // decir que es gratuito
+  alivio_confid:     0.13, // decir que es confidencial
+  alivio_logistica:  0.11, // decir cuándo, dónde y cómo entrar
+  comparte:          0.07, // de quien se inscribe, cuántas lo pasan
+  tau:                 16, // horas de vida media de la difusión
+  pide_consulta:     0.06, // de quien queda con intención, cuántas piden cita
+  ajuste:             1.0, // corrección contra lo que de verdad pasó (ver contraste)
+};
+
+const LAB_ETIQ = {
+  comunidad:'Tamaño de la comunidad alcanzable',
+  atencion:'De quien lo ve, cuánta gente lo lee',
+  interes_ajeno:'Responde aunque el tema no sea suyo',
+  barrera_base:'Freno inicial (pena, horario, desconfianza)',
+  alivio_gratis:'Cuánto ayuda decir que es gratuito',
+  alivio_confid:'Cuánto ayuda decir que es confidencial',
+  alivio_logistica:'Cuánto ayuda decir cuándo, dónde y cómo',
+  comparte:'De quien se inscribe, cuánta gente lo comparte',
+  tau:'Vida media de la difusión, en horas',
+  pide_consulta:'De quien queda con intención, cuánta pide cita',
+  ajuste:'Corrección contra la asistencia real (1 = sin corregir)',
+};
+
+const LAB = { calib:null, coef:{ ...LAB_COEF }, canales:{}, ficha:null, ultimo:null };
+Object.keys(LAB_CANALES).forEach(k => LAB.canales[k] = LAB_CANALES[k].on);
+
+// Generador con semilla: misma semilla y mismos supuestos, mismo resultado.
+// Sin esto una simulación no se puede citar ni auditar.
+function mulberry32(a){
+  return function(){
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+const escoge = (pesos, r) => {
+  let u = r(), acc = 0;
+  for (const p of pesos){ acc += p.p; if (u <= acc) return p.k; }
+  return pesos[pesos.length-1].k;
+};
+const pesosDe = bloque => {
+  const c = (bloque && bloque.celdas) || [];
+  const tot = c.reduce((s,x)=>s+(+x.n),0) || 1;
+  return c.map(x=>({ k:x.k, p:(+x.n)/tot }));
+};
+
+const nrm = s => String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+
+// Lectura determinista del texto. Esto NO usa PUM-AI: son reglas, corren en el
+// navegador y dan el mismo resultado siempre. PUM-AI sirve para la reescritura
+// y para ver lo que las reglas no ven.
+function leerMensaje(txt){
+  const t = nrm(txt);
+  const palabras = (t.match(/[a-z0-9ñ]+/g) || []);
+  const frases = (txt.match(/[.!?…]+/g) || []).length || 1;
+  // Fernández-Huerta, el índice de legibilidad estándar para español.
+  const silabas = palabras.reduce((s,w)=> s + Math.max(1,(w.match(/[aeiouáéíóúü]+/g)||[]).length), 0);
+  const P = palabras.length ? 100 * silabas / palabras.length : 0;
+  const F = palabras.length ? 100 * frases  / palabras.length : 0;
+  const fh = Math.max(0, Math.min(100, 206.84 - 0.60 * P - 1.02 * F));
+  return {
+    palabras: palabras.length,
+    legibilidad: Math.round(fh),
+    nivel: fh >= 70 ? 'sencillo' : fh >= 50 ? 'medio' : 'difícil',
+    temas: ['anticoncepcion','menstrual','its','embarazo','sexualidad','servicios']
+      .filter(k => ({
+        anticoncepcion:/anticoncep|pastilla|inyecc|implante|diu|parche|anillo|condon|preservativo/,
+        menstrual:/menstrua|regla|periodo|ciclo|colico|dismenorrea|sangrad/,
+        its:/vih|sida|its|ets|sifilis|clamidia|gonorrea|vph|papiloma|prueba|tamizaje/,
+        embarazo:/embaraz|aborto|interrupcion|gestacion/,
+        sexualidad:/sexual|sexo|placer|orientacion|pareja|consentimiento/,
+        servicios:/cita|agenda|horario|consulta|servicio|centro|cusmsr|taller|platica/,
+      })[k].test(t)),
+    cuando:  /\d{1,2}[:h]\d{2}|\d{1,2}\s?(am|pm|hrs|horas)|lunes|martes|miercoles|jueves|viernes|sabado|\b\d{1,2}\s+de\s+(ene|feb|mar|abr|may|jun|jul|ago|sep|oct|nov|dic)/.test(t),
+    donde:   /aula|salon|edificio|auditorio|explanada|modulo|consultorio|zoom|meet|teams|https?:|liga|enlace/.test(t),
+    como:    /inscri|registr|apunta|reserva|cupo|escanea|codigo qr|formulario|liga|enlace|llega y ya|sin cita/.test(t),
+    gratis:  /gratis|gratuit|sin costo|no cuesta|no tiene costo/.test(t),
+    confid:  /confidencial|anonim|privad|no se comparte|no le decimos/.test(t),
+  };
+}
+
+// La probabilidad de que alguien acabe con intención de ir, dadas las
+// propiedades del texto. Cada término es un coeficiente declarado arriba.
+function barreraDe(lec, c){
+  let b = c.barrera_base;
+  if (lec.gratis) b -= c.alivio_gratis;
+  if (lec.confid) b -= c.alivio_confid;
+  if (lec.cuando && lec.donde && lec.como) b -= c.alivio_logistica;
+  return Math.max(0.02, Math.min(0.95, b));
+}
+const factorLargo = n => n < 25 ? 0.80 : n <= 120 ? 1 : n <= 220 ? 0.82 : 0.62;
+const factorNivel = l => l >= 70 ? 1 : l >= 50 ? 0.85 : 0.66;
+
+const N_AGENTES = 4000;
+
+// Construye la población sintética. Cada atributo se muestrea POR SEPARADO de
+// su marginal: ésa es la razón de que ningún agente corresponda a una persona.
+function poblacion(semilla){
+  const r = mulberry32(semilla);
+  const cal = LAB.calib;
+  const pArea = pesosDe(cal?.poblacion?.area);
+  const pAvan = pesosDe(cal?.poblacion?.avance);
+  const interes = {};
+  (cal?.interes || []).forEach(x => interes[x.tema] = (+x.pct) / 100);
+  const g = [];
+  for (let i = 0; i < N_AGENTES; i++){
+    const a = {};
+    a.area   = pArea.length ? escoge(pArea, r) : 'sin dato';
+    a.avance = pAvan.length ? escoge(pAvan, r) : 'sin dato';
+    a.interes = {};
+    Object.keys(interes).forEach(t => a.interes[t] = r() < interes[t]);
+    a.u = [r(), r(), r(), r(), r(), r()];   // sorteos fijos por agente
+    g.push(a);
+  }
+  return g;
+}
+
+function correrMensaje(lec, canales, coef, semilla){
+  const pob = poblacion(semilla);
+  const escala = coef.comunidad / N_AGENTES;
+  const pVer = 1 - canales.reduce((p,c)=> p * (1 - LAB_CANALES[c].alcance/100), 1);
+  const pLeer = coef.atencion * factorLargo(lec.palabras);
+  const pEnt  = factorNivel(lec.legibilidad);
+  const barrera = barreraDe(lec, coef);
+
+  const seg = {};
+  let vio=0, leyo=0, entendio=0, intencion=0;
+  pob.forEach(a => {
+    const s = seg[a.area] = seg[a.area] || { n:0, i:0 };
+    s.n++;
+    const v = a.u[0] < pVer;                         if (!v) return; vio++;
+    const l = a.u[1] < pLeer;                        if (!l) return; leyo++;
+    const e = a.u[2] < pEnt;                         if (!e) return; entendio++;
+    const suyo = lec.temas.some(t => a.interes[t]);
+    const p = (suyo ? 1 : coef.interes_ajeno) * (1 - barrera);
+    if (a.u[3] < p){ intencion++; s.i++; a.va = true; }
+  });
+  const aj = coef.ajuste > 0 ? coef.ajuste : 1;
+
+  return {
+    pVer, pLeer, pEnt, barrera, escala, semilla,
+    embudo: [
+      { k:'Comunidad alcanzable', v:Math.round(coef.comunidad) },
+      { k:'Lo vieron',            v:Math.round(vio * escala) },
+      { k:'Lo leyeron',           v:Math.round(leyo * escala) },
+      { k:'Lo entendieron',       v:Math.round(entendio * escala) },
+      { k:'Con intención de ir',  v:Math.round(intencion * escala * aj) },
+    ],
+    intencion: Math.round(intencion * escala * aj),
+    crudo: Math.round(intencion * escala),
+    segmentos: Object.entries(seg).map(([k,s])=>({
+      k, n:Math.round(s.n*escala), i:Math.round(s.i*escala*aj),
+      pct: s.n ? +(100*s.i*aj/s.n).toFixed(1) : 0,
+    })).sort((a,b)=>b.pct-a.pct),
+    pob,
+  };
+}
+
+// Qué pasaría si el texto dijera lo que no dice. Es análisis de sensibilidad
+// del modelo, no una predicción: se corre con la misma semilla para que la
+// diferencia venga del cambio y no del azar.
+function contrafactuales(lec, canales, coef, semilla, base){
+  const pruebas = [
+    { k:'gujeno', et:'decir que es gratuito',            campo:'gratis' },
+    { k:'confid', et:'decir que es confidencial',        campo:'confid' },
+    { k:'logis',  et:'poner hora, lugar y cómo entrar',  campo:'logistica' },
+    { k:'facil',  et:'escribirlo más sencillo',          campo:'nivel' },
+  ];
+  return pruebas.map(p => {
+    const l = { ...lec };
+    if (p.campo === 'gratis'){ if (l.gratis) return null; l.gratis = true; }
+    if (p.campo === 'confid'){ if (l.confid) return null; l.confid = true; }
+    if (p.campo === 'logistica'){
+      if (l.cuando && l.donde && l.como) return null;
+      l.cuando = l.donde = l.como = true;
+    }
+    if (p.campo === 'nivel'){ if (l.legibilidad >= 70) return null; l.legibilidad = 72; }
+    const r = correrMensaje(l, canales, coef, semilla);
+    return { et:p.et, delta:r.intencion - base.intencion, total:r.intencion };
+  }).filter(Boolean).filter(x => x.delta !== 0).sort((a,b)=>b.delta-a.delta);
+}
+
+// ── Las 72 horas ────────────────────────────────────────────────────────────
+// Reloj hora por hora desde que se publica. La exposición llega repartida con
+// una exponencial truncada a 72 h; nadie lee entre las 0 y las 6, así que esas
+// horas se recorren a la mañana siguiente. Quien queda con intención se
+// inscribe con un rezago propio.
+function correr72(lec, canales, coef, semilla, cupo, horaPub){
+  const base = correrMensaje(lec, canales, coef, semilla);
+  const r = mulberry32(semilla ^ 0x9E3779B9);
+  const tau = Math.max(2, coef.tau);
+  const Z = 1 - Math.exp(-72 / tau);
+  const horas = Array.from({length:72}, (_,h)=>({ h, exp:0, insc:0 }));
+  const rezago = () => { const u = r(); return u < 0.5 ? Math.floor(r()*3)
+    : u < 0.8 ? 3 + Math.floor(r()*6) : u < 0.95 ? 9 + Math.floor(r()*15) : 24 + Math.floor(r()*48); };
+
+  const vistos = base.pob.filter(a => a.u[0] < base.pVer);
+  vistos.forEach(a => {
+    let t = Math.round(-tau * Math.log(1 - a.u[4] * Z));
+    // Nadie abre un aviso a las tres de la mañana.
+    for (let g = 0; g < 3; g++){
+      const hd = (horaPub + t) % 24;
+      if (hd >= 0 && hd < 7) t += (7 - hd); else break;
+    }
+    if (t > 71) return;
+    horas[t].exp++;
+    if (a.va){
+      const ti = t + rezago();
+      if (ti <= 71) horas[ti].insc++;
+    }
+  });
+
+  // Reenvío: quien se inscribe lo pasa. Es una segunda ola pequeña y se
+  // declara como supuesto, no se mide.
+  let acumExp = 0, acumIns = 0, lleno = null;
+  const escala = base.escala;
+  const curva = horas.map(x => {
+    const extra = Math.round(acumIns * coef.comparte * 0.06);
+    acumExp += (x.exp + extra) * escala;
+    acumIns += x.insc * escala * (1 + coef.comparte * 0.5);
+    const cap = cupo ? Math.min(acumIns, cupo) : acumIns;
+    if (cupo && lleno === null && acumIns >= cupo) lleno = x.h;
+    return { h:x.h, exp:Math.round(acumExp), ins:Math.round(acumIns), cap:Math.round(cap) };
+  });
+
+  const alcanzadas = h => curva[Math.min(71, h)].exp;
+  return {
+    base, curva, lleno, cupo,
+    total: curva[71].ins,
+    ventana: { h24:alcanzadas(23), h48:alcanzadas(47), h72:alcanzadas(71) },
+    consultas: Math.round(base.intencion * coef.pide_consulta),
+  };
+}
+
+// Curva acumulada de 72 horas. Dos series, una línea de cupo, marcas de día.
+function curva72(datos, cupo){
+  if (!datos || !datos.length) return SIN_DATOS();
+  const W=760,H=260,L=52,B=40,T=16,R=16;
+  const max = Math.max(cupo||0, ...datos.map(d=>d.ins), 1);
+  const paso = Math.pow(10, Math.floor(Math.log10(max)));
+  const tope = Math.ceil(max/paso)*paso;
+  const x = h => L+(W-L-R)*(h/71);
+  const y = v => T+(H-T-B)*(1-v/tope);
+  const ticks = [0, tope/4, tope/2, tope*3/4, tope];
+  const linea = (k,c) => `<polyline fill="none" stroke="${c}" stroke-width="2"
+    stroke-linecap="round" stroke-linejoin="round"
+    points="${datos.map(d=>`${x(d.h)},${y(d[k])}`).join(' ')}"/>`;
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto" role="img">
+    ${ticks.map(t=>`<g><line x1="${L}" x2="${W-R}" y1="${y(t)}" y2="${y(t)}"
+       stroke="var(--grid)" stroke-width="1"/>
+      <text x="${L-9}" y="${y(t)+4}" text-anchor="end" font-size="11"
+       fill="var(--text-muted)">${fmt(Math.round(t))}</text></g>`).join('')}
+    ${[0,24,48,71].map(h=>`<text x="${x(h)}" y="${H-B+21}" text-anchor="middle" font-size="11.5"
+       fill="var(--text-secondary)">${h===0?'publica':h+' h'}</text>`).join('')}
+    ${cupo?`<line x1="${L}" x2="${W-R}" y1="${y(cupo)}" y2="${y(cupo)}" stroke="var(--warn)"
+       stroke-width="2" stroke-dasharray="6 5"/>
+     <text x="${W-R}" y="${y(cupo)-7}" text-anchor="end" font-size="11.5"
+       fill="var(--warn)">cupo ${fmt(cupo)}</text>`:''}
+    ${linea('ins','var(--series-1)')}
+    ${linea('cap','var(--series-4)')}
+  </svg>`;
+}
+
+// ── Ficha de supuestos ──────────────────────────────────────────────────────
+// Lo más importante de la pantalla: qué número salió de la base y qué número
+// nos inventamos. Editable, y se guarda con la corrida.
+function fichaSupuestos(){
+  const cal = LAB.calib;
+  const dato = (t, v, nota) => `<tr><td>${t}</td><td class="num">${v}</td>
+    <td><span class="tag ok">dato</span></td><td style="font-size:11.5px;color:var(--text-muted)">${nota||''}</td></tr>`;
+  const sup = (k) => `<tr><td>${LAB_ETIQ[k]}</td>
+    <td class="num"><input data-coef="${k}" type="number" step="0.01" value="${LAB.coef[k]}"
+      style="width:90px;text-align:right"></td>
+    <td><span class="tag warn">supuesto</span></td>
+    <td style="font-size:11.5px;color:var(--text-muted)">lo pusimos nosotros</td></tr>`;
+
+  const ant = cal?.convocatoria?.anticipacion;
+  const antOk = ant && (ant.celdas||[]).length > 1;
+  const rez = cal?.convocatoria?.rezago;
+  const rezOk = rez && (rez.celdas||[]).length > 1;
+
+  return `<div class="card pad" style="margin-top:18px">
+    <div class="chart-head"><div>
+      <h3>De dónde sale cada número</h3>
+      <p class="why">Una simulación que no distingue lo medido de lo supuesto no sirve para
+        discutir nada. Cambia los supuestos y vuelve a correr: es para eso.</p>
+    </div><div class="tools"><button class="btn btn-2 btn-sm" id="labReset">Volver a los valores por omisión</button></div></div>
+    <div class="tbl on"><table>
+      <thead><tr><th>Parámetro</th><th class="num">Valor</th><th>Origen</th><th>Nota</th></tr></thead>
+      <tbody>
+        ${dato('Personas registradas', fmt(cal?.poblacion?.registradas ?? 0), 'cusmsr.profiles')}
+        ${dato('Mezcla por área', (cal?.poblacion?.area?.celdas||[]).length + ' categorías',
+               (cal?.poblacion?.area?.suprimidas ? cal.poblacion.area.suprimidas + ' suprimidas por umbral' : 'ninguna suprimida'))}
+        ${dato('Mezcla por avance', (cal?.poblacion?.avance?.celdas||[]).length + ' categorías', '')}
+        ${(cal?.interes||[]).map(x=>dato('Interés en ' + eti(x.tema), x.pct + '%',
+            x.personas + ' personas preguntaron de eso')).join('')}
+        ${dato('Inscripciones históricas', fmt(cal?.convocatoria?.inscripciones ?? 0),
+               (cal?.convocatoria?.actividades_publicadas ?? 0) + ' actividades publicadas')}
+        ${antOk
+          ? dato('Anticipación al evento', (ant.celdas||[]).length + ' tramos',
+                 'cuántos días antes se inscribe la gente; medido sobre inscripciones reales')
+          : `<tr><td>Anticipación al evento</td><td class="num">—</td>
+             <td><span class="tag warn">sin medición</span></td>
+             <td style="font-size:11.5px;color:var(--text-muted)">Todavía no hay inscripciones
+               suficientes repartidas en el tiempo.</td></tr>`}
+        ${rezOk
+          ? dato('Rezago entre publicar e inscribirse', (rez.celdas||[]).length + ' tramos', 'medido')
+          : `<tr><td>Rezago entre publicar e inscribirse</td><td class="num">—</td>
+             <td><span class="tag warn">sin medición</span></td>
+             <td style="font-size:11.5px;color:var(--text-muted)">La tabla de actividades no guarda
+               el instante de publicación, así que todas las inscripciones caen en la misma cubeta y
+               la medición no sirve. La curva de las 72 horas usa un supuesto. Para medirlo de
+               verdad haría falta una columna <code>publicada_en</code>: es el pendiente más barato
+               con mayor efecto sobre esta herramienta.</td></tr>`}
+        ${Object.keys(LAB_ETIQ).map(sup).join('')}
+      </tbody></table></div>
+  </div>`;
+}
+
+async function prepararLab(){
+  if (DEMO || !puede('ver_agregados')) return;
+  if (LAB.calib) { pintarSupuestos(); return; }
+  try {
+    const r = await api({ action:'lab_calibracion' });
+    LAB.calib = r.calibracion;
+  } catch (err) { /* la vista lo dirá */ }
+  pintarSupuestos();
+}
+function pintarSupuestos(){
+  const caja = $('#lmSupuestos') || $('#l7Detalle');
+  if (!caja) return;
+  if ($('#lmSupuestos')) $('#lmSupuestos').innerHTML = fichaSupuestos();
+  conectarLab();
+}
+
+function canalesActivos(){ return Object.keys(LAB.canales).filter(k => LAB.canales[k]); }
+
+function pintarSalidaMensaje(lec, res, cf){
+  const box = $('#lmSalida');
+  if (!box) return;
+  const falta = [];
+  if (!lec.cuando) falta.push('la hora o la fecha');
+  if (!lec.donde)  falta.push('el lugar o la liga');
+  if (!lec.como)   falta.push('cómo inscribirse');
+  if (!lec.gratis) falta.push('que es gratuito');
+  if (!lec.confid) falta.push('que es confidencial');
+
+  box.innerHTML = `
+    <div class="chart-head"><div><h3>Resultado del ensayo</h3>
+      <p class="why">Semilla ${res.semilla}. Con los mismos supuestos, el resultado se repite.</p></div></div>
+    ${embudo(res.embudo)}
+    <div style="margin-top:16px">${tabla(['Paso','Personas'], res.embudo.map(d=>[d.k, fmt(d.v)]))}</div>
+
+    <h3 style="margin-top:22px">Lo que el texto sí dice y lo que no</h3>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 4px">
+      ${[['cuándo',lec.cuando],['dónde',lec.donde],['cómo entrar',lec.como],
+         ['gratuito',lec.gratis],['confidencial',lec.confid]].map(([t,v])=>
+        `<span class="tag ${v?'ok':'warn'}">${v?'✓':'✕'} ${t}</span>`).join('')}
+      <span class="tag">${lec.palabras} palabras · lectura ${lec.nivel}</span>
+    </div>
+    ${falta.length ? `<p style="font-size:12.5px;color:var(--text-secondary);line-height:1.6;margin-top:8px">
+      Falta ${falta.join(', ').replace(/, ([^,]*)$/, ' y $1')}.</p>` : ''}
+
+    ${cf.length ? `<h3 style="margin-top:22px">Qué movería más la aguja</h3>
+      <p class="why" style="margin-bottom:10px">Sensibilidad del modelo, no una promesa: es cuánto
+        cambia el resultado si corriges eso y nada más, con la misma semilla.</p>
+      ${tabla(['Si el texto…','Con intención','Diferencia'],
+        cf.map(x=>[x.et, fmt(x.total), `+${fmt(x.delta)}`]))}` : ''}
+
+    <h3 style="margin-top:22px">A quién llega y a quién no</h3>
+    <p class="why" style="margin-bottom:10px">Si los porcentajes salen casi iguales entre áreas es
+      porque no declaraste ninguna diferencia de alcance por canal — y eso también es un hallazgo:
+      quiere decir que el modelo no tiene ninguna razón para creer que llegas distinto.</p>
+    ${tabla(['Área','En la comunidad','Con intención','Tasa'],
+      res.segmentos.map(s=>[s.k, fmt(s.n), fmt(s.i), s.pct + '%']))}
+
+    ${contraste(res.intencion)}
+    ${LAB.ficha ? fichaPumai(LAB.ficha) : ''}`;
+
+  const aj = $('#labAjustar');
+  if (aj) aj.onclick = () => {
+    const med = +(LAB.calib?.convocatoria?.mediana_por_actividad || 0);
+    if (!med || !res.crudo) return;
+    LAB.coef.ajuste = +(med / res.crudo).toFixed(4);
+    pintarSupuestos();
+    const b = $('#lmCorrer'); if (b) b.click();
+  };
+}
+
+// Contraste con lo que de verdad pasó. Es la parte que impide que la
+// simulación se vuelva un generador de cifras bonitas: si el modelo dice diez
+// veces más de lo que jamás se ha logrado, el modelo está mal, no la realidad.
+function contraste(intencion){
+  const cal = LAB.calib;
+  const med = +(cal?.convocatoria?.mediana_por_actividad ?? 0);
+  const acts = cal?.convocatoria?.actividades_publicadas ?? 0;
+  if (!med || !acts || !intencion) return '';
+  const razon = intencion / med;
+  const grave = razon > 3 || razon < 0.33;
+  return `
+    <h3 style="margin-top:24px">Contraste con lo que ya pasó</h3>
+    <div class="note ${grave ? 'warn' : 'ok'}"><span class="ic">${grave ? '⚠' : '✓'}</span>
+      <div><b>${grave ? 'El modelo y la realidad no se parecen' : 'El modelo está en el orden correcto'}</b>
+        Esta corrida da <b style="display:inline">${fmt(intencion)}</b> personas con intención.
+        Tus ${acts} actividades publicadas tuvieron una mediana de
+        <b style="display:inline">${fmt(Math.round(med))}</b> inscripciones.
+        Son <b style="display:inline">${razon >= 1 ? razon.toFixed(1) + ' veces más' : (1/razon).toFixed(1) + ' veces menos'}</b>.
+        ${grave ? 'Una de dos: o los supuestos de alcance por canal están muy por encima de lo que ' +
+                  'realmente pasa, o esas actividades se difundieron muchísimo menos de lo que estás ' +
+                  'simulando. Antes de usar este número para decidir algo, arregla eso.'
+                : 'No quiere decir que la cifra sea correcta, sólo que no es absurda.'}
+      </div></div>
+    <button class="btn btn-2 btn-sm" id="labAjustar">Ajustar los supuestos a lo que ya pasó</button>
+    <p style="font-size:11.5px;color:var(--text-muted);margin-top:8px;line-height:1.55">
+      Esto no arregla el modelo: mete un factor de corrección (${LAB.coef.ajuste}) para que el
+      resultado coincida con tu mediana histórica. Sirve para acercarse; lo que sirve de verdad es
+      corregir los supuestos de alcance uno por uno.</p>`;
+}
+
+const fichaPumai = f => `
+  <h3 style="margin-top:24px">Lectura de PUM-AI</h3>
+  <p class="why" style="margin-bottom:10px">PUM-AI leyó el texto que escribiste. No leyó datos de
+    ninguna persona: esta parte no toca la base.</p>
+  ${f.tono ? `<p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px"><b>Tono:</b> ${f.tono}</p>` : ''}
+  ${(f.riesgos||[]).length ? `<div class="note warn"><span class="ic">⚠</span><div><b>Cuidado con esto</b>
+    <ul style="margin:6px 0 0 16px;line-height:1.6">${f.riesgos.map(x=>`<li>${x}</li>`).join('')}</ul></div></div>` : ''}
+  ${(f.barreras||[]).length ? `<p style="font-size:13px;margin-top:10px"><b>Lo que frenaría a alguien:</b></p>
+    <ul style="margin:6px 0 0 16px;font-size:13px;color:var(--text-secondary);line-height:1.6">
+      ${f.barreras.map(x=>`<li>${x}</li>`).join('')}</ul>` : ''}
+  ${f.reescritura ? `<div class="card" style="margin-top:14px;background:var(--surface-2)">
+    <div style="font-size:11px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+      color:var(--text-muted);margin-bottom:8px">Propuesta de reescritura</div>
+    <div style="white-space:pre-wrap;font-size:13.5px;line-height:1.65">${f.reescritura}</div>
+    <button class="btn btn-2 btn-sm" id="lmUsar" style="margin-top:12px">Usar esta versión</button></div>` : ''}`;
+
+function pintarSalida72(res, urgente){
+  const box = $('#l7Salida');
+  if (!box) return;
+  const v = res.ventana;
+  box.innerHTML = `
+    <div class="chart-head"><div><h3>Las 72 horas</h3>
+      <p class="why">Curva acumulada desde el momento de publicar. La línea punteada es tu cupo.</p></div></div>
+    ${curva72(res.curva, res.cupo)}
+    <div class="g-leyenda">
+      <span><i style="background:var(--series-1)"></i>Quisieron inscribirse</span>
+      <span><i style="background:var(--series-4)"></i>Cupo alcanzado</span>
+    </div>
+    <div class="grid g4" style="margin-top:18px">
+      ${[['Quisieron ir', fmt(res.total), 'en las 72 horas'],
+         ['Cupo', res.cupo ? fmt(res.cupo) : '—',
+           res.lleno !== null && res.lleno !== undefined
+             ? `se llena a la hora ${res.lleno}` : 'no se llena en 72 h'],
+         ['Citas que caerían', fmt(res.consultas), 'sobre la agenda, además del evento'],
+         ['Alcance a 24 h', fmt(v.h24), `de ${fmt(v.h72)} a las 72 h`]]
+        .map(([k,val,s])=>`<div class="card tile"><div class="k">${k}</div>
+          <div class="v" style="font-size:28px">${val}</div><div class="s">${s}</div></div>`).join('')}
+    </div>
+    ${res.cupo && res.lleno !== null && res.lleno !== undefined ? `
+      <div class="note warn"><span class="ic">⚠</span><div><b>El cupo se agota antes de que acabe la difusión</b>
+        Según esta corrida el cupo se llena a la hora ${res.lleno} y quedan
+        ${fmt(Math.max(0, res.total - res.cupo))} personas con la intención y sin lugar. Eso no es
+        éxito: es gente que pidió y no cupo, y es la clase de cosa que hace que la siguiente
+        convocatoria ya no le importe. O abres una segunda fecha, o escalonas la difusión.</div></div>` : ''}
+    ${urgente ? `
+      <div class="note info"><span class="ic">◔</span><div><b>Esto es un mensaje de urgencia</b>
+        Aquí el número que importa no es cuánta gente llegó, sino cuánta llegó a tiempo. La
+        anticoncepción de emergencia y la profilaxis sólo funcionan dentro de la ventana:
+        <b style="display:inline">${fmt(v.h24)}</b> alcanzadas en las primeras 24 horas,
+        ${fmt(v.h48)} a las 48 y ${fmt(v.h72)} a las 72 — de éstas, las últimas ya casi no
+        pueden actuar. Si la diferencia entre 24 y 72 horas es grande, el problema no es el
+        texto: es que la difusión llega tarde.</div></div>` : ''}
+    ${contraste(res.total)}
+    <div style="margin-top:16px">${tabla(['Hora','Alcance acumulado','Con intención acumulada'],
+      res.curva.filter(d=>d.h % 6 === 0 || d.h === 71)
+        .map(d=>[d.h + ' h', fmt(d.exp), fmt(d.ins)]))}</div>`;
+  const aj = $('#labAjustar');
+  if (aj) aj.onclick = () => {
+    const med = +(LAB.calib?.convocatoria?.mediana_por_actividad || 0);
+    if (!med || !res.base.crudo) return;
+    LAB.coef.ajuste = +(med / res.base.crudo).toFixed(4);
+    const b = $('#l7Correr'); if (b) b.click();
+  };
+}
+
+/* ── Ensayo de consejería — casos ficticios ────────────────────────────────
+   Escritos a mano a partir del catálogo didáctico. Ninguno salió de un
+   registro, y ninguno describe a una persona que exista. Se pueden ampliar
+   sin tocar nada más: son texto. */
+const CASOS = [
+  { t:'Primera vez que pide un método',
+    pista:'19 años, nunca ha usado nada, viene con la amiga esperando afuera',
+    d:`Tienes 19 años, cursas el segundo semestre. Nunca has usado ningún método. Tu amiga te
+       convenció de venir y te está esperando afuera. Te da pena decir que ya tuviste relaciones.
+       Sabes de las pastillas porque tu prima las toma, pero oíste que engordan. Si te preguntan
+       directamente si tienes vida sexual activa, primero dices "más o menos".` },
+  { t:'Quiere dejar el método por los efectos',
+    pista:'usa inyección trimestral, sangrados irregulares, ya casi decide dejarlo sin avisar',
+    d:`Llevas siete meses con la inyección trimestral. Desde el cuarto mes tienes manchado casi
+       todo el mes y estás harta. Ya decidiste no ir por la siguiente dosis, pero no lo has dicho.
+       Vienes "nada más a preguntar". No quieres embarazarte. Si te regañan por querer dejarlo,
+       te cierras y dices que sí a todo para irte rápido.` },
+  { t:'Retraso menstrual y miedo',
+    pista:'ocho días de retraso, no se ha hecho prueba, no quiere que su familia sepa',
+    d:`Tienes 21 años y ocho días de retraso. No te has hecho ninguna prueba porque tienes miedo
+       del resultado. Vives con tu mamá y tu mayor preocupación es que se entere. Tu pareja no
+       sabe que viniste. Si te preguntan qué quieres hacer si sale positiva, te quedas callada un
+       momento y dices que no sabes.` },
+  { t:'Se rompió el condón anoche',
+    pista:'llega el mismo día, no sabe que hay un reloj corriendo',
+    d:`Anoche se rompió el condón. Tienes 20 años. Buscaste en internet y te confundiste más.
+       No sabes que hay un plazo. Vienes apurada entre clases y tienes que irte en veinte
+       minutos. Si te empiezan a explicar mucha teoría te desesperas y preguntas "pero entonces
+       ¿qué hago?".` },
+  { t:'Quiere una prueba de VIH y no lo dice',
+    pista:'da vueltas, pregunta por otra cosa, el motivo real sale hasta el final',
+    d:`Vienes preguntando por "chequeos generales". En realidad quieres una prueba de VIH: hace
+       tres semanas tuviste una relación sin condón y no has dormido bien. Te da vergüenza
+       decirlo y empiezas preguntando por el papanicolaou. Sólo dices el motivo real si sientes
+       que no te van a juzgar. Si notas prisa o incomodidad, te vas sin decirlo.` },
+  { t:'Le recomendaron un método que no quiere',
+    pista:'ya vino antes, salió con implante recomendado y no volvió',
+    d:`Viniste hace dos meses y saliste con la indicación de ponerte el implante. No lo hiciste:
+       te asusta que te pongan algo en el brazo y que no te lo puedan quitar. No regresaste por
+       pena. Vienes ahora porque tuviste un susto. Si sientes que te vuelven a empujar al
+       implante, dices que sí y no vuelves.` },
+  { t:'Dolor menstrual que la saca de clases',
+    pista:'lo normaliza, falta a clases, nunca lo ha consultado',
+    d:`Tienes 22 años. Cada mes faltas uno o dos días de clase por cólicos. Tu mamá te dice que
+       es normal y que se quita cuando tengas hijos. Nunca lo has consultado. Vienes porque este
+       mes te desmayaste en el camión. Minimizas: dices "no es para tanto" varias veces aunque
+       describas un dolor severo.` },
+  { t:'Su pareja no quiere que use método',
+    pista:'tema de control en la relación; no llega como violencia y podría serlo',
+    d:`Tienes 20 años y llevas dos años con tu pareja. Él dice que los métodos "son para las que
+       andan con muchos" y que él se cuida solo. Quieres usar algo sin que él sepa. No lo
+       planteas como un problema: lo cuentas como algo normal. Si te preguntan cómo reacciona
+       cuando no estás de acuerdo con él, dudas antes de responder.` },
+];
+let lcCaso = 0, lcTurnos = [], lcOcupado = false;
+
+function pintarChat(){
+  const c = $('#lcChat');
+  if (!c) return;
+  if (!lcTurnos.length){ c.innerHTML = SIN_DATOS('Elige un caso y empieza.'); return; }
+  const burbuja = (t, mia) => `<div style="align-self:${mia?'flex-end':'flex-start'};max-width:82%;
+    background:${mia?'var(--lila-100, var(--surface-2))':'var(--surface-2)'};
+    border:1px solid var(--line);border-radius:14px;padding:10px 13px;font-size:13.5px;line-height:1.6">
+    <div style="font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+      color:var(--text-muted);margin-bottom:5px">${mia?'tú':'la persona (ficticia)'}</div>
+    ${t.replace(/</g,'&lt;')}</div>`;
+  c.innerHTML = lcTurnos.map(t => burbuja(t.texto, t.rol === 'user')).join('')
+    + (lcOcupado ? `<div style="align-self:flex-start;color:var(--text-muted);font-size:12.5px">escribiendo…</div>` : '');
+  c.scrollTop = c.scrollHeight;
+}
+
+async function lcEnviarTurno(txt){
+  if (lcOcupado) return;
+  if (txt){ lcTurnos.push({ rol:'user', texto:txt }); }
+  lcOcupado = true; pintarChat();
+  try {
+    const r = await api({ action:'lab_ai', modo:'consejeria',
+                          caso: CASOS[lcCaso].d, turnos: lcTurnos });
+    lcTurnos.push({ rol:'model', texto:r.texto });
+  } catch (err) {
+    lcTurnos.push({ rol:'model', texto:'[No pude responder: ' + err.message + ']' });
+  } finally { lcOcupado = false; pintarChat(); }
+}
+
+function pintarRubrica(r){
+  const box = $('#lcRub');
+  if (!box) return;
+  const total = (r.criterios||[]).reduce((s,c)=>s+(+c.puntos||0),0);
+  const max = (r.criterios||[]).length * 3;
+  box.innerHTML = `<div class="card pad" style="margin-top:18px">
+    <div class="chart-head"><div><h3>Rúbrica del ensayo</h3>
+      <p class="why">Evalúa la entrevista, no a la persona. ${total} de ${max} puntos.</p></div></div>
+    ${tabla(['Criterio','Puntos','Se vio en','Qué haría la diferencia'],
+      (r.criterios||[]).map(c=>[c.nombre, `${c.puntos}/3`,
+        c.evidencia ? `<i style="color:var(--text-secondary)">"${String(c.evidencia).slice(0,120)}"</i>` : '—',
+        c.mejora || '—']))}
+    <div class="grid g2" style="margin-top:16px">
+      ${r.lo_mejor ? `<div class="note ok"><span class="ic">✓</span><div><b>Lo mejor</b>${r.lo_mejor}</div></div>` : ''}
+      ${r.lo_que_mas_urge ? `<div class="note warn"><span class="ic">⚠</span><div><b>Lo que más urge</b>${r.lo_que_mas_urge}</div></div>` : ''}
+    </div>
+    ${(r.banderas||[]).length ? `<div class="note critical" style="margin-top:12px"><span class="ic">⛔</span>
+      <div><b>Banderas</b><ul style="margin:6px 0 0 16px;line-height:1.6">
+      ${r.banderas.map(b=>`<li>${b}</li>`).join('')}</ul></div></div>` : ''}
+    <p style="font-size:11.5px;color:var(--text-muted);margin-top:14px;line-height:1.55">
+      Esto es un ensayo con un personaje ficticio. No dice nada sobre las personas que atiende el
+      Centro ni sobre el desempeño en consulta real.</p>
+  </div>`;
+}
+
+// ── Cableado de los tres tableros del Laboratorio ───────────────────────────
+function conectarLab(){
+  const marcaCanal = (cont) => $$(cont + ' button[data-canal]').forEach(b => b.onclick = () => {
+    const k = b.dataset.canal;
+    LAB.canales[k] = !LAB.canales[k];
+    b.classList.toggle('on', LAB.canales[k]);
+  });
+  marcaCanal('#lmCanales'); marcaCanal('#l7Canales');
+
+  $$('input[data-coef]').forEach(i => i.onchange = () => {
+    const v = parseFloat(i.value);
+    if (!isNaN(v)) LAB.coef[i.dataset.coef] = v;
+  });
+  const reset = $('#labReset');
+  if (reset) reset.onclick = () => { LAB.coef = { ...LAB_COEF }; pintarSupuestos(); };
+
+  // ── Ensayo de mensaje
+  const correrLm = async (conAI) => {
+    const txt = ($('#lmTexto')?.value || '').trim();
+    if (!txt) { alert('Escribe la convocatoria primero.'); return; }
+    if (!LAB.calib){ alert('No pude traer la calibración de la base. Vuelve a entrar a la sección.'); return; }
+    const canales = canalesActivos();
+    if (!canales.length){ alert('Elige al menos un canal de difusión.'); return; }
+    const lec = leerMensaje(txt);
+    const semilla = 20260818;
+    const res = correrMensaje(lec, canales, LAB.coef, semilla);
+    const cf  = contrafactuales(lec, canales, LAB.coef, semilla, res);
+    LAB.ultimo = { lec, res, cf, canales, texto:txt, semilla };
+    if (conAI){
+      $('#lmSalida').innerHTML = SIN_DATOS('PUM-AI está leyendo la convocatoria…');
+      try { LAB.ficha = (await api({ action:'lab_ai', modo:'mensaje', texto:txt })).ficha; }
+      catch (err) { LAB.ficha = null; alert(err.message); }
+    }
+    pintarSalidaMensaje(lec, res, cf);
+    const usar = $('#lmUsar');
+    if (usar) usar.onclick = () => { $('#lmTexto').value = LAB.ficha.reescritura; };
+  };
+  const bC = $('#lmCorrer'); if (bC) bC.onclick = () => correrLm(false);
+  const bL = $('#lmLeer');   if (bL) bL.onclick = () => correrLm(true);
+  const bG = $('#lmGuardar');
+  if (bG) bG.onclick = async () => {
+    if (!LAB.ultimo){ alert('Corre el ensayo antes de guardarlo.'); return; }
+    try {
+      await api({ action:'lab_guardar', herramienta:'mensaje',
+        titulo: $('#lmTitulo')?.value || null, semilla: LAB.ultimo.semilla,
+        entrada:{ texto:LAB.ultimo.texto, canales:LAB.ultimo.canales,
+                  supuestos:LAB.coef, lectura:LAB.ultimo.lec },
+        salida:{ embudo:LAB.ultimo.res.embudo, segmentos:LAB.ultimo.res.segmentos,
+                 contrafactuales:LAB.ultimo.cf } });
+      bG.textContent = 'Guardado ✓';
+      setTimeout(()=>bG.textContent = 'Guardar el ensayo', 2200);
+    } catch (err) { alert(err.message); }
+  };
+
+  // ── Simulación de 72 horas
+  const b7 = $('#l7Correr');
+  if (b7) b7.onclick = () => {
+    const txt = ($('#l7Texto')?.value || '').trim();
+    if (!txt){ alert('Pega la convocatoria.'); return; }
+    if (!LAB.calib){ alert('No pude traer la calibración de la base.'); return; }
+    const canales = canalesActivos();
+    if (!canales.length){ alert('Elige al menos un canal.'); return; }
+    const cupo = Math.max(1, +($('#l7Cupo')?.value || 40));
+    const hora = Math.min(23, Math.max(0, +($('#l7Hora')?.value || 10)));
+    const urgente = ($('#l7Urg')?.value || 'no') === 'si';
+    const lec = leerMensaje(txt);
+    const res = correr72(lec, canales, LAB.coef, 20260818, cupo, hora);
+    LAB.ultimo72 = { res, lec, canales, cupo, hora, urgente, texto:txt };
+    pintarSalida72(res, urgente);
+    $('#l7Detalle').innerHTML = fichaSupuestos();
+    conectarLab();
+  };
+  const b7g = $('#l7Guardar');
+  if (b7g) b7g.onclick = async () => {
+    if (!LAB.ultimo72){ alert('Corre la simulación antes de guardarla.'); return; }
+    const u = LAB.ultimo72;
+    try {
+      await api({ action:'lab_guardar', herramienta:'72h', titulo:'Simulación de 72 h',
+        semilla:20260818,
+        entrada:{ texto:u.texto, canales:u.canales, cupo:u.cupo, hora:u.hora,
+                  urgente:u.urgente, supuestos:LAB.coef },
+        salida:{ total:u.res.total, lleno:u.res.lleno, ventana:u.res.ventana,
+                 consultas:u.res.consultas } });
+      b7g.textContent = 'Guardada ✓';
+      setTimeout(()=>b7g.textContent = 'Guardar la corrida', 2200);
+    } catch (err) { alert(err.message); }
+  };
+
+  // ── Ensayo de consejería
+  $$('#lcCasos button[data-caso]').forEach(b => b.onclick = () => {
+    $$('#lcCasos button[data-caso]').forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    lcCaso = +b.dataset.caso; lcTurnos = []; pintarChat();
+    if ($('#lcRub')) $('#lcRub').innerHTML = '';
+  });
+  const lcI = $('#lcIniciar');
+  if (lcI) lcI.onclick = () => { lcTurnos = []; if ($('#lcRub')) $('#lcRub').innerHTML = '';
+    lcEnviarTurno('Hola, buenas tardes. Pásale, ¿en qué te puedo ayudar?'); };
+  const lcE = $('#lcEnviar'), lcT = $('#lcTexto');
+  const manda = () => { const t = (lcT?.value || '').trim(); if (!t) return;
+    lcT.value = ''; lcEnviarTurno(t); };
+  if (lcE) lcE.onclick = manda;
+  if (lcT) lcT.onkeydown = e => { if (e.key === 'Enter') manda(); };
+  const lcR = $('#lcRubrica');
+  if (lcR) lcR.onclick = async () => {
+    if (lcTurnos.length < 4){ alert('Ten al menos un par de intercambios antes de pedir la rúbrica.'); return; }
+    lcR.disabled = true; lcR.textContent = 'PUM-AI está revisando…';
+    try {
+      const trans = lcTurnos.map(t => (t.rol === 'user' ? 'CONSEJERÍA: ' : 'PERSONA: ') + t.texto).join('\n');
+      const r = await api({ action:'lab_ai', modo:'rubrica', caso:CASOS[lcCaso].d, transcripcion:trans });
+      pintarRubrica(r.rubrica);
+    } catch (err) { alert(err.message); }
+    finally { lcR.disabled = false; lcR.textContent = 'Terminar y pedir la rúbrica'; }
+  };
+}
+
 function conectar(){
   // toggles gráfica / tabla
   $$('.tgl[data-t]').forEach(b => b.onclick = () => {
@@ -1795,6 +2960,13 @@ function conectar(){
     $(`#${id}-g`).style.display = tabla ? 'none' : '';
     $(`#${id}-t`).classList.toggle('on', tabla);
     $$(`.tgl[data-t="${id}"]`).forEach(x => x.classList.toggle('on', x === b));
+  });
+  conectarLab();
+  // Periodo y Área
+  $$('.filters button[data-f]').forEach(b => b.onclick = () => {
+    const campo = b.dataset.f;
+    const bruto = b.dataset.v;
+    aplicarFiltro(campo, bruto === '' ? null : (campo === 'meses' ? +bruto : bruto));
   });
   // filtros del banco de preguntas
   $$('.tgl[data-qf]').forEach(b => b.onclick = () => {
