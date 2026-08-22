@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Panel · CUSMSR FES Iztacala</title>
+<title>Panel · CUSIM FES Iztacala</title>
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,7 +11,7 @@
 <!-- Three.js servido desde el propio repo: sin CDN de terceros, sin fugar a quien
      visita el panel, y funciona aunque la red de la Facultad filtre dominios. -->
 <script src="../public/vendor/three.min.js" defer></script>
-<link rel="icon" href="../public/assets/CUSMSR-emblem.png" type="image/png">
+<link rel="icon" href="../public/assets/CUSIM-emblem.png" type="image/png">
 <style>
 /* ═══════════════════════════════════════════════════════════════════════════
    PALETA
@@ -264,8 +264,8 @@ input[data-coef]{padding:6px 9px;font-size:12.5px}
 <!-- ══════════ ACCESO ══════════ -->
 <div id="login">
   <form class="login-card" id="loginForm">
-    <img src="../public/assets/CUSMSR-logo.png" alt="CUSMSR">
-    <h1>Panel del Centro</h1>
+    <img src="../public/assets/CUSIM-logo.png" alt="CUSIM">
+    <h1>Panel de la Clínica</h1>
     <p class="sub">Acceso para personal designado</p>
     <div class="field">
       <label for="lUser">Identificador o correo</label>
@@ -296,8 +296,8 @@ input[data-coef]{padding:6px 9px;font-size:12.5px}
 <div id="app">
   <aside>
     <div class="brand">
-      <img src="../public/assets/CUSMSR-emblem.png" alt="">
-      <b>CUSMSR<span>Panel del Centro</span></b>
+      <img src="../public/assets/CUSIM-emblem.png" alt="">
+      <b>CUSIM<span>Panel de la Clínica</span></b>
     </div>
     <nav id="menu"></nav>
   </aside>
@@ -348,7 +348,7 @@ const PERMISOS = {
 // para que el panel y la base nunca discrepen.
 const ROLES = {
   admin: { nombre:'Administración',
-    para:'Responsable técnico y operativo del Centro',
+    para:'Responsable técnico y operativo de la Clínica',
     desc:'Control total. Es el único que da de alta personal, cambia el umbral de k-anonimato, ajusta la retención de datos y revisa la auditoría. Ve todo lo que ven los demás.',
     ojo:'Asígnalo a una o dos personas, no más. Quien lo tiene puede cambiar quién ve qué.',
     permisos:Object.keys(PERMISOS) },
@@ -364,7 +364,7 @@ const ROLES = {
     ojo:'Es el rol correcto para quien pide "los números" sin necesitar leer lo que la gente escribió.',
     permisos:['ver_agregados','ver_insights','exportar'] },
   clinico: { nombre:'Equipo clínico',
-    para:'Personal médico, de enfermería y de psicología del Centro',
+    para:'Personal médico, de enfermería y de psicología de la Clínica',
     desc:'Ve los agregados clínicos y el banco de preguntas, que es lo que le sirve para ajustar la consejería y detectar qué se está explicando mal en consulta.',
     ojo:'No da acceso a expedientes ni a ninguna persona en particular: eso vive en el expediente clínico, no aquí.',
     permisos:['ver_agregados','ver_preguntas','gestionar_agenda','usar_laboratorio'] },
@@ -948,7 +948,7 @@ const VISTAS = {
       <div class="card pad">
         <h3>Elige el caso</h3>
         <p class="why">Los ocho casos están escritos a mano a partir del catálogo didáctico.
-          Ninguno se generó con datos del Centro.</p>
+          Ninguno se generó con datos de la Clínica.</p>
         <div id="lcCasos" style="display:flex;flex-direction:column;gap:8px">
           ${CASOS.map((c,i)=>`<button class="tgl${i?'':' on'}" data-caso="${i}"
             style="text-align:left;padding:11px 13px;line-height:1.5">
@@ -1012,7 +1012,7 @@ const VISTAS = {
     ${bloque({ titulo:'Pruebas registradas y rezago',
       porque:'"Vencidas" son las que ya pasaron su fecha de repetición. Es la cifra que justifica una jornada de tamizaje.',
       svg:barrasH(M.tamizaje,{color:'var(--series-3)'}),
-      tabla:tabla(['Prueba','Total','En el Centro','Vencidas'],
+      tabla:tabla(['Prueba','Total','En la Clínica','Vencidas'],
         M.tamizaje.map(d=>[d.k,fmt(d.v),fmt(d.centro),fmt(d.venc)])),
       extra:nSuprimidos(M.suprimidos.filter(s=>s.d==='Tamizaje')) })}`,
 
@@ -1474,7 +1474,7 @@ const G_COLOR = {
 };
 const G_NOMBRE = {
   anticoncepcion:'Anticoncepción', menstrual:'Salud menstrual', its:'ITS',
-  embarazo:'Embarazo', sexualidad:'Sexualidad', servicios:'Servicios del Centro',
+  embarazo:'Embarazo', sexualidad:'Sexualidad', servicios:'Servicios de la Clínica',
 };
 const G_COLOR_OTRO = '#A9A2BC';
 const gColor  = t => G_COLOR[t]  || G_COLOR_OTRO;
@@ -1952,7 +1952,7 @@ async function pintarCola(){
           color:${r.urgencia === 'pronto' ? 'var(--warn)' : 'var(--text-muted)'}">
           ${r.urgencia === 'pronto' ? 'Lo antes posible' : 'Cuando haya lugar'}</span>
         <span style="font-size:12.5px;color:var(--text-muted)">
-          ${r.modalidad === 'linea' ? 'En línea' : r.modalidad === 'presencial' ? 'En el Centro' : 'Como sea más rápido'}
+          ${r.modalidad === 'linea' ? 'En línea' : r.modalidad === 'presencial' ? 'En la Clínica' : 'Como sea más rápido'}
           · esperando ${r.dias_esperando} día${r.dias_esperando === 1 ? '' : 's'}
           · estado: ${r.status}</span>
       </div>
@@ -2142,7 +2142,7 @@ function dibujarComunidad(){
     <div class="card pad">
       <h3>Cómo se protege esta tabla, y hasta dónde</h3>
       <p class="why">Vale la pena leerlo una vez: es lo que hay que poder explicar si alguien
-        pregunta por qué el Centro publica renglones de personas.</p>
+        pregunta por qué la Clínica publica renglones de personas.</p>
       <div style="font-size:13px;line-height:1.65;color:var(--text-secondary)">
         <p style="margin-bottom:10px"><b style="color:var(--text-primary)">La clase de equivalencia
           es (área, avance).</b> Son los dos únicos datos que alguien podría saber por fuera del
@@ -2231,7 +2231,7 @@ const SIN_AGREGADOS = que => `<div class="deny"><div class="big">⛨</div>
 const LAB_CANALES = {
   whatsapp: { t:'WhatsApp y grupos',    on:true,  alcance:38 },
   correo:   { t:'Correo institucional', on:true,  alcance:22 },
-  redes:    { t:'Redes del Centro',     on:false, alcance:26 },
+  redes:    { t:'Redes de la Clínica',     on:false, alcance:26 },
   cartel:   { t:'Carteles en campus',   on:false, alcance:18 },
   clase:    { t:'Aviso en clase',       on:false, alcance:55 },
 };
