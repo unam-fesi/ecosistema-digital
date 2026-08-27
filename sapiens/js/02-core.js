@@ -7,7 +7,7 @@ try{ sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY); }catch(e){
 /* Inyecta identidad del alumno en las llamadas a PUM-AI (para vincular incidentes de seguridad). */
 (function(){ if(window.__gemWrap)return; window.__gemWrap=true; const _f=window.fetch;
   window.fetch=function(u,o){ try{
-    if(typeof u==='string'&&u.indexOf('/functions/v1/gemini-epi')>=0&&o&&typeof o.body==='string'&&typeof MY_PROFILE!=='undefined'&&MY_PROFILE){
+    if(typeof u==='string'&&u.indexOf('/functions/v1/pumai-epi')>=0&&o&&typeof o.body==='string'&&typeof MY_PROFILE!=='undefined'&&MY_PROFILE){
       const b=JSON.parse(o.body);
       if(b&&typeof b==='object'&&b.uid===undefined){ b.uid=MY_PROFILE.user_id||null; b.nombre=((MY_PROFILE.nombre||'')+' '+(MY_PROFILE.apellido||'')).trim()||null; o=Object.assign({},o,{body:JSON.stringify(b)}); }
     }
@@ -404,7 +404,7 @@ async function planSend(q){q=(q||'').trim();if(!q)return;const inp=document.getE
   const pseg=arr=>(arr||[]).map(x=>x.k+' (n='+x.n+'): HTA '+x.hta+'%, DM2 '+x.dm2+'%, obesidad '+x.obes+'%, COVID alto '+x.covidAlto+'%').join(' | ');
   const pdesTxt=' Desgloses — sexo: '+pseg(dg.sexo)+'; edad: '+pseg(dg.edad)+'; comorbilidad: '+pseg(dg.comorbilidad)+'.';
   const ctx=guideAIContext()+'Contexto (cohorte, N='+s.n+'). HTA '+s.hta+'%, DM2 '+s.dm2+'%, obesidad '+(f.obes||'?')+'%, síndrome metabólico '+(s.smetab||'?')+'%, comorbilidad HTA+DM2 '+(s.comorbilidad||'?')+'%, casos silentes DM2 '+c.silent+'%, riesgo CV alto '+((s.riesgo||[])[2]||0)+'%. Arquetipos ante la vacuna: Provacuna '+s.arq[0]+'%, Indeciso '+s.arq[1]+'%, Renuente '+s.arq[2]+'%, Vulnerable '+s.arq[3]+'%. Riesgo de complicación COVID (bajo/mod/alto): '+((s.riesgoCovid||[]).join('/')||'?')+'. Última simulación COVID: cobertura '+(sim.vac||0)+'%, contagios '+(sim.inf||0)+'%, graves '+(sim.sev||0)+'%.'+pdesTxt+'\n\nSOLICITUD: '+q;
-  try{const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'plan',messages:[{role:'user',content:ctx}]})});const data=await res.json();load.style.whiteSpace='normal';load.innerHTML=mdToHtml(data.reply||'Sin respuesta.');}
+  try{const res=await fetch(SUPABASE_URL+'/functions/v1/pumai-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'plan',messages:[{role:'user',content:ctx}]})});const data=await res.json();load.style.whiteSpace='normal';load.innerHTML=mdToHtml(data.reply||'Sin respuesta.');}
   catch(e){load.textContent='No se pudo planear ('+(e.message||e)+').';}
 }
 function buildLab(){
@@ -597,7 +597,7 @@ async function twinAsk(){const a=sag[twinIdx];if(!a)return;const inp=document.ge
   if(twinMsgs.length===0)document.getElementById('twinChat').innerHTML='';
   twinBubble(q,'user');const btn=document.getElementById('twinSend');btn.disabled=true;const load=twinBubble('…','bot');
   const content=(twinMsgs.length===0?(twinProfile(a)+(guideText?('\n\nGuía clínica de referencia (úsala para hablar de tu tratamiento/medicamentos como paciente, no como experto): '+guideText.slice(0,2500)):'')+'\n\nEl entrevistador te pregunta: '+q):q);twinMsgs.push({role:'user',content:content});
-  try{const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'entrevista',messages:twinMsgs})});const data=await res.json();const rep=data.reply||'…';load.textContent=rep;twinMsgs.push({role:'model',content:rep});}
+  try{const res=await fetch(SUPABASE_URL+'/functions/v1/pumai-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'entrevista',messages:twinMsgs})});const data=await res.json();const rep=data.reply||'…';load.textContent=rep;twinMsgs.push({role:'model',content:rep});}
   catch(e){load.textContent='(no se pudo responder)';twinMsgs.pop();}
   finally{btn.disabled=false;inp.focus();}}
 
@@ -714,7 +714,7 @@ async function anaSend(q){
   else{const muniTxt=(s.muni||[]).map(function(m){return m.name+': HTA '+m.hta+'%, DM2 '+m.dm2+'%';}).join(' | ');const c=s.cascada||{};const dg=s.desglose||{};const segLine=function(arr){return (arr||[]).map(function(x){return x.k+' (n='+x.n+'): HTA '+x.hta+'%, DM2 '+x.dm2+'%';}).join(' | ');};base='Contexto de la cohorte de demostración (N='+s.n+'). Prevalencia HTA '+s.hta+'%, DM2 '+s.dm2+'%. Por municipio: '+muniTxt+'. Desgloses — sexo: '+segLine(dg.sexo)+'; edad: '+segLine(dg.edad)+'; comorbilidad: '+segLine(dg.comorbilidad)+'. Cascada DM2: tiene '+c.tiene+'%, dx '+c.dx+'%, tratamiento '+c.trat+'%, control '+c.ctrl+'%, silentes '+c.silent+'%.';}
   const ctx=guideAIContext()+base+(guideText?(' TEXTO DE LAS GUÍAS: '+guideText.slice(0,2000)):'')+fmt+'\n\nPREGUNTA: '+q;
   try{
-    const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'analisis',messages:[{role:'user',content:ctx}]})});
+    const res=await fetch(SUPABASE_URL+'/functions/v1/pumai-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'analisis',messages:[{role:'user',content:ctx}]})});
     const data=await res.json();const raw=data.reply||'Sin respuesta.';const ex=extractViz(raw);
     loading.style.whiteSpace='normal';loading.innerHTML=mdToHtml(ex.text);
     ex.vizzes.forEach((v,i)=>{const d=document.createElement('div');d.id='vz'+(Date.now()+i);d.style.cssText='margin-top:10px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px';loading.appendChild(d);renderViz(d,v);});
@@ -746,7 +746,7 @@ async function generateReport(){
     let prompt=guideAIContext()+buildReportPrompt();
     if(anaHistory.length)prompt+='\n\nIntegra también estas consultas previas del usuario a PUM-AI (menciona sus hallazgos donde aporten):\n'+anaHistory.slice(-6).map((h,i)=>(i+1)+'. P: '+h.q+' | R: '+String(h.a).replace(/\s+/g,' ').slice(0,400)).join('\n');
     if(REPORT_REFS.length)prompt+='\n\nREFERENCIAS CIENTÍFICAS REALES disponibles (Europe PMC). Cítalas en el texto con corchetes [1], [2]… donde respalden una afirmación, sin inventar otras:\n'+REPORT_REFS.map((r,i)=>'['+(i+1)+'] '+r.title+' ('+r.journal+(r.year?(', '+r.year):'')+')').join('\n');
-    const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'report',messages:[{role:'user',content:prompt}]})});
+    const res=await fetch(SUPABASE_URL+'/functions/v1/pumai-epi',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'report',messages:[{role:'user',content:prompt}]})});
     const data=await res.json();lastReport=data.reply||'No se recibió respuesta.';
     out.innerHTML=buildReportDoc(lastReport);renderReportCharts();
     try{saveAnalisis('informe','Informe epidemiológico'+(usedDemo?' (demo)':''),lastReport,{});}catch(e){}

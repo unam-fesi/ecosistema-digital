@@ -7,7 +7,7 @@
  *     medicamentos, decisiones, psicosocial, archivos, consentimientos,
  *     estudios, preventivo, documentos, interconsultas
  *   - PUM-AI: los 5 widgets con respuesta hardcoded + thinking delay
- *   - Gemini API (legacy): respuestas hardcoded en formato Gemini
+ *   - PUM-AI API (legacy): respuestas hardcoded en formato PUM-AI
  *   - Odontología: odontograma, periodontograma, hallazgos, plan tx
  *   - Traumatología: lesiones, evoluciones, plan tx
  *   - LiveKit / Teleconsulta: simulación
@@ -533,7 +533,7 @@
     ],
   });
 
-  // ─── PASO 8: PUM-AI / Gemini respuestas ──────────────────────────────────
+  // ─── PASO 8: PUM-AI / PUM-AI respuestas ──────────────────────────────────
   const pumaiResumen = (p) =>
     `Paciente ${p.nombre_completo}, ${p.edad} años, ${p.sexo_label.toLowerCase()}. Diagnóstico principal: ${p.dx_principal}. ` +
     `Riesgo clínico: ${p.riesgo.toUpperCase()}. ${p.alergias?.length ? `Alergias: ${p.alergias.join(', ')}. ` : 'Sin alergias documentadas. '}` +
@@ -620,7 +620,7 @@ Este documento es un apoyo a la decisión clínica y no sustituye el criterio de
   const interceptFetch = async function (input, init) {
     const url = typeof input === 'string' ? input : (input?.url || '');
 
-    // Llamadas a Gemini API → respuesta hardcoded en formato Gemini
+    // Llamadas a PUM-AI API → respuesta hardcoded en formato PUM-AI
     if (url.includes('generativelanguage.googleapis.com')) {
       let body = init?.body;
       if (typeof body === 'string') {
@@ -1177,5 +1177,5 @@ Este documento es un apoyo a la decisión clínica y no sustituye el criterio de
     // Sin timeout — el polling corre toda la sesión (no consume CPU significativo)
   });
 
-  console.info('%c[MIRC DEMO v2] Mocks cargados (Gemini + Expediente + Odonto + Trauma)', 'background:#1e40af;color:#fff;padding:4px 10px;border-radius:4px;font-weight:bold');
+  console.info('%c[MIRC DEMO v2] Mocks cargados (PUM-AI + Expediente + Odonto + Trauma)', 'background:#1e40af;color:#fff;padding:4px 10px;border-radius:4px;font-weight:bold');
 })();

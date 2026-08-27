@@ -88,7 +88,7 @@ async function sendChatMessage(){
   showTyping();
   try{
     if(typeof supabaseClient!=='undefined' && typeof SUPABASE_URL!=='undefined' && SUPABASE_URL!=='https://PLACEHOLDER.supabase.co'){
-      const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-chat',{
+      const res=await fetch(SUPABASE_URL+'/functions/v1/pumai-chat',{
         method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPABASE_ANON_KEY},
         body:JSON.stringify({messages:chatHistory})
       });
@@ -194,7 +194,7 @@ async function sendToAPI(text){
   showTyping();
   try{
     if(typeof supabaseClient!=='undefined' && typeof SUPABASE_URL!=='undefined' && SUPABASE_URL!=='https://PLACEHOLDER.supabase.co'){
-      const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-chat',{
+      const res=await fetch(SUPABASE_URL+'/functions/v1/pumai-chat',{
         method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPABASE_ANON_KEY},
         body:JSON.stringify({messages:chatHistory})
       });

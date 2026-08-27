@@ -1865,7 +1865,7 @@ Asegúrate de que tu respuesta sea práctica, accionable y esté fundamentada en
 
     // Call the Supabase edge function
     const response = await fetch(
-      window.SUPABASE_URL + '/functions/v1/gemini-chat',
+      window.SUPABASE_URL + '/functions/v1/pumai-chat',
       {
         method: 'POST',
         headers: {

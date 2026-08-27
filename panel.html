@@ -506,8 +506,8 @@ function mdLite(t){
   }
   return `<div class="mdbody">${html}</div>`;
 }
-async function pumaiAsk(promptText){ try{ const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-chat',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':'Bearer '+SUPABASE_ANON},body:JSON.stringify({mode:'analysis',messages:[{role:'user',parts:[{text:promptText}]}]})}); if(!res.ok)return null; const d=await res.json(); return d.reply||d.text||null; }catch(e){ return null; } }
-async function pumaiConversar(history){ try{ const res=await fetch(SUPABASE_URL+'/functions/v1/gemini-chat',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':'Bearer '+SUPABASE_ANON},body:JSON.stringify({mode:'analysis',messages:history})}); if(!res.ok)return null; const d=await res.json(); return d.reply||d.text||null; }catch(e){ return null; } }
+async function pumaiAsk(promptText){ try{ const res=await fetch(SUPABASE_URL+'/functions/v1/pumai-chat',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':'Bearer '+SUPABASE_ANON},body:JSON.stringify({mode:'analysis',messages:[{role:'user',parts:[{text:promptText}]}]})}); if(!res.ok)return null; const d=await res.json(); return d.reply||d.text||null; }catch(e){ return null; } }
+async function pumaiConversar(history){ try{ const res=await fetch(SUPABASE_URL+'/functions/v1/pumai-chat',{method:'POST',headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':'Bearer '+SUPABASE_ANON},body:JSON.stringify({mode:'analysis',messages:history})}); if(!res.ok)return null; const d=await res.json(); return d.reply||d.text||null; }catch(e){ return null; } }
 
 /* ── SECCIÓN: Inteligencia ── */
 function secInteligencia(V){

@@ -13,7 +13,7 @@ const SYSTEM_PROMPT = `Eres PUM-AI, el asistente virtual del Ecosistema Digital 
 
 Responde siempre en español, de forma amable y concisa. Si te preguntan algo fuera de estos temas, indica amablemente que solo puedes ayudar con información del Ecosistema Digital.`;
 
-const GEMINI_FUNCTION_URL = '/functions/v1/gemini-chat';
+const PUMAI_FUNCTION_URL = '/functions/v1/pumai-chat';
 const WELCOME_MESSAGE = '¡Hola! Soy PUM-AI 🤖, tu asistente del Ecosistema Digital de la FES Iztacala. ¿En qué puedo ayudarte hoy?';
 
 // Historial de conversación (sin system prompt — se fuerza en el servidor)
@@ -175,7 +175,7 @@ async function sendMessage(userMessage) {
   try {
     // Enviar al edge function de Supabase
     const response = await fetch(
-      `${SUPABASE_URL}${GEMINI_FUNCTION_URL}`,
+      `${SUPABASE_URL}${PUMAI_FUNCTION_URL}`,
       {
         method: 'POST',
         headers: {
@@ -273,10 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-
-  // Renderizar mensaje de bienvenida
-  renderWelcome();
-});
 
   // Renderizar mensaje de bienvenida
   renderWelcome();

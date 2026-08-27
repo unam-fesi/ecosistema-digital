@@ -346,18 +346,62 @@
   }
   function bubble(text, who){ var d=document.createElement('div'); d.className='pumai-msg '+who;
     if(who==='b') d.innerHTML=mdToHtml(text); else d.textContent=text; msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight; return d; }
+  // ── Fallback LOCAL: si PUM-AI (función/red) falla, responde lo esencial con los datos ya cargados
+  function noAcc(s){ return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+  function fallbackLocal(q){
+    var n=noAcc(q), ctx=window.__pumaiCtx||null, D=window.PRACTICAS_DATA;
+    // ¿Traen un número de grupo en la pregunta? (aunque no lo hayan buscado arriba)
+    var mg=n.match(/\b(1[1-4]\d{2})\b/);
+    if(mg && D && D.grupos && D.grupos[mg[1]]){
+      var gi=D.grupos[mg[1]], cl=D.clinicas[gi.clinica], lg=gi.turno==='matutino'?'07:00':'14:00';
+      return 'El grupo **'+mg[1]+'** va a **'+cl.nombre+'** ('+cl.direccion+'), el **'+gi.dia+'**, turno **'+gi.turno+'** (llegar '+lg+').\n\nEscribe tu grupo en el buscador de arriba para ver el mapa y la ruta.';
+    }
+    if(!ctx){
+      return 'Escribe tu **número de grupo** (4 dígitos) en el buscador de arriba y te digo tu clínica, día, turno, hora de salida y la ruta.';
+    }
+    var link='https://www.google.com/maps/dir/?api=1&destination='+encodeURIComponent(ctx.coords)+'&travelmode=transit';
+    // Intents
+    if(/(trafico|bloque|cerrad|accidente|choque|congesti|incidente|manifestaci|obra)/.test(n))
+      return 'Ahorita no puedo consultar el **tráfico en vivo**. Revisa el estado del camino y una ruta actualizada aquí: '+link+' — y recuerda salir con tiempo.';
+    if(/(donde|a donde|adonde|clinica|cusi|destino|lugar|voy)/.test(n))
+      return 'Vas a **'+ctx.clinica+'**.\n\n📍 '+ctx.direccion+'\n\nCómo llegar: '+link;
+    if(/(que dia|cuando|dia me toca|dia toca|dia de)/.test(n) || /\bdia\b/.test(n))
+      return 'Tu práctica es el **'+ctx.dia+'** (turno '+ctx.turno+').';
+    if(/(salir|salida|a que hora salgo|cuando salgo|salgo)/.test(n))
+      return 'Te sugiero **salir ~'+ctx.salida_sugerida+'** para llegar a las '+ctx.llega+' con margen. Sal con tiempo y viaja acompañado.';
+    if(/(hora|llegar|entrada|turno|a que hora)/.test(n))
+      return 'Turno **'+ctx.turno+'**: debes **llegar '+ctx.llega+'**. Salida sugerida ~'+ctx.salida_sugerida+'.';
+    if(/(costo|cuanto cuesta|pasaje|precio|dinero)/.test(n)){
+      var cs=(ctx.rutas||[]).map(function(r){return r.costo;}).filter(function(x){return x;});
+      return cs.length? 'El costo de ida ronda **$'+Math.min.apply(null,cs)+'** aprox. (según la ruta que tomes).' : 'El costo depende de la ruta; consulta las opciones en la tarjeta de rutas.';
+    }
+    if(/(ruta|como llego|como llegar|transporte|metro|micro|suburbano|camion|autobus|mexibus|combi)/.test(n)){
+      var rs=(ctx.rutas||[]);
+      if(!rs.length) return 'Revisa la sección de **rutas** en la página; también puedes abrir la ruta en el mapa: '+link;
+      return 'Opciones para llegar a **'+ctx.clinica+'**:\n\n'+rs.map(function(r){return '- Desde **'+r.desde+'** — ~'+r.min+' min, ~$'+r.costo;}).join('\n')+'\n\nRuta en mapa: '+link;
+    }
+    if(/(mapa|maps|como llego|ubicacion|direccion)/.test(n))
+      return '📍 **'+ctx.clinica+'** — '+ctx.direccion+'\n\nAbrir ruta: '+link;
+    // Resumen por defecto
+    return 'Esto es lo que tengo de tu grupo **'+ctx.grupo+'**:\n\n- Clínica: **'+ctx.clinica+'**\n- Día: **'+ctx.dia+'** · Turno **'+ctx.turno+'**\n- Llegar '+ctx.llega+' · salir ~'+ctx.salida_sugerida+'\n\nCómo llegar: '+link;
+  }
   async function ask(q){
     q=(q||'').trim(); if(!q) return;
     if(sugs) sugs.style.display='none';
     bubble(q,'u'); if(input) input.value='';
     var t=bubble('escribiendo…','b'); if(send) send.disabled=true;
     try{
-      var c=client(); if(!c){ t.textContent='PUM-AI no cargó bien. Recarga la página.'; return; }
+      var c=client(); if(!c) throw new Error('noclient');
       var r=await c.functions.invoke('pumai-practicas', { body:{ question:q, contexto: window.__pumaiCtx||null } });
-      if(r.error){ t.textContent='Ahorita no puedo responder. Intenta de nuevo en un momento.'; }
-      else if(r.data && r.data.answer){ t.innerHTML=mdToHtml(r.data.answer); }
-      else { t.textContent=(r.data && r.data.error) ? r.data.error : 'No obtuve respuesta.'; }
-    }catch(e){ t.textContent='Error de conexión. Revisa tu internet.'; }
+      if(r.error) throw new Error('remote');
+      if(r.data && r.data.answer){ t.innerHTML=mdToHtml(r.data.answer); }
+      else if(r.data && r.data.error){ t.textContent=r.data.error; }
+      else throw new Error('empty');
+    }catch(e){
+      var fb=fallbackLocal(q);
+      if(fb){ t.innerHTML=mdToHtml(fb); }
+      else { t.textContent='Ahorita no puedo conectarme con PUM-AI. Busca tu grupo arriba o intenta de nuevo en un momento.'; }
+    }
     finally{ if(send) send.disabled=false; msgs.scrollTop=msgs.scrollHeight; }
   }
   if(send) send.addEventListener('click', function(){ ask(input.value); });
