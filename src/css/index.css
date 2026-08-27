@@ -1673,12 +1673,12 @@ body.spa-locked { overflow: hidden; }
 .proyectos-nuevos-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:20px; }
 
 /* Logos de los proyectos (reemplazan el emoji) */
-.spa-card-logo{ height:76px; width:auto; max-width:84%; object-fit:contain; display:block;
-  margin:0 0 14px; filter:drop-shadow(0 4px 14px rgba(0,0,0,.30)); }
+.spa-card-logo{ height:96px; width:auto; max-width:90%; object-fit:contain; display:block;
+  margin:0 auto 16px; filter:drop-shadow(0 4px 14px rgba(0,0,0,.30)); }
 .spa-card-logo.centrado{ margin-left:auto; margin-right:auto; }
 .mirc-logo{ height:48px; width:auto; max-width:240px; object-fit:contain; display:block; margin:0 0 12px;
   filter:drop-shadow(0 4px 14px rgba(0,0,0,.35)); }
-@media(max-width:600px){ .spa-card-logo{ height:62px; } .mirc-logo{ height:40px; } }
+@media(max-width:600px){ .spa-card-logo{ height:74px; } .mirc-logo{ height:40px; } }
 
 /* ============================================================
    Card CUSMSR - Salud Menstrual, Sexual y Reproductiva
