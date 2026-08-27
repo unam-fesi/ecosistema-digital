@@ -34,7 +34,7 @@ window.PRACTICAS_RUTAS = {
     {
       origen: "Tren Suburbano (Cuautitlán)",
       resumen: [
-        { icono: "suburbano", texto: "Toma el Tren Suburbano (Buenavista → Cuautitlán). Baja según indique Moovit (Cuautitlán / estación previa)." },
+        { icono: "suburbano", texto: "Toma el Tren Suburbano (Buenavista → Cuautitlán). Baja en la estación Cuautitlán (o la que te quede más cerca, según Google Maps)." },
         { icono: "micro", texto: "Micro/ruta local hacia Industrial Xhala – Av. Huehuetoca." },
         { icono: "caminar", texto: "Caminata corta a la CUSI Almaraz." }
       ],
