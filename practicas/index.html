@@ -146,10 +146,18 @@
   .pumai-hint{ font-size:13px; color:var(--mut); margin:0 0 10px; }
   .pumai-q{ display:flex; flex-direction:column; gap:7px; }
   .pumai-q button{ text-align:left; font-size:13px; padding:9px 11px; border-radius:10px; border:1px solid var(--line);
-    background:var(--soft); color:#64748B; cursor:not-allowed; }
+    background:var(--soft); color:#334155; cursor:pointer; transition:background .15s,border-color .15s; }
+  .pumai-q button:hover{ background:rgba(196,162,78,.10); border-color:rgba(196,162,78,.4); }
+  #pumaiMsgs{ max-height:300px; overflow:auto; }
+  .pumai-msg{ font-size:13.5px; line-height:1.5; padding:9px 12px; border-radius:12px; margin:8px 0; max-width:88%; white-space:pre-wrap; word-wrap:break-word; }
+  .pumai-msg.u{ background:#0C2340; color:#fff; margin-left:auto; border-bottom-right-radius:4px; }
+  .pumai-msg.b{ background:var(--soft); color:#1E293B; border:1px solid var(--line); border-bottom-left-radius:4px; }
+  .pumai-msg.b a{ color:#0369A1; word-break:break-all; }
   .pumai-input{ display:flex; gap:8px; padding:0 14px 14px; }
-  .pumai-input input{ flex:1; padding:11px 12px; font-size:14px; border-radius:12px; border:1.5px solid var(--line); background:var(--soft); color:#94A3B8; }
-  .pumai-input button{ width:44px; border:none; border-radius:12px; background:#CBD5E1; color:#fff; cursor:not-allowed; font-size:15px; }
+  .pumai-input input{ flex:1; padding:11px 12px; font-size:14px; border-radius:12px; border:1.5px solid var(--line); background:#fff; color:var(--ink); }
+  .pumai-input input:focus{ outline:none; border-color:var(--gold); }
+  .pumai-input button{ width:44px; border:none; border-radius:12px; background:linear-gradient(135deg,#163A64,#0C2340); color:#fff; cursor:pointer; font-size:15px; }
+  .pumai-input button:disabled{ opacity:.6; cursor:default; }
   @media(max-width:600px){ .pumai-fab{ width:60px; height:60px; } }
 
   @media (max-width:600px){ .logos img{ height:44px; max-width:96px; } .logos{ gap:14px; } }
@@ -276,27 +284,54 @@
       <div><b>PUM-AI</b><span>Asistente de tu práctica · próximamente</span></div>
       <button class="pumai-x" id="pumaiClose" aria-label="Cerrar">✕</button>
     </div>
-    <div class="pumai-body">
-      <p class="pumai-hint">Pronto podrás preguntarme sobre tu práctica. Por ejemplo:</p>
-      <div class="pumai-q">
-        <button type="button" disabled>¿A qué clínica va mi grupo?</button>
-        <button type="button" disabled>¿Qué día tengo práctica clínica?</button>
-        <button type="button" disabled>¿A qué hora salgo para llegar a tiempo?</button>
-        <button type="button" disabled>¿Cómo llego desde el Metro El Rosario?</button>
-        <button type="button" disabled>¿Hay algún bloqueo o problema en mi ruta hoy?</button>
+    <div class="pumai-body" id="pumaiMsgs">
+      <p class="pumai-hint">¡Hola! Soy PUM-AI. Te ayudo a llegar a tu práctica. Prueba:</p>
+      <div class="pumai-q" id="pumaiSugs">
+        <button type="button">¿A qué clínica va mi grupo?</button>
+        <button type="button">¿Qué día tengo práctica clínica?</button>
+        <button type="button">¿A qué hora salgo para llegar a tiempo?</button>
+        <button type="button">¿Cómo llego desde el Metro El Rosario?</button>
+        <button type="button">¿Cómo veo el tráfico ahorita a mi clínica?</button>
       </div>
     </div>
-    <div class="pumai-input"><input disabled placeholder="Escríbeme… (próximamente)"><button type="button" disabled>➤</button></div>
+    <div class="pumai-input"><input id="pumaiInput" placeholder="Escríbeme tu duda…" maxlength="300"><button type="button" id="pumaiSend" aria-label="Enviar">➤</button></div>
   </div>
   <button class="pumai-fab" id="pumaiFab" aria-label="Abrir asistente PUM-AI">
     <img src="../public/assets/pumita-medico-landing.png" alt="PUM-AI">
   </button>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script>
 (function(){
+  var SB_URL="https://risatbuqolklefvjgngb.supabase.co";
+  var SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpc2F0YnVxb2xrbGVmdmpnbmdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxNjc0MzUsImV4cCI6MjA4OTc0MzQzNX0.PTDGmpihCPd5iz8ZhbcUOMbGNuS4mi1sCD5linrVGvY";
+  var sb=null;
+  function client(){ if(!sb && window.supabase) sb=window.supabase.createClient(SB_URL, SB_ANON); return sb; }
   var fab=document.getElementById('pumaiFab'), panel=document.getElementById('pumaiPanel'), x=document.getElementById('pumaiClose');
-  if(fab&&panel) fab.addEventListener('click', function(){ panel.hidden=!panel.hidden; });
-  if(x&&panel) x.addEventListener('click', function(){ panel.hidden=true; });
+  var msgs=document.getElementById('pumaiMsgs'), input=document.getElementById('pumaiInput'), send=document.getElementById('pumaiSend'), sugs=document.getElementById('pumaiSugs');
+  if(fab) fab.addEventListener('click', function(){ panel.hidden=!panel.hidden; if(!panel.hidden && input) setTimeout(function(){ input.focus(); },50); });
+  if(x) x.addEventListener('click', function(){ panel.hidden=true; });
+  function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function linkify(t){ return esc(t).replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>'); }
+  function bubble(text, who){ var d=document.createElement('div'); d.className='pumai-msg '+who;
+    if(who==='b') d.innerHTML=linkify(text); else d.textContent=text; msgs.appendChild(d); msgs.scrollTop=msgs.scrollHeight; return d; }
+  async function ask(q){
+    q=(q||'').trim(); if(!q) return;
+    if(sugs) sugs.style.display='none';
+    bubble(q,'u'); if(input) input.value='';
+    var t=bubble('escribiendo…','b'); if(send) send.disabled=true;
+    try{
+      var c=client(); if(!c){ t.textContent='PUM-AI no cargó bien. Recarga la página.'; return; }
+      var r=await c.functions.invoke('pumai-practicas', { body:{ question:q, contexto: window.__pumaiCtx||null } });
+      if(r.error){ t.textContent='Ahorita no puedo responder. Intenta de nuevo en un momento.'; }
+      else if(r.data && r.data.answer){ t.innerHTML=linkify(r.data.answer); }
+      else { t.textContent=(r.data && r.data.error) ? r.data.error : 'No obtuve respuesta.'; }
+    }catch(e){ t.textContent='Error de conexión. Revisa tu internet.'; }
+    finally{ if(send) send.disabled=false; msgs.scrollTop=msgs.scrollHeight; }
+  }
+  if(send) send.addEventListener('click', function(){ ask(input.value); });
+  if(input) input.addEventListener('keydown', function(e){ if(e.key==='Enter') ask(input.value); });
+  if(sugs) Array.prototype.forEach.call(sugs.querySelectorAll('button'), function(b){ b.addEventListener('click', function(){ ask(b.textContent); }); });
 })();
 </script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -330,6 +365,10 @@
     var durMax = rutas.reduce(function(m,r){ return Math.max(m, r.duracion_min||60); }, 60);
     var salida = restarMin(llegada, durMax + 15);
     var costoMin = rutas.reduce(function(m,r){ return Math.min(m, r.costo_mxn||99); }, 99);
+    // Contexto para PUM-AI (fuente confiable)
+    window.__pumaiCtx = { grupo:g, clinica:cli.nombre, direccion:cli.direccion, coords:cli.lat+","+cli.lng,
+      dia:dia, turno:info.turno, llega:llegada, salida_sugerida:salida,
+      rutas:(rutas||[]).map(function(x){ return { desde:x.origen, min:x.duracion_min, costo:x.costo_mxn }; }) };
 
     $("clinicaHero").innerHTML =
       '<h3>'+cli.nombre+'</h3><div class="dir">'+cli.direccion+'</div>'+
