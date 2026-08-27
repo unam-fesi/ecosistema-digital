@@ -24,21 +24,21 @@ window.PRACTICAS_DATA = {
       id: "iztacala",
       nombre: "CUSI / FES Iztacala",
       direccion: "Av. de los Barrios 1, Los Reyes Ixtacala, Tlalnepantla de Baz, 54090, Edomex",
-      lat: 19.5487, lng: -99.1949, // aprox — AJUSTAR pin
+      lat: 19.5275902, lng: -99.1864398, // CUSI Iztacala (Google Maps)
       color: "#0C7A4B"
     },
     almaraz: {
       id: "almaraz",
       nombre: "CUSI Almaraz",
       direccion: "Av. Huehuetoca 256, Industrial Xhala, 54714 Cuautitlán Izcalli, Edomex",
-      lat: 19.6410, lng: -99.1980, // aprox — AJUSTAR pin
+      lat: 19.6888623, lng: -99.1888411, // CUSI Almaraz (Google Maps)
       color: "#B45309"
     },
     cuautitlan: {
       id: "cuautitlan",
       nombre: "CUSI Cuautitlán",
       direccion: "Jorge Jiménez Cantú s/n, San Juan Atlámica, 54729 Cuautitlán Izcalli, Edomex",
-      lat: 19.6625, lng: -99.1835, // aprox — AJUSTAR pin
+      lat: 19.6737269, lng: -99.2091832, // CUSI Cuautitlán (Google Maps)
       color: "#1E40AF"
     }
   },

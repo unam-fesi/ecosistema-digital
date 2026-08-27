@@ -128,12 +128,14 @@
 
   /* ---------- PUM-AI (asistente del sitio) ---------- */
   .pumai{ position:fixed; right:16px; bottom:16px; z-index:9000; display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
-  .pumai-fab{ position:relative; width:74px; height:74px; border-radius:50%; border:2px solid #fff; cursor:pointer; padding:0; overflow:hidden;
-    background:#fff; box-shadow:0 12px 30px rgba(15,35,64,.24); transition:transform .2s var(--ease); }
-  .pumai-fab img{ width:100%; height:100%; object-fit:cover; }
-  .pumai-fab:hover{ transform:translateY(-3px) scale(1.05); }
-  .pumai-fab::after{ content:"?"; position:absolute; right:-2px; top:-2px; width:22px; height:22px; border-radius:50%;
-    background:linear-gradient(135deg,#e7c65e,#C4A24E); color:#241a02; font:800 13px/22px 'Sora',sans-serif; }
+  .pumai-fab{ position:relative; width:98px; height:auto; border:none; cursor:pointer; padding:0; background:transparent;
+    transition:transform .2s var(--ease); }
+  .pumai-fab img{ width:100%; height:auto; display:block; filter:drop-shadow(0 10px 22px rgba(15,35,64,.30)); }
+  .pumai-fab:hover{ transform:translateY(-3px) scale(1.04); }
+  .pumai-hello{ align-self:flex-end; background:#fff; border:1px solid var(--line); border-radius:16px 16px 4px 16px; padding:9px 13px;
+    font-size:13px; font-weight:700; color:var(--navy); box-shadow:0 10px 24px rgba(15,35,64,.16); max-width:190px; margin-right:8px;
+    animation:pop .3s var(--ease); }
+  .pumai-hello[hidden]{ display:none; }
   .pumai-panel{ width:min(330px,88vw); background:#fff; border:1px solid var(--line); border-radius:18px; overflow:hidden;
     box-shadow:0 24px 60px rgba(15,35,64,.24); animation:pop .25s var(--ease); }
   .pumai-panel[hidden]{ display:none; }
@@ -158,7 +160,7 @@
   .pumai-input input:focus{ outline:none; border-color:var(--gold); }
   .pumai-input button{ width:44px; border:none; border-radius:12px; background:linear-gradient(135deg,#163A64,#0C2340); color:#fff; cursor:pointer; font-size:15px; }
   .pumai-input button:disabled{ opacity:.6; cursor:default; }
-  @media(max-width:600px){ .pumai-fab{ width:60px; height:60px; } }
+  @media(max-width:600px){ .pumai-fab{ width:78px; } .pumai-hello{ max-width:150px; font-size:12px; } }
 
   @media (max-width:600px){ .logos img{ height:44px; max-width:96px; } .logos{ gap:14px; } }
   @media (prefers-reduced-motion:reduce){
@@ -296,6 +298,7 @@
     </div>
     <div class="pumai-input"><input id="pumaiInput" placeholder="Escríbeme tu duda…" maxlength="300"><button type="button" id="pumaiSend" aria-label="Enviar">➤</button></div>
   </div>
+  <div class="pumai-hello" id="pumaiHello">¡Hola! ¿Te ayudo a llegar a tu práctica? 🐾</div>
   <button class="pumai-fab" id="pumaiFab" aria-label="Abrir asistente PUM-AI">
     <img src="../public/assets/pumita-medico-landing.png" alt="PUM-AI">
   </button>
@@ -307,10 +310,11 @@
   var SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpc2F0YnVxb2xrbGVmdmpnbmdiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxNjc0MzUsImV4cCI6MjA4OTc0MzQzNX0.PTDGmpihCPd5iz8ZhbcUOMbGNuS4mi1sCD5linrVGvY";
   var sb=null;
   function client(){ if(!sb && window.supabase) sb=window.supabase.createClient(SB_URL, SB_ANON); return sb; }
-  var fab=document.getElementById('pumaiFab'), panel=document.getElementById('pumaiPanel'), x=document.getElementById('pumaiClose');
+  var fab=document.getElementById('pumaiFab'), panel=document.getElementById('pumaiPanel'), x=document.getElementById('pumaiClose'), hello=document.getElementById('pumaiHello');
   var msgs=document.getElementById('pumaiMsgs'), input=document.getElementById('pumaiInput'), send=document.getElementById('pumaiSend'), sugs=document.getElementById('pumaiSugs');
-  if(fab) fab.addEventListener('click', function(){ panel.hidden=!panel.hidden; if(!panel.hidden && input) setTimeout(function(){ input.focus(); },50); });
-  if(x) x.addEventListener('click', function(){ panel.hidden=true; });
+  function setHello(){ if(hello) hello.hidden = !panel.hidden; }
+  if(fab) fab.addEventListener('click', function(){ panel.hidden=!panel.hidden; setHello(); if(!panel.hidden && input) setTimeout(function(){ input.focus(); },50); });
+  if(x) x.addEventListener('click', function(){ panel.hidden=true; setHello(); });
   function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function linkify(t){ return esc(t).replace(/(https?:\/\/[^\s]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>'); }
   function bubble(text, who){ var d=document.createElement('div'); d.className='pumai-msg '+who;
@@ -385,7 +389,7 @@
         '<div class="box" style="flex-basis:100%;background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.3)"><span style="color:#fecaca">⚠️ Regreso de noche (~20:00): planea tu vuelta segura y acompañado.</span></div>');
     }
 
-    setTimeout(function(){ initMap(cli); maybeUbicacion(); }, 60);
+    setTimeout(function(){ try{ initMap(cli); }catch(e){ console.warn("map", e); } maybeUbicacion(); }, 60);
 
     $("btnGoogle").onclick = function(){
       var u = "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(cli.lat+","+cli.lng)+"&travelmode=transit";
