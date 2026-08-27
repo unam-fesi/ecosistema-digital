@@ -172,8 +172,7 @@
       <div class="salida" id="salidaBox"></div>
       <div id="map"></div>
       <button class="btn btn-gold" id="btnGoogle">🧭 Cómo llegar (Google Maps)</button>
-      <a class="btn btn-ghost" id="btnMoovit" target="_blank" rel="noopener">🚍 Abrir en Moovit (app)</a>
-      <button class="btn btn-ghost" id="btnUbicacion">📍 Usar mi ubicación en el mapa</button>
+      <p class="muted" style="margin:9px 2px 0;font-size:12px">⏱️ Google Maps calcula la ruta <b>desde la hora actual</b> y puede variar (o marcar tiempos largos si no hay transporte a esa hora). Guíate por tu <b style="color:#fde68a">hora de salida sugerida</b> de arriba para llegar a tiempo el día de tu práctica.</p>
     </div>
 
     <div class="card" data-reveal>
@@ -217,7 +216,7 @@
   <div id="consentModal" class="modal-bg hidden" role="dialog" aria-modal="true">
     <div class="modal">
       <h3>📍 Uso de tu ubicación</h3>
-      <p>Para mostrarte en el mapa y trazar tu ruta necesitamos tu ubicación. <b>Se procesa solo en tu teléfono; no la guardamos ni la enviamos a ningún servidor.</b> Si abres Google Maps o Moovit, tu ubicación se comparte con esos servicios bajo sus propias políticas.</p>
+      <p>Para mostrarte en el mapa y trazar tu ruta necesitamos tu ubicación. <b>Se procesa solo en tu teléfono; no la guardamos ni la enviamos a ningún servidor.</b> Si abres Google Maps, tu ubicación se comparte con ese servicio bajo sus propias políticas.</p>
       <label class="chk"><input type="checkbox" id="chkConsent"> He leído el <button type="button" class="footlink" id="verAviso">Aviso de privacidad</button> y autorizo el uso de mi ubicación.</label>
       <button class="btn btn-gold" id="consentOk" disabled>Autorizar y ubicarme</button>
       <button class="btn btn-ghost" id="consentNo">Ahora no</button>
@@ -233,7 +232,7 @@
         <h4>¿Qué datos usamos y para qué?</h4>
         <p>Tu <b>ubicación (geolocalización)</b>, únicamente con tu autorización, para mostrarte en el mapa y calcular la ruta a tu clínica de práctica.</p>
         <h4>¿Dónde se procesa?</h4>
-        <p>Se procesa <b>localmente en tu dispositivo</b>. No se almacena en servidores de la Facultad ni se comparte, <b>salvo</b> cuando tú decides abrir Google Maps o Moovit: en ese momento tu ubicación se envía a esos servicios, sujetos a sus propias políticas.</p>
+        <p>Se procesa <b>localmente en tu dispositivo</b>. No se almacena en servidores de la Facultad ni se comparte, <b>salvo</b> cuando tú decides abrir Google Maps: en ese momento tu ubicación se envía a ese servicio, sujeto a sus propias políticas.</p>
         <h4>Lo que NO hacemos</h4>
         <p>No creamos perfiles, no guardamos historial de ubicaciones ni datos sensibles.</p>
         <h4>Tus derechos</h4>
@@ -296,16 +295,13 @@
         '<div class="box" style="flex-basis:100%;background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.3)"><span style="color:#fecaca">⚠️ Regreso de noche (~20:00): planea tu vuelta segura y acompañado.</span></div>');
     }
 
-    setTimeout(function(){ initMap(cli); }, 60);
+    setTimeout(function(){ initMap(cli); maybeUbicacion(); }, 60);
 
-    var q = encodeURIComponent(cli.nombre+" "+cli.direccion);
     $("btnGoogle").onclick = function(){
-      var u = "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(cli.direccion)+"&travelmode=transit";
+      var u = "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(cli.lat+","+cli.lng)+"&travelmode=transit";
       if(userLL) u += "&origin="+userLL.la+","+userLL.ln;
       window.open(u,"_blank","noopener");
     };
-    $("btnMoovit").href = "https://moovit.com/?to="+q+"&tll="+cli.lat+"_"+cli.lng;
-    $("btnUbicacion").onclick = pedirUbicacion;
 
     $("rutas").innerHTML = rutas.map(function(r){
       var steps = r.resumen.map(function(s){ var ic = ICON[s.icono]||ICON.micro;
@@ -338,10 +334,12 @@
   }
 
   var GEO_KEY = "practicas.geoConsent";
-  function pedirUbicacion(){
-    if(!navigator.geolocation){ alert("Tu navegador no permite ubicación."); return; }
-    var ya=false; try{ ya = localStorage.getItem(GEO_KEY)==="1"; }catch(e){}
-    if(ya){ geolocaliza(); return; }
+  function maybeUbicacion(){
+    if(!navigator.geolocation) return;
+    var v=null; try{ v=localStorage.getItem(GEO_KEY); }catch(e){}
+    if(v==="1"){ geolocaliza(); return; }   // ya autorizó
+    if(v==="0"){ return; }                    // ya decidió que no
+    // sin decisión previa: el consentimiento activa la ubicación al aceptar
     var chk=$("chkConsent"); if(chk){ chk.checked=false; } var ok=$("consentOk"); if(ok){ ok.disabled=true; }
     $("consentModal").classList.remove("hidden");
   }
@@ -351,13 +349,13 @@
       if(userMarker) map.removeLayer(userMarker);
       userMarker = L.circleMarker([la,ln],{ radius:9, color:"#38BDF8", fillColor:"#38BDF8", fillOpacity:.85 }).addTo(map).bindPopup("Estás aquí");
       map.fitBounds([[la,ln],[marker.getLatLng().lat, marker.getLatLng().lng]],{ padding:[40,40] });
-    }, function(){ alert("No pudimos obtener tu ubicación. Puedes usar el botón de Google/Moovit."); }, { enableHighAccuracy:true, timeout:8000 });
+    }, function(){ /* sin ubicación: el mapa muestra la clínica igual */ }, { enableHighAccuracy:true, timeout:8000 });
   }
   (function wireConsent(){
     var chk=$("chkConsent"), ok=$("consentOk"), no=$("consentNo");
     if(chk&&ok){ chk.addEventListener("change", function(){ ok.disabled = !chk.checked; }); }
     if(ok){ ok.addEventListener("click", function(){ if(!chk.checked) return; try{ localStorage.setItem(GEO_KEY,"1"); }catch(e){} $("consentModal").classList.add("hidden"); geolocaliza(); }); }
-    if(no){ no.addEventListener("click", function(){ $("consentModal").classList.add("hidden"); }); }
+    if(no){ no.addEventListener("click", function(){ try{ localStorage.setItem(GEO_KEY,"0"); }catch(e){} $("consentModal").classList.add("hidden"); }); }
     function showAviso(e){ if(e)e.preventDefault(); $("avisoModal").classList.remove("hidden"); }
     var va=$("verAviso"), fa=$("footAviso"), ac=$("avisoClose");
     if(va) va.addEventListener("click", showAviso);
