@@ -449,6 +449,9 @@
 
   $("btnBuscar").addEventListener("click", buscar);
   $("grupo").addEventListener("keydown", function(e){ if(e.key==="Enter") buscar(); });
+  // Deep-link: ?grupo=1101 (p. ej. desde el Mapa 3D) autocompleta y busca
+  (function(){ try{ var qg=new URLSearchParams(location.search).get("grupo");
+    if(qg && D.grupos[qg]){ $("grupo").value=qg; buscar(); } }catch(e){} })();
 
   function buscar(){
     var g = ($("grupo").value||"").trim();

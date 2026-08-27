@@ -74,6 +74,7 @@
       <a href="#" data-section="tecnologia" onclick="SPA.goToSection('tecnologia');return false">Tecnología</a>
       <a href="#" data-section="colaboracion" onclick="SPA.goToSection('colaboracion');return false">Colaboración</a>
       <a href="#" data-section="proyectos" onclick="SPA.goToSection('proyectos');return false">Nuevos Proyectos</a>
+      <a href="#" data-section="grafo" onclick="SPA.goToSection('grafo');return false">Mapa 3D</a>
       <a href="#" data-section="servicios" onclick="SPA.goToSection('servicios');return false">Servicios</a>
       <a href="#" data-section="cursos" onclick="SPA.goToSection('cursos');return false">Cursos</a>
       <a href="#" data-section="logros" onclick="SPA.goToSection('logros');return false">Logros</a>
@@ -138,6 +139,14 @@
       <div class="spa-card-title" style="color:#C4A24E !important;font-weight:800">Nuevos Proyectos</div>
       <div class="spa-card-desc" style="color:#475569 !important">MIRC Expediente 360, Hospital Virtual, Aura y más iniciativas tecnológicas del ecosistema.</div>
       <div class="spa-card-arrow" style="background:rgba(196,162,78,0.15) !important"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4A24E" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
+    </div>
+
+    <!-- Card: Mapa 3D de Prácticas -->
+    <div class="spa-card" data-section="grafo">
+      <div class="spa-card-emoji">🧠</div>
+      <div class="spa-card-title">Mapa 3D de Prácticas</div>
+      <div class="spa-card-desc">Grafo interactivo de los 48 grupos de Medicina: clínica, día y turno en un mapa mental 3D navegable.</div>
+      <div class="spa-card-arrow"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg></div>
     </div>
 
     <!-- Card: ¿Quiénes Somos? -->
@@ -307,6 +316,37 @@
     </div>
   </div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+     SPA SECTION: Mapa mental 3D (Práctica Clínica)
+     ═══════════════════════════════════════════════════════════════════ -->
+<div class="spa-section-overlay" id="spa-section-grafo" data-dark="true">
+  <div class="spa-section-content">
+    <button class="spa-panel-close-hint" onclick="SPA.navigateBack()" title="Cerrar">✕</button>
+    <div style="margin-top:56px">
+      <div class="sec-header reveal">
+        <div class="sec-tag"><span class="dot"></span> Práctica Clínica</div>
+        <h2 class="serif">Mapa mental 3D de grupos y horarios</h2>
+        <p>Un grafo interactivo de los 48 grupos de Médico Cirujano: su clínica, día y turno. Alterna entre 4 vistas, busca tu grupo y descubre quién comparte tu trayecto.</p>
+      </div>
+      <div class="reveal" style="border:1px solid rgba(196,162,78,.35);border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);background:#06101f">
+        <iframe id="grafoFrame" data-src="grafo/index.html" title="Mapa 3D de práctica clínica" loading="lazy"
+                style="width:100%;height:76vh;min-height:460px;border:0;display:block"></iframe>
+      </div>
+      <div style="text-align:center;margin-top:14px">
+        <a class="btn btn-gold" href="grafo/index.html" target="_blank" rel="noopener">Abrir en pantalla completa ↗</a>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  var ov=document.getElementById('spa-section-grafo'); if(!ov) return;
+  function load(){ var f=document.getElementById('grafoFrame'); if(f && !f.src && f.dataset.src){ f.src=f.dataset.src; } }
+  new MutationObserver(function(){ if(ov.classList.contains('active')) load(); }).observe(ov,{attributes:true,attributeFilter:['class']});
+  if(location.hash==='#grafo') setTimeout(load, 400);
+})();
+</script>
 
 <!-- ═══════════════════════════════════════════════════════════════════
      SPA SECTION: Nuevos Proyectos

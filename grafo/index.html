@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Mapa mental 3D · Práctica Clínica FES Iztacala</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --navy:#0C2340; --navy2:#0a1a30; --gold:#C4A24E; --gold2:#f4d03f; --line:rgba(255,255,255,.14); --ink:#eaf1fb; --mut:#9fb2cc; }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; background:radial-gradient(120% 120% at 50% 0%, #12315a 0%, #0a1a30 55%, #06101f 100%); color:var(--ink); font-family:'Inter',system-ui,sans-serif; overflow:hidden; }
+  #cv{ position:fixed; inset:0; display:block; touch-action:none; }
+  .ui{ position:fixed; z-index:5; }
+
+  /* Top bar */
+  .topbar{ top:0; left:0; right:0; display:flex; align-items:center; gap:12px; padding:12px 16px; flex-wrap:wrap;
+           background:linear-gradient(180deg, rgba(6,16,31,.72), rgba(6,16,31,0)); pointer-events:none; }
+  .topbar > *{ pointer-events:auto; }
+  .title{ font-family:'Sora',sans-serif; font-weight:800; font-size:15px; letter-spacing:.2px; }
+  .title small{ display:block; font-family:'Inter'; font-weight:500; font-size:11px; color:var(--mut); }
+  .views{ display:flex; gap:6px; flex-wrap:wrap; margin-left:auto; }
+  .views button{ font:600 12.5px 'Inter'; color:var(--ink); background:rgba(255,255,255,.06); border:1px solid var(--line);
+                 padding:7px 12px; border-radius:999px; cursor:pointer; transition:.18s; white-space:nowrap; }
+  .views button:hover{ background:rgba(196,162,78,.16); }
+  .views button.on{ background:linear-gradient(135deg,var(--gold),#a9863b); color:#231a06; border-color:transparent; box-shadow:0 4px 14px rgba(196,162,78,.35); }
+
+  /* Left panel */
+  .panel{ left:16px; top:76px; width:250px; max-width:calc(100vw - 32px); background:rgba(9,22,40,.82); backdrop-filter:blur(10px);
+          border:1px solid var(--line); border-radius:16px; padding:14px; box-shadow:0 18px 50px rgba(0,0,0,.4); }
+  .panel h4{ margin:2px 0 8px; font:700 12px 'Sora'; color:var(--gold); letter-spacing:.4px; text-transform:uppercase; }
+  .search{ display:flex; gap:6px; }
+  .search input{ flex:1; min-width:0; background:#0b1c34; border:1.5px solid var(--line); border-radius:10px; color:var(--ink); padding:9px 11px; font-size:14px; }
+  .search input:focus{ outline:none; border-color:var(--gold); }
+  .search button{ border:none; border-radius:10px; background:var(--gold); color:#231a06; font-weight:700; padding:0 12px; cursor:pointer; }
+  .filters{ display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:11px; }
+  .filters select{ background:#0b1c34; border:1px solid var(--line); border-radius:9px; color:var(--ink); padding:7px 8px; font-size:12px; }
+  .filters select:focus{ outline:none; border-color:var(--gold); }
+  .row-btns{ display:flex; gap:6px; margin-top:9px; }
+  .row-btns button{ flex:1; font:600 11.5px 'Inter'; color:var(--mut); background:rgba(255,255,255,.05); border:1px solid var(--line); border-radius:9px; padding:7px; cursor:pointer; }
+  .row-btns button:hover{ color:var(--ink); border-color:var(--gold); }
+  .legend{ margin-top:12px; font-size:11.5px; color:var(--mut); line-height:1.7; }
+  .legend .dot{ display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:6px; vertical-align:-1px; }
+  .hint-view{ margin-top:10px; font-size:11.5px; color:var(--mut); line-height:1.5; border-top:1px solid var(--line); padding-top:9px; }
+
+  /* Info card */
+  .card{ left:16px; bottom:16px; width:270px; max-width:calc(100vw - 32px); background:rgba(9,22,40,.9); backdrop-filter:blur(10px);
+         border:1px solid var(--line); border-radius:16px; padding:14px; box-shadow:0 18px 50px rgba(0,0,0,.45); display:none; }
+  .card.on{ display:block; animation:pop .25s ease; }
+  @keyframes pop{ from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none} }
+  .card .g{ font:800 20px 'Sora'; }
+  .card .cl{ font-weight:700; margin-top:2px; }
+  .card .meta{ display:flex; flex-wrap:wrap; gap:6px; margin:9px 0; }
+  .card .pill{ font-size:11.5px; padding:4px 9px; border-radius:999px; background:rgba(255,255,255,.07); border:1px solid var(--line); }
+  .card .comp{ font-size:12px; color:var(--mut); line-height:1.5; }
+  .card .comp b{ color:var(--gold2); }
+  .card a.btn{ display:block; text-align:center; margin-top:10px; text-decoration:none; background:linear-gradient(135deg,var(--gold),#a9863b);
+               color:#231a06; font-weight:700; padding:10px; border-radius:11px; font-size:13.5px; }
+  .card .x{ position:absolute; top:9px; right:11px; cursor:pointer; color:var(--mut); font-size:15px; background:none; border:none; }
+
+  /* Tooltip */
+  #tip{ position:fixed; z-index:8; pointer-events:none; background:rgba(6,16,31,.95); border:1px solid var(--gold);
+        border-radius:10px; padding:7px 10px; font-size:12.5px; color:var(--ink); display:none; max-width:220px; box-shadow:0 8px 24px rgba(0,0,0,.5); }
+  #tip b{ color:var(--gold2); }
+
+  #err{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; text-align:center; padding:24px; font-size:15px; color:var(--mut); }
+  .fade{ position:fixed; z-index:9; inset:0; display:flex; align-items:center; justify-content:center; background:#06101f; color:var(--mut); font:600 14px 'Inter'; transition:opacity .5s; }
+
+  @media (max-width:620px){
+    .panel{ top:auto; bottom:96px; left:12px; right:12px; width:auto; max-height:44vh; overflow:auto; }
+    .card{ left:12px; right:12px; width:auto; bottom:12px; }
+    .title small{ display:none; }
+  }
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+
+<div class="ui topbar">
+  <div class="title">🧠 Mapa 3D de Práctica Clínica<small>48 grupos · 3 clínicas · horarios y ubicaciones — FES Iztacala</small></div>
+  <div class="views" id="views">
+    <button data-v="solar" class="on">☀️ Sistema solar</button>
+    <button data-v="cluster">🧩 Clústeres</button>
+    <button data-v="tree">🌳 Mapa mental</button>
+    <button data-v="geo">📍 Geográfico</button>
+  </div>
+</div>
+
+<div class="ui panel">
+  <h4>Buscar grupo</h4>
+  <div class="search">
+    <input id="q" list="codes" inputmode="numeric" placeholder="Ej. 1101" maxlength="4" autocomplete="off">
+    <button id="qbtn">Ir</button>
+  </div>
+  <datalist id="codes"></datalist>
+  <div class="filters">
+    <select id="fDia"><option value="">Todos los días</option></select>
+    <select id="fTurno"><option value="">Ambos turnos</option><option value="matutino">Matutino</option><option value="vespertino">Vespertino</option></select>
+    <select id="fCiclo"><option value="">Todos los ciclos</option><option value="1">Ciclo I</option><option value="2">Ciclo II</option><option value="3">Ciclo III</option><option value="4">Ciclo IV</option></select>
+    <select id="fGen"><option value="">Ambas gen.</option><option value="2027">Gen 2027</option><option value="2026">Gen 2026</option></select>
+  </div>
+  <div class="row-btns">
+    <button id="bReset">↺ Reiniciar</button>
+    <button id="bRot">⏸ Giro auto</button>
+  </div>
+  <div class="legend" id="legend"></div>
+  <div class="hint-view" id="hintView"></div>
+</div>
+
+<div class="ui card" id="card">
+  <button class="x" id="cardX">✕</button>
+  <div class="g" id="cG"></div>
+  <div class="cl" id="cCl"></div>
+  <div class="meta" id="cMeta"></div>
+  <div class="comp" id="cComp"></div>
+  <a class="btn" id="cLink" href="../practicas/" target="_blank" rel="noopener">🧭 Ver cómo llegar</a>
+</div>
+
+<div id="tip"></div>
+<div id="err">No pude cargar los datos de los grupos.<br>Abre esta página desde el sitio (necesita <code>../practicas/data-grupos.js</code>).</div>
+<div class="fade" id="fade">Cargando mapa 3D…</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script src="../practicas/data-grupos.js"></script>
+<script>
+(function(){
+  "use strict";
+  var D = window.PRACTICAS_DATA;
+  if(!D || !D.grupos || !window.THREE){ document.getElementById('err').style.display='flex'; document.getElementById('fade').style.display='none'; return; }
+  var THREE = window.THREE, V3 = THREE.Vector3;
+
+  var CLIN = D.clinicas;
+  var DIAS = ['lunes','martes','miércoles','jueves','viernes'];
+  var DIA_CORTO = { 'lunes':'Lun','martes':'Mar','miércoles':'Mié','jueves':'Jue','viernes':'Vie' };
+  var CLINORDER = ['iztacala','almaraz','cuautitlan'];
+  var cap = function(s){ return s ? s.charAt(0).toUpperCase()+s.slice(1) : s; };
+
+  var groupsArr = Object.keys(D.grupos).map(function(code){
+    var g = D.grupos[code];
+    return { code:code, dia:g.dia, clinica:g.clinica, turno:g.turno, ciclo:g.ciclo, gen:g.gen,
+             clinIndex:Math.max(0,CLINORDER.indexOf(g.clinica)), dayIndex:Math.max(0,DIAS.indexOf(g.dia)) };
+  });
+
+  // proyección geográfica local
+  var geoPts = CLINORDER.map(function(k){ return CLIN[k]; });
+  var lat0 = geoPts.reduce(function(s,c){return s+c.lat;},0)/geoPts.length;
+  var lng0 = geoPts.reduce(function(s,c){return s+c.lng;},0)/geoPts.length;
+  function geoXZ(lat,lng,scale){ return { x:(lng-lng0)*Math.cos(lat0*Math.PI/180)*scale, z:-(lat-lat0)*scale }; }
+
+  // ---- Three setup ----
+  var canvas = document.getElementById('cv');
+  var scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x081627, 0.0022);
+  var camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, 0.1, 5000);
+  camera.position.set(6, 62, 150);
+  var renderer = new THREE.WebGLRenderer({ canvas:canvas, antialias:true, alpha:true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio||1, 2));
+  renderer.setSize(innerWidth, innerHeight);
+
+  scene.add(new THREE.AmbientLight(0x88a2c8, 0.85));
+  var key = new THREE.PointLight(0xffffff, 0.9, 0, 2); key.position.set(80,140,120); scene.add(key);
+  var gold = new THREE.PointLight(0xC4A24E, 0.5, 600); gold.position.set(-120,40,-80); scene.add(gold);
+
+  var controls = THREE.OrbitControls ? new THREE.OrbitControls(camera, renderer.domElement) : null;
+  if(controls){ controls.enableDamping=true; controls.dampingFactor=.08; controls.minDistance=34; controls.maxDistance=620;
+    controls.maxPolarAngle=Math.PI*0.92; controls.autoRotate=true; controls.autoRotateSpeed=0.5; controls.target.set(0,4,0); }
+
+  // estrellas
+  (function(){
+    var N=900, pos=new Float32Array(N*3);
+    for(var i=0;i<N;i++){ var r=800+Math.random()*1500, t=Math.random()*Math.PI*2, p=Math.acos(2*Math.random()-1);
+      pos[i*3]=r*Math.sin(p)*Math.cos(t); pos[i*3+1]=r*Math.cos(p); pos[i*3+2]=r*Math.sin(p)*Math.sin(t); }
+    var g=new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(pos,3));
+    scene.add(new THREE.Points(g, new THREE.PointsMaterial({ color:0x9fb6d6, size:1.7, transparent:true, opacity:.7 })));
+  })();
+
+  function makeLabel(text, color, px){
+    px = px||34; var pad=10, font='bold '+px+'px Inter,Arial';
+    var cv=document.createElement('canvas'), ctx=cv.getContext('2d');
+    ctx.font=font; var lines=String(text).split('\n');
+    var w=0; lines.forEach(function(l){ w=Math.max(w, ctx.measureText(l).width); }); w+=pad*2;
+    var lh=px*1.25, h=lh*lines.length+pad*2;
+    cv.width=w; cv.height=h; ctx.font=font; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.shadowColor='rgba(0,0,0,.85)'; ctx.shadowBlur=7; ctx.fillStyle=color||'#fff';
+    lines.forEach(function(l,i){ ctx.fillText(l, w/2, pad+lh*(i+0.5)); });
+    var tex=new THREE.CanvasTexture(cv); tex.minFilter=THREE.LinearFilter;
+    var spr=new THREE.Sprite(new THREE.SpriteMaterial({ map:tex, transparent:true, depthWrite:false, depthTest:false }));
+    var sc=0.11; spr.scale.set(w*sc, h*sc, 1); spr.userData.baseScale=[w*sc,h*sc];
+    return spr;
+  }
+
+  // ---- nodos ----
+  var clinicMeshes={}, groupMeshes={};
+  var geoBig=new THREE.SphereGeometry(6.2,32,24), geoSmall=new THREE.SphereGeometry(2.2,20,16);
+  CLINORDER.forEach(function(k){
+    var c=CLIN[k];
+    var m=new THREE.Mesh(geoBig, new THREE.MeshStandardMaterial({ color:c.color, emissive:c.color, emissiveIntensity:.5, roughness:.35, metalness:.25 }));
+    m.userData={ type:'clinic', id:k, nombre:c.nombre, direccion:c.direccion };
+    scene.add(m); clinicMeshes[k]=m;
+    var lab=makeLabel(c.nombre.replace('CUSI ','CUSI ').replace(' / ','\n'), '#ffffff', 40);
+    m.userData.label=lab; scene.add(lab);
+  });
+  groupsArr.forEach(function(g){
+    var col=CLIN[g.clinica].color;
+    var m=new THREE.Mesh(geoSmall, new THREE.MeshStandardMaterial({ color:col, emissive:col, emissiveIntensity:.55, roughness:.4, transparent:true, opacity:1 }));
+    m.userData=Object.assign({ type:'group', scaleMul:1 }, g);
+    scene.add(m); groupMeshes[g.code]=m;
+  });
+
+  var ROOT=new V3(0,60,0);
+  var rootLabel=makeLabel('Práctica\nClínica', '#C4A24E', 38); rootLabel.visible=false; scene.add(rootLabel);
+
+  // ---- líneas dinámicas ----
+  var MAXC=260;
+  var lineGeo=new THREE.BufferGeometry();
+  lineGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(MAXC*2*3), 3));
+  var lineMat=new THREE.LineBasicMaterial({ color:0xC4A24E, transparent:true, opacity:.22 });
+  var lineSeg=new THREE.LineSegments(lineGeo, lineMat); lineSeg.frustumCulled=false; scene.add(lineSeg);
+  var connections=[];
+  function getPos(id){ if(id==='root') return ROOT; if(id.charAt(0)==='c') return clinicMeshes[id.slice(2)].position; return groupMeshes[id.slice(2)].position; }
+  function updateLines(){
+    var arr=lineGeo.attributes.position.array, n=Math.min(connections.length, MAXC), i;
+    for(i=0;i<n;i++){ var a=getPos(connections[i][0]), b=getPos(connections[i][1]);
+      arr[i*6]=a.x;arr[i*6+1]=a.y;arr[i*6+2]=a.z; arr[i*6+3]=b.x;arr[i*6+4]=b.y;arr[i*6+5]=b.z; }
+    for(i=n;i<MAXC;i++){ for(var j=0;j<6;j++) arr[i*6+j]=0; }
+    lineGeo.attributes.position.needsUpdate=true; lineGeo.setDrawRange(0, n*2);
+  }
+
+  // arcos geográficos (Iztacala -> otras)
+  function makeArc(){ var g=new THREE.BufferGeometry(); g.setAttribute('position', new THREE.BufferAttribute(new Float32Array(26*3),3));
+    var l=new THREE.Line(g, new THREE.LineBasicMaterial({ color:0x5ad1a6, transparent:true, opacity:.55 })); l.frustumCulled=false; l.visible=false; scene.add(l); return l; }
+  var arcs=[makeArc(), makeArc()];
+  function updateArcs(on){
+    arcs.forEach(function(a){ a.visible=on; });
+    if(!on) return;
+    var src=clinicMeshes['iztacala'].position;
+    [['almaraz',0],['cuautitlan',1]].forEach(function(pair){
+      var dst=clinicMeshes[pair[0]].position, line=arcs[pair[1]];
+      var mid=src.clone().add(dst).multiplyScalar(0.5); mid.y+=Math.max(20, src.distanceTo(dst)*0.32);
+      var curve=new THREE.QuadraticBezierCurve3(src.clone(), mid, dst.clone());
+      var pts=curve.getPoints(25), arr=line.geometry.attributes.position.array;
+      for(var i=0;i<26;i++){ arr[i*3]=pts[i].x; arr[i*3+1]=pts[i].y; arr[i*3+2]=pts[i].z; }
+      line.geometry.attributes.position.needsUpdate=true;
+    });
+  }
+
+  // etiquetas de ejes (vista clúster)
+  var clusterHelp=new THREE.Group(); clusterHelp.visible=false; scene.add(clusterHelp);
+  DIAS.forEach(function(d,i){ var s=makeLabel(DIA_CORTO[d], '#9fb2cc', 30); s.position.set((i-2)*24, -34, 0); clusterHelp.add(s); });
+  (function(){ var m=makeLabel('☀ Matutino','#f4d03f',28); m.position.set(-70,20,0); clusterHelp.add(m);
+    var v=makeLabel('🌙 Vespertino','#8b93ff',28); v.position.set(-70,-20,0); clusterHelp.add(v); })();
+
+  // ---- layouts ----
+  function bucketMap(keyFn){ var m={}; groupsArr.forEach(function(g){ var k=keyFn(g); (m[k]=m[k]||[]).push(g.code); }); return m; }
+  function setTarget(mesh,x,y,z){ mesh.userData.target=new V3(x,y,z); }
+
+  var HINTS={
+    solar:'Cada CUSI es un "sol"; los grupos orbitan su clínica. El anillo = día (lun→vie) y el color = clínica. Matutino arriba, vespertino abajo.',
+    cluster:'Ejes: día (X), turno (Y) y clínica (Z). Los grupos se agrupan solos. Ideal para ver quién comparte tu trayecto.',
+    tree:'Árbol: raíz → clínica → grupos por día y turno. El "mapa mental" clásico, navegable en 3D.',
+    geo:'Ubicación real: FES Iztacala y las 3 CUSI en su posición geográfica, con arcos de distancia. Los grupos flotan sobre su destino.'
+  };
+
+  function computeLayout(view){
+    var bk, i, n, arr;
+    if(view==='solar'){
+      CLINORDER.forEach(function(k){ var c=CLIN[k], p=geoXZ(c.lat,c.lng,240); setTarget(clinicMeshes[k], p.x,0,p.z); });
+      bk=bucketMap(function(g){ return g.clinica+'|'+g.dayIndex; });
+      groupsArr.forEach(function(g){ var c=clinicMeshes[g.clinica].userData.target; arr=bk[g.clinica+'|'+g.dayIndex]; i=arr.indexOf(g.code); n=arr.length;
+        var r=11+g.dayIndex*4.2, ang=(i/n)*Math.PI*2 + g.dayIndex*0.6, y=(g.turno==='matutino'?3.4:-3.4);
+        setTarget(groupMeshes[g.code], c.x+Math.cos(ang)*r, y, c.z+Math.sin(ang)*r); });
+      connections=groupsArr.map(function(g){ return ['c:'+g.clinica,'g:'+g.code]; });
+      updateArcs(false); clusterHelp.visible=false; rootLabel.visible=false;
+    } else if(view==='cluster'){
+      CLINORDER.forEach(function(k,ci){ setTarget(clinicMeshes[k], 62, 30, (ci-1)*40); });
+      bk=bucketMap(function(g){ return g.dayIndex+'|'+g.turno+'|'+g.clinIndex; });
+      groupsArr.forEach(function(g){ arr=bk[g.dayIndex+'|'+g.turno+'|'+g.clinIndex]; i=arr.indexOf(g.code); n=arr.length;
+        var cx=(g.dayIndex-2)*24, cy=(g.turno==='matutino'?16:-16), cz=(g.clinIndex-1)*40;
+        var a=(i/Math.max(1,n))*Math.PI*2, rr=n>1?5:0;
+        setTarget(groupMeshes[g.code], cx+Math.cos(a)*rr, cy+Math.sin(a)*rr*0.6, cz); });
+      connections=[]; updateArcs(false); clusterHelp.visible=true; rootLabel.visible=false;
+    } else if(view==='tree'){
+      CLINORDER.forEach(function(k,ci){ setTarget(clinicMeshes[k], (ci-1)*50, 26, 0); });
+      bk=bucketMap(function(g){ return g.clinica+'|'+g.dayIndex+'|'+g.turno; });
+      groupsArr.forEach(function(g){ arr=bk[g.clinica+'|'+g.dayIndex+'|'+g.turno]; i=arr.indexOf(g.code); n=arr.length;
+        var cx=(g.clinIndex-1)*50, x=cx+(g.dayIndex-2)*9.5, y=(g.turno==='matutino'?-2:-17), z=(i-(n-1)/2)*7;
+        setTarget(groupMeshes[g.code], x, y, z); });
+      connections=[]; CLINORDER.forEach(function(k){ connections.push(['root','c:'+k]); });
+      groupsArr.forEach(function(g){ connections.push(['c:'+g.clinica,'g:'+g.code]); });
+      updateArcs(false); clusterHelp.visible=false; rootLabel.visible=true; rootLabel.position.copy(ROOT).add(new V3(0,7,0));
+    } else { // geo
+      CLINORDER.forEach(function(k){ var c=CLIN[k], p=geoXZ(c.lat,c.lng,460); setTarget(clinicMeshes[k], p.x,0,p.z); });
+      bk=bucketMap(function(g){ return g.clinica+'|'+g.dayIndex; });
+      groupsArr.forEach(function(g){ var c=clinicMeshes[g.clinica].userData.target; arr=bk[g.clinica+'|'+g.dayIndex]; i=arr.indexOf(g.code); n=arr.length;
+        var r=5+g.dayIndex*1.6, ang=(i/n)*Math.PI*2, y=12+g.dayIndex*3+(g.turno==='vespertino'?1.5:0);
+        setTarget(groupMeshes[g.code], c.x+Math.cos(ang)*r, y, c.z+Math.sin(ang)*r); });
+      connections=groupsArr.map(function(g){ return ['c:'+g.clinica,'g:'+g.code]; });
+      clusterHelp.visible=false; rootLabel.visible=false;
+    }
+    lineMat.opacity = (view==='cluster') ? 0.09 : 0.24;
+    document.getElementById('hintView').textContent = HINTS[view];
+    if(view!=='geo') updateArcs(false);
+  }
+
+  // ---- estado / filtros / selección ----
+  var view='solar', selected=null, filt={ dia:'', turno:'', ciclo:'', gen:'' };
+  function passFilter(g){ return (!filt.dia||g.dia===filt.dia) && (!filt.turno||g.turno===filt.turno)
+        && (!filt.ciclo||String(g.ciclo)===filt.ciclo) && (!filt.gen||String(g.gen)===filt.gen); }
+  function esCompanero(g){ if(!selected) return false; var s=D.grupos[selected]; return g.code!==selected && g.clinica===s.clinica && g.dia===s.dia && g.turno===s.turno; }
+
+  function applyStyles(){
+    groupsArr.forEach(function(g){
+      var m=groupMeshes[g.code], pf=passFilter(g), mat=m.material;
+      if(selected){
+        if(g.code===selected){ mat.opacity=1; mat.emissiveIntensity=1.2; m.userData.scaleMul=2.2; }
+        else if(esCompanero(g)){ mat.opacity=pf?1:.5; mat.emissiveIntensity=.85; m.userData.scaleMul=1.55; }
+        else { mat.opacity=pf?.3:.08; mat.emissiveIntensity=.25; m.userData.scaleMul=.9; }
+      } else {
+        mat.opacity=pf?1:.12; mat.emissiveIntensity=pf?.55:.2; m.userData.scaleMul=pf?1:.85;
+      }
+    });
+  }
+
+  function showCard(code){
+    var g=D.grupos[code], c=CLIN[g.clinica];
+    var comps=groupsArr.filter(esCompanero).map(function(x){return x.code;});
+    document.getElementById('cG').textContent='Grupo '+code;
+    document.getElementById('cCl').innerHTML='<span style="color:'+c.color+'">●</span> '+c.nombre;
+    document.getElementById('cMeta').innerHTML=
+      '<span class="pill">📅 '+cap(g.dia)+'</span>'+
+      '<span class="pill">'+(g.turno==='matutino'?'☀ Matutino · llegar 7:00':'🌙 Vespertino · llegar 14:00')+'</span>'+
+      '<span class="pill">Ciclo '+g.ciclo+'</span><span class="pill">Gen '+g.gen+'</span>';
+    document.getElementById('cComp').innerHTML = comps.length
+      ? 'Comparten tu trayecto (misma clínica, día y turno): <b>'+comps.join(', ')+'</b>. Considera viajar acompañado.'
+      : 'No hay otro grupo con tu misma clínica, día y turno.';
+    document.getElementById('cLink').href='../practicas/?grupo='+code;
+    document.getElementById('card').classList.add('on');
+  }
+  function select(code){ if(!D.grupos[code]) return; selected=code; applyStyles(); showCard(code); focusOn(groupMeshes[code].position); }
+  function deselect(){ selected=null; document.getElementById('card').classList.remove('on'); applyStyles(); }
+
+  // ---- cámara focus suave ----
+  var focusV=null, focusT=0;
+  function focusOn(vec){ focusV=vec.clone(); focusT=1; }
+
+  // ---- raycast hover ----
+  var ray=new THREE.Raycaster(), mouse=new THREE.Vector2(), hovered=null;
+  var tip=document.getElementById('tip'), pickables=null;
+  function rebuildPickables(){ pickables=CLINORDER.map(function(k){return clinicMeshes[k];}).concat(groupsArr.map(function(g){return groupMeshes[g.code];})); }
+  rebuildPickables();
+  function onMove(e){
+    var t=(e.touches&&e.touches[0])||e; mouse.x=(t.clientX/innerWidth)*2-1; mouse.y=-(t.clientY/innerHeight)*2+1;
+    ray.setFromCamera(mouse, camera); var hit=ray.intersectObjects(pickables, false);
+    if(hit.length){ var u=hit[0].object.userData; hovered=hit[0].object;
+      tip.style.display='block'; tip.style.left=(t.clientX+14)+'px'; tip.style.top=(t.clientY+14)+'px';
+      if(u.type==='clinic'){ tip.innerHTML='<b>'+u.nombre+'</b><br>'+u.direccion; }
+      else { tip.innerHTML='<b>Grupo '+u.code+'</b><br>'+CLIN[u.clinica].nombre+'<br>'+cap(u.dia)+' · '+u.turno; }
+      canvas.style.cursor='pointer';
+    } else { hovered=null; tip.style.display='none'; canvas.style.cursor='grab'; }
+  }
+  function onClick(e){
+    if(hovered && hovered.userData.type==='group'){ select(hovered.userData.code); }
+    else if(hovered && hovered.userData.type==='clinic'){ /* enfocar clínica */ focusOn(hovered.position); }
+    else { deselect(); }
+  }
+  canvas.addEventListener('mousemove', onMove);
+  canvas.addEventListener('pointerdown', function(e){ setTimeout(function(){ onMove(e); },0); });
+  canvas.addEventListener('click', onClick);
+
+  // ---- UI wiring ----
+  var codesDL=document.getElementById('codes');
+  groupsArr.map(function(g){return g.code;}).sort().forEach(function(c){ var o=document.createElement('option'); o.value=c; codesDL.appendChild(o); });
+  var fDia=document.getElementById('fDia'); DIAS.forEach(function(d){ var o=document.createElement('option'); o.value=d; o.textContent=cap(d); fDia.appendChild(o); });
+
+  document.getElementById('views').addEventListener('click', function(e){ var b=e.target.closest('button'); if(!b) return;
+    view=b.getAttribute('data-v'); Array.prototype.forEach.call(this.children, function(x){ x.classList.toggle('on', x===b); });
+    computeLayout(view); });
+  function doSearch(){ var v=document.getElementById('q').value.trim(); if(D.grupos[v]) select(v); }
+  document.getElementById('qbtn').addEventListener('click', doSearch);
+  document.getElementById('q').addEventListener('keydown', function(e){ if(e.key==='Enter') doSearch(); });
+  document.getElementById('q').addEventListener('input', function(){ if(D.grupos[this.value.trim()]) select(this.value.trim()); });
+  ['fDia','fTurno','fCiclo','fGen'].forEach(function(id){ document.getElementById(id).addEventListener('change', function(){
+    filt.dia=document.getElementById('fDia').value; filt.turno=document.getElementById('fTurno').value;
+    filt.ciclo=document.getElementById('fCiclo').value; filt.gen=document.getElementById('fGen').value; applyStyles(); }); });
+  document.getElementById('bReset').addEventListener('click', function(){
+    filt={dia:'',turno:'',ciclo:'',gen:''}; ['fDia','fTurno','fCiclo','fGen'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('q').value=''; deselect(); if(controls){ controls.target.set(0,4,0); } camera.position.set(6,62,150); });
+  document.getElementById('bRot').addEventListener('click', function(){ if(!controls) return; controls.autoRotate=!controls.autoRotate;
+    this.textContent=(controls.autoRotate?'⏸':'▶')+' Giro auto'; });
+  document.getElementById('cardX').addEventListener('click', deselect);
+
+  document.getElementById('legend').innerHTML =
+    CLINORDER.map(function(k){ return '<span><span class="dot" style="background:'+CLIN[k].color+'"></span>'+CLIN[k].nombre+'</span>'; }).join('<br>')
+    + '<br><span style="color:#cfd9e8">☀ matutino (arriba) · 🌙 vespertino (abajo)</span>';
+
+  // ---- init positions (start collapsed at center for intro) ----
+  computeLayout('solar');
+  CLINORDER.forEach(function(k){ clinicMeshes[k].position.set(0,4,0); });
+  groupsArr.forEach(function(g){ groupMeshes[g.code].position.set(0,4,0); });
+  applyStyles();
+  setTimeout(function(){ var f=document.getElementById('fade'); f.style.opacity='0'; setTimeout(function(){ f.style.display='none'; }, 550); }, 350);
+
+  // ---- loop ----
+  var tmp=new V3();
+  function animate(){
+    requestAnimationFrame(animate);
+    CLINORDER.forEach(function(k){ var m=clinicMeshes[k]; if(m.userData.target) m.position.lerp(m.userData.target, 0.09);
+      if(m.userData.label){ m.userData.label.position.copy(m.position).add(new V3(0,10,0)); } });
+    groupsArr.forEach(function(g){ var m=groupMeshes[g.code]; if(m.userData.target) m.position.lerp(m.userData.target, 0.09);
+      var s=m.userData.scaleMul||1; m.scale.lerp(tmp.set(s,s,s), 0.15); });
+    if(hovered && hovered.userData.type==='group'){ hovered.scale.lerp(tmp.set(2.4,2.4,2.4),0.3); }
+    updateLines(); if(view==='geo') updateArcs(true);
+    if(focusV && controls){ controls.target.lerp(focusV, 0.06); focusT*=0.94; if(focusT<0.02) focusV=null; }
+    if(controls) controls.update();
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  addEventListener('resize', function(){ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+
+  // deep-link ?grupo=XXXX
+  var qs=new URLSearchParams(location.search).get('grupo'); if(qs && D.grupos[qs]){ setTimeout(function(){ select(qs); }, 700); }
+})();
+</script>
+</body>
+</html>
