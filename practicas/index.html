@@ -84,27 +84,23 @@
   .salida .box span{ font-size:11px; color:var(--mut); text-transform:uppercase; letter-spacing:.06em; }
   #map{ height:290px; border-radius:16px; margin-top:14px; border:1px solid var(--line); }
 
-  /* ---- Pila de cartas (deck) ---- */
-  .deck{ position:relative; margin:0 0 36px; }
-  .deck::before, .deck::after{ content:''; position:absolute; inset:0; border-radius:20px; background:var(--panel);
-    border:1px solid var(--line); box-shadow:0 12px 30px rgba(15,35,64,.12); z-index:0; pointer-events:none; }
-  .deck::before{ transform:translateY(13px) scale(.966); opacity:.9; }
-  .deck::after{ transform:translateY(26px) scale(.932); opacity:.65; }
-  .deck-card{ position:absolute; top:0; left:0; width:100%; z-index:2; opacity:0; transform:translateY(14px);
-    transition:transform .34s var(--ease), opacity .34s var(--ease); }
-  .deck-card.is-front{ position:relative; opacity:1; transform:translateY(0); }
-  .deck-card .card{ margin:0; position:relative; }
-  .deck-nav{ display:flex; align-items:center; justify-content:center; gap:12px; margin:16px 0 4px; flex-wrap:wrap; }
-  .deck-arrow{ width:42px; height:42px; flex:0 0 auto; border-radius:50%; border:1px solid var(--line); background:#fff;
-    color:var(--navy); font-size:22px; line-height:1; cursor:pointer; box-shadow:0 4px 12px rgba(15,35,64,.08); transition:.15s; }
-  .deck-arrow:hover:not(:disabled){ border-color:var(--gold); color:var(--gold-ink); }
-  .deck-arrow:disabled{ opacity:.35; cursor:default; }
-  .deck-dots{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; }
-  .deck-dots button{ border:1px solid var(--line); background:#fff; color:var(--mut); font:600 11.5px 'Inter',sans-serif;
-    padding:5px 10px; border-radius:999px; cursor:pointer; transition:.15s; }
-  .deck-dots button.on{ background:var(--navy); color:#fff; border-color:var(--navy); }
-  .deck-dots button.locked{ opacity:.4; cursor:default; }
-  @media(max-width:600px){ .deck-dots button{ font-size:0; padding:0; width:10px; height:10px; border-radius:50%; } }
+  /* ---- Pila de cartas (acordeón con títulos y marco dorado) ---- */
+  .deck{ position:relative; display:flex; flex-direction:column; gap:11px; margin:0 0 12px; }
+  .deck-card{ border:1.5px solid rgba(196,162,78,.45); border-radius:16px; background:var(--panel);
+    box-shadow:0 6px 16px rgba(15,35,64,.05); overflow:hidden; transition:border-color .2s, box-shadow .2s, transform .2s; }
+  .deck-head{ width:100%; text-align:left; background:transparent; border:0; cursor:pointer; display:flex; align-items:center; gap:10px;
+    padding:13px 16px; font:700 14px 'Sora',sans-serif; color:var(--navy); }
+  .deck-head .num{ width:23px; height:23px; flex:0 0 auto; border-radius:50%; background:rgba(196,162,78,.16); color:var(--gold-ink);
+    display:flex; align-items:center; justify-content:center; font:800 12px 'Inter',sans-serif; }
+  .deck-head .chev{ margin-left:auto; color:var(--gold-ink); font-size:14px; transition:transform .3s var(--ease); }
+  .deck-card .card{ display:none; margin:0; border:0; box-shadow:none; border-radius:0; padding:2px 18px 18px; }
+  .deck-card.is-front{ border-color:var(--gold); box-shadow:0 16px 36px rgba(196,162,78,.20); }
+  .deck-card.is-front .deck-head{ color:var(--gold-ink); }
+  .deck-card.is-front .deck-head .chev{ transform:rotate(90deg); }
+  .deck-card.is-front .card{ display:block; }
+  .deck-card.locked{ opacity:.5; }
+  .deck-card.locked .deck-head{ cursor:default; color:var(--mut); }
+  .deck-nav{ display:none; }
   .leaflet-container{ background:#eef2f7; }
 
   .ruta{ border:1px solid var(--line); border-radius:16px; padding:15px; margin-top:13px; background:#fff;
@@ -511,27 +507,23 @@
   }
   function msg(t){ $("msg").textContent = t; }
 
-  // ---- Pila de cartas (deck): swipe + flechas + puntitos ----
-  var deckI=0, deckReady=false, deckCards=[], deckDotsWrap, deckPrevBtn, deckNextBtn;
+  // ---- Pila de cartas (acordeón): título siempre visible, click para expandir ----
+  var deckI=0, deckReady=false, deckCards=[];
   function deckMax(){ return deckReady ? deckCards.length-1 : 0; }
   function deckSetup(){
     deckCards = Array.prototype.slice.call(document.querySelectorAll('#deck .deck-card'));
-    deckDotsWrap=$("deckDots"); deckPrevBtn=$("deckPrev"); deckNextBtn=$("deckNext");
-    if(!deckCards.length || !deckDotsWrap) return;
-    deckDotsWrap.innerHTML = deckCards.map(function(c,i){ return '<button data-i="'+i+'">'+c.getAttribute('data-title')+'</button>'; }).join("");
-    Array.prototype.forEach.call(deckDotsWrap.querySelectorAll('button'), function(b){ b.addEventListener('click', function(){ deckGo(+b.getAttribute('data-i')); }); });
-    if(deckPrevBtn) deckPrevBtn.addEventListener('click', function(){ deckGo(deckI-1); });
-    if(deckNextBtn) deckNextBtn.addEventListener('click', function(){ deckGo(deckI+1); });
-    var deck=$("deck"), x0=null, y0=null;
-    if(deck){
-      deck.addEventListener('touchstart', function(e){ var t=e.touches[0]; x0=t.clientX; y0=t.clientY; }, {passive:true});
-      deck.addEventListener('touchend', function(e){ if(x0===null) return; var t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0;
-        if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)*1.4){ deckGo(deckI+(dx<0?1:-1)); } x0=null; }, {passive:true});
-    }
+    if(!deckCards.length) return;
+    deckCards.forEach(function(c,idx){
+      var h=document.createElement('button'); h.type='button'; h.className='deck-head';
+      h.innerHTML='<span class="num">'+(idx+1)+'</span><span>'+c.getAttribute('data-title')+'</span><span class="chev">▸</span>';
+      h.addEventListener('click', function(){ if(idx<=deckMax()) deckGo(idx); });
+      c.insertBefore(h, c.firstChild);
+    });
     document.addEventListener('keydown', function(e){
       var tn=(e.target&&e.target.tagName||'').toLowerCase(); if(tn==='input'||tn==='textarea') return;
-      if(e.key==='ArrowRight') deckGo(deckI+1); else if(e.key==='ArrowLeft') deckGo(deckI-1); });
-    window.addEventListener('resize', function(){ deckGo(deckI); });
+      if(e.key==='ArrowRight'||e.key==='ArrowDown') deckGo(deckI+1);
+      else if(e.key==='ArrowLeft'||e.key==='ArrowUp') deckGo(deckI-1);
+    });
     deckGo(0);
   }
   function deckGo(i){
@@ -539,13 +531,9 @@
     i=Math.max(0, Math.min(deckMax(), i));
     deckCards.forEach(function(c,idx){
       c.classList.toggle('is-front', idx===i);
-      c.style.pointerEvents = (idx===i) ? 'auto' : 'none';
+      c.classList.toggle('locked', idx>deckMax());
     });
     deckI=i;
-    if(deckDotsWrap) Array.prototype.forEach.call(deckDotsWrap.querySelectorAll('button'), function(b,idx){
-      b.classList.toggle('on', idx===i); b.classList.toggle('locked', idx>deckMax()); });
-    if(deckPrevBtn) deckPrevBtn.disabled=(i===0);
-    if(deckNextBtn) deckNextBtn.disabled=(i>=deckMax());
     if(deckCards[i].querySelector('#map') && map){ setTimeout(function(){ try{ map.invalidateSize(); }catch(e){} }, 90); }
   }
   deckSetup();
