@@ -385,21 +385,42 @@
     // Resumen por defecto
     return 'Esto es lo que tengo de tu grupo **'+ctx.grupo+'**:\n\n- Clínica: **'+ctx.clinica+'**\n- Día: **'+ctx.dia+'** · Turno **'+ctx.turno+'**\n- Llegar '+ctx.llega+' · salir ~'+ctx.salida_sugerida+'\n\nCómo llegar: '+link;
   }
+  // Historial de la conversación (para que PUM-AI lleve la secuencia)
+  var chatHist=[];
+  function restarMinLocal(hhmm,mins){ var p=String(hhmm).split(':'); var tt=(+p[0])*60+(+p[1])-mins; tt=((tt%1440)+1440)%1440; var h=Math.floor(tt/60),m=tt%60; return (h<10?'0':'')+h+':'+(m<10?'0':'')+m; }
+  // Si el alumno escribe su grupo en el chat, resolvemos su clínica/día/turno con los datos del sitio
+  function buildCtxFromGrupo(g){
+    var D=window.PRACTICAS_DATA, R=window.PRACTICAS_RUTAS||{};
+    if(!D||!D.grupos||!D.grupos[g]) return null;
+    var gi=D.grupos[g], cli=D.clinicas[gi.clinica]; if(!cli) return null;
+    var dia=gi.dia||D.diaPractica||'por confirmar';
+    var llega=gi.turno==='matutino'?'07:00':'14:00';
+    var rutas=(R[gi.clinica]||[]);
+    var durMax=rutas.reduce(function(m,r){ return Math.max(m, r.duracion_min||60); }, 60);
+    var salida=restarMinLocal(llega, durMax+15);
+    return { grupo:g, clinica:cli.nombre, direccion:cli.direccion, coords:cli.lat+','+cli.lng,
+      dia:dia, turno:gi.turno, llega:llega, salida_sugerida:salida,
+      rutas:rutas.map(function(x){ return { desde:x.origen, min:x.duracion_min, costo:x.costo_mxn }; }) };
+  }
   async function ask(q){
     q=(q||'').trim(); if(!q) return;
     if(sugs) sugs.style.display='none';
     bubble(q,'u'); if(input) input.value='';
+    // resolver grupo escrito en el chat y fijarlo como contexto confiable
+    var mg=(q.match(/\b(1[1-4]\d{2})\b/)||[])[1];
+    if(mg){ var cc=buildCtxFromGrupo(mg); if(cc) window.__pumaiCtx=cc; }
     var t=bubble('escribiendo…','b'); if(send) send.disabled=true;
     try{
       var c=client(); if(!c) throw new Error('noclient');
-      var r=await c.functions.invoke('pumai-practicas', { body:{ question:q, contexto: window.__pumaiCtx||null } });
+      var r=await c.functions.invoke('pumai-practicas', { body:{ question:q, contexto: window.__pumaiCtx||null, historial: chatHist.slice(-10) } });
       if(r.error) throw new Error('remote');
-      if(r.data && r.data.answer){ t.innerHTML=mdToHtml(r.data.answer); }
+      var ans=(r.data && r.data.answer) ? r.data.answer : null;
+      if(ans){ t.innerHTML=mdToHtml(ans); chatHist.push({role:'user',text:q}); chatHist.push({role:'model',text:ans}); }
       else if(r.data && r.data.error){ t.textContent=r.data.error; }
       else throw new Error('empty');
     }catch(e){
       var fb=fallbackLocal(q);
-      if(fb){ t.innerHTML=mdToHtml(fb); }
+      if(fb){ t.innerHTML=mdToHtml(fb); chatHist.push({role:'user',text:q}); chatHist.push({role:'model',text:fb}); }
       else { t.textContent='Ahorita no puedo conectarme con PUM-AI. Busca tu grupo arriba o intenta de nuevo en un momento.'; }
     }
     finally{ if(send) send.disabled=false; msgs.scrollTop=msgs.scrollHeight; }
