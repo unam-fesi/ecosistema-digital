@@ -330,8 +330,8 @@
         <h2 class="serif">Mapa mental 3D de grupos y horarios</h2>
         <p>Un grafo interactivo de los 48 grupos de Médico Cirujano: su clínica, día y turno. Alterna entre 4 vistas, busca tu grupo y descubre quién comparte tu trayecto.</p>
       </div>
-      <div class="reveal" style="border:1px solid rgba(196,162,78,.35);border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);background:#06101f">
-        <iframe id="grafoFrame" data-src="grafo/index.html" title="Mapa 3D de práctica clínica" loading="lazy"
+      <div style="border:1px solid rgba(196,162,78,.35);border-radius:18px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.4);background:#06101f;opacity:1">
+        <iframe id="grafoFrame" data-src="grafo/index.html" title="Mapa 3D de práctica clínica"
                 style="width:100%;height:76vh;min-height:460px;border:0;display:block"></iframe>
       </div>
       <div style="text-align:center;margin-top:14px">
@@ -344,8 +344,10 @@
 (function(){
   var ov=document.getElementById('spa-section-grafo'); if(!ov) return;
   function load(){ var f=document.getElementById('grafoFrame'); if(f && !f.src && f.dataset.src){ f.src=f.dataset.src; } }
-  new MutationObserver(function(){ if(ov.classList.contains('active')) load(); }).observe(ov,{attributes:true,attributeFilter:['class']});
-  if(location.hash==='#grafo') setTimeout(load, 400);
+  new MutationObserver(function(){ if(ov.classList.contains('active')) load(); }).observe(ov,{attributes:true,attributeFilter:['class','style']});
+  // Respaldo: cargar al hacer clic en cualquier acceso al Mapa 3D
+  document.addEventListener('click', function(e){ var t=e.target.closest('[data-section="grafo"], [onclick*="grafo"]'); if(t) setTimeout(load, 60); }, true);
+  if(location.hash==='#grafo') setTimeout(load, 500);
 })();
 </script>
 
