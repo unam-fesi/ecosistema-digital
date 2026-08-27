@@ -136,7 +136,7 @@
   "use strict";
   var D = window.PRACTICAS_DATA, R = window.PRACTICAS_RUTAS, EMG = window.PRACTICAS_EMERGENCIA || [];
   var ICON = { metro:["c-metro","Ⓜ️"], suburbano:["c-suburbano","🚆"], mexibus:["c-mexibus","🚌"], micro:["c-micro","🚐"], bus:["c-bus","🚌"], caminar:["c-caminar","🚶"] };
-  var map, marker, userMarker;
+  var map, marker, userMarker, curCli;
   var $ = function(id){ return document.getElementById(id); };
 
   $("btnBuscar").addEventListener("click", buscar);
@@ -153,18 +153,20 @@
 
   function render(g, info){
     var cli = D.clinicas[info.clinica];
+    curCli = cli;
+    var dia = info.dia || D.diaPractica || "por confirmar";
     var esMat = info.turno === "matutino";
     var llegada = esMat ? "07:00" : "14:00";
     // hora de salida sugerida = llegada - duración ruta (min) - 25 min colchón
     var rutas = (R[info.clinica]||[]);
     var durMax = rutas.reduce(function(m,r){ return Math.max(m, r.duracion_min||60); }, 60);
-    var salida = restarMin(llegada, durMax + 25);
+    var salida = restarMin(llegada, durMax + 15);
 
     // Hero
     $("clinicaHero").innerHTML =
       '<h3>'+cli.nombre+'</h3>'+
       '<div class="dir">'+cli.direccion+'</div>'+
-      '<div><span class="pill pill-day">'+cap(D.diaPractica)+'</span>'+
+      '<div><span class="pill pill-day">📅 '+cap(dia)+'</span>'+
       '<span class="pill pill-turn">Turno '+info.turno+' · llegar '+llegada+'</span>'+
       '<span class="pill pill-turn">Grupo '+g+'</span></div>';
 
@@ -184,7 +186,7 @@
 
     // Botones cómo llegar
     var q = encodeURIComponent(cli.nombre+" "+cli.direccion);
-    $("btnGoogle").href = "https://www.google.com/maps/dir/?api=1&destination="+cli.lat+","+cli.lng+"&travelmode=transit";
+    $("btnGoogle").href = "https://www.google.com/maps/dir/?api=1&destination="+encodeURIComponent(cli.direccion)+"&travelmode=transit";
     $("btnComoLlegar").onclick = function(){
       window.open("https://moovit.com/?to="+q+"&tll="+cli.lat+"_"+cli.lng+"&metroId=822", "_blank", "noopener");
     };
@@ -232,8 +234,7 @@
       userMarker = L.circleMarker([la,ln],{ radius:9, color:"#2563EB", fillColor:"#2563EB", fillOpacity:.8 }).addTo(map).bindPopup("Estás aquí");
       map.fitBounds([[la,ln],[marker.getLatLng().lat, marker.getLatLng().lng]],{ padding:[40,40] });
       // Google con origen real
-      var cliLL = marker.getLatLng();
-      $("btnGoogle").href = "https://www.google.com/maps/dir/?api=1&origin="+la+","+ln+"&destination="+cliLL.lat+","+cliLL.lng+"&travelmode=transit";
+      $("btnGoogle").href = "https://www.google.com/maps/dir/?api=1&origin="+la+","+ln+"&destination="+encodeURIComponent(curCli.direccion)+"&travelmode=transit";
     }, function(){ alert("No pudimos obtener tu ubicación. Puedes usar el botón de Moovit/Google."); }, { enableHighAccuracy:true, timeout:8000 });
   }
 
