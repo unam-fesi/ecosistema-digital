@@ -1,0 +1,89 @@
+CUSIM · panel: comunidad anónima k-anónima, filtros que sí filtran y Laboratorio
+
+Tres cosas en el panel, más el cambio de nombre del proyecto a CUSIM (Clínica
+Universitaria de Salud Integral Menstrual), que en este archivo toca títulos,
+rutas de logo y la forma en que el servicio se nombra a sí mismo.
+
+1. Comunidad anónima (nueva sección en Panorama)
+
+Un renglón por persona, que es lo que faltaba para leer adherencia y abandono
+caso por caso. Lo que hace publicable al renglón:
+
+  · No lleva anonymous_code. Ese código es la credencial de acceso de la
+    alumna; mostrarlo convierte "soy CUS-ABC-1234" en una llave. Cada fila trae
+    un seudónimo derivado de una semilla nueva en cada llamada, así que sirve
+    para leer la tabla y no para armar un expediente a lo largo del tiempo.
+  · La clase de equivalencia es (área, avance): los dos únicos datos que
+    alguien podría saber por fuera del sistema. Cuándo se registró o cuándo
+    entró por última vez sólo existe aquí — eso es conducta, no identidad.
+    Cada grupo publicado tiene min_n personas o más; los que no llegan se
+    generalizan y, si aun así no llegan, se suprimen.
+  · l-diversidad por columna sensible: si dentro de un grupo todas comparten el
+    mismo método, pertenecer al grupo revela el método aunque el grupo sea
+    grande. En ese caso el valor se oculta.
+
+Medido sobre los datos de demostración: 401 de 401 se publican, 0 suprimidas,
+52 generalizadas. La pantalla dice también lo que NO protege — a alguien que ya
+conoce varias respuestas de salud de una persona y busca el renglón que las
+reúne. Contra eso no hay tabla de microdatos que sirva.
+
+2. Los filtros de Periodo y Área
+
+Eran decoración: <button> sin manejador sobre vistas de SQL sin parámetros.
+Ahora el filtro viaja a la base y el umbral se aplica DESPUÉS de filtrar, que es
+el único orden correcto — filtrar sobre cifras ya publicadas dejaría celdas de
+tres personas. Si la cohorte filtrada no alcanza el umbral, el panel explica por
+qué en vez de dibujar cajas vacías.
+
+El banco de preguntas queda con el filtro de área deshabilitado y su explicación
+en pantalla: question_pool no tiene columna que lo ligue a un perfil. Es la
+disociación del sistema, no un pendiente.
+
+3. Laboratorio (tres herramientas, y una de ellas no es simulación)
+
+  · Ensayo de mensaje — SÍ es simulación.
+  · Simulación de 72 horas — SÍ es simulación.
+  · Ensayo de consejería — NO lo es. Es un maniquí de práctica con personajes
+    ficticios escritos a mano; no predice nada y no es evidencia sobre nadie.
+
+Las dos simulaciones nunca leen un renglón: leen agregados que ya pasaron el
+umbral y arman una población sintética muestreando cada atributo POR SEPARADO.
+Muestrear de la marginal y no de la conjunta destruye las correlaciones a
+propósito — si se muestreara de la conjunta, cada agente sería la copia de una
+combinación que existe de verdad, y una combinación rara identifica aunque no
+traiga nombre. Se pierde realismo para que ningún agente corresponda a nadie.
+
+Cada parámetro trae etiqueta de dato o de supuesto, los supuestos son editables
+y se guardan con la corrida y su semilla, de modo que cualquier resultado se
+puede reproducir. Y hay contraste contra la realidad: el panel compara el
+resultado con la mediana histórica de inscripciones por actividad y lo marca
+cuando no se parecen. Con los supuestos por omisión sale 49 veces más alto, y
+está bien que se vea.
+
+PUM-AI participa en dos puntos y en ninguno toca datos de personas: lee el TEXTO
+de la convocatoria que escribió el personal, e interpreta el personaje ficticio
+del ensayo de consejería. Ningún nombre de proveedor ni de modelo aparece en la
+interfaz ni en los mensajes de error.
+
+Nota sobre el backend: supabase/ está en .gitignore, así que las piezas de base
+de datos no viajan en este commit. Viven en
+supabase/cusmsr/{10-laboratorio.sql,11-comunidad-y-filtros.sql} y en
+functions/cusmsr-panel/index.ts, y ya están aplicadas como migraciones
+cusmsr_laboratorio_simulacion, cusmsr_calibracion_anticipacion,
+cusmsr_fn_metrics_filtrable, cusmsr_fn_comunidad_microdatos y
+cusmsr_comunidad_clase_equivalencia, con cusmsr-panel en la versión 15.
+
+Los identificadores internos NO se renombraron: el esquema sigue siendo cusmsr,
+las edge functions siguen siendo cusmsr-*, y los secretos conservan su nombre.
+Renombrarlos rompería producción sin ganar nada visible. El único CUSMSR que
+queda a la vista en esta pantalla es CUSMSR_AI_MODEL, que es el nombre real de
+una variable de entorno y debe seguir diciendo la verdad.
+
+Pendiente barato con mucho efecto: cusmsr.activities no guarda el instante de
+publicación, sólo created_at. Por eso el rezago entre publicar e inscribirse no
+es medible hoy y la curva de 72 horas usa un supuesto. Una columna publicada_en
+lo convierte en dato.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01D3sxb7UQ7LZRE7fNeBTp7Z
+

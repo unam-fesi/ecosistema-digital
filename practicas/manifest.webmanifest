@@ -1,0 +1,13 @@
+{
+  "name": "Práctica Clínica · FES Iztacala",
+  "short_name": "Práctica FESI",
+  "description": "Cómo llegar a tu clínica de práctica clínica en transporte público, seguro y a tiempo.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#0C2340",
+  "theme_color": "#0C2340",
+  "icons": [
+    { "src": "../public/assets/logo-ecosistema-digital.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

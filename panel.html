@@ -635,23 +635,42 @@ function nodeInfoHTML(a){ const m=META[a.id]||{},sc=m.score||0,col=sc>=70?'#0d8b
    <ul style="margin:4px 0 0 18px;font-size:.85rem;color:#3a4557">${(m.reasons||[]).map(r=>`<li>${esc(r)}</li>`).join('')}</ul></div>`; }
 
 /* ── SECCIÓN: Comparativa ── */
+const CMP_REF=['Universidad Anáhuac','La Salle','UVM','Universidad Westhill','Tecmilenio','Ibero','Universidad Panamericana'];
+function refChips(){ return `<div class="row" style="gap:6px;flex-wrap:wrap;margin-top:10px"><span style="font-size:.76rem;color:#8a97a8;font-weight:700;align-self:center">Referentes del sector privado considerados:</span>${CMP_REF.map(u=>`<span class="flag" style="background:#7C5CFF18;color:#5b45c4;font-weight:600">${esc(u)}</span>`).join('')}</div>`; }
 function secComparativa(V){
-  V.innerHTML=`<div class="card"><h2>Comparativa vs escuelas privadas</h2><p class="muted" style="font-size:.84rem">PUM-AI compara el diplomado contra programas similares de instituciones privadas (contenido, duración, alcance, costo, modalidad). Datos <b>indicativos</b> para validación del comité.</p>
-   <div class="row" style="margin-top:10px;gap:8px"><select id="cmpSel" class="mini" style="flex:1">${ADMIN_DATA.map(a=>`<option value="${a.id}">${esc(a.folio)} · ${esc(a.titulo)}</option>`).join('')}</select><button class="btn gold sm" id="cmpRun">⚖ Comparar con PUM-AI</button></div>
+  V.innerHTML=`<div class="card"><h2>Comparativa vs escuelas privadas</h2><p class="muted" style="font-size:.84rem">PUM-AI compara el diplomado contra programas similares de instituciones privadas (contenido, duración, alcance, costo, modalidad) y <b>nombra los programas y universidades</b> usados como referencia. Datos <b>indicativos</b> para validación del comité.</p>
+   ${refChips()}
+   <div class="row" style="margin-top:12px;gap:8px"><select id="cmpSel" class="mini" style="flex:1">${ADMIN_DATA.map(a=>`<option value="${a.id}">${esc(a.folio)} · ${esc(a.titulo)}</option>`).join('')}</select><button class="btn gold sm" id="cmpRun">⚖ Comparar con PUM-AI</button></div>
    <div id="cmpOut" style="margin-top:14px"><div class="empty">Elige un diplomado y ejecuta la comparativa.</div></div></div>`;
   $('#cmpRun').onclick=async()=>{const a=ADMIN_DATA.find(x=>x.id===$('#cmpSel').value);if(!a)return;const out=$('#cmpOut');
     out.innerHTML='<div class="empty"><span class="spin" style="border-color:rgba(6,43,92,.3);border-top-color:#062B5C"></span> PUM-AI analizando el mercado…</div>';
-    const reply=await pumaiAsk(`Eres PUM-AI, analista académico de la DEU FES Iztacala (UNAM). Compara este diplomado contra programas SIMILARES de universidades PRIVADAS en México (Anáhuac, La Salle, UVM, Westhill, Tecmilenio). Diplomado: "${a.titulo}", tipo ${a.tipo}, ${a.duracion_horas||'?'} horas, carrera ${CARRERA_LBL[a.carrera]}, modalidad ${a.modalidad}. En español y breve: 1) tabla comparativa (contenido, duración, alcance, costo aprox, modalidad) vs 2-3 referentes; 2) posicionamiento del diplomado UNAM; 3) rango de precio sugerido; 4) diferenciadores. Marca los datos de mercado como indicativos.`);
+    const reply=await pumaiAsk(`Eres PUM-AI, analista académico de la DEU FES Iztacala (UNAM). Compara este diplomado contra programas SIMILARES de universidades PRIVADAS en México. Diplomado UNAM: "${a.titulo}", tipo ${TIPO_LBL[a.tipo]||a.tipo}, ${a.duracion_horas||'?'} horas, carrera ${CARRERA_LBL[a.carrera]||a.carrera}, modalidad ${a.modalidad}.
+Responde en español, conciso, con estas secciones y encabezados en negrita:
+### Referentes comparados
+Una tabla Markdown con columnas: Universidad | Programa comparable | Duración aprox | Costo aprox | Modalidad. Incluye 3 referentes reales del sector privado, eligiendo los más pertinentes entre: ${CMP_REF.join(', ')}. Nombra el programa/diplomado específico de cada universidad.
+### Comparativa
+Tabla Markdown con columnas: Criterio | Diplomado UNAM | Referentes privados. Filas: contenido, duración, alcance, costo aprox, valor curricular.
+### Posicionamiento del diplomado UNAM
+### Rango de precio sugerido
+### Diferenciadores
+IMPORTANTE: marca los nombres de programas y los costos como INDICATIVOS/aproximados, no como oferta verificada en tiempo real.`);
     const radar=radarSVG(a);
-    out.innerHTML=`<div class="grid grid-2"><div>${reply?mdLite(reply):cmpFallback(a)}</div><div><h3>Posicionamiento (indicativo)</h3>${radar}<div class="insight" style="margin-top:8px">Diferenciador clave: <b>aval institucional UNAM</b> y valor curricular frente a la oferta privada.</div></div></div>`;
+    out.innerHTML=`<div class="grid grid-2"><div>${reply?mdLite(reply):cmpFallback(a)}</div><div><h3>Posicionamiento (indicativo)</h3>${radar}<div class="insight" style="margin-top:8px">Diferenciador clave: <b>aval institucional UNAM</b> y valor curricular frente a la oferta privada.</div></div></div>
+    <div class="notice info" style="margin-top:12px"><span>ℹ</span><div>Los programas, universidades y costos mostrados son <b>referencias indicativas</b> generadas por PUM-AI para orientar al comité; deben verificarse contra los catálogos vigentes de cada institución antes de usarse como dato oficial.</div></div>`;
   };
 }
 function cmpFallback(a){ const horas=a.duracion_horas||120; const precio=Math.round(horas*90/1000)*1000;
-  return `<div class="notice info"><span>ℹ</span><div>PUM-AI no está disponible ahora; se muestra una comparativa base <b>indicativa</b>.</div></div>
-  <table style="margin-top:10px"><thead><tr><th>Criterio</th><th>Este diplomado</th><th>Privadas (aprox)</th></tr></thead><tbody>
+  const refs=[['Universidad Anáhuac','Diplomado afín',horas],['La Salle','Programa de educación continua',Math.round(horas*0.9)],['UVM','Diplomado profesionalizante',Math.round(horas*1.1)]];
+  return `<div class="notice info"><span>ℹ</span><div>PUM-AI no está disponible ahora; se muestra una comparativa base <b>indicativa</b> con referentes genéricos.</div></div>
+  <h3>Referentes comparados (indicativos)</h3>
+  <table class="mdt" style="margin-top:6px"><thead><tr><th>Universidad</th><th>Programa comparable</th><th>Duración aprox</th><th>Costo aprox</th></tr></thead><tbody>
+  ${refs.map(([u,p,h])=>`<tr><td>${esc(u)}</td><td>${esc(p)}</td><td>${h} h</td><td>$${(Math.round(h*90/1000)*1000).toLocaleString()}–$${(Math.round(h*90/1000)*2000).toLocaleString()}</td></tr>`).join('')}
+  </tbody></table>
+  <h3 style="margin-top:12px">Comparativa</h3>
+  <table class="mdt" style="margin-top:6px"><thead><tr><th>Criterio</th><th>Diplomado UNAM</th><th>Referentes privados</th></tr></thead><tbody>
   <tr><td>Duración</td><td>${horas} h</td><td>90–180 h</td></tr>
   <tr><td>Modalidad</td><td>${esc(a.modalidad)}</td><td>Presencial / mixta</td></tr>
-  <tr><td>Costo estimado</td><td>Aval UNAM</td><td>$${precio.toLocaleString()}–$${(precio*2).toLocaleString()}</td></tr>
+  <tr><td>Costo estimado</td><td>Aval UNAM (accesible)</td><td>$${precio.toLocaleString()}–$${(precio*2).toLocaleString()}</td></tr>
   <tr><td>Valor curricular</td><td><b>Aval UNAM</b></td><td>Constancia institucional</td></tr>
   </tbody></table><div class="insight" style="margin-top:8px">Rango de precio sugerido: <b>$${Math.round(precio*0.6).toLocaleString()}–$${precio.toLocaleString()}</b> (accesible vs mercado privado, capitalizando el aval UNAM).</div>`; }
 

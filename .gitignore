@@ -12,6 +12,9 @@ supabase/
 .env.*
 *.local
 
+# Laboratorio local de IntelOwl (homelab, NO se publica)
+vulture/
+
 # Documentación / notas locales
 docs/
 notas/

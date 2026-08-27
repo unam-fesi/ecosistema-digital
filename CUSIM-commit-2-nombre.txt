@@ -1,0 +1,62 @@
+CUSIM · el proyecto cambia de nombre, y la portada gana pumita y un tercer logo
+
+El proyecto pasa a llamarse CUSIM — Clínica Universitaria de Salud Integral
+Menstrual. Cambian el nombre visible, las siglas, los títulos, el logo y la
+forma en que el servicio se refiere a sí mismo: donde decía "el Centro" ahora
+dice "la Clínica", con la concordancia de género corregida a mano. El orden de
+los reemplazos importa más de lo que parece: hacer "el Centro" antes que "del
+Centro" produce "dla Clínica", y cambiar el nombre largo sin el artículo produce
+"el Clínica Universitaria". Ambas cosas pasaron en el primer intento y están
+corregidas.
+
+Lo que NO se renombró, a propósito: el esquema de la base sigue siendo cusmsr,
+las edge functions siguen siendo cusmsr-*, los secretos conservan su nombre y
+los archivos SQL su ruta. Son identificadores internos; renombrarlos hoy
+rompería producción a cambio de nada que alguien pueda ver.
+
+El logo se rehízo, no se editó a mano. El emblema se conserva pixel por pixel
+—se recorta del archivo original y se vuelve a pegar— y sólo se redibujó el
+bloque de texto, que es donde vive el nombre. Las medidas salieron de medir el
+canal alfa del logo anterior banda por banda (siglas y 569-722, subtítulo
+748-856, filete 880-887, pie 912-945) para que la silueta no cambie. El
+subtítulo nuevo cabe en una línea donde el anterior necesitaba dos. Detalle que
+costó un intento: el pie "FES Iztacala · UNAM" lleva letra chica MUY espaciada;
+ajustarlo sólo por ancho da letras grandes y juntas, que es otro efecto, así que
+el tamaño se fija por el alto de caja y el interletrado se calcula para llegar
+al ancho original. El script queda en el repo del proyecto para poder repetirlo.
+
+En la portada, además:
+
+El pumita va anclado al MARGEN derecho, no al borde de la ventana. El contenido
+vive en una columna de 1180px centrada; pegado al borde, en cuanto la ventana
+baja de ~1500px se le encima al texto y se come el signo de apertura de cada
+pregunta. Con left:calc(50% + 580px) su borde izquierdo queda siempre 16px a la
+derecha de donde termina el texto, y el alto sale del mismo margen —menos 6px,
+para que del otro lado le queden también 16px al borde de la ventana. Abajo de
+1400px el margen ya no da y desaparece. Medido a 1920, 1600, 1440 y 1400: 16px
+de holgura de los dos lados en las cuatro, y cero choques con texto.
+
+Para presupuestar ese ancho hay que usar la relación del ARCHIVO (846x1200 =
+0.705), no la del dibujo (0.66): lo que ocupa espacio es la caja de la imagen,
+transparencias incluidas.
+
+Lleva pointer-events:none y queda por debajo del riel de navegación, así que
+nunca roba un clic. Y se desvanece cuando el pie entra en pantalla: ahí abajo
+están el aviso legal, el de privacidad y el acceso del personal, y una mascota
+encima de eso es una mascota tapando justo lo que no se debe tapar.
+
+Los tres logos —FES Iztacala, Ecosistema Digital y CUSIM— van al mismo tamaño
+VISIBLE, que no es lo mismo que la misma altura de CSS. Cada PNG trae distinta
+cantidad de transparencia alrededor del dibujo: medido sobre el canal alfa, el
+contenido ocupa 67.2% del alto del archivo en fesi-logo, 67.5% en
+logo-ecosistema-digital y 89.5% en el logo de la Clínica. Con la misma `height`
+el de la Clínica se vería un tercio más grande. Ahora hay una sola perilla,
+--lk, que es el alto del dibujo, y cada logo divide entre su propia fracción.
+Verificado en el navegador: los tres miden 84px de dibujo en el hero.
+
+Los archivos CUSMSR-*.png se dejan en su lugar por ahora; se pueden borrar una
+vez que se confirme que nada más los referencia.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01D3sxb7UQ7LZRE7fNeBTp7Z
+
