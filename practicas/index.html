@@ -56,6 +56,17 @@
   .muted{ color:var(--mut); font-size:13px; }
   .weather{ display:flex; align-items:center; gap:10px; font-size:14px; }
   .weather .t{ font-size:24px; font-weight:800; color:var(--navy); }
+  .modal-bg{ position:fixed; inset:0; background:rgba(6,16,30,.62); z-index:9999; display:flex; align-items:center; justify-content:center; padding:18px; }
+  .modal{ background:#fff; border-radius:18px; max-width:460px; width:100%; padding:22px; max-height:88vh; overflow:auto; box-shadow:0 30px 90px rgba(0,0,0,.4); }
+  .modal h3{ margin:0 0 10px; color:var(--navy); }
+  .modal p{ font-size:14px; line-height:1.55; }
+  .chk{ display:flex; gap:10px; align-items:flex-start; font-size:14px; margin:14px 0; }
+  .chk input{ width:auto; margin-top:3px; }
+  .btn:disabled{ opacity:.5; cursor:not-allowed; }
+  .aviso-txt{ font-size:13px; line-height:1.6; color:#334155; }
+  .aviso-txt h4{ margin:14px 0 4px; color:var(--navy); font-size:14px; }
+  .footlink{ background:none; border:none; color:var(--gold); text-decoration:underline; cursor:pointer; font:inherit; padding:0; }
+  footer .footlink{ color:var(--mut); }
   footer{ text-align:center; color:var(--mut); font-size:12px; margin-top:22px; }
 </style>
 </head>
@@ -125,7 +136,40 @@
     </div>
   </div>
 
-  <footer>Ecosistema Digital · FES Iztacala — herramienta de apoyo (datos por verificar)</footer>
+  <!-- Modal: consentimiento de ubicación -->
+  <div id="consentModal" class="modal-bg hidden" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h3>📍 Uso de tu ubicación</h3>
+      <p>Para mostrarte en el mapa y trazar tu ruta necesitamos tu ubicación. <b>Se procesa solo en tu teléfono; no la guardamos ni la enviamos a ningún servidor.</b> Si abres Google Maps o Moovit, tu ubicación se comparte con esos servicios bajo sus propias políticas.</p>
+      <label class="chk"><input type="checkbox" id="chkConsent"> He leído el <button type="button" class="footlink" id="verAviso">Aviso de privacidad</button> y autorizo el uso de mi ubicación.</label>
+      <button class="btn btn-gold" id="consentOk" disabled>Autorizar y ubicarme</button>
+      <button class="btn btn-out" id="consentNo">Ahora no</button>
+    </div>
+  </div>
+
+  <!-- Modal: aviso de privacidad -->
+  <div id="avisoModal" class="modal-bg hidden" role="dialog" aria-modal="true">
+    <div class="modal">
+      <h3>Aviso de privacidad simplificado</h3>
+      <div class="aviso-txt">
+        <p><b>Responsable:</b> Facultad de Estudios Superiores Iztacala, UNAM (Ecosistema Digital). <span class="muted">[completar área responsable y correo de contacto]</span></p>
+        <h4>¿Qué datos usamos y para qué?</h4>
+        <p>Tu <b>ubicación (geolocalización)</b>, únicamente con tu autorización, para mostrarte en el mapa y calcular la ruta a tu clínica de práctica.</p>
+        <h4>¿Dónde se procesa?</h4>
+        <p>Se procesa <b>localmente en tu dispositivo</b>. No se almacena en servidores de la Facultad ni se comparte, <b>salvo</b> cuando tú decides abrir Google Maps o Moovit: en ese momento tu ubicación se envía a esos servicios, sujetos a sus propias políticas.</p>
+        <h4>Lo que NO hacemos</h4>
+        <p>No creamos perfiles, no guardamos historial de ubicaciones ni datos sensibles.</p>
+        <h4>Tus derechos</h4>
+        <p>Puedes <b>revocar el permiso</b> de ubicación en tu navegador cuando quieras. Para ejercer tus derechos ARCO (acceso, rectificación, cancelación u oposición) contacta a [correo/área responsable].</p>
+        <h4>Marco legal</h4>
+        <p>Tratamos tus datos conforme a la Ley General de Protección de Datos Personales en Posesión de Sujetos Obligados.</p>
+        <p class="muted">Versión preliminar — revísalo con la Unidad de Transparencia / jurídico de la Facultad antes de publicar.</p>
+      </div>
+      <button class="btn btn-navy" id="avisoClose">Entendido</button>
+    </div>
+  </div>
+
+  <footer>Ecosistema Digital · FES Iztacala — herramienta de apoyo (datos por verificar) · <button class="footlink" id="footAviso">Aviso de privacidad</button></footer>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -226,17 +270,35 @@
     setTimeout(function(){ map.invalidateSize(); }, 120);
   }
 
+  var GEO_KEY = "practicas.geoConsent";
   function pedirUbicacion(){
     if(!navigator.geolocation){ alert("Tu navegador no permite ubicación."); return; }
+    var yaConsintio=false; try{ yaConsintio = localStorage.getItem(GEO_KEY)==="1"; }catch(e){}
+    if(yaConsintio){ geolocaliza(); return; }
+    var chk=$("chkConsent"); if(chk){ chk.checked=false; } var ok=$("consentOk"); if(ok){ ok.disabled=true; }
+    $("consentModal").classList.remove("hidden");
+  }
+  function geolocaliza(){
     navigator.geolocation.getCurrentPosition(function(pos){
       var la=pos.coords.latitude, ln=pos.coords.longitude;
       if(userMarker) map.removeLayer(userMarker);
       userMarker = L.circleMarker([la,ln],{ radius:9, color:"#2563EB", fillColor:"#2563EB", fillOpacity:.8 }).addTo(map).bindPopup("Estás aquí");
       map.fitBounds([[la,ln],[marker.getLatLng().lat, marker.getLatLng().lng]],{ padding:[40,40] });
-      // Google con origen real
       $("btnGoogle").href = "https://www.google.com/maps/dir/?api=1&origin="+la+","+ln+"&destination="+encodeURIComponent(curCli.direccion)+"&travelmode=transit";
     }, function(){ alert("No pudimos obtener tu ubicación. Puedes usar el botón de Moovit/Google."); }, { enableHighAccuracy:true, timeout:8000 });
   }
+  // Consentimiento + aviso de privacidad
+  (function wireConsent(){
+    var chk=$("chkConsent"), ok=$("consentOk"), no=$("consentNo");
+    if(chk&&ok){ chk.addEventListener("change", function(){ ok.disabled = !chk.checked; }); }
+    if(ok){ ok.addEventListener("click", function(){ if(!chk.checked) return; try{ localStorage.setItem(GEO_KEY,"1"); }catch(e){} $("consentModal").classList.add("hidden"); geolocaliza(); }); }
+    if(no){ no.addEventListener("click", function(){ $("consentModal").classList.add("hidden"); }); }
+    function showAviso(e){ if(e)e.preventDefault(); $("avisoModal").classList.remove("hidden"); }
+    var va=$("verAviso"), fa=$("footAviso"), ac=$("avisoClose");
+    if(va) va.addEventListener("click", showAviso);
+    if(fa) fa.addEventListener("click", showAviso);
+    if(ac) ac.addEventListener("click", function(){ $("avisoModal").classList.add("hidden"); });
+  })();
 
   async function clima(cli){
     try{
