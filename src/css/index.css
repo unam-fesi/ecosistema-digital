@@ -1681,13 +1681,13 @@ body.spa-locked { overflow: hidden; }
 @media(max-width:600px){ .spa-card-logo{ height:74px; } .mirc-logo{ height:40px; } }
 
 /* ============================================================
-   Card CUSMSR - Salud Menstrual, Sexual y Reproductiva
-   Logo del CUSMSR centrado sobre el card.
+   Card CUSIM - Clínica Universitaria de Salud Integral Menstrual
+   Logo de la CUSIM centrado sobre el card.
    ============================================================ */
-.card-cusmsr .cusmsr-logo{
+.card-cusim .cusim-logo{
   height:108px; width:auto; max-width:82%; object-fit:contain; display:block;
   margin:2px auto 16px; padding-bottom:14px; position:relative;
   filter:drop-shadow(0 4px 14px rgba(0,0,0,.22));
 }
-.card-cusmsr:hover{ box-shadow:0 26px 70px rgba(8,20,40,.42), 0 0 50px rgba(169,139,240,.22); }
-@media(max-width:600px){ .card-cusmsr .cusmsr-logo{ height:88px } }
+.card-cusim:hover{ box-shadow:0 26px 70px rgba(8,20,40,.42), 0 0 50px rgba(169,139,240,.22); }
+@media(max-width:600px){ .card-cusim .cusim-logo{ height:88px } }

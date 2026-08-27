@@ -106,8 +106,7 @@
   box-shadow:0 6px 30px rgba(8,20,40,.10);}
 
 /* ---------- 11. Scroll innovador en secciones (scroll-cine.js) ---------- */
-.cx-sec-progress{position:sticky;top:0;left:0;height:3px;width:0;z-index:50;border-radius:0 3px 3px 0;
-  background:var(--cx-grad-tech);box-shadow:0 0 12px rgba(56,189,248,.55);transition:width .08s linear;}
+.cx-sec-progress{display:none !important;}
 .cx-js .cx-depth{opacity:0;transform:translateY(34px) scale(.985);
   transition:opacity .75s var(--cx-ease),transform .75s var(--cx-ease);will-change:opacity,transform;}
 .cx-js .cx-depth.cx-depth-in{opacity:1;transform:none;}

@@ -152,7 +152,7 @@
   var scene = new THREE.Scene();
   scene.fog = new THREE.FogExp2(0x081627, 0.0022);
   var camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, 0.1, 5000);
-  camera.position.set(6, 62, 150);
+  camera.position.set(0, 72, 185);
   var renderer = new THREE.WebGLRenderer({ canvas:canvas, antialias:true, alpha:true });
   renderer.setPixelRatio(Math.min(devicePixelRatio||1, 2));
   renderer.setSize(innerWidth, innerHeight);
@@ -264,7 +264,8 @@
   function computeLayout(view){
     var bk, i, n, arr;
     if(view==='solar'){
-      CLINORDER.forEach(function(k){ var c=CLIN[k], p=geoXZ(c.lat,c.lng,240); setTarget(clinicMeshes[k], p.x,0,p.z); });
+      // triángulo fijo (no geográfico) para que las 3 CUSI no se encimen
+      CLINORDER.forEach(function(k,ci){ var ang=-Math.PI/2 + ci*(Math.PI*2/3), R=84; setTarget(clinicMeshes[k], Math.cos(ang)*R, 0, Math.sin(ang)*R); });
       bk=bucketMap(function(g){ return g.clinica+'|'+g.dayIndex; });
       groupsArr.forEach(function(g){ var c=clinicMeshes[g.clinica].userData.target; arr=bk[g.clinica+'|'+g.dayIndex]; i=arr.indexOf(g.code); n=arr.length;
         var r=11+g.dayIndex*4.2, ang=(i/n)*Math.PI*2 + g.dayIndex*0.6, y=(g.turno==='matutino'?3.4:-3.4);
@@ -384,7 +385,7 @@
     filt.ciclo=document.getElementById('fCiclo').value; filt.gen=document.getElementById('fGen').value; applyStyles(); }); });
   document.getElementById('bReset').addEventListener('click', function(){
     filt={dia:'',turno:'',ciclo:'',gen:''}; ['fDia','fTurno','fCiclo','fGen'].forEach(function(id){document.getElementById(id).value='';});
-    document.getElementById('q').value=''; deselect(); if(controls){ controls.target.set(0,4,0); } camera.position.set(6,62,150); });
+    document.getElementById('q').value=''; deselect(); if(controls){ controls.target.set(0,4,0); } camera.position.set(0,72,185); });
   document.getElementById('bRot').addEventListener('click', function(){ if(!controls) return; controls.autoRotate=!controls.autoRotate;
     this.textContent=(controls.autoRotate?'⏸':'▶')+' Giro auto'; });
   document.getElementById('cardX').addEventListener('click', deselect);
