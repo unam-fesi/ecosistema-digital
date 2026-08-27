@@ -85,14 +85,15 @@
   #map{ height:290px; border-radius:16px; margin-top:14px; border:1px solid var(--line); }
 
   /* ---- Pila de cartas (deck) ---- */
-  .deck{ position:relative; margin:0 0 30px; transition:height .32s var(--ease); }
+  .deck{ position:relative; margin:0 0 36px; }
   .deck::before, .deck::after{ content:''; position:absolute; inset:0; border-radius:20px; background:var(--panel);
-    border:1px solid var(--line); box-shadow:0 10px 26px rgba(15,35,64,.08); z-index:0; pointer-events:none; }
-  .deck::before{ transform:translateY(11px) scale(.972); opacity:.75; }
-  .deck::after{ transform:translateY(22px) scale(.944); opacity:.5; }
-  .deck-card{ position:absolute; top:0; left:0; width:100%; z-index:2; opacity:0; transform:translateY(16px);
+    border:1px solid var(--line); box-shadow:0 12px 30px rgba(15,35,64,.12); z-index:0; pointer-events:none; }
+  .deck::before{ transform:translateY(13px) scale(.966); opacity:.9; }
+  .deck::after{ transform:translateY(26px) scale(.932); opacity:.65; }
+  .deck-card{ position:absolute; top:0; left:0; width:100%; z-index:2; opacity:0; transform:translateY(14px);
     transition:transform .34s var(--ease), opacity .34s var(--ease); }
-  .deck-card .card{ margin:0; }
+  .deck-card.is-front{ position:relative; opacity:1; transform:translateY(0); }
+  .deck-card .card{ margin:0; position:relative; }
   .deck-nav{ display:flex; align-items:center; justify-content:center; gap:12px; margin:16px 0 4px; flex-wrap:wrap; }
   .deck-arrow{ width:42px; height:42px; flex:0 0 auto; border-radius:50%; border:1px solid var(--line); background:#fff;
     color:var(--navy); font-size:22px; line-height:1; cursor:pointer; box-shadow:0 4px 12px rgba(15,35,64,.08); transition:.15s; }
@@ -217,7 +218,7 @@
   <div class="deck" id="deck">
 
     <!-- Carta 0: buscador -->
-    <section class="deck-card active" data-title="Inicio">
+    <section class="deck-card is-front" data-title="Inicio">
       <div class="card">
         <h2 class="sec">🔎 Busca tu grupo</h2>
         <label for="grupo">Número de grupo (ej. 1101)</label>
@@ -537,18 +538,15 @@
     if(!deckCards.length) return;
     i=Math.max(0, Math.min(deckMax(), i));
     deckCards.forEach(function(c,idx){
-      var d=idx-i;
-      if(d===0){ c.style.transform='translateY(0)'; c.style.opacity='1'; c.style.zIndex=3; c.style.pointerEvents='auto'; }
-      else { c.style.transform='translateY('+(d>0?16:-16)+'px)'; c.style.opacity='0'; c.style.zIndex=1; c.style.pointerEvents='none'; }
+      c.classList.toggle('is-front', idx===i);
+      c.style.pointerEvents = (idx===i) ? 'auto' : 'none';
     });
     deckI=i;
-    var front=deckCards[i].querySelector('.card');
-    if(front){ $("deck").style.height=(front.offsetHeight+34)+'px'; }
     if(deckDotsWrap) Array.prototype.forEach.call(deckDotsWrap.querySelectorAll('button'), function(b,idx){
       b.classList.toggle('on', idx===i); b.classList.toggle('locked', idx>deckMax()); });
     if(deckPrevBtn) deckPrevBtn.disabled=(i===0);
     if(deckNextBtn) deckNextBtn.disabled=(i>=deckMax());
-    if(deckCards[i].querySelector('#map') && map){ setTimeout(function(){ try{ map.invalidateSize(); if(front) $("deck").style.height=(front.offsetHeight+34)+'px'; }catch(e){} }, 90); }
+    if(deckCards[i].querySelector('#map') && map){ setTimeout(function(){ try{ map.invalidateSize(); }catch(e){} }, 90); }
   }
   deckSetup();
 
