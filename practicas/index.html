@@ -263,7 +263,7 @@
     <div class="modal">
       <h3>Aviso de privacidad simplificado</h3>
       <div class="aviso-txt">
-        <p><b>Responsable:</b> Facultad de Estudios Superiores Iztacala, UNAM (Ecosistema Digital). <span class="muted">[completar área responsable y correo de contacto]</span></p>
+        <p><b>Responsable:</b> FES Iztacala, UNAM.</p>
         <h4>¿Qué datos usamos y para qué?</h4>
         <p>Tu <b>ubicación (geolocalización)</b>, únicamente con tu autorización, para mostrarte en el mapa y calcular la ruta a tu clínica de práctica.</p>
         <h4>¿Dónde se procesa?</h4>
@@ -271,10 +271,9 @@
         <h4>Lo que NO hacemos</h4>
         <p>No creamos perfiles, no guardamos historial de ubicaciones ni datos sensibles.</p>
         <h4>Tus derechos</h4>
-        <p>Puedes <b>revocar el permiso</b> de ubicación en tu navegador cuando quieras. Para ejercer tus derechos ARCO contacta a [correo/área responsable].</p>
+        <p>Puedes <b>revocar el permiso</b> de ubicación en tu navegador cuando quieras. Para ejercer tus derechos ARCO contacta a la FES Iztacala.</p>
         <h4>Marco legal</h4>
         <p>Tratamos tus datos conforme a la Ley General de Protección de Datos Personales en Posesión de Sujetos Obligados.</p>
-        <p class="muted">Versión preliminar — revísalo con la Unidad de Transparencia / jurídico de la Facultad antes de publicar.</p>
       </div>
       <button class="btn btn-navy" id="avisoClose">Entendido</button>
     </div>
@@ -317,9 +316,16 @@
   function client(){ if(!sb && window.supabase) sb=window.supabase.createClient(SB_URL, SB_ANON); return sb; }
   var fab=document.getElementById('pumaiFab'), panel=document.getElementById('pumaiPanel'), x=document.getElementById('pumaiClose'), hello=document.getElementById('pumaiHello');
   var msgs=document.getElementById('pumaiMsgs'), input=document.getElementById('pumaiInput'), send=document.getElementById('pumaiSend'), sugs=document.getElementById('pumaiSugs');
+  var initialMsgsHTML = msgs ? msgs.innerHTML : '';
+  function bindSugs(){ sugs=document.getElementById('pumaiSugs'); if(sugs) Array.prototype.forEach.call(sugs.querySelectorAll('button'), function(b){ b.addEventListener('click', function(){ ask(b.textContent); }); }); }
+  function resetChat(){ chatHist=[]; if(msgs) msgs.innerHTML=initialMsgsHTML; bindSugs(); }
   function setHello(){ if(hello) hello.hidden = !panel.hidden; }
-  if(fab) fab.addEventListener('click', function(){ panel.hidden=!panel.hidden; setHello(); if(!panel.hidden && input) setTimeout(function(){ input.focus(); },50); });
-  if(x) x.addEventListener('click', function(){ panel.hidden=true; setHello(); });
+  if(fab) fab.addEventListener('click', function(){
+    panel.hidden=!panel.hidden; setHello();
+    if(panel.hidden){ resetChat(); }
+    else { if(sugs) sugs.style.display=''; if(input) setTimeout(function(){ input.focus(); },50); }
+  });
+  if(x) x.addEventListener('click', function(){ panel.hidden=true; setHello(); resetChat(); });
   function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function inline(s){
     s=esc(s);
@@ -427,7 +433,7 @@
   }
   if(send) send.addEventListener('click', function(){ ask(input.value); });
   if(input) input.addEventListener('keydown', function(e){ if(e.key==='Enter') ask(input.value); });
-  if(sugs) Array.prototype.forEach.call(sugs.querySelectorAll('button'), function(b){ b.addEventListener('click', function(){ ask(b.textContent); }); });
+  bindSugs();
 })();
 </script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
