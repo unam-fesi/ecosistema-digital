@@ -83,6 +83,23 @@
   .salida .box b.hl{ color:var(--gold-ink); }
   .salida .box span{ font-size:11px; color:var(--mut); text-transform:uppercase; letter-spacing:.06em; }
   #map{ height:290px; border-radius:16px; margin-top:14px; border:1px solid var(--line); }
+
+  /* ---- Mazo de cartas (deck) ---- */
+  .deck{ position:relative; }
+  .deck-card{ position:absolute; top:0; left:0; width:100%; opacity:0; transform:translateX(28px); pointer-events:none;
+    transition:opacity .32s var(--ease), transform .32s var(--ease); }
+  .deck-card.active{ position:relative; opacity:1; transform:none; pointer-events:auto; }
+  .deck-card.back{ transform:translateX(-28px); }
+  .deck-nav{ display:flex; align-items:center; justify-content:center; gap:12px; margin:14px 0 4px; flex-wrap:wrap; }
+  .deck-arrow{ width:42px; height:42px; flex:0 0 auto; border-radius:50%; border:1px solid var(--line); background:#fff;
+    color:var(--navy); font-size:22px; line-height:1; cursor:pointer; box-shadow:0 4px 12px rgba(15,35,64,.08); transition:.15s; }
+  .deck-arrow:hover:not(:disabled){ border-color:var(--gold); color:var(--gold-ink); }
+  .deck-arrow:disabled{ opacity:.35; cursor:default; }
+  .deck-dots{ display:flex; gap:6px; flex-wrap:wrap; justify-content:center; }
+  .deck-dots button{ border:1px solid var(--line); background:#fff; color:var(--mut); font:600 11.5px 'Inter',sans-serif;
+    padding:5px 10px; border-radius:999px; cursor:pointer; transition:.15s; }
+  .deck-dots button.on{ background:var(--navy); color:#fff; border-color:var(--navy); }
+  @media(max-width:600px){ .deck-dots button{ font-size:0; padding:0; width:10px; height:10px; border-radius:50%; } }
   .leaflet-container{ background:#eef2f7; }
 
   .ruta{ border:1px solid var(--line); border-radius:16px; padding:15px; margin-top:13px; background:#fff;
@@ -203,48 +220,74 @@
   </div>
 
   <div id="resultado" class="hidden">
-    <div class="card" data-reveal>
-      <div class="clinica-hero" id="clinicaHero"></div>
-      <div class="salida" id="salidaBox"></div>
-      <div id="map"></div>
-      <button class="btn btn-gold" id="btnGoogle">🧭 Cómo llegar (Google Maps)</button>
-      <p class="muted" style="margin:9px 2px 0;font-size:12px">⏱️ Google Maps calcula la ruta <b>desde la hora actual</b> y puede variar (o marcar tiempos largos si no hay transporte a esa hora). Guíate por tu <b style="color:#fde68a">hora de salida sugerida</b> de arriba para llegar a tiempo el día de tu práctica.</p>
+    <div class="deck" id="deck">
+
+      <!-- Carta 1: respuesta directa -->
+      <section class="deck-card active" data-title="Tu práctica">
+        <div class="card">
+          <div class="clinica-hero" id="clinicaHero"></div>
+          <div class="salida" id="salidaBox"></div>
+          <button class="btn btn-gold" id="btnGoogle">🧭 Cómo llegar (Google Maps)</button>
+          <p class="muted" style="margin:9px 2px 0;font-size:12px">⏱️ Google Maps calcula la ruta <b>desde la hora actual</b> y puede variar. Guíate por tu <b style="color:var(--gold-ink)">hora de salida sugerida</b> para llegar a tiempo el día de tu práctica.</p>
+        </div>
+      </section>
+
+      <!-- Carta 2: rutas -->
+      <section class="deck-card" data-title="Ruta">
+        <div class="card">
+          <h2 class="sec">🚏 Rutas sugeridas (transporte público)</h2>
+          <p class="muted" style="margin-top:-6px">Directas, con pocos transbordes y priorizando tu seguridad. <b style="color:var(--gold-ink)">Verifica antes de tu primer viaje.</b></p>
+          <div id="rutas"></div>
+        </div>
+      </section>
+
+      <!-- Carta 3: mapa -->
+      <section class="deck-card" data-title="Mapa">
+        <div class="card">
+          <h2 class="sec">🗺️ Mapa de tu clínica</h2>
+          <div id="map"></div>
+        </div>
+      </section>
+
+      <!-- Carta 4: clima -->
+      <section class="deck-card" data-title="Clima">
+        <div class="card">
+          <h2 class="sec">🌦️ El clima ese día temprano</h2>
+          <div class="weather" id="weather"><span class="muted">Consultando…</span></div>
+        </div>
+      </section>
+
+      <!-- Carta 5: seguridad -->
+      <section class="deck-card" data-title="Seguridad">
+        <div class="card">
+          <h2 class="sec">🎒 Antes de salir</h2>
+          <ul class="list">
+            <li>Bata y credencial UNAM.</li>
+            <li>Material de la práctica.</li>
+            <li>Tarjeta de transporte cargada (Metro/Suburbano) + efectivo para micro.</li>
+            <li>Carga tu celular y avisa a alguien tu ruta.</li>
+            <li>Sal con tiempo: más vale llegar antes que correr riesgos.</li>
+          </ul>
+          <h2 class="sec" style="margin-top:18px">🤝 Viaja acompañado</h2>
+          <p class="muted" style="margin:0">Ubica a compañeros de tu <b style="color:var(--navy)">mismo grupo</b> (van a la misma clínica el mismo día) y pónganse de acuerdo para viajar juntos desde una estación común.</p>
+          <div class="aviso" style="margin-top:14px">⚠️ Rutas y tiempos son una <b>guía en construcción</b>. Confírmalos y prioriza tu seguridad: evita tramos solitarios y mal iluminados, sobre todo de noche (turno vespertino). Si algo se ve inseguro, no lo tomes.</div>
+        </div>
+      </section>
+
+      <!-- Carta 6: emergencias -->
+      <section class="deck-card" data-title="Emergencias">
+        <div class="card">
+          <h2 class="sec">🆘 Emergencias</h2>
+          <div class="emg" id="emergencia"></div>
+        </div>
+      </section>
+
     </div>
 
-    <div class="card" data-reveal>
-      <h2 class="sec">🚏 Rutas sugeridas (transporte público)</h2>
-      <p class="muted" style="margin-top:-6px">Directas, con pocos transbordes y priorizando tu seguridad. <b style="color:#fde68a">Borrador — verifica antes de tu primer viaje.</b></p>
-      <div id="rutas"></div>
-    </div>
-
-    <div class="card" data-reveal>
-      <h2 class="sec">🌦️ El clima ese día temprano</h2>
-      <div class="weather" id="weather"><span class="muted">Consultando…</span></div>
-    </div>
-
-    <div class="card" data-reveal>
-      <h2 class="sec">🎒 Antes de salir</h2>
-      <ul class="list">
-        <li>Bata y credencial UNAM.</li>
-        <li>Material de la práctica.</li>
-        <li>Tarjeta de transporte cargada (Metro/Suburbano) + efectivo para micro.</li>
-        <li>Carga tu celular y avisa a alguien tu ruta.</li>
-        <li>Sal con tiempo: más vale llegar antes que correr riesgos.</li>
-      </ul>
-    </div>
-
-    <div class="card" data-reveal>
-      <h2 class="sec">🤝 Viaja acompañado</h2>
-      <p class="muted" style="margin:0">Ubica a compañeros de tu <b style="color:#fff">mismo grupo</b> (van a la misma clínica el mismo día) y pónganse de acuerdo para viajar juntos desde una estación común. Organícenlo entre ustedes.</p>
-    </div>
-
-    <div class="card" data-reveal>
-      <h2 class="sec">🆘 Emergencias</h2>
-      <div class="emg" id="emergencia"></div>
-    </div>
-
-    <div class="aviso" data-reveal>
-      ⚠️ Rutas y tiempos son una <b>guía en construcción</b>. Confírmalos y prioriza tu seguridad: evita tramos solitarios y mal iluminados, sobre todo de noche (turno vespertino). Si algo se ve inseguro, no lo tomes.
+    <div class="deck-nav">
+      <button class="deck-arrow" id="deckPrev" aria-label="Carta anterior">‹</button>
+      <div class="deck-dots" id="deckDots"></div>
+      <button class="deck-arrow" id="deckNext" aria-label="Carta siguiente">›</button>
     </div>
   </div>
 
@@ -462,6 +505,37 @@
   }
   function msg(t){ $("msg").textContent = t; }
 
+  // ---- Mazo de cartas (deck): swipe + flechas + puntitos ----
+  var deckI=0, deckCards=[], deckDotsWrap, deckPrevBtn, deckNextBtn;
+  function deckSetup(){
+    deckCards = Array.prototype.slice.call(document.querySelectorAll('#deck .deck-card'));
+    deckDotsWrap=$("deckDots"); deckPrevBtn=$("deckPrev"); deckNextBtn=$("deckNext");
+    if(!deckCards.length || !deckDotsWrap) return;
+    deckDotsWrap.innerHTML = deckCards.map(function(c,i){ return '<button data-i="'+i+'">'+c.getAttribute('data-title')+'</button>'; }).join("");
+    Array.prototype.forEach.call(deckDotsWrap.querySelectorAll('button'), function(b){ b.addEventListener('click', function(){ deckGo(+b.getAttribute('data-i')); }); });
+    if(deckPrevBtn) deckPrevBtn.addEventListener('click', function(){ deckGo(deckI-1); });
+    if(deckNextBtn) deckNextBtn.addEventListener('click', function(){ deckGo(deckI+1); });
+    var deck=$("deck"), x0=null, y0=null;
+    if(deck){
+      deck.addEventListener('touchstart', function(e){ var t=e.touches[0]; x0=t.clientX; y0=t.clientY; }, {passive:true});
+      deck.addEventListener('touchend', function(e){ if(x0===null) return; var t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0;
+        if(Math.abs(dx)>45 && Math.abs(dx)>Math.abs(dy)*1.4){ deckGo(deckI+(dx<0?1:-1)); } x0=null; }, {passive:true});
+    }
+    document.addEventListener('keydown', function(e){ if($("resultado").classList.contains('hidden')) return;
+      if(e.key==='ArrowRight') deckGo(deckI+1); else if(e.key==='ArrowLeft') deckGo(deckI-1); });
+  }
+  function deckGo(i){
+    if(!deckCards.length) return;
+    i=Math.max(0, Math.min(deckCards.length-1, i));
+    deckCards.forEach(function(c,idx){ c.classList.toggle('active', idx===i); c.classList.toggle('back', idx<i); });
+    if(deckDotsWrap) Array.prototype.forEach.call(deckDotsWrap.querySelectorAll('button'), function(b,idx){ b.classList.toggle('on', idx===i); });
+    if(deckPrevBtn) deckPrevBtn.disabled=(i===0);
+    if(deckNextBtn) deckNextBtn.disabled=(i===deckCards.length-1);
+    deckI=i;
+    if(deckCards[i].querySelector('#map') && map){ setTimeout(function(){ try{ map.invalidateSize(); }catch(e){} }, 70); }
+  }
+  deckSetup();
+
   function render(g, info){
     var cli = D.clinicas[info.clinica]; curCli = cli; userLL=null;
     var dia = info.dia || D.diaPractica || "por confirmar";
@@ -514,6 +588,7 @@
 
     clima(cli);
     $("resultado").classList.remove("hidden");
+    deckGo(0);
     revealAll();
     $("resultado").scrollIntoView({ behavior:"smooth", block:"start" });
   }
