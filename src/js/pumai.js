@@ -47,11 +47,26 @@ function pumaiSelectAction(action){
   }
 }
 
+function pumaiEsc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function pumaiInline(s){ s=pumaiEsc(s);
+  s=s.replace(/\[([^\]]+)\]\((https?:[^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+  s=s.replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
+  s=s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  s=s.replace(/`([^`]+)`/g,'<code>$1</code>');
+  return s; }
+function pumaiMd(md){ var lines=String(md).replace(/\r/g,'').split('\n'), html='', lt=null, li=[], para=[];
+  function fl(){ if(lt){ html+='<'+lt+'>'+li.map(function(x){return '<li>'+pumaiInline(x)+'</li>';}).join('')+'</'+lt+'>'; lt=null; li=[]; } }
+  function fp(){ if(para.length){ html+='<p>'+para.map(pumaiInline).join('<br>')+'</p>'; para=[]; } }
+  for(var i=0;i<lines.length;i++){ var ln=lines[i], h=ln.match(/^\s*(#{1,3})\s+(.*)/), ul=ln.match(/^\s*[-*•]\s+(.*)/), ol=ln.match(/^\s*\d+[.)]\s+(.*)/);
+    if(h){ fp(); fl(); html+='<div class="mh mh'+h[1].length+'">'+pumaiInline(h[2])+'</div>'; }
+    else if(ul){ fp(); if(lt&&lt!=='ul') fl(); lt='ul'; li.push(ul[1]); }
+    else if(ol){ fp(); if(lt&&lt!=='ol') fl(); lt='ol'; li.push(ol[1]); }
+    else if(ln.trim()===''){ fp(); fl(); } else { fl(); para.push(ln); } }
+  fp(); fl(); return html; }
 function addBotMsg(text){
   const m=document.createElement('div');
   m.className='msg msg-bot';
-  // Support simple line breaks
-  m.innerHTML=escapeHTML(text).replace(/\n/g,'<br>');
+  m.innerHTML=pumaiMd(text);
   document.getElementById('pumaiMessages').appendChild(m);
   scrollChat();
 }
