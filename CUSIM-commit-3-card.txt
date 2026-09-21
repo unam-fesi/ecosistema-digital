@@ -1,0 +1,20 @@
+CUSIM en el card de Nuevos Proyectos del portal
+
+El renombre anterior alcanzó al sitio /salud pero no al portal que lo enlaza:
+el card de la sección Nuevos Proyectos seguía apuntando a CUSMSR-logo.png y
+diciendo el nombre viejo en el título, en la descripción, en el alt de la imagen
+y en el aria-label del enlace.
+
+Cambia también el nombre de las clases —card-cusmsr y cusmsr-logo pasan a
+card-cusim y cusim-logo— en el marcado y en src/css/index.css, que es donde
+vive la regla que le da al logo sus 108px de alto. Renombrar sólo una de las
+dos partes habría dejado el logo sin estilo y a tamaño natural, que son 1536px
+de ancho: el card habría reventado.
+
+Verificado en el navegador: el card muestra "Salud Integral Menstrual", el logo
+carga desde CUSIM-logo.png y conserva su alto de 108px, y no quedan
+referencias a CUSMSR en el portal.
+
+Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01D3sxb7UQ7LZRE7fNeBTp7Z
+

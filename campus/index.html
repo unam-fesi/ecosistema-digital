@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Campus 3D · Cómo llegar a los edificios · FES Iztacala</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{ --navy:#0C2340; --navy2:#163A64; --gold:#C4A24E; --gold2:#f4d03f; --ink:#eaf1fb; --mut:#9fb2cc; --line:rgba(255,255,255,.14); }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; height:100%; background:radial-gradient(120% 120% at 50% 0%, #12315a 0%, #0a1a30 55%, #06101f 100%); color:var(--ink); font-family:'Inter',system-ui,sans-serif; overflow:hidden; }
+  #cv{ position:fixed; inset:0; display:block; touch-action:none; }
+  .ui{ position:fixed; z-index:5; }
+  .topbar{ top:0; left:0; right:0; display:flex; align-items:center; gap:12px; padding:12px 16px; flex-wrap:wrap;
+           background:linear-gradient(180deg, rgba(6,16,31,.72), rgba(6,16,31,0)); pointer-events:none; }
+  .topbar > *{ pointer-events:auto; }
+  .title{ font-family:'Sora',sans-serif; font-weight:800; font-size:15px; }
+  .title small{ display:block; font-family:'Inter'; font-weight:500; font-size:11px; color:var(--mut); }
+  .modes{ display:flex; gap:6px; margin-left:auto; }
+  .modes button{ font:600 12.5px 'Inter'; color:var(--ink); background:rgba(255,255,255,.06); border:1px solid var(--line);
+                 padding:7px 12px; border-radius:999px; cursor:pointer; }
+  .modes button.on{ background:linear-gradient(135deg,var(--gold),#a9863b); color:#231a06; border-color:transparent; }
+
+  .panel{ left:16px; top:74px; width:262px; max-width:calc(100vw - 32px); background:rgba(9,22,40,.85); backdrop-filter:blur(10px);
+          border:1px solid var(--line); border-radius:16px; padding:14px; box-shadow:0 18px 50px rgba(0,0,0,.42); }
+  .panel h4{ margin:2px 0 8px; font:700 12px 'Sora'; color:var(--gold); text-transform:uppercase; letter-spacing:.4px; }
+  .search{ display:flex; gap:6px; }
+  .search input{ flex:1; min-width:0; background:#0b1c34; border:1.5px solid var(--line); border-radius:10px; color:var(--ink); padding:9px 11px; font-size:14px; }
+  .search input:focus{ outline:none; border-color:var(--gold); }
+  .search button{ border:none; border-radius:10px; background:var(--gold); color:#231a06; font-weight:700; padding:0 13px; cursor:pointer; }
+  .quick{ display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .quick button{ font:600 11.5px 'Inter'; color:var(--ink); background:rgba(255,255,255,.05); border:1px solid var(--line); border-radius:8px; padding:6px 9px; cursor:pointer; }
+  .quick button:hover{ border-color:var(--gold); color:var(--gold2); }
+  .legend{ margin-top:12px; font-size:11.5px; color:var(--mut); line-height:1.7; border-top:1px solid var(--line); padding-top:9px; }
+  .legend .sw{ display:inline-block; width:11px; height:11px; border-radius:3px; margin-right:6px; vertical-align:-1px; }
+
+  .card{ left:16px; bottom:16px; width:270px; max-width:calc(100vw - 32px); background:rgba(9,22,40,.92); backdrop-filter:blur(10px);
+         border:1px solid var(--line); border-radius:16px; padding:14px; box-shadow:0 18px 50px rgba(0,0,0,.45); display:none; }
+  .card.on{ display:block; animation:pop .25s ease; }
+  @keyframes pop{ from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:none} }
+  .card .b{ font:800 17px 'Sora'; }
+  .card .meta{ display:flex; flex-wrap:wrap; gap:6px; margin:9px 0 0; }
+  .card .pill{ font-size:11.5px; padding:4px 9px; border-radius:999px; background:rgba(196,162,78,.14); border:1px solid rgba(196,162,78,.35); color:var(--gold2); }
+  .card .x{ position:absolute; top:9px; right:11px; cursor:pointer; color:var(--mut); background:none; border:none; font-size:15px; }
+
+  #tip{ position:fixed; z-index:8; pointer-events:none; background:rgba(6,16,31,.95); border:1px solid var(--gold);
+        border-radius:9px; padding:6px 10px; font-size:12.5px; display:none; box-shadow:0 8px 24px rgba(0,0,0,.5); }
+  #cross{ position:fixed; left:50%; top:50%; width:18px; height:18px; margin:-9px 0 0 -9px; z-index:7; display:none; pointer-events:none; }
+  #cross::before,#cross::after{ content:''; position:absolute; background:rgba(255,255,255,.85); }
+  #cross::before{ left:8px; top:0; width:2px; height:18px; } #cross::after{ top:8px; left:0; height:2px; width:18px; }
+  #fpHint{ position:fixed; z-index:7; bottom:18px; left:50%; transform:translateX(-50%); background:rgba(6,16,31,.9); border:1px solid var(--line);
+           border-radius:12px; padding:9px 14px; font-size:12.5px; color:var(--ink); display:none; text-align:center; }
+  #fpHint b{ color:var(--gold2); }
+  .fade{ position:fixed; z-index:9; inset:0; display:flex; align-items:center; justify-content:center; background:#06101f; color:var(--mut); font:600 14px 'Inter'; transition:opacity .5s; }
+  @media(max-width:620px){ .panel{ top:auto; bottom:92px; left:12px; right:12px; width:auto; max-height:42vh; overflow:auto; } .card{ left:12px; right:12px; width:auto; } .title small{ display:none; } }
+</style>
+</head>
+<body>
+<canvas id="cv"></canvas>
+
+<div class="ui topbar">
+  <div class="title">🏫 Campus 3D · FES Iztacala<small>Busca un edificio y te muestro cómo llegar — o camina el campus</small></div>
+  <div class="modes">
+    <button id="mGuia" class="on">🧭 Guía</button>
+    <button id="mWalk">🚶 Caminar</button>
+  </div>
+</div>
+
+<div class="ui panel">
+  <h4>¿A qué edificio vas?</h4>
+  <div class="search">
+    <input id="q" list="bldgs" placeholder="Ej. CUSI, Biblioteca, A1…" autocomplete="off">
+    <button id="qbtn">Ir</button>
+  </div>
+  <datalist id="bldgs"></datalist>
+  <div class="quick" id="quick"></div>
+  <div class="legend" id="legend"></div>
+</div>
+
+<div class="ui card" id="card">
+  <button class="x" id="cardX">✕</button>
+  <div class="b" id="cB"></div>
+  <div class="meta" id="cMeta"></div>
+</div>
+
+<div id="tip"></div>
+<div id="cross"></div>
+<div id="fpHint"><b>WASD</b> caminar · <b>Mouse</b> mirar · <b>Shift</b> correr · <b>ESC</b> salir</div>
+<div class="fade" id="fade">Cargando el campus 3D…</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+  "use strict";
+  var THREE = window.THREE;
+  var fade = document.getElementById('fade');
+  if(!THREE){ fade.textContent = 'No se pudo cargar Three.js.'; return; }
+
+  var canvas = document.getElementById('cv');
+  var scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0a1a30);
+  scene.fog = new THREE.Fog(0x0a1a30, 500, 1600);
+  var camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.5, 5000);
+  var renderer = new THREE.WebGLRenderer({ canvas:canvas, antialias:true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio||1, 2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.shadowMap.enabled = true;
+
+  scene.add(new THREE.HemisphereLight(0xbfd4ff, 0x3a5a2a, 0.85));
+  var sun = new THREE.DirectionalLight(0xffffff, 0.9);
+  sun.position.set(220, 400, 160); sun.castShadow = true;
+  sun.shadow.mapSize.set(2048,2048);
+  var sc = 500; sun.shadow.camera.left=-sc; sun.shadow.camera.right=sc; sun.shadow.camera.top=sc; sun.shadow.camera.bottom=-sc; sun.shadow.camera.far=1600;
+  scene.add(sun);
+
+  var controls = new THREE.OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true; controls.dampingFactor = 0.08;
+  controls.maxPolarAngle = Math.PI*0.49; controls.minDistance = 20; controls.maxDistance = 1400;
+
+  // helpers de proyección: pts ya están en metros locales. worldX=p0, worldZ=-p1
+  function centroid(pts){ var sx=0,sy=0; pts.forEach(function(p){ sx+=p[0]; sy+=p[1]; }); return [sx/pts.length, sy/pts.length]; }
+  function label(text){
+    var pad=8, f='bold 30px Inter,Arial', cv=document.createElement('canvas'), c=cv.getContext('2d');
+    c.font=f; var w=c.measureText(text).width+pad*2, h=42;
+    cv.width=w; cv.height=h; c.font=f; c.textAlign='center'; c.textBaseline='middle';
+    c.fillStyle='rgba(6,16,31,.82)'; roundRect(c,0,0,w,h,10); c.fill();
+    c.fillStyle='#fff'; c.shadowColor='rgba(0,0,0,.7)'; c.shadowBlur=4; c.fillText(text,w/2,h/2+1);
+    var tex=new THREE.CanvasTexture(cv); tex.minFilter=THREE.LinearFilter;
+    var s=new THREE.Sprite(new THREE.SpriteMaterial({map:tex, transparent:true, depthTest:false, depthWrite:false}));
+    s.scale.set(w*0.13, h*0.13, 1); s.renderOrder=10; return s;
+  }
+  function roundRect(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
+
+  var DATA=null, buildingMeshes=[], namedBuildings=[], labelSprites=[], entrance=null, ENTRANCE_NAME='Vigilancia, Servicio Médico y Cajas';
+  var COL={ bldg:0xE8DBC8, sel:0xC4A24E, road:0x64748b, pitch:0x3f8f5f, parking:0x556070, floor:0x24406a };
+
+  function heightFor(b){
+    var t=b.tags||{}, lv=parseFloat(t['building:levels']);
+    if(isFinite(lv)) return Math.max(4, lv*3.4);
+    var n=(b.name||''); if(/^[AL]\d/.test(n)) return 12; if(/CUSI|Cl[ií]nica|Gimnasio|Biblioteca|Gobierno|Bunker|Centro/i.test(n)) return 11;
+    return 8;
+  }
+
+  function polyShape(pts){ var s=new THREE.Shape(); pts.forEach(function(p,i){ i?s.lineTo(p[0],p[1]):s.moveTo(p[0],p[1]); }); return s; }
+  function flatPoly(pts, color, y, op){
+    var g=new THREE.ShapeGeometry(polyShape(pts)); g.rotateX(-Math.PI/2);
+    var m=new THREE.Mesh(g, new THREE.MeshStandardMaterial({ color:color, roughness:.95, transparent:op<1, opacity:op })); m.position.y=y; m.receiveShadow=true; return m;
+  }
+  function polyLine(pts, color, y){ var v=pts.map(function(p){ return new THREE.Vector3(p[0], y, -p[1]); });
+    return new THREE.Line(new THREE.BufferGeometry().setFromPoints(v), new THREE.LineBasicMaterial({ color:color, transparent:true, opacity:.75 })); }
+
+  function build(){
+    // suelo base
+    var ground=new THREE.Mesh(new THREE.PlaneGeometry(4000,4000), new THREE.MeshStandardMaterial({ color:0x0e2340, roughness:1 }));
+    ground.rotation.x=-Math.PI/2; ground.position.y=-0.2; ground.receiveShadow=true; scene.add(ground);
+
+    // piso del campus (boundary)
+    if(DATA.campus_boundary && DATA.campus_boundary.length>2){
+      scene.add(flatPoly(DATA.campus_boundary, COL.floor, 0.02, 0.9));
+      scene.add(polyLine(DATA.campus_boundary.concat([DATA.campus_boundary[0]]), 0x2E7D32, 0.15));
+    }
+    // canchas y estacionamientos
+    (DATA.pitches||[]).forEach(function(p){ if(p.pts&&p.pts.length>2) scene.add(flatPoly(p.pts, COL.pitch, 0.05, .9)); });
+    (DATA.parking||[]).forEach(function(p){ if(p.pts&&p.pts.length>2) scene.add(flatPoly(p.pts, COL.parking, 0.05, .9)); });
+    // calles
+    (DATA.roads||[]).forEach(function(r){ if(r.pts&&r.pts.length>1) scene.add(polyLine(r.pts, COL.road, 0.1)); });
+
+    // edificios
+    (DATA.buildings||[]).forEach(function(b){
+      if(!b.pts || b.pts.length<3) return;
+      var h=heightFor(b);
+      var geo=new THREE.ExtrudeGeometry(polyShape(b.pts), { depth:h, bevelEnabled:false }); geo.rotateX(-Math.PI/2);
+      var mat=new THREE.MeshStandardMaterial({ color:COL.bldg, roughness:.85 });
+      var mesh=new THREE.Mesh(geo, mat); mesh.castShadow=true; mesh.receiveShadow=true;
+      var ctr=centroid(b.pts);
+      mesh.userData={ isBuilding:true, name:b.name||'', h:h, cx:ctr[0], cz:-ctr[1], baseColor:COL.bldg };
+      scene.add(mesh); buildingMeshes.push(mesh);
+      if(b.name && b.name.trim()){
+        namedBuildings.push({ name:b.name, mesh:mesh, cx:ctr[0], cz:-ctr[1], h:h });
+        var sp=label(b.name); sp.position.set(ctr[0], h+6, -ctr[1]); sp.userData={base:h+6}; scene.add(sp); labelSprites.push(sp);
+        if(b.name===ENTRANCE_NAME) entrance={ x:ctr[0], z:-ctr[1] };
+      }
+    });
+    if(!entrance && namedBuildings.length) entrance={ x:namedBuildings[0].cx, z:namedBuildings[0].cz };
+
+    // marca de acceso
+    var pin=new THREE.Mesh(new THREE.ConeGeometry(4,12,16), new THREE.MeshStandardMaterial({ color:0x22c55e, emissive:0x0f5c2e, emissiveIntensity:.4 }));
+    pin.position.set(entrance.x, 6, entrance.z); pin.rotation.x=Math.PI; scene.add(pin);
+    var el=label('🚪 Acceso'); el.position.set(entrance.x, 16, entrance.z); scene.add(el);
+  }
+
+  // ---- ruta ----
+  var routeLine=null, routeDot=null, routeLabel=null, selected=null;
+  function clearRoute(){ [routeLine,routeDot,routeLabel].forEach(function(o){ if(o){ scene.remove(o); } }); routeLine=routeDot=routeLabel=null; }
+  function goTo(name){
+    var b=namedBuildings.find(function(x){ return x.name.toLowerCase()===String(name).toLowerCase(); });
+    if(!b){ b=namedBuildings.find(function(x){ return x.name.toLowerCase().indexOf(String(name).toLowerCase())>=0; }); }
+    if(!b) return false;
+    selectBuilding(b);
+    return true;
+  }
+  function selectBuilding(b){
+    // reset color previo
+    buildingMeshes.forEach(function(m){ m.material.color.setHex(m.userData.baseColor); m.material.emissive && m.material.emissive.setHex(0x000000); });
+    b.mesh.material.color.setHex(COL.sel); b.mesh.material.emissive=new THREE.Color(0x5a4410);
+    selected=b; clearRoute();
+    // línea de ruta directa acceso -> edificio
+    var a=new THREE.Vector3(entrance.x, 2, entrance.z), c=new THREE.Vector3(b.cx, 2, b.cz);
+    var mid=a.clone().add(c).multiplyScalar(0.5); mid.y=18;
+    var curve=new THREE.QuadraticBezierCurve3(a, mid, c);
+    routeLine=new THREE.Mesh(new THREE.TubeGeometry(curve, 40, 1.4, 8, false), new THREE.MeshBasicMaterial({ color:0xf4d03f }));
+    scene.add(routeLine);
+    routeDot=new THREE.Mesh(new THREE.SphereGeometry(3,16,12), new THREE.MeshBasicMaterial({ color:0xffffff })); scene.add(routeDot);
+    routeDot.userData={ curve:curve, t:0 };
+    var dist=Math.round(Math.hypot(b.cx-entrance.x, b.cz-entrance.z));
+    routeLabel=label('~'+dist+' m · ~'+Math.max(1,Math.round(dist/78))+' min'); routeLabel.position.copy(mid).add(new THREE.Vector3(0,6,0)); scene.add(routeLabel);
+    // info card
+    document.getElementById('cB').textContent=b.name;
+    document.getElementById('cMeta').innerHTML='<span class="pill">📍 desde el Acceso</span><span class="pill">~'+dist+' m</span><span class="pill">~'+Math.max(1,Math.round(dist/78))+' min a pie</span>';
+    document.getElementById('card').classList.add('on');
+    // volar cámara
+    flyTo(b);
+  }
+
+  // ---- cámara guiada ----
+  var flyT=null;
+  function flyTo(b){
+    var target=new THREE.Vector3(b.cx, b.h*0.5, b.cz);
+    var dir=new THREE.Vector3(b.cx-entrance.x, 0, b.cz-entrance.z); if(dir.length()<1) dir.set(1,0,1); dir.normalize();
+    var camPos=target.clone().add(new THREE.Vector3(-dir.x*90 + 40, 130, -dir.z*90 + 40));
+    flyT={ camFrom:camera.position.clone(), camTo:camPos, tgtFrom:controls.target.clone(), tgtTo:target, t:0 };
+  }
+
+  function frameCampus(){
+    var box=new THREE.Box3(); buildingMeshes.forEach(function(m){ box.expandByObject(m); });
+    var c=box.getCenter(new THREE.Vector3()), s=box.getSize(new THREE.Vector3());
+    controls.target.copy(c);
+    camera.position.set(c.x + s.x*0.15, Math.max(s.x,s.z)*0.9, c.z + s.z*0.75);
+  }
+
+  // ---- picking (modo guía) ----
+  var ray=new THREE.Raycaster(), mouse=new THREE.Vector2(), tip=document.getElementById('tip'), hovered=null;
+  function onMove(e){ if(fpActive) return; var t=(e.touches&&e.touches[0])||e;
+    mouse.x=(t.clientX/innerWidth)*2-1; mouse.y=-(t.clientY/innerHeight)*2+1;
+    ray.setFromCamera(mouse, camera); var hit=ray.intersectObjects(buildingMeshes,false);
+    if(hit.length && hit[0].object.userData.name){ hovered=hit[0].object; tip.style.display='block';
+      tip.style.left=(t.clientX+14)+'px'; tip.style.top=(t.clientY+14)+'px'; tip.textContent=hovered.userData.name; canvas.style.cursor='pointer';
+    } else { hovered=null; tip.style.display='none'; canvas.style.cursor='grab'; } }
+  function onClick(){ if(fpActive) return; if(hovered && hovered.userData.name){
+    var b=namedBuildings.find(function(x){ return x.mesh===hovered; }); if(b) selectBuilding(b); } }
+  canvas.addEventListener('mousemove', onMove);
+  canvas.addEventListener('click', onClick);
+
+  // ---- modo primera persona ----
+  var fpActive=false, keys={}, yaw=0, pitch=0, player=new THREE.Vector3();
+  var mGuia=document.getElementById('mGuia'), mWalk=document.getElementById('mWalk');
+  function enterFP(){
+    fpActive=true; mGuia.classList.remove('on'); mWalk.classList.add('on');
+    controls.enabled=false; document.getElementById('cross').style.display='block'; document.getElementById('fpHint').style.display='block';
+    player.set(entrance.x, 1.7, entrance.z);
+    yaw=Math.atan2(entrance.x, entrance.z); pitch=0; // mira hacia el centro del campus
+    canvas.requestPointerLock && canvas.requestPointerLock();
+  }
+  function exitFP(){
+    fpActive=false; mWalk.classList.remove('on'); mGuia.classList.add('on');
+    controls.enabled=true; document.getElementById('cross').style.display='none'; document.getElementById('fpHint').style.display='none';
+    if(document.pointerLockElement) document.exitPointerLock();
+    frameCampus();
+  }
+  mWalk.addEventListener('click', function(){ fpActive?exitFP():enterFP(); });
+  mGuia.addEventListener('click', function(){ if(fpActive) exitFP(); });
+  document.addEventListener('pointerlockchange', function(){ if(!document.pointerLockElement && fpActive){ /* soltó lock: sigue en FP con teclado */ } });
+  document.addEventListener('mousemove', function(e){ if(!fpActive || document.pointerLockElement!==canvas) return;
+    yaw -= e.movementX*0.0022; pitch -= e.movementY*0.0022; pitch=Math.max(-1.2, Math.min(1.2, pitch)); });
+  canvas.addEventListener('click', function(){ if(fpActive && document.pointerLockElement!==canvas) canvas.requestPointerLock && canvas.requestPointerLock(); });
+  document.addEventListener('keydown', function(e){ keys[e.code]=true; if(e.code==='Escape'&&fpActive) exitFP(); });
+  document.addEventListener('keyup', function(e){ keys[e.code]=false; });
+
+  // ---- UI ----
+  function wireUI(){
+    var dl=document.getElementById('bldgs');
+    namedBuildings.map(function(b){return b.name;}).sort().forEach(function(n){ var o=document.createElement('option'); o.value=n; dl.appendChild(o); });
+    function search(){ var v=document.getElementById('q').value.trim(); if(v && !goTo(v)){ document.getElementById('q').style.borderColor='#e0564f'; } }
+    document.getElementById('qbtn').addEventListener('click', search);
+    document.getElementById('q').addEventListener('keydown', function(e){ if(e.key==='Enter') search(); });
+    document.getElementById('q').addEventListener('input', function(){ this.style.borderColor=''; if(namedBuildings.some(function(b){return b.name===this.value;}.bind(this))) goTo(this.value); });
+    var faves=['CUSI','Biblioteca','Gimnasio Central','Edificio de Gobierno (Bunker)','Idiomas','A1','L1'];
+    var qk=document.getElementById('quick');
+    faves.forEach(function(n){ if(namedBuildings.some(function(b){return b.name===n;})){ var btn=document.createElement('button'); btn.textContent=n; btn.addEventListener('click', function(){ goTo(n); }); qk.appendChild(btn); } });
+    document.getElementById('cardX').addEventListener('click', function(){ document.getElementById('card').classList.remove('on'); });
+    document.getElementById('legend').innerHTML =
+      '<span><span class="sw" style="background:#E8DBC8"></span>Edificios</span> · <span><span class="sw" style="background:#C4A24E"></span>Tu destino</span><br>'+
+      '<span><span class="sw" style="background:#3f8f5f"></span>Canchas</span> · <span><span class="sw" style="background:#556070"></span>Estac.</span> · <span><span class="sw" style="background:#22c55e"></span>Acceso</span>';
+  }
+
+  // ---- carga ----
+  fetch('data/iztacala_campus.json').then(function(r){ return r.json(); }).then(function(j){
+    DATA=j; build(); wireUI(); frameCampus();
+    setTimeout(function(){ fade.style.opacity='0'; setTimeout(function(){ fade.style.display='none'; }, 550); }, 250);
+  }).catch(function(e){ fade.textContent='No pude cargar el mapa del campus ('+e+').'; });
+
+  // ---- loop ----
+  var clock=new THREE.Clock();
+  function animate(){
+    requestAnimationFrame(animate);
+    var dt=Math.min(0.05, clock.getDelta());
+    if(fpActive){
+      var sp=(keys['ShiftLeft']||keys['ShiftRight']?13:6.5)*dt;
+      var fwd=(keys['KeyW']||keys['ArrowUp']?1:0)-(keys['KeyS']||keys['ArrowDown']?1:0), strafe=(keys['KeyD']?1:0)-(keys['KeyA']?1:0);
+      if(fwd||strafe){ var sinY=Math.sin(yaw), cosY=Math.cos(yaw);
+        player.x += (-sinY*fwd + cosY*strafe)*sp; player.z += (-cosY*fwd - sinY*strafe)*sp; }
+      camera.position.copy(player); camera.rotation.set(pitch, yaw, 0, 'YXZ');
+    } else {
+      if(flyT){ flyT.t=Math.min(1, flyT.t+dt*1.1); var e=1-Math.pow(1-flyT.t,3);
+        camera.position.lerpVectors(flyT.camFrom, flyT.camTo, e); controls.target.lerpVectors(flyT.tgtFrom, flyT.tgtTo, e);
+        if(flyT.t>=1) flyT=null; }
+      controls.update();
+    }
+    if(routeDot && routeDot.userData.curve){ routeDot.userData.t=(routeDot.userData.t+dt*0.35)%1; routeDot.position.copy(routeDot.userData.curve.getPoint(routeDot.userData.t)); }
+    // etiquetas: se ocultan de lejos para no saturar (escala fija)
+    labelSprites.forEach(function(s){ s.visible = camera.position.distanceTo(s.position) < 560; });
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  addEventListener('resize', function(){ camera.aspect=innerWidth/innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+
+  // deep-link ?ir=CUSI
+  var qs=new URLSearchParams(location.search).get('ir'); if(qs){ var iv=setInterval(function(){ if(namedBuildings.length){ clearInterval(iv); goTo(qs); } }, 200); }
+})();
+</script>
+</body>
+</html>
