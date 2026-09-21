@@ -171,22 +171,23 @@
   .reveal.rx-r{ transform:translateX(46px) scale(.985); }
   .reveal.in{ opacity:1; transform:none; transition:opacity .7s var(--ease), transform .85s var(--ease); }
 
-  /* banda horizontal "Así se vive" (scroll horizontal ligado al vertical) */
-  .hgal{ position:relative; height:300vh; margin:46px 0; width:100vw; margin-left:calc(50% - 50vw); }
-  .hgal-sticky{ position:sticky; top:0; height:100vh; display:flex; align-items:center; overflow:hidden; }
-  .hgal-head{ position:absolute; top:42px; left:0; right:0; text-align:center; z-index:2; pointer-events:none; }
+  /* galería horizontal "Así se vive" (arrastrable + flechas + swipe) */
+  .hgal{ margin:48px 0; width:100vw; margin-left:calc(50% - 50vw); }
+  .hgal-head{ text-align:center; margin-bottom:16px; padding:0 18px; }
   .hgal-head span{ display:inline-block; font:700 12px 'Inter'; letter-spacing:.6px; text-transform:uppercase; color:var(--gold-ink); background:rgba(196,162,78,.12); border:1px solid rgba(196,162,78,.35); padding:6px 14px; border-radius:999px; }
   .hgal-head h2{ font-family:'Sora'; font-size:clamp(22px,3.5vw,32px); color:var(--navy); margin:10px 0 0; }
-  .hgal-track{ display:flex; gap:20px; padding:0 5vw; will-change:transform; }
-  .hgal-item{ position:relative; flex:0 0 auto; width:min(72vw,460px); height:62vh; border-radius:20px; overflow:hidden; box-shadow:0 22px 54px rgba(15,35,64,.24); }
-  .hgal-item img{ width:100%; height:100%; object-fit:cover; display:block; }
-  .hgal-item figcaption{ position:absolute; left:0; right:0; bottom:0; padding:28px 20px 18px; color:#fff; font:800 18px 'Sora'; background:linear-gradient(180deg,transparent,rgba(6,16,31,.85)); }
-  .hgal--static{ height:auto; margin:30px 0; }
-  .hgal--static .hgal-sticky{ position:static; height:auto; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; padding:8px 0 16px; display:block; white-space:nowrap; }
-  .hgal--static .hgal-head{ position:static; margin-bottom:14px; }
-  .hgal--static .hgal-track{ transform:none !important; }
-  .hgal--static .hgal-item{ scroll-snap-align:center; height:44vh; display:inline-block; vertical-align:top; }
-  @media(prefers-reduced-motion:reduce){ .hgal{ height:auto; } }
+  .hgal-wrap{ position:relative; }
+  .hgal-scroller{ display:flex; gap:18px; overflow-x:auto; scroll-snap-type:x mandatory; padding:6px 5vw 20px; scroll-behavior:smooth; cursor:grab; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+  .hgal-scroller::-webkit-scrollbar{ display:none; }
+  .hgal-scroller.drag{ cursor:grabbing; scroll-behavior:auto; }
+  .hgal-item{ position:relative; flex:0 0 auto; width:min(80vw,420px); height:300px; border-radius:20px; overflow:hidden; scroll-snap-align:center; box-shadow:0 18px 44px rgba(15,35,64,.2); }
+  .hgal-item img{ width:100%; height:100%; object-fit:cover; display:block; pointer-events:none; }
+  .hgal-item figcaption{ position:absolute; left:0; right:0; bottom:0; padding:26px 18px 16px; color:#fff; font:800 17px 'Sora'; background:linear-gradient(180deg,transparent,rgba(6,16,31,.85)); }
+  .hgal-btn{ position:absolute; top:50%; transform:translateY(-50%); z-index:3; width:46px; height:46px; border-radius:50%; border:none;
+    background:rgba(12,35,64,.9); color:#fff; font-size:22px; line-height:1; cursor:pointer; box-shadow:0 8px 20px rgba(0,0,0,.28); }
+  .hgal-btn:hover{ background:var(--navy2); }
+  .hgal-btn.prev{ left:14px; } .hgal-btn.next{ right:14px; }
+  @media(max-width:600px){ .hgal-btn{ display:none; } .hgal-item{ height:240px; } }
   @media(prefers-reduced-motion:reduce){ .reveal{opacity:1;transform:none} .hero,.hero .blob,.hslide.on{animation:none} }
 
   /* PUM-AI widget */
@@ -209,9 +210,13 @@
   #pumaiMsgs{ max-height:320px; overflow:auto; }
   .pumai-msg{ font-size:13.5px; line-height:1.5; padding:9px 12px; border-radius:12px; margin:8px 0; max-width:90%; word-wrap:break-word; }
   .pumai-msg.u{ background:#0C2340; color:#fff; margin-left:auto; border-bottom-right-radius:4px; white-space:pre-wrap; }
-  .pumai-msg.b{ background:var(--soft); color:#1E293B; border:1px solid var(--line); border-bottom-left-radius:4px; }
-  .pumai-msg.b a{ color:#0369A1; word-break:break-word; } .pumai-msg.b p{ margin:0 0 8px; } .pumai-msg.b p:last-child{ margin:0; }
-  .pumai-msg.b ul,.pumai-msg.b ol{ margin:6px 0; padding-left:20px; } .pumai-msg.b strong{ color:var(--navy); }
+  .pumai-msg.b{ background:linear-gradient(180deg,#ffffff,#f3f7fd); color:var(--navy); border:1px solid var(--line); border-left:3px solid var(--gold); border-bottom-left-radius:4px; }
+  .pumai-msg.b a{ color:var(--gold-ink); font-weight:600; word-break:break-word; } .pumai-msg.b p{ margin:0 0 8px; } .pumai-msg.b p:last-child{ margin:0; }
+  .pumai-msg.b ul,.pumai-msg.b ol{ margin:6px 0; padding-left:20px; } .pumai-msg.b li{ margin:3px 0; } .pumai-msg.b li::marker{ color:var(--gold); }
+  .pumai-msg.b strong{ color:var(--navy); font-weight:800; }
+  .pumai-msg.b .mh{ font-family:'Sora',sans-serif; color:var(--navy); font-weight:800; margin:8px 0 3px; }
+  .pumai-msg.b .mh1{ font-size:15px; } .pumai-msg.b .mh2{ font-size:14px; } .pumai-msg.b .mh3{ font-size:13px; color:var(--gold-ink); }
+  .pumai-msg.b code{ background:rgba(196,162,78,.14); color:var(--gold-ink); padding:1px 5px; border-radius:5px; font-size:12px; }
   .pumai-input{ display:flex; gap:8px; padding:0 14px 14px; }
   .pumai-input input{ flex:1; padding:11px 12px; font-size:14px; border-radius:12px; border:1.5px solid var(--line); }
   .pumai-input input:focus{ outline:none; border-color:var(--gold); }
@@ -443,9 +448,10 @@
 
   <!-- Banda horizontal "Así se vive el Ecosistema" -->
   <section class="hgal" id="hgal" aria-label="Galería de la comunidad">
-    <div class="hgal-sticky">
-      <div class="hgal-head"><span>Comunidad</span><h2>Así se vive el Ecosistema Digital</h2></div>
-      <div class="hgal-track" id="hgalTrack">
+    <div class="hgal-head"><span>Comunidad</span><h2>Así se vive el Ecosistema Digital</h2></div>
+    <div class="hgal-wrap">
+      <button class="hgal-btn prev" id="hgalPrev" aria-label="Anterior">‹</button>
+      <div class="hgal-scroller" id="hgalScroller">
         <figure class="hgal-item"><img src="../public/assets/img-hero.jpg" alt="" loading="lazy"><figcaption>Comunidad universitaria</figcaption></figure>
         <figure class="hgal-item"><img src="../public/assets/img-ecosistema.jpg" alt="" loading="lazy"><figcaption>Innovación y realidad virtual</figcaption></figure>
         <figure class="hgal-item"><img src="../public/assets/img-biblioteca.jpg" alt="" loading="lazy"><figcaption>Biblioteca Digital UNAM</figcaption></figure>
@@ -453,6 +459,7 @@
         <figure class="hgal-item"><img src="../public/assets/img-gemini.jpg" alt="" loading="lazy"><figcaption>Estudia con inteligencia artificial</figcaption></figure>
         <figure class="hgal-item"><img src="../public/assets/img-conectaia.jpg" alt="" loading="lazy"><figcaption>Herramientas de IA</figcaption></figure>
       </div>
+      <button class="hgal-btn next" id="hgalNext" aria-label="Siguiente">›</button>
     </div>
   </section>
 
@@ -546,8 +553,9 @@
   function mdToHtml(md){ var lines=String(md).replace(/\r/g,'').split('\n'), html='', lt=null, li=[], para=[];
     function fl(){ if(lt){ html+='<'+lt+'>'+li.map(function(x){return '<li>'+inline(x)+'</li>';}).join('')+'</'+lt+'>'; lt=null; li=[]; } }
     function fp(){ if(para.length){ html+='<p>'+para.map(inline).join('<br>')+'</p>'; para=[]; } }
-    for(var i=0;i<lines.length;i++){ var ln=lines[i], ul=ln.match(/^\s*[-*•]\s+(.*)/), ol=ln.match(/^\s*\d+[.)]\s+(.*)/);
-      if(ul){ fp(); if(lt&&lt!=='ul') fl(); lt='ul'; li.push(ul[1]); }
+    for(var i=0;i<lines.length;i++){ var ln=lines[i], h=ln.match(/^\s*(#{1,3})\s+(.*)/), ul=ln.match(/^\s*[-*•]\s+(.*)/), ol=ln.match(/^\s*\d+[.)]\s+(.*)/);
+      if(h){ fp(); fl(); html+='<div class="mh mh'+h[1].length+'">'+inline(h[2])+'</div>'; }
+      else if(ul){ fp(); if(lt&&lt!=='ul') fl(); lt='ul'; li.push(ul[1]); }
       else if(ol){ fp(); if(lt&&lt!=='ol') fl(); lt='ol'; li.push(ol[1]); }
       else if(ln.trim()===''){ fp(); fl(); } else { fl(); para.push(ln); } }
     fp(); fl(); return html; }
@@ -624,28 +632,38 @@
       if(lenis) lenis.scrollTo(el,{offset:-66}); else el.scrollIntoView({behavior:'smooth'}); });
   });
 
-  // 6) hero cinemático + banda horizontal ligados al scroll
+  // 6) hero cinemático ligado al scroll
   var hero=document.querySelector('.hero'), heroCar=document.getElementById('heroCar'), heroInner=document.querySelector('.hero-inner');
-  var hgal=document.getElementById('hgal'), track=document.getElementById('hgalTrack');
-  if(hgal && (reduce || window.innerWidth<760)) hgal.classList.add('hgal--static');
   var tick=false;
   function sfx(){
     tick=false;
+    if(reduce || !hero) return;
     var st=window.scrollY||document.documentElement.scrollTop||0;
-    if(!reduce && hero){ var hp=Math.min(1, st/(hero.offsetHeight||1));
-      if(heroCar) heroCar.style.transform='scale('+(1+hp*0.14).toFixed(3)+')';
-      if(heroInner){ heroInner.style.opacity=Math.max(0,1-hp*1.15).toFixed(3); heroInner.style.transform='translateY('+(hp*44).toFixed(1)+'px)'; } }
-    if(hgal && track && !hgal.classList.contains('hgal--static')){
-      var r=hgal.getBoundingClientRect(); var total=hgal.offsetHeight-window.innerHeight;
-      var prog=Math.min(1,Math.max(0,(-r.top)/(total||1)));
-      var max=track.scrollWidth - track.clientWidth; if(max<0) max=0;
-      track.style.transform='translateX('+(-prog*max).toFixed(1)+'px)';
-    }
+    var hp=Math.min(1, st/(hero.offsetHeight||1));
+    if(heroCar) heroCar.style.transform='scale('+(1+hp*0.14).toFixed(3)+')';
+    if(heroInner){ heroInner.style.opacity=Math.max(0,1-hp*1.15).toFixed(3); heroInner.style.transform='translateY('+(hp*44).toFixed(1)+'px)'; }
   }
   window.addEventListener('scroll', function(){ if(!tick){ requestAnimationFrame(sfx); tick=true; } }, {passive:true});
-  window.addEventListener('resize', function(){ if(hgal){ if(reduce||window.innerWidth<760) hgal.classList.add('hgal--static'); else hgal.classList.remove('hgal--static'); } sfx(); });
+  window.addEventListener('resize', sfx);
   if(lenis) lenis.on('scroll', function(){ if(!tick){ requestAnimationFrame(sfx); tick=true; } });
   sfx();
+
+  // 7) galería "Así se vive": arrastrar con mouse + flechas + swipe
+  var sc=document.getElementById('hgalScroller');
+  if(sc){
+    var down=false, sx=0, sl=0, moved=false;
+    sc.addEventListener('pointerdown', function(e){ down=true; moved=false; sc.classList.add('drag'); sx=e.clientX; sl=sc.scrollLeft; try{ sc.setPointerCapture(e.pointerId); }catch(_){} });
+    sc.addEventListener('pointermove', function(e){ if(!down) return; var dx=e.clientX-sx; if(Math.abs(dx)>4) moved=true; sc.scrollLeft=sl-dx; });
+    function end(){ down=false; sc.classList.remove('drag'); }
+    sc.addEventListener('pointerup', end); sc.addEventListener('pointercancel', end); sc.addEventListener('pointerleave', end);
+    sc.addEventListener('click', function(e){ if(moved){ e.preventDefault(); e.stopPropagation(); } }, true);
+    // rueda vertical -> desplazamiento horizontal
+    sc.addEventListener('wheel', function(e){ if(Math.abs(e.deltaY)>Math.abs(e.deltaX)){ sc.scrollLeft += e.deltaY; e.preventDefault(); } }, {passive:false});
+    var step=function(){ var it=sc.querySelector('.hgal-item'); return it? it.offsetWidth+18 : 340; };
+    var pv=document.getElementById('hgalPrev'), nx=document.getElementById('hgalNext');
+    if(pv) pv.addEventListener('click', function(){ sc.scrollBy({left:-step(), behavior:'smooth'}); });
+    if(nx) nx.addEventListener('click', function(){ sc.scrollBy({left:step(), behavior:'smooth'}); });
+  }
 })();
 </script>
 </body>
