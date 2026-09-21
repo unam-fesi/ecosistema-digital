@@ -125,11 +125,17 @@
   .card-banner{ position:relative; margin:-24px -24px 18px; height:172px; background-size:cover; background-position:center; }
   .card-banner::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(255,255,255,0) 45%, #fff 100%); }
   @media(max-width:600px){ .card-banner{ height:140px; } }
+  /* Ken Burns en el carrusel del hero */
+  @keyframes kb{ from{ transform:scale(1.03); } to{ transform:scale(1.12); } }
+  .hslide.on{ animation:kb 7s ease forwards; }
+  /* barra de progreso de scroll */
+  .scrollbar{ position:fixed; top:0; left:0; height:3px; width:0; z-index:9500;
+    background:linear-gradient(90deg,var(--gold),#f4d879); box-shadow:0 0 10px rgba(196,162,78,.6); }
 
   /* animación de aparición */
   .reveal{ opacity:0; transform:translateY(26px); }
   .reveal.in{ opacity:1; transform:none; transition:opacity .7s var(--ease), transform .7s var(--ease); }
-  @media(prefers-reduced-motion:reduce){ .reveal{opacity:1;transform:none} .hero,.hero .blob{animation:none} }
+  @media(prefers-reduced-motion:reduce){ .reveal{opacity:1;transform:none} .hero,.hero .blob,.hslide.on{animation:none} }
 
   /* PUM-AI widget */
   .pumai{ position:fixed; right:16px; bottom:16px; z-index:9000; display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
@@ -162,6 +168,7 @@
 </style>
 </head>
 <body>
+<div class="scrollbar" id="scrollbar"></div>
 
 <!-- ===== HERO ===== -->
 <header class="hero">
@@ -411,6 +418,25 @@
   var rev=document.querySelectorAll('.reveal');
   if(io){ rev.forEach(function(n,i){ n.style.transitionDelay=((i%3)*70)+'ms'; io.observe(n); }); }
   else rev.forEach(function(n){ n.classList.add('in'); });
+
+  // efectos: parallax en banners de tarjeta + barra de progreso de scroll
+  (function(){
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var bar=document.getElementById('scrollbar');
+    var banners=Array.prototype.slice.call(document.querySelectorAll('.card-banner'));
+    var ticking=false;
+    function upd(){
+      ticking=false;
+      var st=window.scrollY||document.documentElement.scrollTop||0;
+      var h=document.documentElement.scrollHeight-window.innerHeight;
+      if(bar) bar.style.width=(h>0?(st/h*100):0)+'%';
+      if(!reduce){ var vh=window.innerHeight;
+        banners.forEach(function(b){ var r=b.getBoundingClientRect(); if(r.bottom<-60||r.top>vh+60) return;
+          var prog=((r.top+r.height/2)-vh/2)/vh; b.style.backgroundPositionY=(50+prog*16)+'%'; }); }
+    }
+    window.addEventListener('scroll', function(){ if(!ticking){ requestAnimationFrame(upd); ticking=true; } }, {passive:true});
+    window.addEventListener('resize', upd); upd();
+  })();
 
   // hero: carrusel de fondo (auto + dots)
   (function(){
