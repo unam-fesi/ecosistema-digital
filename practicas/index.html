@@ -386,10 +386,11 @@
   function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
   function inline(s){
     s=esc(s);
-    s=s.replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
     s=s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
     s=s.replace(/(^|[^*])\*([^*\n]+)\*/g,'$1<em>$2</em>');
     s=s.replace(/`([^`]+)`/g,'<code>$1</code>');
+    s=s.replace(/\[([^\]]+)\]\((https?:[^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+    s=s.replace(/(^|[\s(])(https?:\/\/[^\s<)"']+)/g,function(m,p,u){ return p+'<a href="'+u+'" target="_blank" rel="noopener">'+u+'</a>'; });
     return s;
   }
   function mdToHtml(md){

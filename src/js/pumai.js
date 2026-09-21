@@ -50,10 +50,10 @@ function pumaiSelectAction(action){
 
 function pumaiEsc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function pumaiInline(s){ s=pumaiEsc(s);
-  s=s.replace(/\[([^\]]+)\]\((https?:[^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
-  s=s.replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
   s=s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
   s=s.replace(/`([^`]+)`/g,'<code>$1</code>');
+  s=s.replace(/\[([^\]]+)\]\((https?:[^)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');
+  s=s.replace(/(^|[\s(])(https?:\/\/[^\s<)"']+)/g,function(m,p,u){ return p+'<a href="'+u+'" target="_blank" rel="noopener">'+u+'</a>'; });
   return s; }
 function pumaiMd(md){ var lines=String(md).replace(/\r/g,'').split('\n'), html='', lt=null, li=[], para=[];
   function fl(){ if(lt){ html+='<'+lt+'>'+li.map(function(x){return '<li>'+pumaiInline(x)+'</li>';}).join('')+'</'+lt+'>'; lt=null; li=[]; } }
