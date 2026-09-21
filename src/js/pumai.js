@@ -10,6 +10,7 @@ const PUMAI_SYSTEM="Eres PUM-AI, el asistente virtual del Ecosistema Digital de 
 function toggleChat(){
   chatOpen=!chatOpen;
   document.getElementById('pumaiPanel').classList.toggle('open',chatOpen);
+  var _fab=document.getElementById('pumaiBtn'); if(_fab) _fab.classList.toggle('chatting',chatOpen);
   if(chatOpen && !document.getElementById('pumaiMessages').children.length){
     addBotMsg("¡Hola! Soy PUM-AI, tu asistente del Ecosistema Digital de la FES Iztacala. Selecciona una opción para comenzar:");
     showQuickActions();
