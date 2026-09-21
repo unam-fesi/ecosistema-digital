@@ -136,14 +136,22 @@
   .stat span{ display:block; margin-top:6px; font-size:12.5px; color:var(--mut); }
   @media(max-width:640px){ .stats{ grid-template-columns:repeat(2,1fr); } }
   /* tilt 3D */
-  .card{ transform-style:preserve-3d; }
-  /* blur-up de banners */
-  .card-banner{ filter:blur(14px); opacity:.5; transition:filter .7s var(--ease), opacity .7s var(--ease); }
-  .card-banner.loaded{ filter:none; opacity:1; }
+  .card{ transform-style:preserve-3d; background:linear-gradient(180deg,#ffffff 0%, #eef4fb 100%); }
+  /* imagen completa (sin recorte) con blur-up y fundido al fondo de la tarjeta */
+  .card-media{ position:relative; margin:-24px -24px 18px; border-radius:22px 22px 0 0; overflow:hidden; background:var(--soft); }
+  .card-media img{ width:100%; height:auto; display:block; filter:blur(16px); opacity:.5; transform:scale(1.03);
+    transition:filter .8s var(--ease), opacity .8s var(--ease), transform .8s var(--ease); }
+  .card-media img.loaded{ filter:none; opacity:1; transform:none; }
+  .card-media::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:34%; pointer-events:none;
+    background:linear-gradient(180deg, rgba(255,255,255,0), #ffffff); }
 
-  .card-banner{ position:relative; margin:-24px -24px 18px; height:172px; background-size:cover; background-position:center; }
-  .card-banner::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(255,255,255,0) 45%, #fff 100%); }
-  @media(max-width:600px){ .card-banner{ height:140px; } }
+  /* glassmorphism en los cuadros (pasos, mini-tarjetas, herramientas, cifras) */
+  .step, .mini-card, .tool, .stat{
+    background:linear-gradient(135deg, rgba(255,255,255,.55), rgba(255,255,255,.2)) !important;
+    -webkit-backdrop-filter:blur(9px) saturate(1.3); backdrop-filter:blur(9px) saturate(1.3);
+    border:1px solid rgba(255,255,255,.65) !important;
+    box-shadow:0 8px 22px rgba(15,35,64,.08), inset 0 1px 0 rgba(255,255,255,.75) !important; }
+  .step:hover, .mini-card:hover, .tool:hover{ border-color:rgba(196,162,78,.55) !important; }
   /* Ken Burns en el carrusel del hero */
   @keyframes kb{ from{ transform:scale(1.03); } to{ transform:scale(1.12); } }
   .hslide.on{ animation:kb 7s ease forwards; }
@@ -242,7 +250,7 @@
 
   <!-- Correo @iztacala -->
   <div class="card izta reveal">
-        <div class="card-banner" style="background-image:url(../public/assets/img-correo-izta.jpg)"></div>
+        <div class="card-media"><img src="../public/assets/img-correo-izta.jpg" alt="" loading="lazy"></div>
     <div class="card-top">
       <div class="svc-ico" style="background:rgba(12,122,75,.12)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0C7A4B" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
       <div>
@@ -276,7 +284,7 @@
 
   <!-- Ecosistema -->
   <div class="card izta reveal">
-        <div class="card-banner" style="background-image:url(../public/assets/img-ecosistema.jpg)"></div>
+        <div class="card-media"><img src="../public/assets/img-ecosistema.jpg" alt="" loading="lazy"></div>
     <div class="card-top">
       <div class="svc-ico" style="background:rgba(196,162,78,.14)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#9A7B1E" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4M5 5l3 3M16 16l3 3M19 5l-3 3M8 16l-3 3"/></svg></div>
       <div><h3>Ecosistema Digital FES Iztacala</h3><span class="mini izta"><img src="../public/assets/fesi-logo.png" onerror="this.style.display='none'"> FES Iztacala</span></div>
@@ -295,7 +303,7 @@
 
   <!-- BiDi -->
   <div class="card unam reveal">
-        <div class="card-banner" style="background-image:url(../public/assets/img-biblioteca.jpg)"></div>
+        <div class="card-media"><img src="../public/assets/img-biblioteca.jpg" alt="" loading="lazy"></div>
     <div class="card-top">
       <div class="svc-ico" style="background:rgba(30,64,175,.12)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 19V5"/></svg></div>
       <div><h3>Biblioteca Digital UNAM (BiDi)</h3><span class="mini unam"><img src="../public/assets/unam-escudo.svg" onerror="this.style.display='none'"> DGB · UNAM</span></div>
@@ -314,7 +322,7 @@
 
   <!-- Correo comunidad -->
   <div class="card unam reveal">
-        <div class="card-banner" style="background-image:url(../public/assets/img-comunidad.jpg)"></div>
+        <div class="card-media"><img src="../public/assets/img-comunidad.jpg" alt="" loading="lazy"></div>
     <div class="card-top">
       <div class="svc-ico" style="background:rgba(30,64,175,.12)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg></div>
       <div><h3>Correo @comunidad.unam.mx</h3><span class="mini unam"><img src="../public/assets/dgtic-logo.png" onerror="this.style.display='none'"> DGTIC · UNAM · Microsoft 365</span></div>
@@ -366,7 +374,7 @@
 
   <!-- Gemini -->
   <div class="card unam reveal">
-        <div class="card-banner" style="background-image:url(../public/assets/img-gemini.jpg)"></div>
+        <div class="card-media"><img src="../public/assets/img-gemini.jpg" alt="" loading="lazy"></div>
     <div class="card-top">
       <div class="svc-ico" style="background:rgba(124,92,255,.14)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6D4EF2" stroke-width="2"><path d="M12 3c1 5 4 8 9 9-5 1-8 4-9 9-1-5-4-8-9-9 5-1 8-4 9-9z"/></svg></div>
       <div><h3>Gemini Advanced para alumnos UNAM</h3><span class="mini unam"><img src="../public/assets/unam-escudo.svg" onerror="this.style.display='none'"> Google · UNAM · 1 año gratis</span></div>
@@ -392,7 +400,7 @@
 
   <!-- ConectaIA -->
   <div class="card unam reveal">
-        <div class="card-banner" style="background-image:url(../public/assets/img-conectaia.jpg)"></div>
+        <div class="card-media"><img src="../public/assets/img-conectaia.jpg" alt="" loading="lazy"></div>
     <div class="card-top">
       <div class="svc-ico" style="background:rgba(30,64,175,.12)"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>
       <div><h3>Conecta IA — catálogo de herramientas</h3><span class="mini unam"><img src="../public/assets/cuaed-logo.png" onerror="this.style.display='none'"> CUAED · UNAM</span></div>
@@ -556,13 +564,12 @@
     });
   }
 
-  // 4) blur-up de banners (precarga → enfoca)
-  Array.prototype.forEach.call(document.querySelectorAll('.card-banner'), function(b){
-    var m=(b.getAttribute('style')||'').match(/url\(([^)]+)\)/);
-    if(!m){ b.classList.add('loaded'); return; }
-    var img=new Image(); img.onload=function(){ b.classList.add('loaded'); }; img.onerror=function(){ b.classList.add('loaded'); }; img.src=m[1].replace(/["']/g,'');
+  // 4) blur-up de imágenes (enfoca al cargar)
+  Array.prototype.forEach.call(document.querySelectorAll('.card-media img'), function(im){
+    if(im.complete){ im.classList.add('loaded'); }
+    else { im.addEventListener('load', function(){ im.classList.add('loaded'); }); im.addEventListener('error', function(){ im.classList.add('loaded'); }); }
   });
-  setTimeout(function(){ Array.prototype.forEach.call(document.querySelectorAll('.card-banner:not(.loaded)'), function(b){ b.classList.add('loaded'); }); }, 2600);
+  setTimeout(function(){ Array.prototype.forEach.call(document.querySelectorAll('.card-media img:not(.loaded)'), function(im){ im.classList.add('loaded'); }); }, 2600);
 })();
 </script>
 </body>
