@@ -122,6 +122,25 @@
   .hcar-dots{ display:flex; gap:8px; justify-content:center; margin-top:18px; }
   .hcar-dots button{ width:9px; height:9px; border-radius:50%; border:none; background:rgba(255,255,255,.4); cursor:pointer; padding:0; transition:.3s; }
   .hcar-dots button.on{ background:var(--gold); width:22px; border-radius:999px; }
+  /* subnav pegajoso */
+  .subnav{ position:sticky; top:0; z-index:40; display:flex; gap:6px; justify-content:center; flex-wrap:wrap;
+    padding:10px; background:rgba(247,249,252,.9); backdrop-filter:blur(10px); border-bottom:1px solid var(--line); }
+  .subnav a{ text-decoration:none; font:700 12.5px 'Inter'; color:var(--mut); padding:8px 14px; border-radius:999px; border:1px solid transparent; transition:.2s; }
+  .subnav a:hover{ color:var(--navy); background:var(--soft); }
+  .subnav a.on{ color:#fff; background:linear-gradient(135deg,var(--navy2),var(--navy)); }
+  [id^="sec-"]{ scroll-margin-top:66px; }
+  /* franja de cifras (contadores) */
+  .stats{ display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin:28px 0 6px; }
+  .stat{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:18px 14px; text-align:center; box-shadow:0 8px 22px rgba(15,35,64,.06); }
+  .stat b{ display:block; font:800 30px 'Sora'; line-height:1; background:linear-gradient(120deg,var(--gold),#8a6d1a); -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; }
+  .stat span{ display:block; margin-top:6px; font-size:12.5px; color:var(--mut); }
+  @media(max-width:640px){ .stats{ grid-template-columns:repeat(2,1fr); } }
+  /* tilt 3D */
+  .card{ transform-style:preserve-3d; }
+  /* blur-up de banners */
+  .card-banner{ filter:blur(14px); opacity:.5; transition:filter .7s var(--ease), opacity .7s var(--ease); }
+  .card-banner.loaded{ filter:none; opacity:1; }
+
   .card-banner{ position:relative; margin:-24px -24px 18px; height:172px; background-size:cover; background-position:center; }
   .card-banner::after{ content:""; position:absolute; inset:0; background:linear-gradient(180deg, rgba(255,255,255,0) 45%, #fff 100%); }
   @media(max-width:600px){ .card-banner{ height:140px; } }
@@ -198,10 +217,24 @@
   </div>
 </header>
 
+<nav class="subnav" id="subnav">
+  <a href="#sec-izta" data-t="sec-izta">FES Iztacala</a>
+  <a href="#sec-unam" data-t="sec-unam">UNAM · DGTIC/CUAED/DGB</a>
+  <a href="#sec-contacto" data-t="sec-contacto">Contacto</a>
+</nav>
+
 <div class="wrap">
 
+  <div class="stats reveal" id="stats">
+    <div class="stat"><b data-count="1" data-suf=" TB">0</b><span>Almacenamiento @iztacala</span></div>
+    <div class="stat"><b data-count="50" data-suf=" GB">0</b><span>Correo @comunidad</span></div>
+    <div class="stat"><b data-count="12" data-suf=" meses">0</b><span>Gemini Advanced gratis</span></div>
+    <div class="stat"><b data-count="17" data-suf="+">0</b><span>Herramientas de IA (ConectaIA)</span></div>
+  </div>
+
+
   <!-- ============ FES IZTACALA ============ -->
-  <div class="sec-head reveal">
+  <div class="sec-head reveal" id="sec-izta">
     <span class="badge izta"><span class="dot" style="background:var(--izta)"></span> FES Iztacala</span>
     <h2>Servicios propios de tu Facultad</h2>
   </div>
@@ -254,7 +287,7 @@
   </div>
 
   <!-- ============ UNAM CENTRAL ============ -->
-  <div class="sec-head reveal" style="margin-top:56px">
+  <div class="sec-head reveal" id="sec-unam" style="margin-top:56px">
     <span class="badge unam"><span class="dot" style="background:var(--unam)"></span> UNAM</span>
     <h2>Servicios de la UNAM central</h2>
   </div>
@@ -376,7 +409,7 @@
   </div>
 
   <!-- Contacto -->
-  <div class="contacto reveal" style="background-image:linear-gradient(135deg,rgba(22,58,100,.86),rgba(12,35,64,.9)),url(../public/assets/img-contacto.jpg);background-size:cover;background-position:center">
+  <div class="contacto reveal" id="sec-contacto" style="background-image:linear-gradient(135deg,rgba(22,58,100,.86),rgba(12,35,64,.9)),url(../public/assets/img-contacto.jpg);background-size:cover;background-position:center">
     <h3>¿Dudas sobre estos servicios?</h3>
     <p style="margin:0;color:rgba(255,255,255,.85);font-size:14px;position:relative">Pregúntale a <b>PUM-AI</b> (abajo a la derecha). Si algo no lo sabe, escríbenos:</p>
     <a class="mail" href="mailto:ecosistemadigital@iztacala.unam.mx">ecosistemadigital@iztacala.unam.mx</a>
@@ -488,6 +521,48 @@
   if(send) send.addEventListener('click', function(){ ask(input.value); });
   if(input) input.addEventListener('keydown', function(e){ if(e.key==='Enter') ask(input.value); });
   bindSugs();
+})();
+</script>
+<script>
+(function(){
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // 1) contadores animados
+  var stats=document.getElementById('stats');
+  if(stats && 'IntersectionObserver' in window){
+    var so=new IntersectionObserver(function(es){ es.forEach(function(en){ if(!en.isIntersecting) return; so.disconnect();
+      stats.querySelectorAll('b[data-count]').forEach(function(el){ var target=+el.getAttribute('data-count'), suf=el.getAttribute('data-suf')||'', t0=null, dur=1100;
+        function step(ts){ if(!t0)t0=ts; var p=Math.min(1,(ts-t0)/dur); el.textContent=Math.round(target*(1-Math.pow(1-p,3)))+suf; if(p<1) requestAnimationFrame(step); }
+        requestAnimationFrame(step); }); }); }, {threshold:.4});
+    so.observe(stats);
+  } else if(stats){ stats.querySelectorAll('b[data-count]').forEach(function(el){ el.textContent=el.getAttribute('data-count')+(el.getAttribute('data-suf')||''); }); }
+
+  // 2) índice pegajoso: resaltar sección activa
+  var subnav=document.getElementById('subnav');
+  if(subnav && 'IntersectionObserver' in window){
+    var links={}; Array.prototype.forEach.call(subnav.querySelectorAll('a'), function(a){ links[a.getAttribute('data-t')]=a; });
+    var secObs=new IntersectionObserver(function(es){ es.forEach(function(en){ if(en.isIntersecting){ var id=en.target.id;
+      Object.keys(links).forEach(function(k){ links[k].classList.toggle('on', k===id); }); } }); }, {rootMargin:'-45% 0px -50% 0px'});
+    ['sec-izta','sec-unam','sec-contacto'].forEach(function(id){ var el=document.getElementById(id); if(el) secObs.observe(el); });
+  }
+
+  // 3) tilt 3D en tarjetas (solo mouse, sin reduced-motion)
+  if(!reduce && !(window.matchMedia && matchMedia('(hover: none)').matches)){
+    Array.prototype.forEach.call(document.querySelectorAll('.card'), function(c){
+      c.addEventListener('mousemove', function(e){ var r=c.getBoundingClientRect();
+        var px=(e.clientX-r.left)/r.width-0.5, py=(e.clientY-r.top)/r.height-0.5;
+        c.style.transform='perspective(900px) rotateX('+(-py*4).toFixed(2)+'deg) rotateY('+(px*4).toFixed(2)+'deg) translateY(-4px)'; });
+      c.addEventListener('mouseleave', function(){ c.style.transform=''; });
+    });
+  }
+
+  // 4) blur-up de banners (precarga → enfoca)
+  Array.prototype.forEach.call(document.querySelectorAll('.card-banner'), function(b){
+    var m=(b.getAttribute('style')||'').match(/url\(([^)]+)\)/);
+    if(!m){ b.classList.add('loaded'); return; }
+    var img=new Image(); img.onload=function(){ b.classList.add('loaded'); }; img.onerror=function(){ b.classList.add('loaded'); }; img.src=m[1].replace(/["']/g,'');
+  });
+  setTimeout(function(){ Array.prototype.forEach.call(document.querySelectorAll('.card-banner:not(.loaded)'), function(b){ b.classList.add('loaded'); }); }, 2600);
 })();
 </script>
 </body>
