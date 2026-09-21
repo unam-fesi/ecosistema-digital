@@ -159,9 +159,34 @@
   .scrollbar{ position:fixed; top:0; left:0; height:3px; width:0; z-index:9500;
     background:linear-gradient(90deg,var(--gold),#f4d879); box-shadow:0 0 10px rgba(196,162,78,.6); }
 
-  /* animación de aparición */
-  .reveal{ opacity:0; transform:translateY(26px); }
-  .reveal.in{ opacity:1; transform:none; transition:opacity .7s var(--ease), transform .7s var(--ease); }
+  /* scroll suave (Lenis) */
+  html.lenis, html.lenis body{ height:auto; }
+  .lenis.lenis-smooth{ scroll-behavior:auto !important; }
+  .lenis.lenis-smooth [data-lenis-prevent]{ overscroll-behavior:contain; }
+  .hero-carousel{ transform-origin:center center; }
+
+  /* animación de aparición (reveals direccionales) */
+  .reveal{ opacity:0; transform:translateY(30px) scale(.985); will-change:opacity,transform; }
+  .reveal.rx-l{ transform:translateX(-46px) scale(.985); }
+  .reveal.rx-r{ transform:translateX(46px) scale(.985); }
+  .reveal.in{ opacity:1; transform:none; transition:opacity .7s var(--ease), transform .85s var(--ease); }
+
+  /* banda horizontal "Así se vive" (scroll horizontal ligado al vertical) */
+  .hgal{ position:relative; height:300vh; margin:46px 0; width:100vw; margin-left:calc(50% - 50vw); }
+  .hgal-sticky{ position:sticky; top:0; height:100vh; display:flex; align-items:center; overflow:hidden; }
+  .hgal-head{ position:absolute; top:42px; left:0; right:0; text-align:center; z-index:2; pointer-events:none; }
+  .hgal-head span{ display:inline-block; font:700 12px 'Inter'; letter-spacing:.6px; text-transform:uppercase; color:var(--gold-ink); background:rgba(196,162,78,.12); border:1px solid rgba(196,162,78,.35); padding:6px 14px; border-radius:999px; }
+  .hgal-head h2{ font-family:'Sora'; font-size:clamp(22px,3.5vw,32px); color:var(--navy); margin:10px 0 0; }
+  .hgal-track{ display:flex; gap:20px; padding:0 5vw; will-change:transform; }
+  .hgal-item{ position:relative; flex:0 0 auto; width:min(72vw,460px); height:62vh; border-radius:20px; overflow:hidden; box-shadow:0 22px 54px rgba(15,35,64,.24); }
+  .hgal-item img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .hgal-item figcaption{ position:absolute; left:0; right:0; bottom:0; padding:28px 20px 18px; color:#fff; font:800 18px 'Sora'; background:linear-gradient(180deg,transparent,rgba(6,16,31,.85)); }
+  .hgal--static{ height:auto; margin:30px 0; }
+  .hgal--static .hgal-sticky{ position:static; height:auto; overflow-x:auto; scroll-snap-type:x mandatory; -webkit-overflow-scrolling:touch; padding:8px 0 16px; display:block; white-space:nowrap; }
+  .hgal--static .hgal-head{ position:static; margin-bottom:14px; }
+  .hgal--static .hgal-track{ transform:none !important; }
+  .hgal--static .hgal-item{ scroll-snap-align:center; height:44vh; display:inline-block; vertical-align:top; }
+  @media(prefers-reduced-motion:reduce){ .hgal{ height:auto; } }
   @media(prefers-reduced-motion:reduce){ .reveal{opacity:1;transform:none} .hero,.hero .blob,.hslide.on{animation:none} }
 
   /* PUM-AI widget */
@@ -416,6 +441,21 @@
     <a class="link-tramite" href="https://conectaia.cuaed.unam.mx/herramientas" target="_blank" rel="noopener"><span>🔗 Ver el catálogo Conecta IA<small>conectaia.cuaed.unam.mx/herramientas</small></span></a>
   </div>
 
+  <!-- Banda horizontal "Así se vive el Ecosistema" -->
+  <section class="hgal" id="hgal" aria-label="Galería de la comunidad">
+    <div class="hgal-sticky">
+      <div class="hgal-head"><span>Comunidad</span><h2>Así se vive el Ecosistema Digital</h2></div>
+      <div class="hgal-track" id="hgalTrack">
+        <figure class="hgal-item"><img src="../public/assets/img-hero.jpg" alt="" loading="lazy"><figcaption>Comunidad universitaria</figcaption></figure>
+        <figure class="hgal-item"><img src="../public/assets/img-ecosistema.jpg" alt="" loading="lazy"><figcaption>Innovación y realidad virtual</figcaption></figure>
+        <figure class="hgal-item"><img src="../public/assets/img-biblioteca.jpg" alt="" loading="lazy"><figcaption>Biblioteca Digital UNAM</figcaption></figure>
+        <figure class="hgal-item"><img src="../public/assets/img-comunidad.jpg" alt="" loading="lazy"><figcaption>Colaboración en línea</figcaption></figure>
+        <figure class="hgal-item"><img src="../public/assets/img-gemini.jpg" alt="" loading="lazy"><figcaption>Estudia con inteligencia artificial</figcaption></figure>
+        <figure class="hgal-item"><img src="../public/assets/img-conectaia.jpg" alt="" loading="lazy"><figcaption>Herramientas de IA</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
   <!-- Contacto -->
   <div class="contacto reveal" id="sec-contacto" style="background-image:linear-gradient(135deg,rgba(22,58,100,.86),rgba(12,35,64,.9)),url(../public/assets/img-contacto.jpg);background-size:cover;background-position:center">
     <h3>¿Dudas sobre estos servicios?</h3>
@@ -434,7 +474,7 @@
       <div><b>PUM-AI</b><span>Servicios digitales · FES Iztacala</span></div>
       <button class="pumai-x" id="pumaiClose" aria-label="Cerrar">✕</button>
     </div>
-    <div class="pumai-body" id="pumaiMsgs">
+    <div class="pumai-body" id="pumaiMsgs" data-lenis-prevent>
       <p class="pumai-hint">¡Hola! Soy PUM-AI. Te ayudo con los servicios digitales. Prueba:</p>
       <div class="pumai-q" id="pumaiSugs">
         <button>¿Cómo tramito mi correo @iztacala?</button>
@@ -457,7 +497,8 @@
     es.forEach(function(en){ if(en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
   }, { threshold:.12 }) : null;
   var rev=document.querySelectorAll('.reveal');
-  if(io){ rev.forEach(function(n,i){ n.style.transitionDelay=((i%3)*70)+'ms'; io.observe(n); }); }
+  if(io){ var ci=0; rev.forEach(function(n,i){ n.style.transitionDelay=((i%3)*70)+'ms';
+    if(n.classList.contains('card')){ n.classList.add(ci%2 ? 'rx-r' : 'rx-l'); ci++; } io.observe(n); }); }
   else rev.forEach(function(n){ n.classList.add('in'); });
 
   // efectos: parallax en banners de tarjeta + barra de progreso de scroll
@@ -531,6 +572,7 @@
   bindSugs();
 })();
 </script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1/dist/lenis.min.js"></script>
 <script>
 (function(){
   var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -570,6 +612,40 @@
     else { im.addEventListener('load', function(){ im.classList.add('loaded'); }); im.addEventListener('error', function(){ im.classList.add('loaded'); }); }
   });
   setTimeout(function(){ Array.prototype.forEach.call(document.querySelectorAll('.card-media img:not(.loaded)'), function(im){ im.classList.add('loaded'); }); }, 2600);
+
+  // 5) scroll suave (Lenis) + anclas suaves
+  var lenis=null;
+  if(!reduce && window.Lenis){
+    lenis=new Lenis({ duration:1.1, smoothWheel:true });
+    (function raf(t){ lenis.raf(t); requestAnimationFrame(raf); })(0);
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('a[href^="#"]'), function(a){
+    a.addEventListener('click', function(e){ var id=a.getAttribute('href'); if(!id||id.length<2) return; var el=document.querySelector(id); if(!el) return; e.preventDefault();
+      if(lenis) lenis.scrollTo(el,{offset:-66}); else el.scrollIntoView({behavior:'smooth'}); });
+  });
+
+  // 6) hero cinemático + banda horizontal ligados al scroll
+  var hero=document.querySelector('.hero'), heroCar=document.getElementById('heroCar'), heroInner=document.querySelector('.hero-inner');
+  var hgal=document.getElementById('hgal'), track=document.getElementById('hgalTrack');
+  if(hgal && (reduce || window.innerWidth<760)) hgal.classList.add('hgal--static');
+  var tick=false;
+  function sfx(){
+    tick=false;
+    var st=window.scrollY||document.documentElement.scrollTop||0;
+    if(!reduce && hero){ var hp=Math.min(1, st/(hero.offsetHeight||1));
+      if(heroCar) heroCar.style.transform='scale('+(1+hp*0.14).toFixed(3)+')';
+      if(heroInner){ heroInner.style.opacity=Math.max(0,1-hp*1.15).toFixed(3); heroInner.style.transform='translateY('+(hp*44).toFixed(1)+'px)'; } }
+    if(hgal && track && !hgal.classList.contains('hgal--static')){
+      var r=hgal.getBoundingClientRect(); var total=hgal.offsetHeight-window.innerHeight;
+      var prog=Math.min(1,Math.max(0,(-r.top)/(total||1)));
+      var max=track.scrollWidth - track.clientWidth; if(max<0) max=0;
+      track.style.transform='translateX('+(-prog*max).toFixed(1)+'px)';
+    }
+  }
+  window.addEventListener('scroll', function(){ if(!tick){ requestAnimationFrame(sfx); tick=true; } }, {passive:true});
+  window.addEventListener('resize', function(){ if(hgal){ if(reduce||window.innerWidth<760) hgal.classList.add('hgal--static'); else hgal.classList.remove('hgal--static'); } sfx(); });
+  if(lenis) lenis.on('scroll', function(){ if(!tick){ requestAnimationFrame(sfx); tick=true; } });
+  sfx();
 })();
 </script>
 </body>
